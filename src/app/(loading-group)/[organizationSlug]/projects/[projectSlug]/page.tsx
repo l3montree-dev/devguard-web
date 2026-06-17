@@ -4,17 +4,19 @@ import CustomPagination from "@/components/common/CustomPagination";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
+import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import Markdown from "react-markdown";
 import { toast } from "sonner";
 import useSWR from "swr";
 import AssetForm, {
   type AssetFormValues,
 } from "../../../../../components/asset/AssetForm";
+import AuthGuard from "../../../../../components/AuthGuard";
 import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import Page from "../../../../../components/Page";
@@ -28,16 +30,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../../../components/ui/dialog";
-import {
-  isOrganization,
-  useOrganization,
-} from "../../../../../context/OrganizationContext";
+import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { isAdmin, useCurrentUserRole } from "../../../../../hooks/useUserRole";
-import AuthGuard from "../../../../../components/AuthGuard";
 import { browserApiClient } from "../../../../../services/devGuardApi";
 import type {
   AssetDTO,
@@ -48,6 +46,7 @@ import type {
 } from "../../../../../types/api/api";
 import { RequirementsLevel } from "../../../../../types/api/api";
 
+import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
@@ -83,7 +82,7 @@ export default function RepositoriesPage() {
   const pushQuery = useRouterQuery();
 
   const swrUrl = (() => {
-    if (!isOrganization(organization.organization)) return null;
+    if (!organization.organization) return null;
     const orgSlug = decodeURIComponent(organization.organization.slug);
     if (isSearchActive) {
       return `/organizations/${orgSlug}/projects/search?parentId=${project?.id}&${queryWithState.toString()}`;
@@ -294,10 +293,12 @@ export default function RepositoriesPage() {
                     data-tour="create-subgroup-button"
                     variant={"secondary"}
                     onClick={() => setShowProjectModal(true)}
+                    data-testid="create-subgroup-button"
                   >
                     Create New Subgroup
                   </Button>
                   <Button
+                    data-testid="create-repository-button"
                     data-tour="create-repository-button"
                     onClick={() => setShowModal(true)}
                   >
@@ -423,6 +424,7 @@ export default function RepositoriesPage() {
               />
               <DialogFooter>
                 <Button
+                  data-testid="create-repository-submit-button"
                   isSubmitting={form.formState.isSubmitting}
                   type="submit"
                   variant="default"

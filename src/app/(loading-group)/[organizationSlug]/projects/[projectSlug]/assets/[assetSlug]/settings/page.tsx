@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import Alert from "../../../../../../../../components/common/Alert";
 import DangerZone from "../../../../../../../../components/common/DangerZone";
@@ -501,7 +501,12 @@ const Index: FunctionComponent = () => {
                     description="This action cannot be undone. All data associated with this repository will be deleted."
                     onConfirm={handleDeleteAsset}
                   >
-                    <Button variant={"destructive"}>Delete</Button>
+                    <Button
+                      variant={"destructive"}
+                      data-testid="delete-repository-button"
+                    >
+                      Delete
+                    </Button>
                   </Alert>
                 }
               />

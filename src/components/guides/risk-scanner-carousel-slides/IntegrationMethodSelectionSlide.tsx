@@ -69,7 +69,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               api?.scrollTo(fileUploadSlideIndex);
             }}
           >
-            <CardHeader>
+            <CardHeader data-testid="manual-upload-card">
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <DocumentArrowUpIcon className="inline-block mr-2 w-4 h-4" />
                 Upload manually

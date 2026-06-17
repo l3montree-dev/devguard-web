@@ -39,6 +39,7 @@ interface Props {
     href: string;
     Icon: React.ComponentType<{ className?: string }>;
     isActive?: boolean;
+    testId?: string;
   }> | null;
   z: number;
 }
@@ -86,6 +87,7 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
                 )}
                 key={item.title}
                 href={item.href}
+                data-testid={item.testId}
               >
                 {(item.isActive || pathname == item.href) && (
                   <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />

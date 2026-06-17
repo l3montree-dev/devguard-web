@@ -31,11 +31,14 @@ const Callout: FunctionComponent<CalloutProps> = ({
       className={classNames(
         "rounded-lg border p-3 text-sm",
         showIcon && "flex items-start gap-3",
-        intent === "info" && "border-info bg-info-muted text-info",
-        intent === "success" && "border-success bg-success-muted text-success",
-        intent === "warning" && "border-warning bg-warning-muted text-warning",
+        intent === "info" &&
+          "border-info bg-info-muted text-info-muted-foreground",
+        intent === "success" &&
+          "border-success bg-success-muted text-success-muted-foreground",
+        intent === "warning" &&
+          "border-warning bg-warning-muted text-warning-muted-foreground",
         intent === "danger" &&
-          "border-destructive bg-destructive-muted text-destructive",
+          "border-destructive bg-destructive-muted text-destructive-muted-foreground",
         intent === "neutral" && "border-border bg-muted text-muted-foreground",
       )}
     >

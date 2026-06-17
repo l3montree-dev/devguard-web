@@ -11,7 +11,7 @@ import {
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../context/AssetContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveProject } from "../hooks/useActiveProject";

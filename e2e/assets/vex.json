@@ -1,0 +1,3264 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "bom-ref": "pkg:devguard/testgirlab/git/playwright@main",
+      "type": "application",
+      "name": "pkg:devguard/testgirlab/git/playwright@main",
+      "purl": "pkg:devguard/testgirlab/git/playwright@main"
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "pkg:apk/alpine/busybox@1.37.0-r18",
+      "type": "library",
+      "name": "busybox",
+      "version": "1.37.0-r18",
+      "purl": "pkg:apk/alpine/busybox@1.37.0-r18"
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/c-ares@1.34.5-r0",
+      "type": "library",
+      "name": "c-ares",
+      "version": "1.34.5-r0",
+      "purl": "pkg:apk/alpine/c-ares@1.34.5-r0"
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/curl@8.14.1-r1",
+      "type": "library",
+      "name": "curl",
+      "version": "8.14.1-r1",
+      "purl": "pkg:apk/alpine/curl@8.14.1-r1"
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/musl@1.2.5-r10",
+      "type": "library",
+      "name": "musl",
+      "version": "1.2.5-r10",
+      "purl": "pkg:apk/alpine/musl@1.2.5-r10"
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/nghttp2@1.65.0-r0",
+      "type": "library",
+      "name": "nghttp2",
+      "version": "1.65.0-r0",
+      "purl": "pkg:apk/alpine/nghttp2@1.65.0-r0"
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/openssl@3.5.1-r0",
+      "type": "library",
+      "name": "openssl",
+      "version": "3.5.1-r0",
+      "purl": "pkg:apk/alpine/openssl@3.5.1-r0"
+    },
+    {
+      "bom-ref": "pkg:apk/alpine/zlib@1.3.1-r2",
+      "type": "library",
+      "name": "zlib",
+      "version": "1.3.1-r2",
+      "purl": "pkg:apk/alpine/zlib@1.3.1-r2"
+    },
+    {
+      "bom-ref": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5",
+      "type": "library",
+      "name": "v5",
+      "version": "v5.7.5",
+      "purl": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5"
+    },
+    {
+      "bom-ref": "pkg:golang/golang.org/x/crypto@v0.41.0",
+      "type": "library",
+      "name": "crypto",
+      "version": "v0.41.0",
+      "purl": "pkg:golang/golang.org/x/crypto@v0.41.0"
+    },
+    {
+      "bom-ref": "pkg:golang/golang.org/x/sys@v0.35.0",
+      "type": "library",
+      "name": "sys",
+      "version": "v0.35.0",
+      "purl": "pkg:golang/golang.org/x/sys@v0.35.0"
+    },
+    {
+      "bom-ref": "pkg:golang/stdlib@v1.25.0",
+      "type": "library",
+      "name": "stdlib",
+      "version": "v1.25.0",
+      "purl": "pkg:golang/stdlib@v1.25.0"
+    },
+    {
+      "bom-ref": "pkg:devguard/testgirlab/git/playwright@main",
+      "type": "application",
+      "name": "pkg:devguard/testgirlab/git/playwright@main",
+      "purl": "pkg:devguard/testgirlab/git/playwright@main"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "pkg:apk/alpine/busybox@1.37.0-r18",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/c-ares@1.34.5-r0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/curl@8.14.1-r1",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/musl@1.2.5-r10",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/nghttp2@1.65.0-r0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/openssl@3.5.1-r0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:apk/alpine/zlib@1.3.1-r2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/crypto@v0.41.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:golang/golang.org/x/sys@v0.35.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:golang/stdlib@v1.25.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:devguard/testgirlab/git/playwright@main",
+      "dependsOn": [
+        "pkg:apk/alpine/c-ares@1.34.5-r0",
+        "pkg:golang/github.com/jackc/pgx/v5@v5.7.5",
+        "pkg:apk/alpine/busybox@1.37.0-r18",
+        "pkg:apk/alpine/openssl@3.5.1-r0",
+        "pkg:apk/alpine/nghttp2@1.65.0-r0",
+        "pkg:golang/golang.org/x/crypto@v0.41.0",
+        "pkg:golang/golang.org/x/sys@v0.35.0",
+        "pkg:golang/stdlib@v1.25.0",
+        "pkg:apk/alpine/musl@1.2.5-r10",
+        "pkg:apk/alpine/zlib@1.3.1-r2",
+        "pkg:apk/alpine/curl@8.14.1-r1"
+      ]
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "id": "ALPINE-CVE-2025-9231",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-9231"
+      },
+      "ratings": [
+        {
+          "score": 6.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L"
+        },
+        {
+          "score": 1.5,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":6.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00038,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.5,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-3805",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-3805"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 3.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0.0003,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":3.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-10148",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-10148"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+        },
+        {
+          "score": 2.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00219,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5021",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5021"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5023",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5023"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-46394",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-46394"
+      },
+      "ratings": [
+        {
+          "score": 3.3,
+          "severity": "low",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N"
+        },
+        {
+          "score": 0.77,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":3.299999952316284,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0.77,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/busybox@1.37.0-r18"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-28390",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-28390"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.72,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.72,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4340",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4340"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00009,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4603",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4603"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4869",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4869"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4008",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4008"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00017,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4175",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4175"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00008,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4007",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4007"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.0002,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2024-58251",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2024-58251"
+      },
+      "ratings": [
+        {
+          "score": 2.5,
+          "severity": "low",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:L"
+        },
+        {
+          "score": 0.57,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":2.5,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0.57,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/busybox@1.37.0-r18"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-28389",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-28389"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.72,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.72,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-14524",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-14524"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+        },
+        {
+          "score": 2.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00026,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5037",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5037"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-31790",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-31790"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N"
+        },
+        {
+          "score": 1.72,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.72,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4134",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4134"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00046,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-3955",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-3955"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4772",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4772"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4771",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4771"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-22184",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-22184"
+      },
+      "ratings": [
+        {
+          "score": 7.8,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 1.77,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.800000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00006,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.77,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/zlib@1.3.1-r2"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-28388",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-28388"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.72,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.72,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-66199",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-66199"
+      },
+      "ratings": [
+        {
+          "score": 5.9,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.35,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.900000095367432,\"confidentialityRequirement\":\"M\",\"epss\":0.00114,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.35,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-22795",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-22795"
+      },
+      "ratings": [
+        {
+          "score": 5.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.27,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00048,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.27,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-3783",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-3783"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N"
+        },
+        {
+          "score": 2.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00028,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-10966",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-10966"
+      },
+      "ratings": [
+        {
+          "score": 4.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N"
+        },
+        {
+          "score": 2,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":4.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00033,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5005",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5005"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5017",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5017"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-69421",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-69421"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.72,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00128,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.72,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-1965",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-1965"
+      },
+      "ratings": [
+        {
+          "score": 6.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N"
+        },
+        {
+          "score": 3,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":6.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00073,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":3,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-14017",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-14017"
+      },
+      "ratings": [
+        {
+          "score": 6.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N"
+        },
+        {
+          "score": 2.9,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":6.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00003,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.9,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:H/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-14819",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-14819"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+        },
+        {
+          "score": 2.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00029,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-62408",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-62408"
+      },
+      "ratings": [
+        {
+          "score": 5.9,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 0.9,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.900000095367432,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0.9,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/c-ares@1.34.5-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5013",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5013"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-68160",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-68160"
+      },
+      "ratings": [
+        {
+          "score": 4.7,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.07,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":4.699999809265137,\"confidentialityRequirement\":\"M\",\"epss\":0.00042,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.07,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:H/PR:L/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-9232",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-9232"
+      },
+      "ratings": [
+        {
+          "score": 5.9,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.35,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.900000095367432,\"confidentialityRequirement\":\"M\",\"epss\":0.00069,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.35,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5018",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5018"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5024",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5024"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/sys@v0.35.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4865",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4865"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4013",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4013"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00012,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4006",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4006"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5039",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5039"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-22796",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-22796"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+        },
+        {
+          "score": 1.23,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.0052,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.23,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5006",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5006"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4342",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4342"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00043,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4009",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4009"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00042,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4012",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4012"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4014",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4014"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4155",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4155"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00019,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4982",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4982"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-6042",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-6042"
+      },
+      "ratings": [
+        {
+          "score": 4.8,
+          "severity": "medium",
+          "method": "CVSSv4",
+          "vector": "CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N"
+        },
+        {
+          "score": 0.55,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:U/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":4.800000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0.55,\"underAttack\":false,\"vector\":\"CVSS:4.0/AV:L/AC:L/AT:N/PR:L/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N/E:U/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/musl@1.2.5-r10"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5014",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5014"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4135",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4135"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00014,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-f6x5-jh6r-wrfv",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GHSA-f6x5-jh6r-wrfv"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+        },
+        {
+          "score": 2.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00014,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4947",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4947"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4870",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4870"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4977",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4977"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-15469",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-15469"
+      },
+      "ratings": [
+        {
+          "score": 5.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N"
+        },
+        {
+          "score": 1.27,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00007,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.27,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-69419",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-69419"
+      },
+      "ratings": [
+        {
+          "score": 7.4,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N"
+        },
+        {
+          "score": 1.7,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.400000095367432,\"confidentialityRequirement\":\"M\",\"epss\":0.00115,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.7,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5020",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5020"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5015",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5015"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4337",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4337"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00017,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4015",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4015"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00023,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5038",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5038"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-28387",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-28387"
+      },
+      "ratings": [
+        {
+          "score": 8.1,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 1.85,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":8.100000381469727,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.85,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-27171",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-27171"
+      },
+      "ratings": [
+        {
+          "score": 5.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.27,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00009,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.27,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/zlib@1.3.1-r2"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-9086",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-9086"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 3.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00275,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":3.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4602",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4602"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4946",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4946"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4976",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4976"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4980",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4980"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4981",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4981"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-40200",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-40200"
+      },
+      "ratings": [
+        {
+          "score": 8.1,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:H"
+        },
+        {
+          "score": 3.75,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":8.100000381469727,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":3.75,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/musl@1.2.5-r10"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-j88v-2chj-qfwx",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GHSA-j88v-2chj-qfwx"
+      },
+      "ratings": [
+        {
+          "score": 2.3,
+          "severity": "low",
+          "method": "CVSSv4",
+          "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N"
+        },
+        {
+          "score": 0.3,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":2.299999952316284,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0.3,\"underAttack\":false,\"vector\":\"CVSS:4.0/AV:N/AC:H/AT:P/PR:L/UI:N/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N/E:U/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4601",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4601"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4918",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4918"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-31789",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-31789"
+      },
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 2.25,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":9.800000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.25,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-15467",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-15467"
+      },
+      "ratings": [
+        {
+          "score": 8.8,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 2.08,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":8.800000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.02889,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.08,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-9230",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-9230"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.72,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00041,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.72,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-j5w8-q4qc-rx2x",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GHSA-j5w8-q4qc-rx2x"
+      },
+      "ratings": [
+        {
+          "score": 5.3,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+        },
+        {
+          "score": 2.45,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.300000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0.00046,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":2.45,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4341",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4341"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00045,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-3784",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-3784"
+      },
+      "ratings": [
+        {
+          "score": 6.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N"
+        },
+        {
+          "score": 3,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":6.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00025,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":3,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/curl@8.14.1-r1"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-27135",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-27135"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.15,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0.0003,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.15,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/nghttp2@1.65.0-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4986",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4986"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4971",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4971"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-69418",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-69418"
+      },
+      "ratings": [
+        {
+          "score": 4,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N"
+        },
+        {
+          "score": 0.92,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":4,\"confidentialityRequirement\":\"M\",\"epss\":0.00009,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0.92,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:U/C:L/I:L/A:N/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5019",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5019"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5033",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5033"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4011",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4011"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00034,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4010",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4010"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0.00024,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-69420",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-69420"
+      },
+      "ratings": [
+        {
+          "score": 7.5,
+          "severity": "high",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.74,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":7.5,\"confidentialityRequirement\":\"M\",\"epss\":0.01131,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.74,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "GHSA-9jj7-4m8r-rfcm",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GHSA-9jj7-4m8r-rfcm"
+      },
+      "ratings": [
+        {
+          "score": 9.8,
+          "severity": "critical",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+        },
+        {
+          "score": 4.5,
+          "severity": "medium",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":9.800000190734863,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":4.5,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "false_positive",
+        "response": [
+          "will_not_fix"
+        ],
+        "detail": "Marked as false positive via dependency graph: Does Not Call Vulnerable Function",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:34Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/github.com/jackc/pgx/v5@v5.7.5"
+        }
+      ],
+      "properties": [
+        {
+          "name": "devguard:pathPattern",
+          "value": "[\"*\",\"ROOT\",\"pkg:golang/github.com/jackc/pgx/v5@v5.7.5\"]"
+        },
+        {
+          "name": "firstResponded",
+          "value": "2026-06-08T09:55:34Z"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-5016",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-5016"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2025-4116",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2025-4116"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/golang.org/x/crypto@v0.41.0"
+        }
+      ]
+    },
+    {
+      "id": "GO-2026-4864",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/GO-2026-4864"
+      },
+      "ratings": [
+        {
+          "score": -1,
+          "severity": "low",
+          "method": "CVSSv4"
+        },
+        {
+          "score": 0,
+          "severity": "low",
+          "method": "DevGuard",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":-1,\"confidentialityRequirement\":\"M\",\"epss\":0,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":0,\"underAttack\":false,\"vector\":\"\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:golang/stdlib@v1.25.0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2026-2673",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2026-2673"
+      },
+      "ratings": [
+        {
+          "score": 6.5,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L"
+        },
+        {
+          "score": 1.5,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":6.5,\"confidentialityRequirement\":\"M\",\"epss\":0.00038,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.5,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:L/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-11187",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-11187"
+      },
+      "ratings": [
+        {
+          "score": 6.1,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:H"
+        },
+        {
+          "score": 1.4,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":6.099999904632568,\"confidentialityRequirement\":\"M\",\"epss\":0.00008,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.4,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:L/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    },
+    {
+      "id": "ALPINE-CVE-2025-15468",
+      "source": {
+        "name": "NVD",
+        "url": "https://nvd.nist.gov/vuln/detail/ALPINE-CVE-2025-15468"
+      },
+      "ratings": [
+        {
+          "score": 5.9,
+          "severity": "medium",
+          "method": "CVSSv31",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H"
+        },
+        {
+          "score": 1.35,
+          "severity": "low",
+          "method": "DevGuard",
+          "vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M",
+          "justification": "{\"availabilityRequirement\":\"M\",\"baseScore\":5.900000095367432,\"confidentialityRequirement\":\"M\",\"epss\":0.00046,\"exploitExists\":false,\"integrityRequirement\":\"M\",\"risk\":1.35,\"underAttack\":false,\"vector\":\"CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:U/RC:C/CR:M/IR:M/AR:M\",\"verifiedExploitExists\":false}"
+        }
+      ],
+      "analysis": {
+        "state": "in_triage",
+        "firstIssued": "2026-06-08T09:55:25Z",
+        "lastUpdated": "2026-06-08T09:55:25Z"
+      },
+      "affects": [
+        {
+          "ref": "pkg:apk/alpine/openssl@3.5.1-r0"
+        }
+      ]
+    }
+  ]
+}

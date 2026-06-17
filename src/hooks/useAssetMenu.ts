@@ -100,6 +100,7 @@ export const useAssetMenu = () => {
       } & RefAttributes<SVGSVGElement>
     >;
     isActive: boolean;
+    testId?: string;
   }> = [];
 
   if ((activeAsset?.refs?.length ?? 0) > 0) {
@@ -125,6 +126,7 @@ export const useAssetMenu = () => {
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events` ||
         pathname ===
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs`,
+      testId: "nav-asset-overview",
     });
 
     menu = menu.concat([
@@ -142,6 +144,7 @@ export const useAssetMenu = () => {
           "/dependency-risks",
         Icon: WrenchScrewdriverIcon,
         isActive: pathname.includes("dependency-risks"),
+        testId: "nav-asset-dependency-risks",
       },
       {
         title: "Code Risks",
@@ -157,6 +160,7 @@ export const useAssetMenu = () => {
           "/code-risks",
         Icon: CodeIcon,
         isActive: pathname.includes("code-risks"),
+        testId: "nav-asset-code-risks",
       },
       {
         title: "License Risks",
@@ -172,6 +176,7 @@ export const useAssetMenu = () => {
           "/license-risks",
         Icon: ScanText,
         isActive: pathname.includes("license-risks"),
+        testId: "nav-asset-license-risks",
       },
       {
         title: "Dependency Insights",
@@ -187,6 +192,7 @@ export const useAssetMenu = () => {
           "/dependencies",
         Icon: ShareIcon,
         isActive: pathname.includes("dependencies"),
+        testId: "nav-asset-dependency-insights",
       },
       {
         title: "VEX Rules",
@@ -202,6 +208,7 @@ export const useAssetMenu = () => {
           "/vex-rules",
         Icon: BookCheckIcon,
         isActive: pathname.includes("vex-rules"),
+        testId: "nav-asset-vex-rules",
       },
       {
         title: "Artifacts",
@@ -217,6 +224,7 @@ export const useAssetMenu = () => {
           "/artifacts",
         Icon: TextSelect,
         isActive: pathname.includes("artifacts"),
+        testId: "nav-asset-artifacts",
       },
     ]);
   } else {
@@ -230,6 +238,7 @@ export const useAssetMenu = () => {
         ) &&
         pathname !==
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
+      testId: "nav-asset-onboarding",
     });
   }
 
@@ -249,6 +258,7 @@ export const useAssetMenu = () => {
         isActive:
           pathname ===
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
+        testId: "repository-settings",
       },
     ]);
   }

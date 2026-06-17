@@ -106,6 +106,7 @@ export default function VexDownloadModal({
         </p>
         <div className="flex items-start justify-start gap-4 mt-2">
           <DelayedDownloadButton
+            data-testid="download-vex-json-format"
             href={
               pathname +
               `/../vex.json?${new URLSearchParams({

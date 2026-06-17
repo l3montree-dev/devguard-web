@@ -35,6 +35,7 @@ export function OryButton({
       value={attributes.value?.toString()}
       disabled={attributes.disabled || isSubmitting || passwordsMismatch}
       variant={node.group === "passkey" ? "default" : "secondary"}
+      data-testid={`${node.group}-submit`}
       onClick={(e) => {
         onClick?.(e);
         setClicked(true);

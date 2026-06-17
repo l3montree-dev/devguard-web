@@ -16,7 +16,7 @@ describe("OpenCode project handling", () => {
 
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
-    await devguardPOM.logout();
+    await devguardPOM.auth().logout();
     await devguardPOM.verifyOnDevGuardLoginURL();
   });
 
@@ -26,17 +26,6 @@ describe("OpenCode project handling", () => {
     await openCodePOM.logout();
 
     const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.logout();
+    await devguardPOM.auth().logout();
   });
-
-  /*
-  test('test bla', async ({ page }) => {
-    const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadDevGuard();
-    await devguardPOM.loginWithOpenCode();
-    await page.waitForTimeout(10_000);
-
-    // TODO.. do whatever here 
-  });
-  */
 });

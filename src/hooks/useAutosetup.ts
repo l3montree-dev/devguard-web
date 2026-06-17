@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 
 import { browserApiClient } from "@/services/devGuardApi";
-import type { PatWithPrivKey } from "@/types/api/api";
+import type { SeeOncePatWithPrivKey } from "@/types/api/api";
 import { once } from "lodash";
 import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
@@ -42,7 +42,7 @@ export function useAutosetup(
 
   const pat =
     personalAccessTokens.length > 0
-      ? (personalAccessTokens[0] as PatWithPrivKey)
+      ? (personalAccessTokens[0] as SeeOncePatWithPrivKey)
       : undefined;
 
   const [progress, setProgress] = useState<{
@@ -86,6 +86,7 @@ export function useAutosetup(
       if (asset?.externalEntityProviderId && !pendingAutosetup) {
         // we need to redirect the user to authorize the "autosetup" oauth2 application
         sessionStorage.setItem("pending-autosetup", "true");
+        // eslint-disable-next-line react-hooks/immutability
         window.location.href =
           window.location.origin +
           "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
@@ -97,12 +98,12 @@ export function useAutosetup(
       }
 
       // create a new one for autosetup
-      const privKey = (
-        await onCreatePat({
-          description: "DevGuard Autosetup (used inside GitLab Pipeline)",
-          scopes: "scan",
-        })
-      ).privKey;
+      const pat = await onCreatePat({
+        description: "DevGuard Autosetup (used inside GitLab Pipeline)",
+        scopes: "scan",
+        expiryDateUnix: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
+      });
+      const privKey = pat.privKey;
 
       // set the progress to pending
       setProgress((prev) => {

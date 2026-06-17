@@ -124,23 +124,35 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     avatarUrl?: string;
     role?: UserRole.Owner | UserRole.Admin | UserRole.Member;
   }>;
-  oauth2Error?: boolean;
 }
 
-export interface PersonalAccessTokenDTO {
+export type PersonalAccessTokenDTO =
+  | AsymmetricPersonalAccessTokenDTO
+  | SymmetricPersonalAccessTokenDTO;
+
+interface PersonalAccessTokenBase {
   description: string;
   scopes: string;
-
   userId: string;
   createdAt: string;
   id: string;
-  pubKey: string;
-  fingerprint: string;
+  expiryDateUnix: number;
   lastUsedAt: string | null;
 }
 
-export interface PatWithPrivKey extends PersonalAccessTokenDTO {
+export interface AsymmetricPersonalAccessTokenDTO extends PersonalAccessTokenBase {
+  pubKey: string;
+  fingerprint: string;
+}
+
+export interface SymmetricPersonalAccessTokenDTO extends PersonalAccessTokenBase {}
+
+export interface SeeOncePatWithPrivKey extends PersonalAccessTokenBase {
   privKey: string;
+}
+
+export interface SeeOncePatWithBearerToken extends PersonalAccessTokenBase {
+  bearerToken: string;
 }
 
 export type SubGroupsAndAsset =

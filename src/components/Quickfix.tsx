@@ -82,6 +82,14 @@ function renderQuickFixText(
 }
 
 function getFixedVersionPurl(vuln: DetailedDependencyVulnDTO): string | null {
+  if (!vuln.directDependencyFixedVersion && vuln.componentFixedVersion) {
+    if (vuln.vulnerabilityPath && vuln.vulnerabilityPath.length === 1) {
+      const purl = PackageURL.fromString(vuln.vulnerabilityPath[0]); // Check if it's a valid purl
+      purl.version = vuln.componentFixedVersion;
+      return purl.toString();
+    }
+    return null;
+  }
   return vuln.directDependencyFixedVersion;
 }
 
@@ -89,6 +97,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
 }) => {
   const fixedVersionPurl = getFixedVersionPurl(vuln);
+  console.log(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
   if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {

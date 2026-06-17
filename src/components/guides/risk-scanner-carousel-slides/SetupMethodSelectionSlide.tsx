@@ -62,7 +62,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
                 : "border border-transparent",
             )}
           >
-            <CardContent className="p-0">
+            <CardContent data-testid="auto-setup-gitlab" className="p-0">
               <CardHeader>
                 <CardTitle className="text-lg items-center flex flex-row leading-tight">
                   <SparklesIcon className="inline-block mr-2 w-4 h-4" />
@@ -129,7 +129,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
       <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
         <Button
           disabled={selectedScanner === undefined}
-          id="setup-method-continue"
+          data-testid="setup-method-continue"
           onClick={() => {
             const targetSlide =
               selectedScanner === "auto-setup"

@@ -34,8 +34,28 @@ export async function fetchOrganization(organizationSlug: string) {
     if (!org.ok) {
       if (org.status === 402) {
         throw new HttpError("Payment Required", { statusCode: 402 });
+      } else if (org.status === 403) {
+        throw new HttpError("Forbidden", { statusCode: 403 });
+      } else if (org.status === 401) {
+        throw new HttpError("Unauthorized", {
+          statusCode: 401,
+          title: "Page not found",
+          description:
+            "The page you're looking for doesn't exist or you don't have access. Please log in to continue.",
+          homeLink: "/login",
+        });
+      } else if (org.status === 404) {
+        throw new HttpError("Not Found", {
+          statusCode: 404,
+          title: "Page not found",
+          description: "The organization you're looking for doesn't exist.",
+          homeLink: "/",
+        });
+      } else {
+        throw new HttpError("An unexpected error occurred", {
+          statusCode: org.status,
+        });
       }
-      throw new HttpError();
     }
     // parse the organization
     const organization: OrganizationDetailsDTO = await org.json();

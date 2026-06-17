@@ -11,7 +11,7 @@ import type { WithUpdater } from "./ClientContextWrapper";
 import type { ContentTreeElement } from "../utils/view";
 
 type OrgContextParams = {
-  organization: OrganizationDetailsDTO | { oauth2Error: boolean } | null;
+  organization: OrganizationDetailsDTO | null;
   contentTree: ContentTreeElement[];
 };
 const OrganizationContext = createContext<WithUpdater<OrgContextParams>>({
@@ -27,7 +27,7 @@ export const OrganizationProvider = (
 ) => {
   useEffect(() => {
     const org = props.value.v.organization;
-    if (isOrganization(org) && org.id !== "" && org.slug !== "/") {
+    if (org && org.id !== "" && org.slug !== "/") {
       localStorage.setItem("lastActiveOrg", org.slug);
     }
   }, [props.value.v.organization]);
@@ -38,12 +38,3 @@ export const useOrganization = () => useContext(OrganizationContext).v;
 
 export const useUpdateOrganization = () =>
   useContext(OrganizationContext).update;
-
-export const isOrganization = (
-  org: OrganizationDetailsDTO | { oauth2Error: boolean } | null,
-): org is OrganizationDetailsDTO => {
-  if (!org) return false;
-  // oauth2Error is only present in case of an error
-  if ("oauth2Error" in org) return false;
-  return true;
-};

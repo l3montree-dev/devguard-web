@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import type { VexSelection } from "@/components/DependencyGraph";
 
 interface UseCreateParams {

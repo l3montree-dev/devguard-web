@@ -29,6 +29,7 @@ export function PasswordField({
   field,
   label,
   id,
+  "data-testid": dataTestId,
   placeholder,
   maxLength,
   autoComplete,
@@ -42,6 +43,7 @@ export function PasswordField({
   field: UseFormRegisterReturn;
   label: string;
   id?: string;
+  "data-testid"?: string;
   placeholder?: string;
   maxLength?: number;
   autoComplete?: string;
@@ -72,6 +74,7 @@ export function PasswordField({
           onBlur?.(e);
           fieldOnBlur(e);
         }}
+        data-testid={dataTestId}
         {...fieldRest}
         className="w-full py-2 pl-3"
       />

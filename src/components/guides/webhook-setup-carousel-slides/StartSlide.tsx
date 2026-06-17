@@ -22,7 +22,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { useTheme } from "next-themes";
 

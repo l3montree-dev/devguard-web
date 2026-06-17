@@ -7,10 +7,7 @@ import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  useUpdateOrganization,
-  isOrganization,
-} from "../../context/OrganizationContext";
+import { useUpdateOrganization } from "../../context/OrganizationContext";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 
 interface ProviderSetupProps {
@@ -52,7 +49,7 @@ export default function ProviderSetup({
     if (resp.ok) {
       // Update the organization context with the filtered integrations
       updateOrganization((prev) => {
-        if (!isOrganization(prev.organization)) {
+        if (!prev.organization) {
           return prev; // Don't update if organization is invalid
         }
         return {

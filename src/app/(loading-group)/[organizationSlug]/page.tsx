@@ -41,7 +41,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
@@ -306,6 +306,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                 <ProjectForm forceVerticalSections form={form} hideDangerZone />
                 <DialogFooter>
                   <Button
+                    data-testid="create-group-submit-button"
                     type="submit"
                     isSubmitting={form.formState.isSubmitting}
                   >
@@ -345,6 +346,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               !activeOrg.externalEntityProviderId && (
                 <AuthGuard require="admin">
                   <Button
+                    data-testid="create-group-button"
                     data-tour="create-group-button"
                     onClick={() => setOpen(true)}
                   >

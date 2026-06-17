@@ -68,6 +68,7 @@ const ArtifactDialog = ({
                     Cancel
                   </Button>
                   <Button
+                    data-testid="submit-artifact-button"
                     disabled={form.formState.isSubmitting}
                     type="submit"
                     variant="default"

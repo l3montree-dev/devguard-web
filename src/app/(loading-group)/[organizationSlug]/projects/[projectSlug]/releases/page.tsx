@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import Alert from "../../../../../../components/common/Alert";
 import EmptyParty from "../../../../../../components/common/EmptyParty";

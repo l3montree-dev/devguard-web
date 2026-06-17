@@ -9,7 +9,7 @@ import React, {
   useEffect,
 } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { AsyncButton, Button } from "../ui/button";
 import { Card } from "../ui/card";
 import {

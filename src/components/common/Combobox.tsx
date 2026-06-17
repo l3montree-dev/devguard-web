@@ -48,12 +48,14 @@ interface Props {
   value?: string;
   multiSelect?: boolean;
   alwaysRenderPlaceholder?: boolean; // if true, the placeholder is always rendered even if a value is selected
+  "data-testid"?: string;
 }
 
 export function Combobox(props: Props) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(props.value ?? "");
   const { loading } = props;
+  const testId = props["data-testid"];
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -63,6 +65,7 @@ export function Combobox(props: Props) {
           role="combobox"
           aria-expanded={open}
           className="-my-0.5 h-11 w-full min-w-[300px] justify-between"
+          data-testid={testId}
         >
           <span className="flex-1 overflow-hidden overflow-ellipsis text-left">
             {value && !Boolean(props.alwaysRenderPlaceholder)
@@ -93,6 +96,7 @@ export function Combobox(props: Props) {
                   key={item.value}
                   value={item.value}
                   keywords={[item.label]}
+                  data-testid={testId ? `${testId}-option` : undefined}
                   className={classNames(
                     value === item.value ? "bg-accent" : "",
                     "text-ellipsis",
