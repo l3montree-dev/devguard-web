@@ -646,10 +646,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
             />
             <IntegrationMethodSelectionSlide
-              variant={variant}
               setVariant={setVariant}
               api={api}
-              prevIndex={prevIndex}
               cliSlideIndex={12}
               fileUploadSlideIndex={13}
             />

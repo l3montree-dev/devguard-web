@@ -64,12 +64,13 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
           </Card>
           <Card
             className="cursor-pointer mt-2"
+            data-testid="upload-manually"
             onClick={() => {
               setVariant("manual");
               api?.scrollTo(fileUploadSlideIndex);
             }}
           >
-            <CardHeader data-testid="manual-upload-card">
+            <CardHeader>
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <DocumentArrowUpIcon className="inline-block mr-2 w-4 h-4" />
                 Upload manually

@@ -15,7 +15,7 @@ import { usePageTour } from "@/hooks/usePageTour";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { OrgOverview } from "@/types/api/api";
 import Link from "next/link";
-import type { FunctionComponent, useEffect } from "react";
+import { useEffect, type FunctionComponent } from "react";
 import useSWR from "swr";
 import { useTourSeen } from "@/hooks/useTourSeen";
 

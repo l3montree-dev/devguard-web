@@ -147,6 +147,7 @@ const Index: FunctionComponent = () => {
                       </span>
                     </div>
                     <Button
+                      data-testid="gitlab-connect-repository"
                       className="self-start"
                       onClick={() => {
                         // ProviderSetupSlide (slide 3) if integration exists, else GitLabIntegrationSlide (slide 2)
@@ -164,7 +165,7 @@ const Index: FunctionComponent = () => {
               <hr className="mb-8" />
             </>
           )}
-          <Card className="space-y-1.5 p-6">
+          <Card className="space-y-1.5 p-6 shadow-none">
             <div className="flex gap-x-3 items-top">
               <div className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary">
                 <SearchCode className="w-5 h-5 text-secondary-foreground/70" />
@@ -200,6 +201,7 @@ const Index: FunctionComponent = () => {
                       recommended: true,
                       githubOnly: false,
                       slide: 7,
+                      testId: "own-setup-card",
                     },
                     {
                       icon: <Code />,
@@ -208,6 +210,7 @@ const Index: FunctionComponent = () => {
                       recommended: false,
                       githubOnly: false,
                       slide: 16,
+                      testId: "devguard-cli-card",
                     },
                     {
                       icon: <Upload />,
@@ -216,6 +219,7 @@ const Index: FunctionComponent = () => {
                       recommended: false,
                       githubOnly: false,
                       slide: 11,
+                      testId: "manual-upload-card",
                     },
                     {
                       icon: <Link2 />,
@@ -224,6 +228,7 @@ const Index: FunctionComponent = () => {
                       recommended: false,
                       githubOnly: false,
                       slide: 15,
+                      testId: "supplier-url-card",
                     },
                   ];
 
@@ -235,38 +240,45 @@ const Index: FunctionComponent = () => {
                     <div
                       className={`grid gap-4 mt-4 ${cards.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}
                     >
-                      {cards.map(({ icon, name, sub, recommended, slide }) => (
-                        <button
-                          key={name}
-                          type="button"
-                          data-tour={
-                            recommended ? "setup-risk-scan" : undefined
-                          }
-                          className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
-                            recommended ? "border-primary" : "border-secondary"
-                          }`}
-                          onClick={() => {
-                            setRiskScanningInitialSlide(slide);
-                            setRiskScanningOpen(true);
-                          }}
-                        >
-                          <div className="flex items-center justify-between">
-                            {icon}
-                            {recommended && (
-                              <Badge
-                                variant="default"
-                                className="text-xs text-primary-foreground"
-                              >
-                                Recommended
-                              </Badge>
-                            )}
-                          </div>
-                          <span className="text-base font-medium">{name}</span>
-                          <span className="text-sm leading-relaxed text-muted-foreground">
-                            {sub}
-                          </span>
-                        </button>
-                      ))}
+                      {cards.map(
+                        ({ icon, name, sub, recommended, slide, testId }) => (
+                          <button
+                            key={name}
+                            type="button"
+                            data-testid={testId}
+                            data-tour={
+                              recommended ? "setup-risk-scan" : undefined
+                            }
+                            className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
+                              recommended
+                                ? "border-primary"
+                                : "border-secondary"
+                            }`}
+                            onClick={() => {
+                              setRiskScanningInitialSlide(slide);
+                              setRiskScanningOpen(true);
+                            }}
+                          >
+                            <div className="flex items-center justify-between">
+                              {icon}
+                              {recommended && (
+                                <Badge
+                                  variant="default"
+                                  className="text-xs text-primary-foreground"
+                                >
+                                  Recommended
+                                </Badge>
+                              )}
+                            </div>
+                            <span className="text-base font-medium">
+                              {name}
+                            </span>
+                            <span className="text-sm leading-relaxed text-muted-foreground">
+                              {sub}
+                            </span>
+                          </button>
+                        ),
+                      )}
                     </div>
                   );
                 })()}
