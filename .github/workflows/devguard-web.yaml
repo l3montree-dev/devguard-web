@@ -8,7 +8,7 @@ on:
 
 jobs:
   code-scanning:
-    uses: l3montree-dev/devguard-action/.github/workflows/code-scanning.yml@nix
+    uses: l3montree-dev/devguard-ci-components/.github/workflows/code-scanning.yml@nix
     permissions:
       contents: read
       security-events: write
@@ -23,7 +23,7 @@ jobs:
       devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
 
   web-pipeline:
-    uses: l3montree-dev/devguard-action/.github/workflows/full-nix.yml@nix
+    uses: l3montree-dev/devguard-ci-components/.github/workflows/full-nix.yml@nix
     permissions:
       contents: read
       packages: write
