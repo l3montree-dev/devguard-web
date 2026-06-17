@@ -20,7 +20,7 @@ import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import {
   adminSSETrigger,
   AdminAPIError,
-  type DaemonSSEEvent,
+  type AdminDaemonSSEEvent,
 } from "@/services/adminApi";
 
 interface Daemon {
@@ -113,7 +113,7 @@ export default function TriggerDaemonsCard() {
         await adminSSETrigger(
           daemon.endpoint,
           signingKey,
-          (evt: DaemonSSEEvent) => {
+          (evt: AdminDaemonSSEEvent) => {
             switch (evt.event) {
               case "log":
                 appendLog(daemon.id, evt.data);

@@ -1,12 +1,13 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import { config } from "../config";
 import { signAdminRequest } from "./admin-request-signing";
+import { parseSSEStream, type SSEEvent } from "../lib/sse";
 
 /**
  * Create an API client for instance admin requests.
- * All requests are HTTP-signed with the provided non-extractable ECDSA P-256
- * CryptoKey (imported via `importAdminKey`).
+ * All requests are HTTP-signed.
  * Requests go through the devguard-tunnel proxy which forwards the signing headers.
  */
 export const adminBrowserApiClient = async (
@@ -15,22 +16,18 @@ export const adminBrowserApiClient = async (
   init?: RequestInit,
   prefix = "/api/v1",
 ): Promise<Response> => {
-  const url =
-    typeof window !== "undefined"
-      ? window.location.origin + "/api/devguard-tunnel" + prefix + input
-      : "/api/devguard-tunnel" + prefix + input;
+  const url = config.frontendUrl + "/api/devguard-tunnel" + prefix + input;
 
   const method = init?.method ?? "GET";
-  // Only string bodies are supported: the signed Content-Digest must be computed
-  // over the exact bytes sent, so a non-string body would sign empty but send
-  // non-empty and fail admin auth in a hard-to-debug way.
+  // Only string bodies are supported
   if (init?.body !== undefined && typeof init.body !== "string") {
-    throw new Error("adminBrowserApiClient only supports string request bodies");
+    throw new Error(
+      "adminBrowserApiClient only supports string request bodies",
+    );
   }
   const body: string | undefined =
     typeof init?.body === "string" ? init.body : undefined;
 
-  // Sign the request — produces Signature, Signature-Input, and Content-Digest headers
   const sigHeaders = await signAdminRequest(url, method, body, key);
 
   return fetch(url, {
@@ -49,7 +46,7 @@ export const adminBrowserApiClient = async (
 /**
  * SSE event payload from daemon trigger endpoints.
  */
-export interface DaemonSSEEvent {
+export interface AdminDaemonSSEEvent {
   event: "log" | "done" | "error";
   data: string;
 }
@@ -67,14 +64,30 @@ export class AdminAPIError extends Error {
 }
 
 /**
+ * Extract a human-readable message from a failed admin response.
+ */
+async function extractErrorMessage(resp: Response): Promise<string> {
+  const fallback = resp.statusText || `HTTP ${resp.status}`;
+  const text = await resp.text().catch(() => "");
+
+  try {
+    // The Echo error handler sends `he.Message` as JSON: a bare string or
+    // an object with a `message` field.
+    const json = JSON.parse(text);
+    return (typeof json === "string" ? json : json?.message) || fallback;
+  } catch {
+    // Not JSON – use the raw body only if it's short enough to be a message.
+    return (text.length < 500 && text) || fallback;
+  }
+}
+
+/**
  * Trigger an admin daemon endpoint that returns an SSE stream.
- * Calls `onEvent` for each SSE event received, then resolves when the stream ends.
- * Rejects on HTTP errors (e.g. 429 cooldown) or network failures.
  */
 export async function adminSSETrigger(
   input: string,
   key: CryptoKey,
-  onEvent: (evt: DaemonSSEEvent) => void,
+  onEvent: (evt: AdminDaemonSSEEvent) => void,
   body?: string,
 ): Promise<void> {
   const resp = await adminBrowserApiClient(input, key, {
@@ -84,68 +97,16 @@ export async function adminSSETrigger(
   });
 
   if (!resp.ok) {
-    let message: string | undefined;
-    try {
-      const text = await resp.text();
-      // The custom Echo error handler sends he.Message directly as JSON,
-      // which may be a bare string (e.g. "some message") or an object
-      // (e.g. {"message":"..."}). Handle both.
-      try {
-        const json = JSON.parse(text);
-        if (typeof json === "string") {
-          message = json;
-        } else if (typeof json === "object" && json !== null) {
-          message = json.message ?? JSON.stringify(json);
-        }
-      } catch {
-        // Not valid JSON – use the raw body if it looks meaningful
-        if (text && text.length < 500) {
-          message = text;
-        }
-      }
-    } catch {
-      // body unreadable
-    }
-    throw new AdminAPIError(
-      message ?? resp.statusText ?? `HTTP ${resp.status}`,
-      resp.status,
-    );
+    throw new AdminAPIError(await extractErrorMessage(resp), resp.status);
   }
-
   if (!resp.body) {
     throw new Error("No response body");
   }
 
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    buffer += decoder.decode(value, { stream: true });
-
-    // Parse SSE lines from buffer
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? ""; // keep incomplete line in buffer
-
-    let currentEvent = "";
-    for (const rawLine of lines) {
-      // Strip a trailing \r so CRLF (\r\n) line endings parse correctly.
-      const line = rawLine.endsWith("\r") ? rawLine.slice(0, -1) : rawLine;
-      if (line.startsWith("event: ")) {
-        currentEvent = line.slice(7);
-      } else if (line.startsWith("data: ")) {
-        const data = line.slice(6);
-        if (currentEvent) {
-          onEvent({
-            event: currentEvent as DaemonSSEEvent["event"],
-            data,
-          });
-          currentEvent = "";
-        }
-      }
-    }
-  }
+  await parseSSEStream(resp.body, (evt: SSEEvent) =>
+    onEvent({
+      event: evt.event as AdminDaemonSSEEvent["event"],
+      data: evt.data,
+    }),
+  );
 }
