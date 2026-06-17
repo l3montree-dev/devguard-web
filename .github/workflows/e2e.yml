@@ -78,7 +78,8 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: |
           docker pull mcr.microsoft.com/playwright:v1.56.1-noble@sha256:f1e7e01021efd65dd1a2c56064be399f3e4de00fd021ac561325f2bfbb2b837a
-          docker save mcr.microsoft.com/playwright:v1.56.1-noble -o /tmp/playwright-image.tar
+          docker tag mcr.microsoft.com/playwright:v1.56.1-noble playwright:v1.56.1-noble
+          docker save playwright:v1.56.1-noble -o /tmp/playwright-image.tar
 
       - name: Load Playwright Docker image from cache
         if: steps.cache-playwright.outputs.cache-hit == 'true'
@@ -93,5 +94,5 @@ jobs:
             -u $(id -u):$(id -g) \
             -e CI=true \
             -e HOME=/tmp \
-            mcr.microsoft.com/playwright:v1.56.1-noble \
+            playwright:v1.56.1-noble \
             bash e2e/run-devguard-tests.sh
