@@ -95,7 +95,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@eslint/eslintrc": "^3.3.5",
+        "@eslint/eslintrc": "3.3.5",
         "@eslint/js": "^9.39.4",
         "@playwright/test": "^1.56.1",
         "@tailwindcss/postcss": "^4.2.2",

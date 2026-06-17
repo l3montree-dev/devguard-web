@@ -254,17 +254,15 @@ const Index: FunctionComponent = () => {
                             {icon}
                             {recommended && (
                               <Badge
-                                variant="outline"
-                                className="text-[10px] border-primary text-primary"
+                                variant="default"
+                                className="text-xs text-primary-foreground"
                               >
                                 Recommended
                               </Badge>
                             )}
                           </div>
-                          <span className="text-[13px] font-medium">
-                            {name}
-                          </span>
-                          <span className="text-[11px] leading-relaxed text-muted-foreground">
+                          <span className="text-base font-medium">{name}</span>
+                          <span className="text-sm leading-relaxed text-muted-foreground">
                             {sub}
                           </span>
                         </button>

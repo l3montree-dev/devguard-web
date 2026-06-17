@@ -10,8 +10,6 @@ import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import Markdown from "react-markdown";
-import { toast } from "sonner";
 import useSWR from "swr";
 import AssetForm, {
   type AssetFormValues,
@@ -52,7 +50,6 @@ import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
 import { usePageTour } from "@/hooks/usePageTour";
-import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
 import { useTourSeen } from "@/hooks/useTourSeen";
 
 export default function RepositoriesPage() {
