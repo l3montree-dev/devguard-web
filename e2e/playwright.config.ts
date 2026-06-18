@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import path from "path";
 
 /**
  * Read environment variables from file.
@@ -11,6 +12,8 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+export const STORAGE_STATE = path.join(__dirname, "playwright/.auth/user.json");
+
 export default defineConfig({
   testDir: "./src",
   /* Run tests in files in parallel */
@@ -36,11 +39,23 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "chromium",
+      name: "setup",
+      testMatch: /devguard-auth-setup\.ts/,
+    },
+    {
+      name: "chromium-authenticated",
+      testMatch: /devguard-.*\.auth\.e2e\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
-        // locale: 'de-DE',
-        locale: "en-US",
+        storageState: STORAGE_STATE,
+      },
+      dependencies: ["setup"],
+    },
+    {
+      name: "chromium",
+      testMatch: /devguard-(?!auth-setup).*(?<!\.auth)\.e2e\.spec\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
       },
     },
     /*

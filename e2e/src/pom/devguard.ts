@@ -10,6 +10,7 @@ import { SetupFlow } from "./flows/setup";
 import { VulnFlow } from "./flows/vuln";
 import { ArtifactFlow } from "./flows/artifact";
 import { ShareFlow } from "./flows/sharing";
+import { ModalHelper } from "./flows/modal-helper";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -58,6 +59,10 @@ export class DevGuardPOM {
     return new ShareFlow(this.page);
   }
 
+  modal(): ModalHelper {
+    return new ModalHelper(this.page);
+  }
+
   async loadDevGuard() {
     await this.page.goto(this.devGuardDomain);
     await this.verifyOnDevGuardURL();
@@ -89,19 +94,6 @@ export class DevGuardPOM {
     await this.page.getByTestId("dark-mode").click();
   }
 
-  async dismissWelcomeModalIfPresent() {
-    const exploreButton = this.page.getByTestId("explore-button");
-    try {
-      await exploreButton.waitFor({ state: "visible", timeout: 30_000 });
-      await exploreButton.click();
-      await this.page
-        .locator(".DialogOverlay")
-        .waitFor({ state: "hidden", timeout: 10_000 });
-    } catch {
-      // welcome modal not shown, continuing
-    }
-  }
-
   async loadAndRegister() {
     await this.loadDevGuard();
     await this.registerNewUser();
@@ -125,15 +117,17 @@ export class DevGuardPOM {
     await this.setup().uploadSbomFile(inputFile);
   }
 
-  async createTestOrganizationGroupAndRepo() {
-    await this.org().createOrganization("Test Organization");
-    await this.group().createGroup(
-      "Test Group",
-      "Test Group that contains very important projects!",
-    );
-    await this.repo().createGitHubRepo(
-      "Test Repo",
-      "This repo contains top secret information. Without a Provider though..",
-    );
+  async createTestOrganizationGroupAndRepo(options?: {
+  orgName?: string;
+  groupName?: string;
+  repoName?: string;
+  }) {
+    const orgName = options?.orgName ?? `Test Org ${Date.now()}`;
+    const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
+    const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
+
+    await this.org().createOrganization(orgName);
+    await this.group().createGroup(groupName, "Test Group that contains very important projects!");
+    await this.repo().createGitHubRepo(repoName, "This repo contains top secret information.");
   }
 }

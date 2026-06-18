@@ -5,13 +5,6 @@ import { DevGuardPOM } from "./pom/devguard";
 import { envConfig } from "./utils";
 
 test.describe("DevGuard Email login flows", () => {
-  test("test registration using email and password (new user)", async ({
-    page,
-  }) => {
-    const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadAndRegister();
-  });
-
   test("test registration with already existing user", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();

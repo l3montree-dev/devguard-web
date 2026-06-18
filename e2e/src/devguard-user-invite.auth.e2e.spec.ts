@@ -6,8 +6,8 @@ import { DevGuardPOM } from "./pom/devguard";
 test.describe("DevGuard invite a user to your organization", () => {
   test("test", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadAndRegister();
-    await devguardPOM.org().createOrganization("TestOrg");
+    await devguardPOM.loadDevGuard();
+    await devguardPOM.modal().dismissWelcomeModalIfPresent();
     await devguardPOM.org().inviteUserOrg("testuser@example.com");
   });
 });

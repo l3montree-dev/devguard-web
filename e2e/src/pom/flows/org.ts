@@ -1,10 +1,13 @@
 import { expect, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
+import { ModalHelper } from "./modal-helper";
+import { envConfig } from "../../utils";
 
 export class OrgFlow {
   constructor(private page: Page) {}
 
   async createOrganization(name: string) {
+    await this.page.goto(`${envConfig.devGuard.domain}/setup`);
     await this.page.getByTestId("org-name-label").click();
     await this.page
       .getByRole("textbox", { name: "Organization name*" })
@@ -15,16 +18,7 @@ export class OrgFlow {
     await this.page
       .getByRole("button", { name: "Create Organization" })
       .click();
-    const exploreButton = this.page.getByTestId("explore-button");
-    try {
-      await exploreButton.waitFor({ state: "visible", timeout: 30_000 });
-      await exploreButton.click();
-      await this.page
-        .locator(".DialogOverlay")
-        .waitFor({ state: "hidden", timeout: 10_000 });
-    } catch {
-      // welcome modal not shown, continuing
-    }
+    await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
   }
 
   async inviteUserOrg(mail: string) {
@@ -73,6 +67,21 @@ export class OrgFlow {
   }
 
   async createSecondOrganization(name: string, level: DevGuardNavigationLevel) {
+    await this.redirectToNewOrg(level);
+    await this.page.getByTestId("org-name-label").click();
+    await this.page
+      .getByRole("textbox", { name: "Organization name*" })
+      .waitFor({ state: "visible" });
+    await this.page
+      .getByRole("textbox", { name: "Organization name*" })
+      .fill(name);
+    await this.page
+      .getByRole("button", { name: "Create Organization" })
+      .click();
+    await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
+  }
+
+  async redirectToNewOrg(level: DevGuardNavigationLevel) {
     try {
       await this.page
         .locator(".DialogOverlay")
@@ -84,6 +93,5 @@ export class OrgFlow {
       .locator(`${level} [data-testid="org-switcher-dropdown"]`)
       .click();
     await this.page.getByTestId("create-new-organization-button").click();
-    await this.createOrganization(name);
   }
 }
