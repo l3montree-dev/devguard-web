@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import Section from "@/components/common/Section";
-import SeverityCard from "@/components/SeverityCard";
 import RemediationTypeDistribution from "@/components/organization/RemediationDistributionChart";
 import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
@@ -18,12 +17,12 @@ export interface AverageStatsSectionProps {
 
 type Severity = "critical" | "high" | "medium" | "low";
 
-interface SeverityAvg {
+interface SeverityRemediation {
   variant: Severity;
-  risk: number | undefined;
-  cvss: number | undefined;
   remediationRisk: number | undefined;
   remediationCvss: number | undefined;
+  openRisk: number | undefined;
+  openCvss: number | undefined;
 }
 
 export default function AverageStatsSection({
@@ -37,60 +36,46 @@ export default function AverageStatsSection({
       (orgStatistics?.vulnEventAverage?.averageFixedEvents ?? 0),
   );
 
-  const severities: SeverityAvg[] = [
+  const remediation = orgStatistics?.averageRemediationTimes;
+
+  const severities: SeverityRemediation[] = [
     {
       variant: "critical",
-      risk: orgStatistics?.projectOpenVulnAverage.riskCriticalAverage,
-      cvss: orgStatistics?.projectOpenVulnAverage.cvssCriticalAverage,
-      remediationRisk:
-        orgStatistics?.averageRemediationTimes?.criticalRiskAverage,
-      remediationCvss:
-        orgStatistics?.averageRemediationTimes?.criticalCVSSAverage,
+      remediationRisk: remediation?.criticalRiskRemediated,
+      remediationCvss: remediation?.criticalCVSSRemediated,
+      openRisk: remediation?.criticalRiskOpen,
+      openCvss: remediation?.criticalCVSSOpen,
     },
     {
       variant: "high",
-      risk: orgStatistics?.projectOpenVulnAverage.riskHighAverage,
-      cvss: orgStatistics?.projectOpenVulnAverage.cvssHighAverage,
-      remediationRisk: orgStatistics?.averageRemediationTimes?.highRiskAverage,
-      remediationCvss: orgStatistics?.averageRemediationTimes?.highCVSSAverage,
+      remediationRisk: remediation?.highRiskRemediated,
+      remediationCvss: remediation?.highCVSSRemediated,
+      openRisk: remediation?.highRiskOpen,
+      openCvss: remediation?.highCVSSOpen,
     },
     {
       variant: "medium",
-      risk: orgStatistics?.projectOpenVulnAverage.riskMediumAverage,
-      cvss: orgStatistics?.projectOpenVulnAverage.cvssMediumAverage,
-      remediationRisk:
-        orgStatistics?.averageRemediationTimes?.mediumRiskAverage,
-      remediationCvss:
-        orgStatistics?.averageRemediationTimes?.mediumCVSSAverage,
+      remediationRisk: remediation?.mediumRiskRemediated,
+      remediationCvss: remediation?.mediumCVSSRemediated,
+      openRisk: remediation?.mediumRiskOpen,
+      openCvss: remediation?.mediumCVSSOpen,
     },
     {
       variant: "low",
-      risk: orgStatistics?.projectOpenVulnAverage.riskLowAverage,
-      cvss: orgStatistics?.projectOpenVulnAverage.cvssLowAverage,
-      remediationRisk: orgStatistics?.averageRemediationTimes?.lowRiskAverage,
-      remediationCvss: orgStatistics?.averageRemediationTimes?.lowCVSSAverage,
+      remediationRisk: remediation?.lowRiskRemediated,
+      remediationCvss: remediation?.lowCVSSRemediated,
+      openRisk: remediation?.lowRiskOpen,
+      openCvss: remediation?.lowCVSSOpen,
     },
   ];
 
   return (
     <Section
       forceVertical
-      title="Average Open Vulnerabilities per Project"
-      description="Mean number of unresolved vulnerabilities across projects, broken down by severity."
+      title="Remediation & Open Vulnerability Metrics"
+      description="Mean time to remediate vulnerabilities and the average age of currently open vulnerabilities, broken down by severity."
       className="mt-16"
     >
-      <div data-tour="average-stats-section" className="grid grid-cols-4 gap-4">
-        {severities.map(({ variant, risk, cvss }) => (
-          <SeverityCard
-            key={variant}
-            variant={variant}
-            fixableAmount={0}
-            isLoading={isStatisticsLoading}
-            currentAmount={Math.round((mode === "risk" ? risk : cvss) ?? 0)}
-            mode={mode}
-          />
-        ))}
-      </div>
       <RemediationTypeDistribution
         distribution={orgStatistics?.remediationTypeDistribution}
       />
@@ -106,21 +91,33 @@ export default function AverageStatsSection({
           amount={orgStatistics?.averageOpenCodeRisksPerProject}
         />
       </div>
-      <div className="grid grid-cols-4 gap-4">
-        {severities.map(({ variant, remediationRisk, remediationCvss }) => (
-          <AverageFixingTimeChart
-            key={variant}
-            mode={mode}
-            variant={variant}
-            title="Avg. remediation time"
-            description={`Time for ${variant} severity vulnerabilities`}
-            avgFixingTime={{
-              averageFixingTimeSeconds: remediationRisk ?? 0,
-              averageFixingTimeSecondsByCvss: remediationCvss ?? 0,
-            }}
-            isLoading={isStatisticsLoading}
-          />
-        ))}
+      <div data-tour="average-stats-section" className="grid grid-cols-4 gap-4">
+        {severities.map(
+          ({
+            variant,
+            remediationRisk,
+            remediationCvss,
+            openRisk,
+            openCvss,
+          }) => (
+            <AverageFixingTimeChart
+              key={variant}
+              mode={mode}
+              variant={variant}
+              title="Avg. remediation time"
+              description={`Time for ${variant} severity vulnerabilities`}
+              avgFixingTime={{
+                averageFixingTimeSeconds: remediationRisk ?? 0,
+                averageFixingTimeSecondsByCvss: remediationCvss ?? 0,
+              }}
+              openAge={{
+                averageFixingTimeSeconds: openRisk ?? 0,
+                averageFixingTimeSecondsByCvss: openCvss ?? 0,
+              }}
+              isLoading={isStatisticsLoading}
+            />
+          ),
+        )}
       </div>
     </Section>
   );

@@ -14,8 +14,9 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { usePageTour } from "@/hooks/usePageTour";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { OrgOverview } from "@/types/api/api";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import type { FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 import useSWR from "swr";
 
 const STATS_PARAMS = new URLSearchParams({
@@ -37,10 +38,30 @@ const OrganizationOverview: FunctionComponent = () => {
     data: orgStatistics,
     isLoading: isStatisticsLoading,
     error,
+    mutate,
   } = useSWR<OrgOverview>(
     `/organizations/${orgSlug}/stats/vuln-statistics/?${STATS_PARAMS}`,
     fetcher,
   );
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // The backend caches these statistics for 15 minutes. Hitting the same
+  // endpoint with `forceRefresh=true` bypasses that cache; we then seed the SWR
+  // cache with the fresh result so a plain revalidation wouldn't undo it.
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const fresh = await fetcher<OrgOverview>(
+        `/organizations/${orgSlug}/stats/vuln-statistics/?${STATS_PARAMS}&forceRefresh=true`,
+      );
+      await mutate(fresh, { revalidate: false });
+    } catch {
+      // Fetch failures surface through SWR's own error state on next load.
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const is404 = error instanceof FetcherError && error.status === 404;
   const isError = !isStatisticsLoading && error && !is404;
@@ -61,16 +82,29 @@ const OrganizationOverview: FunctionComponent = () => {
           </p>
         </div>
         {!hasNoData && !isError && (
-          <Tabs
-            data-tour="view-mode-tabs"
-            value={mode}
-            onValueChange={(value) => setMode(value as "risk" | "cvss")}
-          >
-            <TabsList>
-              <TabsTrigger value="risk">Risk</TabsTrigger>
-              <TabsTrigger value="cvss">CVSS</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing || isStatisticsLoading}
+            >
+              <ArrowPathIcon
+                className={`mr-1.5 h-3.5 w-3.5 ${isRefreshing ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
+            <Tabs
+              data-tour="view-mode-tabs"
+              value={mode}
+              onValueChange={(value) => setMode(value as "risk" | "cvss")}
+            >
+              <TabsList>
+                <TabsTrigger value="risk">Risk</TabsTrigger>
+                <TabsTrigger value="cvss">CVSS</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
         )}
       </div>
       {isError ? (

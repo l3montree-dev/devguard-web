@@ -14,6 +14,12 @@ import { Skeleton } from "./ui/skeleton";
 
 interface Props {
   avgFixingTime: AverageFixingTime | undefined;
+  /**
+   * Optional secondary metric: the average age of currently open (unremediated)
+   * vulns. When provided it is rendered below the remediation time in the same
+   * card. Existing single-metric callers can omit it.
+   */
+  openAge?: AverageFixingTime;
   variant: "high" | "medium" | "low" | "critical";
   title: string;
   description: string;
@@ -23,6 +29,7 @@ interface Props {
 
 const AverageFixingTimeChart: FunctionComponent<Props> = ({
   avgFixingTime,
+  openAge,
   title,
   description,
   variant,
@@ -60,6 +67,17 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   const hasData = seconds > 0;
 
   const { duration, type } = getHumanReadableDuration(seconds);
+
+  const openSeconds = openAge
+    ? mode === "cvss"
+      ? openAge.averageFixingTimeSecondsByCvss
+      : openAge.averageFixingTimeSeconds
+    : undefined;
+  const openHuman =
+    openSeconds !== undefined
+      ? getHumanReadableDuration(openSeconds)
+      : undefined;
+
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
@@ -80,7 +98,19 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
             </>
           )}
         </div>
-        <div className="flex">
+        {openHuman && (
+          <div className="mt-2 flex items-baseline justify-center gap-1 border-t pt-2 text-sm">
+            <span className="text-muted-foreground">Avg. age of open:</span>
+            {openSeconds && openSeconds > 0 ? (
+              <span className="font-medium tabular-nums">
+                {openHuman.duration} {openHuman.type}
+              </span>
+            ) : (
+              <span className="text-muted-foreground">no data yet</span>
+            )}
+          </div>
+        )}
+        <div className="mt-2 flex">
           <span
             className={classNames(
               "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
