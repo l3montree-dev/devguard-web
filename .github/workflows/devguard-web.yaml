@@ -8,7 +8,7 @@ on:
 
 jobs:
   code-scanning:
-    uses: l3montree-dev/devguard-ci-components/.github/workflows/code-scanning.yml@main
+    uses: l3montree-dev/devguard-ci-components/.github/workflows/code-scanning.yml@fix/pipeline
     permissions:
       contents: read
       security-events: write
