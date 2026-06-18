@@ -23,7 +23,7 @@ jobs:
       devguard-token: ${{ secrets.DEVGUARD_TOKEN }}
 
   web-pipeline:
-    uses: l3montree-dev/devguard-ci-components/.github/workflows/full-nix.yml@main
+    uses: l3montree-dev/devguard-ci-components/.github/workflows/full-nix.yml@fix/pipeline
     permissions:
       contents: read
       packages: write
