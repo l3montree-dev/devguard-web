@@ -6,8 +6,8 @@ import { DevGuardNavigationLevel, DevGuardPOM } from "./pom/devguard";
 test.describe("DevGuard test light and dark mode", () => {
   test("test", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadAndRegister();
-    await devguardPOM.org().createOrganization("TestOrg");
+    await devguardPOM.loadDevGuard();
+    await devguardPOM.modal().dismissWelcomeModalIfPresent();
     await devguardPOM.testLightDarkSystemMode(
       DevGuardNavigationLevel.Organization,
     );

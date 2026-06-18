@@ -38,7 +38,7 @@ test.describe.skip("DevGuard multi-user: invite and permission flow", () => {
       ),
       { timeout: 20_000 },
     );
-    await user2POM.dismissWelcomeModalIfPresent();
+    await user2POM.modal().dismissWelcomeModalIfPresent();
 
     await context2.close();
 

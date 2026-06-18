@@ -4,29 +4,28 @@ import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 
 test.describe("DevGuard repo flows", () => {
+  let devguardPOM: DevGuardPOM;
+
+  test.beforeEach(async ({ page }) => {
+    devguardPOM = new DevGuardPOM(page);
+    await devguardPOM.loadDevGuard();
+    await devguardPOM.createTestOrganizationGroupAndRepo();
+  });
+  
   test("test create, settings and delete (through settings) of repo", async ({
     page,
   }) => {
-    const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadAndRegister();
-    await devguardPOM.createTestOrganizationGroupAndRepo();
     await page.waitForTimeout(500);
     await devguardPOM.repo().settingClickthroughRepo();
     await devguardPOM.repo().deleteRepo();
   });
 
   test("test manual sbom upload", async ({ page }) => {
-    const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadAndRegister();
-    await devguardPOM.createTestOrganizationGroupAndRepo();
     await devguardPOM.setupSbomUpload();
     await page.waitForTimeout(2_000);
   });
 
   test("test if we can add artifact manually", async ({ page }) => {
-    const devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadAndRegister();
-    await devguardPOM.createTestOrganizationGroupAndRepo();
     await page.waitForTimeout(500);
     await devguardPOM.setupSbomUpload();
     await devguardPOM
