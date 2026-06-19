@@ -1,7 +1,6 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { config } from "../config";
 import { signAdminRequest } from "./admin-request-signing";
 import { parseSSEStream, type SSEEvent } from "../lib/sse";
 
@@ -16,7 +15,8 @@ export const adminBrowserApiClient = async (
   init?: RequestInit,
   prefix = "/api/v1",
 ): Promise<Response> => {
-  const url = config.frontendUrl + "/api/devguard-tunnel" + prefix + input;
+  // as client for browser, config.frontendUrl is not exposed...
+  const url = window.location.origin + "/api/devguard-tunnel" + prefix + input;
 
   const method = init?.method ?? "GET";
   // Only string bodies are supported
