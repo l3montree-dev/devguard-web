@@ -46,8 +46,8 @@ export default function InstanceAdminPage() {
   const dashboardRef = useRef<InstanceDashboardHandle>(null);
 
   useEffect(() => {
-    // used for line 121 -> display warning with current host
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    // Avoid hydration mismatch: window.location.host is only available client-side.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional one-time flag
     setMounted(true);
   }, []);
 
