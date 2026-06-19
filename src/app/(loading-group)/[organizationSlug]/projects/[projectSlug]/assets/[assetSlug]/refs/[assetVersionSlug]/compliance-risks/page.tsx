@@ -27,6 +27,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { CaretDownIcon } from "@radix-ui/react-icons";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
@@ -39,6 +45,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
+import ComplianceStats from "./ComplianceStats";
+import { Card } from "@/components/ui/card";
 
 const columnHelper = createColumnHelper<ComplianceRiskDTO>();
 
@@ -260,6 +268,20 @@ const Index: FunctionComponent = () => {
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-col gap-2">
+          <Card>
+            <Collapsible className="my-2">
+              <CollapsibleTrigger className="flex w-full items-center justify-between p-2 cursor-pointer rounded-md transition-colors">
+                <ComplianceStats
+                  uri={uri}
+                  assetVersionSlug={assetVersionSlug}
+                />
+                <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="my-4">
+                This will be a compliance risk animated chart...
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
           <Tabs
             defaultValue={
               params?.has("state") ? (params.get("state") as string) : "open"
@@ -273,7 +295,7 @@ const Index: FunctionComponent = () => {
                 onClick={() => push({ state: "closed" })}
                 value="closed"
               >
-                Closed
+                Resolved
               </TabsTrigger>
             </TabsList>
           </Tabs>
