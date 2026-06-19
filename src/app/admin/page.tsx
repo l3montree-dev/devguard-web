@@ -46,6 +46,8 @@ export default function InstanceAdminPage() {
   const dashboardRef = useRef<InstanceDashboardHandle>(null);
 
   useEffect(() => {
+    // Avoid hydration mismatch: window.location.host is only available client-side.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional one-time flag
     setMounted(true);
   }, []);
 
@@ -98,8 +100,6 @@ export default function InstanceAdminPage() {
     toast.success("Admin session ended. Private key removed from session.");
   }, [logout]);
 
-  if (!mounted) return null;
-
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-[calc(100vh-112px)] flex-col items-center justify-center px-6">
@@ -118,7 +118,7 @@ export default function InstanceAdminPage() {
                 <p className="mt-1">
                   You are about to enter your instance admin private key on{" "}
                   <span className="font-mono font-semibold break-all">
-                    {window.location.host}
+                    {mounted ? window.location.host : ""}
                   </span>
                   . Only continue if this is your own DevGuard instance — never
                   paste your key on a site you don&apos;t recognise.
