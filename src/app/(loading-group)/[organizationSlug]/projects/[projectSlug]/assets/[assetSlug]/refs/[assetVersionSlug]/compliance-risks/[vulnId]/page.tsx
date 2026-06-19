@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import VulnState from "@/components/common/VulnState";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import GitProviderIcon from "@/components/GitProviderIcon";
+import { Download } from "lucide-react";
 import useSWR from "swr";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { fetcher } from "@/data-fetcher/fetcher";
@@ -279,9 +280,18 @@ const Index = () => {
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">
             <div className="col-span-3">
-              <h1 className="text-2xl font-semibold">
-                {vuln.policyTitle ?? "Compliance Risk"}
-              </h1>
+              <div className="flex flex-row items-start justify-between gap-4">
+                <h1 className="text-2xl font-semibold">
+                  {vuln.policyTitle ?? "Compliance Risk"}
+                </h1>
+                <Button
+                  variant={"secondary"}
+                  onClick={() => alert("Download evidence")}
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download evidence
+                </Button>
+              </div>
               <div className="mt-4 text-muted-foreground">
                 <Markdown>
                   {vuln.policyDescription?.replaceAll("\n", "\n\n")}

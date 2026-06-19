@@ -46,6 +46,7 @@ import useSWR from "swr";
 import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
+import ComplianceDistribution from "./ComplianceDistribution";
 import { Card } from "@/components/ui/card";
 
 const columnHelper = createColumnHelper<ComplianceRiskDTO>();
@@ -277,8 +278,11 @@ const Index: FunctionComponent = () => {
                 />
                 <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
               </CollapsibleTrigger>
-              <CollapsibleContent className="my-4">
-                This will be a compliance risk animated chart...
+              <CollapsibleContent className="my-4 p-2">
+                <ComplianceDistribution
+                  uri={uri}
+                  assetVersionSlug={assetVersionSlug}
+                />
               </CollapsibleContent>
             </Collapsible>
           </Card>
