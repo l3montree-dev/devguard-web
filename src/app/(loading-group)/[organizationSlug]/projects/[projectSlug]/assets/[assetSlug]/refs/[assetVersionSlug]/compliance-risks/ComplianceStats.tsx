@@ -1,6 +1,6 @@
 "use client";
 
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 import useSWR from "swr";
 
 import {
@@ -20,18 +20,38 @@ interface Props {
   assetVersionSlug: string;
 }
 
+// TODO(backend): "Controls covered" and "Last attestation" are not exposed by the
+// compliance-risks API yet, so they are mocked below. The clean fix is a dedicated
+// summary endpoint (e.g. `…/compliance-risks/stats`) returning all four figures so
+// the component reads one source instead of deriving counts. Target shape:
+//   interface ComplianceStatsDTO {
+//     openRisks: number;
+//     resolvedRisks: number;
+//     controlsCovered: number;
+//     controlsTotal: number;
+//     lastAttestationAt: string | null; // ISO timestamp, formatted to relative time
+//   }
+// Until then Open/Resolved come from the two count fetches below, and the remaining
+// tiles render these placeholders:
+const MOCK_CONTROLS_COVERED = 7;
+const MOCK_CONTROLS_TOTAL = 43;
+const MOCK_LAST_ATTESTATION = "2h ago"; // later: relative time from lastAttestationAt
+
 interface TileProps {
   label: string;
-  value?: number;
-  isLoading: boolean;
-  colorClass: string;
+  colorClass?: string;
+  isLoading?: boolean;
+  children: ReactNode;
 }
 
+// Presentational only: owns the card/label/loading chrome. Each metric passes its
+// own already-formatted figure as children, so numbers, ratios and time strings all
+// render without widening a shared value type.
 const StatTile: FunctionComponent<TileProps> = ({
   label,
-  value,
-  isLoading,
   colorClass,
+  isLoading = false,
+  children,
 }) => (
   <Card>
     <CardHeader>
@@ -40,7 +60,7 @@ const StatTile: FunctionComponent<TileProps> = ({
         <Skeleton className="h-10 w-12" />
       ) : (
         <CardTitle className={classNames("text-4xl", colorClass)}>
-          {value ?? 0}
+          {children}
         </CardTitle>
       )}
     </CardHeader>
@@ -70,19 +90,29 @@ const ComplianceStats: FunctionComponent<Props> = ({
   });
 
   return (
-    <div className="grid w-full grid-cols-2 gap-4">
+    <div className="grid w-full grid-cols-4 gap-4">
       <StatTile
         label="Open risks"
-        value={open?.total}
-        isLoading={openLoading}
         colorClass="text-red-500"
-      />
+        isLoading={openLoading}
+      >
+        {open?.total ?? 0}
+      </StatTile>
       <StatTile
         label="Resolved"
-        value={resolved?.total}
-        isLoading={resolvedLoading}
         colorClass="text-green-500"
-      />
+        isLoading={resolvedLoading}
+      >
+        {resolved?.total ?? 0}
+      </StatTile>
+      {/* TODO(backend): replace mock with real control coverage */}
+      <StatTile label="Controls covered" colorClass="text-muted-foreground">
+        {MOCK_CONTROLS_COVERED} / {MOCK_CONTROLS_TOTAL}
+      </StatTile>
+      {/* TODO(backend): replace mock with real last attestation timestamp */}
+      <StatTile label="Last attestation" colorClass="text-muted-foreground">
+        {MOCK_LAST_ATTESTATION}
+      </StatTile>
     </div>
   );
 };
