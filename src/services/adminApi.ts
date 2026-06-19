@@ -15,11 +15,8 @@ export const adminBrowserApiClient = async (
   init?: RequestInit,
   prefix = "/api/v1",
 ): Promise<Response> => {
-  // This client runs in the browser... config.frontendUrl is not exposed client-side...
-  if (typeof window === "undefined") {
-    throw new Error("adminBrowserApiClient can only be used in the browser");
-  }
-  const url = window.location.origin + "/api/devguard-tunnel" + prefix + input;
+  // Relative URL — resolves against the current origin, same as browserApiClient
+  const url = "/api/devguard-tunnel" + prefix + input;
 
   const method = init?.method ?? "GET";
   // Only string bodies are supported
