@@ -59,9 +59,8 @@ import {
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
 import Alert from "../../../../components/common/Alert";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
-import { useTourSeen } from "@/hooks/useTourSeen";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -279,16 +278,7 @@ const Home = () => {
     }
   };
 
-  const { startTour } = usePageTour(orgSettingsTourSteps);
-  const { showModal: shouldStartTour, markSeen } = useTourSeen("org-settings");
-
-  useEffect(() => {
-    if (shouldStartTour) {
-      markSeen();
-      startTour();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldStartTour]);
+  useAutoTour("org-settings", orgSettingsTourSteps);
 
   const config = useConfig();
 

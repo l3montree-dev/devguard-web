@@ -87,9 +87,8 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { dependencyInsightsTourSteps } from "@/components/common/tours/dependency-insights-tour";
-import { useTourSeen } from "@/hooks/useTourSeen";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
   bad: [null, 3],
@@ -332,16 +331,7 @@ const columnsDef: ColumnDef<
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
-  const { startTour } = usePageTour(dependencyInsightsTourSteps);
-  const { showModal: shouldStartTour, markSeen } = useTourSeen("dependency-insights");
-
-  useEffect(() => {
-    if (shouldStartTour) {
-      markSeen();
-      startTour();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldStartTour]);
+  useAutoTour("dependency-insights", dependencyInsightsTourSteps);
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);

@@ -40,9 +40,8 @@ import DateString from "../../../../../../../../components/common/DateString";
 import Section from "@/components/common/Section";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
-import { useTourSeen } from "@/hooks/useTourSeen";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -314,16 +313,7 @@ const Index: FunctionComponent = () => {
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
-  const { startTour } = usePageTour(repoSettingsTourSteps);
-  const { showModal: shouldStartTour, markSeen } = useTourSeen("repo-settings");
-
-  useEffect(() => {
-    if (shouldStartTour) {
-      markSeen();
-      startTour();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldStartTour]);
+  useAutoTour("repo-settings", repoSettingsTourSteps);
 
   return (
     <Page

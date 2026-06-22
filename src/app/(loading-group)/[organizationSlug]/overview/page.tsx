@@ -11,13 +11,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetcher, FetcherError } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { OrgOverview } from "@/types/api/api";
 import Link from "next/link";
-import { useEffect, type FunctionComponent } from "react";
+import type { FunctionComponent } from "react";
 import useSWR from "swr";
-import { useTourSeen } from "@/hooks/useTourSeen";
 
 const STATS_PARAMS = new URLSearchParams({
   orgComponentsLimit: "5",
@@ -32,16 +31,7 @@ const OrganizationOverview: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
-  const { startTour } = usePageTour(orgOverviewTourSteps);
-  const { showModal: shouldStartTour, markSeen } = useTourSeen("org-overview");
-
-  useEffect(() => {
-    if (shouldStartTour) {
-      markSeen();
-      startTour();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shouldStartTour]);
+  useAutoTour("org-overview", orgOverviewTourSteps);
 
   const {
     data: orgStatistics,
