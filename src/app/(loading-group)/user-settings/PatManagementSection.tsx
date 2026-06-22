@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { toast } from "@/lib/toast";
 import { getLogoutUrl } from "@/server/actions/logout";
+import { addYears } from "date-fns";
 import { KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
@@ -192,21 +193,37 @@ const PatManagementSection: FunctionComponent = () => {
               </FormSection>
 
               <FormSection step={4} title="Expiry date" last>
-                <div className="flex items-center gap-3">
-                  <DatePicker
-                    date={expiryDate}
-                    onDateChange={setExpiryDate}
-                    label="Pick a date"
-                  />
-                  {expiryDate && (
-                    <span className="text-xs text-muted-foreground">
-                      Token valid until{" "}
-                      {expiryDate.toLocaleDateString(undefined, {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-3">
+                    <DatePicker
+                      date={expiryDate}
+                      onDateChange={setExpiryDate}
+                    />
+                    {expiryDate &&
+                      !(expiryDate > addYears(new Date(), 1)) &&
+                      !(
+                        expiryDate < new Date(new Date().setHours(0, 0, 0, 0))
+                      ) && (
+                        <span className="text-xs text-muted-foreground">
+                          Token valid until{" "}
+                          {expiryDate.toLocaleDateString(undefined, {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </span>
+                      )}
+                  </div>
+                  {expiryDate &&
+                    expiryDate < new Date(new Date().setHours(0, 0, 0, 0)) && (
+                      <p className="text-xs text-destructive">
+                        Expiry date cannot be in the past.
+                      </p>
+                    )}
+                  {expiryDate && expiryDate > addYears(new Date(), 1) && (
+                    <p className="text-xs text-destructive">
+                      Expiry date cannot be more than 1 year in the future.
+                    </p>
                   )}
                 </div>
               </FormSection>
