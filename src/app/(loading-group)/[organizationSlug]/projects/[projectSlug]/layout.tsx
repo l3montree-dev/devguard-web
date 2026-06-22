@@ -3,6 +3,7 @@ import React from "react";
 import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 import { ProjectProvider } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
+import { handleHttpError } from "../../../../../data-fetcher/handle-http-error";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.
@@ -14,14 +15,18 @@ export default async function RootLayout({
   params: Promise<{ organizationSlug: string; projectSlug: string }>;
 }) {
   const { organizationSlug, projectSlug } = await params;
-  const [project] = await Promise.all([
-    fetchProject(decodeURIComponent(organizationSlug), projectSlug),
-  ]);
+  try {
+    const [project] = await Promise.all([
+      fetchProject(decodeURIComponent(organizationSlug), projectSlug),
+    ]);
 
-  return (
-    <ClientContextWrapper Provider={ProjectProvider} value={project}>
-      <ProjectHeader />
-      {children}
-    </ClientContextWrapper>
-  );
+    return (
+      <ClientContextWrapper Provider={ProjectProvider} value={project}>
+        <ProjectHeader />
+        {children}
+      </ClientContextWrapper>
+    );
+  } catch (error) {
+    handleHttpError(error);
+  }
 }

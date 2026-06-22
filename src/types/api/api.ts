@@ -1010,26 +1010,27 @@ export type EcosystemUsageInOrg = {
 };
 
 export type AverageRemediationTimes = {
-  lowRiskAverage: number;
-  mediumRiskAverage: number;
-  highRiskAverage: number;
-  criticalRiskAverage: number;
+  // average time until vulns are remediated
+  lowRiskRemediated: number;
+  mediumRiskRemediated: number;
+  highRiskRemediated: number;
+  criticalRiskRemediated: number;
 
-  lowCVSSAverage: number;
-  mediumCVSSAverage: number;
-  highCVSSAverage: number;
-  criticalCVSSAverage: number;
-};
+  lowCVSSRemediated: number;
+  mediumCVSSRemediated: number;
+  highCVSSRemediated: number;
+  criticalCVSSRemediated: number;
 
-export type ProjectVulnCountAverageBySeverity = {
-  riskLowAverage: number;
-  riskMediumAverage: number;
-  riskHighAverage: number;
-  riskCriticalAverage: number;
-  cvssLowAverage: number;
-  cvssMediumAverage: number;
-  cvssHighAverage: number;
-  cvssCriticalAverage: number;
+  // average age of non-remediated (open) vulns
+  lowRiskOpen: number;
+  mediumRiskOpen: number;
+  highRiskOpen: number;
+  criticalRiskOpen: number;
+
+  lowCVSSOpen: number;
+  mediumCVSSOpen: number;
+  highCVSSOpen: number;
+  criticalCVSSOpen: number;
 };
 
 export type RemediationTypeUsage = {
@@ -1054,6 +1055,94 @@ export type OrgOverview = {
   averageRemediationTimes: AverageRemediationTimes;
   averageAgeOfDependencies: number;
   averageOpenCodeRisksPerProject: number;
-  projectOpenVulnAverage: ProjectVulnCountAverageBySeverity;
   remediationTypeDistribution: RemediationTypeUsage;
 };
+
+// Instance-wide usage counters from `GET /admin/statistics/usage/`.
+// NOTE: the backend `dtos.InstanceUsageStatistics` struct carries no `json`
+// tags, so the serialized keys are the Go field names verbatim (PascalCase).
+export interface InstanceUsageStatistics {
+  NumberOfUsers: number;
+  NumberOfOrganizations: number;
+  NumberOfProjects: number;
+  NumberOfAssetVersions: number;
+  NumberOfTicketSyncedProjects: number;
+  NumberOfProjectsWithGitlabIntegration: number;
+}
+
+// A malicious package detected somewhere across the instance, with the full
+// slug path needed to locate it. Mirrors `dtos.MaliciousPackage`.
+export interface MaliciousPackage {
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
+  assetName: string;
+  assetVersionName: string;
+  component: string;
+  maliciousPackageID: string;
+}
+
+// Like ComponentUsageInOrg but with the instance-wide relative share. Mirrors
+// `dtos.ComponentOccurrenceAcrossInstance`. Assignable to ComponentUsageInOrg.
+export interface ComponentOccurrenceAcrossInstance {
+  purl: string;
+  totalAmount: number;
+  relativeAmount: number;
+}
+
+// Instance-wide vulnerability overview from
+// `GET /admin/statistics/vulnerabilities/`. Mirrors `dtos.InstanceOverview`.
+export interface InstanceOverview {
+  topCVEs: CVEOccurrenceInOrg[];
+  topComponents: ComponentOccurrenceAcrossInstance[];
+  maliciousPackages: MaliciousPackage[];
+  averageOpenCodeRisks: number;
+  topVulnerableProjects: VulnDistributionInStructure[];
+  // `dtos.OrgVulnAverage` = `RemediationTimeAverages`: the same 8 risk/cvss
+  // average keys already modelled by AllAverageFixingTimes.
+  averageOpenVulnsPerOrg: AllAverageFixingTimes;
+}
+
+export interface InstanceBuildInfo {
+  version: string;
+  commit: string;
+  branch: string;
+  buildDate: string;
+}
+
+export interface InstanceProcessInfo {
+  pid: number;
+  hostname: string;
+  uptimeSeconds: number;
+}
+
+export interface InstanceRuntimeMemInfo {
+  alloc: number;
+  totalAlloc: number;
+  sys: number;
+  heapAlloc: number;
+}
+
+export interface InstanceRuntimeInfo {
+  goVersion: string;
+  numGoroutines: number;
+  mem: InstanceRuntimeMemInfo;
+}
+
+export interface InstanceDatabaseInfo {
+  maxOpenConnections: number;
+  openConnections: number;
+  inUse: number;
+  idle: number;
+  status: string;
+  migrationVersion: number;
+  migrationDirty: boolean;
+  vulndbVersion: string;
+}
+
+export interface InstanceInfoDTO {
+  build: InstanceBuildInfo;
+  process: InstanceProcessInfo;
+  runtime: InstanceRuntimeInfo;
+  database: InstanceDatabaseInfo;
+}

@@ -3,12 +3,10 @@ import React, { Suspense } from "react";
 import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
 import OrgHeader from "@/components/common/OrgHeader";
-import { redirect } from "next/navigation";
-import { config } from "../../../config";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
-import { HttpError } from "../../../data-fetcher/http-error";
+import { handleHttpError } from "../../../data-fetcher/handle-http-error";
 
 export default function OrganizationLayout({
   // Layouts must accept a children prop.
@@ -57,25 +55,6 @@ async function OrganizationShell({
       </ClientContextWrapper>
     );
   } catch (error) {
-    if (error instanceof HttpError && error.statusCode === 402) {
-      const billingUrl = new URL(config.billingUrl);
-      billingUrl.searchParams.set("expired", "1");
-      if (organizationSlug) {
-        billingUrl.searchParams.set("orgName", organizationSlug);
-      }
-      redirect(billingUrl.toString());
-    } else if (error instanceof HttpError && error.statusCode === 403) {
-      // this only happens, if the user needs to reauthorize an identity provider. In this case we can show a specific error message.
-      redirect("/" + organizationSlug + "/oauth2error");
-    } else if (
-      error instanceof HttpError &&
-      (error.statusCode === 401 || error.statusCode === 404)
-    ) {
-      // Let the error boundary handle 401/404 to show proper error pages
-      throw error;
-    } else {
-      console.error("An unexpected error occurred:", error);
-      throw error;
-    }
+    handleHttpError(error, organizationSlug);
   }
 }

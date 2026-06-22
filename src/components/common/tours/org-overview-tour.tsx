@@ -40,8 +40,8 @@ export const orgOverviewTourSteps: ConditionalStep[] = [
     selector: '[data-tour="average-stats-section"]',
     content: (
       <>
-        Average Open Vulnerabilities per Project shows you the mean number of
-        unresolved issues per project. It also includes{" "}
+        These cards show the average time it takes to remediate vulnerabilities
+        and the average age of those still open, per severity. It also includes{" "}
         <TourLink
           href={`${DOCS}/how-to-guides/vulnerability-management/track-fix-progress`}
         >
