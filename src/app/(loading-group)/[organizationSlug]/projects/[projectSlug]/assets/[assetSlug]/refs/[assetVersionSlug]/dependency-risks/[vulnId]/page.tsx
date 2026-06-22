@@ -321,7 +321,8 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
   const { startTour, registerSteps } = usePageTour(dependencyRiskTourSteps);
-  const { showModal: shouldStartTour, markSeen } = useTourSeen("dependency-risk");
+  const { showModal: shouldStartTour, markSeen } =
+    useTourSeen("dependency-risk");
   const [
     acceptVexRuleRecommendationDialogOpen,
     setAcceptVexRuleRecommendationDialogOpen,
@@ -380,7 +381,11 @@ const Index: FunctionComponent = () => {
   );
 
   const handleGraphReady = useCallback(() => {
-    if (searchParams?.get("startTour") !== "4" && !shouldStartTour) return;
+    if (
+      searchParams?.get("startTour") !== "dependency-risk" &&
+      !shouldStartTour
+    )
+      return;
     markSeen();
     registerSteps(dependencyRiskTourSteps);
     startTour();
@@ -390,7 +395,8 @@ const Index: FunctionComponent = () => {
   // Path explosion: no graph is rendered so onReady never fires — start tour directly
   useEffect(() => {
     if (
-      (searchParams?.get("startTour") !== "4" && !shouldStartTour) ||
+      (searchParams?.get("startTour") !== "dependency-risk" &&
+        !shouldStartTour) ||
       graphLoading ||
       (vuln?.vulnerabilityPath.length || 0) !== 0
     )
