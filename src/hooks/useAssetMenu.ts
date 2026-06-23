@@ -20,7 +20,13 @@ import {
   ShareIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { CodeIcon, BookCheckIcon, ScanText, TextSelect } from "lucide-react";
+import {
+  CodeIcon,
+  BookCheckIcon,
+  ScanText,
+  TextSelect,
+  ShieldEllipsis,
+} from "lucide-react";
 import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
@@ -225,6 +231,22 @@ export const useAssetMenu = () => {
         Icon: TextSelect,
         isActive: pathname.includes("artifacts"),
         testId: "nav-asset-artifacts",
+      },
+      {
+        title: "Security Advisory",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/advisory",
+        Icon: ShieldEllipsis,
+        isActive: pathname.includes("advisory"),
+        testId: "nav-asset-advisory",
       },
     ]);
   } else {
