@@ -972,72 +972,73 @@ const Index: FunctionComponent = () => {
                                   <div className="flex flex-row justify-end gap-1">
                                     <div className="flex flex-row items-start gap-2 pt-2">
                                       {vuln.ticketId === null &&
-                                      integrationName === undefined ? (
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <span>
-                                              <Button
-                                                variant={"ghost"}
-                                                disabled
-                                                className=""
+                                        (integrationName === undefined ? (
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <span>
+                                                <Button
+                                                  variant={"ghost"}
+                                                  disabled
+                                                  className=""
+                                                >
+                                                  <span className="ml-1 text-muted-foreground">
+                                                    Create Ticket
+                                                  </span>
+                                                </Button>
+                                              </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              No repository is linked. To create
+                                              a ticket, please integrate your
+                                              issue tracker in the {` `}
+                                              <Link
+                                                href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                                className="underline"
                                               >
-                                                <span className="ml-1 text-muted-foreground">
-                                                  Create Ticket
-                                                </span>
-                                              </Button>
+                                                settings
+                                              </Link>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        ) : (
+                                          <Button
+                                            variant={"secondary"}
+                                            onClick={() =>
+                                              setMitigateDialogOpen(true)
+                                            }
+                                          >
+                                            {integrationName === "gitlab" && (
+                                              <GitProviderIcon
+                                                externalEntityProviderIdOrRepositoryId={
+                                                  asset.externalEntityProviderId ??
+                                                  "gitlab"
+                                                }
+                                              />
+                                            )}
+                                            {integrationName === "github" && (
+                                              <Image
+                                                alt="GitHub Logo"
+                                                width={15}
+                                                height={15}
+                                                className="dark:invert"
+                                                src={"/assets/github.svg"}
+                                              />
+                                            )}
+                                            {integrationName === "jira" && (
+                                              <Image
+                                                alt="Jira Logo"
+                                                width={15}
+                                                height={15}
+                                                src={
+                                                  "/assets/jira-svgrepo-com.svg"
+                                                }
+                                              />
+                                            )}
+                                            <span className="ml-1">
+                                              Create Ticket{" "}
                                             </span>
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            No repository is linked. To create a
-                                            ticket, please integrate your issue
-                                            tracker in the {` `}
-                                            <Link
-                                              href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                              className="underline"
-                                            >
-                                              settings
-                                            </Link>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      ) : (
-                                        <Button
-                                          variant={"secondary"}
-                                          onClick={() =>
-                                            setMitigateDialogOpen(true)
-                                          }
-                                        >
-                                          {integrationName === "gitlab" && (
-                                            <GitProviderIcon
-                                              externalEntityProviderIdOrRepositoryId={
-                                                asset.externalEntityProviderId ??
-                                                "gitlab"
-                                              }
-                                            />
-                                          )}
-                                          {integrationName === "github" && (
-                                            <Image
-                                              alt="GitHub Logo"
-                                              width={15}
-                                              height={15}
-                                              className="dark:invert"
-                                              src={"/assets/github.svg"}
-                                            />
-                                          )}
-                                          {integrationName === "jira" && (
-                                            <Image
-                                              alt="Jira Logo"
-                                              width={15}
-                                              height={15}
-                                              src={
-                                                "/assets/jira-svgrepo-com.svg"
-                                              }
-                                            />
-                                          )}
-                                          <span className="ml-1">
-                                            Create Ticket{" "}
-                                          </span>
-                                        </Button>
-                                      )}
+                                          </Button>
+                                        ))}
+
                                       <Button
                                         data-testid="mark-false-positive"
                                         onClick={() =>
