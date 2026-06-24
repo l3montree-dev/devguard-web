@@ -9,5 +9,6 @@
     "licenser.useSPDXLicenseFormat": true,
     "cSpell.words": [
         "devguard"
-    ]
+    ],
+    "eslint.useFlatConfig": true
 }

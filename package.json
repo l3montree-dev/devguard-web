@@ -99,7 +99,7 @@
         "react-hook-form": "7.56.4"
     },
     "devDependencies": {
-        "@eslint/eslintrc": "^3.3.5",
+        "@eslint/eslintrc": "3.3.5",
         "@eslint/js": "^9.39.4",
         "@playwright/test": "^1.61.0",
         "@tailwindcss/postcss": "^4.2.4",

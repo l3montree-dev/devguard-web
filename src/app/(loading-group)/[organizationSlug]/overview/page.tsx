@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetcher, FetcherError } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { OrgOverview } from "@/types/api/api";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
@@ -32,7 +32,7 @@ const OrganizationOverview: FunctionComponent = () => {
 
   const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
-  const { startTour } = usePageTour(orgOverviewTourSteps);
+  useAutoTour("org-overview", orgOverviewTourSteps);
 
   const {
     data: orgStatistics,

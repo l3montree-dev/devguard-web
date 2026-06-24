@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Page from "../../../../components/Page";
 
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
@@ -59,7 +59,7 @@ import {
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
 import Alert from "../../../../components/common/Alert";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
 
 const Home = () => {
@@ -278,7 +278,7 @@ const Home = () => {
     }
   };
 
-  const { startTour } = usePageTour(orgSettingsTourSteps);
+  useAutoTour("org-settings", orgSettingsTourSteps);
 
   const config = useConfig();
 

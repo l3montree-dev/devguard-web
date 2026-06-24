@@ -149,7 +149,7 @@ export default function HelpCenterPage() {
   }, [firstProject?.slug, resources]);
 
   const depRiskTourHref = depRiskTarget
-    ? `/${activeOrg.slug}/projects/${depRiskTarget.projectSlug}/assets/${depRiskTarget.assetSlug}/refs/${depRiskTarget.refSlug}/dependency-risks/${depRiskTarget.vulnId}?startTour=4`
+    ? `/${activeOrg.slug}/projects/${depRiskTarget.projectSlug}/assets/${depRiskTarget.assetSlug}/refs/${depRiskTarget.refSlug}/dependency-risks/${depRiskTarget.vulnId}?startTour=dependency-risk`
     : undefined;
 
   const depRiskTourDisabledReason =
@@ -164,7 +164,7 @@ export default function HelpCenterPage() {
           : undefined;
 
   const repoTourHref = repoTourTarget
-    ? `/${activeOrg.slug}/projects/${repoTourTarget.projectSlug}/assets/${repoTourTarget.assetSlug}?startTour=3`
+    ? `/${activeOrg.slug}/projects/${repoTourTarget.projectSlug}/assets/${repoTourTarget.assetSlug}?startTour=repo-home`
     : undefined;
 
   const repoTourDisabledReason =
@@ -215,7 +215,7 @@ export default function HelpCenterPage() {
                 Description="Get a guided overview of the organization dashboard."
                 Button={
                   <Link
-                    href={`/${activeOrg.slug}?startTour=1`}
+                    href={`/${activeOrg.slug}?startTour=org-home`}
                     className={cn(
                       buttonVariants({ variant: "default" }),
                       "hover:no-underline text-primary-foreground!",
@@ -240,7 +240,7 @@ export default function HelpCenterPage() {
                 Button={
                   firstProject ? (
                     <Link
-                      href={`/${activeOrg.slug}/projects/${firstProject.slug}?startTour=2`}
+                      href={`/${activeOrg.slug}/projects/${firstProject.slug}?startTour=group-home`}
                       className={cn(
                         buttonVariants({ variant: "secondary" }),
                         "hover:no-underline",
