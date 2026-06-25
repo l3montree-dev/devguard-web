@@ -68,7 +68,7 @@ const ComplianceDistribution: FunctionComponent<Props> = ({
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 pr-5">
       <Card className="bg-background">
         <CardHeader className="items-start pb-4">
           <CardTitle>Overview</CardTitle>
@@ -87,7 +87,9 @@ const ComplianceDistribution: FunctionComponent<Props> = ({
               className="mx-auto aspect-square max-h-[220px]"
             >
               <PieChart>
-                <ChartTooltip content={<ChartTooltipContent nameKey="state" />} />
+                <ChartTooltip
+                  content={<ChartTooltipContent nameKey="state" />}
+                />
                 <Pie
                   data={chartData}
                   dataKey="count"
