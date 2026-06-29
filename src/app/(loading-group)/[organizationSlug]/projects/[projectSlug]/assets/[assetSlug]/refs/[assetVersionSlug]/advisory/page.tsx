@@ -34,6 +34,7 @@ import AdvisoryDialog, {
   type AdvisoryFormData,
 } from "@/components/AdvisoryDialog";
 import { toast } from "@/lib/toast";
+import { vectorStringToScore } from "@/utils/cvss";
 
 const columnHelper = createColumnHelper<SecurityAdvisory>();
 
@@ -59,6 +60,7 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
     cell: (info) => {
       const severity = info.getValue();
       if (!severity) return null;
+      const score = vectorStringToScore(info.row.original.vectorstring ?? "");
       return (
         <span
           className={classNames(
@@ -67,6 +69,7 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
           )}
         >
           {severity}
+          {score !== null && ` (${score.toFixed(1)})`}
         </span>
       );
     },

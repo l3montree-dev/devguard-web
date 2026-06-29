@@ -945,6 +945,18 @@ export function vectorStringToSeverity(vec: string): string | null {
   }
 }
 
+export function vectorStringToScore(vec: string): number | null {
+  const parsed = parseCvssVector(vec);
+  if (!parsed) return null;
+  try {
+    return parsed.version === "3.1"
+      ? calcCvss31(parsed.metrics)
+      : calcCvss40(parsed.metrics);
+  } catch {
+    return null;
+  }
+}
+
 export function buildVectorString(
   version: "3.1" | "4.0",
   vals: Record<string, string>,
