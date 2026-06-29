@@ -26,7 +26,12 @@ const EntityProviderBanner = () => {
     return null;
   }
 
-  if (assetSlug && activeAsset && activeAsset.externalEntityProviderId) {
+  if (
+    organizationSlug?.startsWith("@") &&
+    assetSlug &&
+    activeAsset &&
+    activeAsset.externalEntityProviderId
+  ) {
     return (
       <div>
         <Link
@@ -50,7 +55,12 @@ const EntityProviderBanner = () => {
     );
   }
 
-  if (projectSlug && activeProject && activeProject.externalEntityProviderId) {
+  if (
+    organizationSlug?.startsWith("@") &&
+    projectSlug &&
+    activeProject &&
+    activeProject.externalEntityProviderId
+  ) {
     return (
       <div>
         <Link
@@ -94,7 +104,19 @@ const EntityProviderBanner = () => {
     );
   }
 
-  return <div></div>;
+  return (
+    <div className="flex !text-secondary-foreground items-center justify-center bg-secondary px-4 py-1 text-xs transition-all text-white">
+      External managed entity (
+      <Link
+        target="_blank"
+        className="hover:underline"
+        href="https://docs.devguard.org/reference/api/external-entity/"
+      >
+        Documentation
+      </Link>
+      )
+    </div>
+  );
 };
 
 export default EntityProviderBanner;

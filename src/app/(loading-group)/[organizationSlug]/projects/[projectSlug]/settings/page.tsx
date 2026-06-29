@@ -28,6 +28,8 @@ import Section from "../../../../../../components/common/Section";
 import { Label } from "../../../../../../components/ui/label";
 import { useUpdateProject } from "../../../../../../context/ProjectContext";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
+import Image from "next/image";
+import { useConfig } from "../../../../../../context/ConfigContext";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -36,6 +38,7 @@ const Index: FunctionComponent = () => {
   const currentUserRole = useCurrentUserRole();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
 
+  const config = useConfig();
   const router = useRouter();
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     if (!project) {
@@ -207,6 +210,62 @@ const Index: FunctionComponent = () => {
           <h1 className="text-2xl font-semibold">Group Settings</h1>
         </div>
         <div>
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(handleUpdate)}>
+              <ProjectForm
+                onConfirmDelete={
+                  Boolean(project.externalEntityProviderId)
+                    ? undefined
+                    : handleDeleteProject
+                }
+                forceVerticalSections={false}
+                form={form}
+              />
+              <div className="mt-4 flex flex-row justify-end">
+                <Button>Update</Button>
+              </div>
+            </form>
+          </FormProvider>
+          <div className="my-4">
+            <hr />
+          </div>
+          <Section
+            description="DevGuard is built around a set of APIs that allow external systems to integrate and contribute data.
+
+To support integration with external platforms, DevGuard provides ingestion endpoints that allow other systems to push data while referencing entities using opaque external identifiers.
+
+These identifiers are managed by the external system and are treated as immutable references within DevGuard."
+            title="External Integrations"
+          >
+            <Label>SBOM Ingestion API</Label>
+            <CopyInput
+              value={
+                config.devguardApiUrlPublicInternet +
+                "api/v1" +
+                "/organizations/" +
+                activeOrg.slug +
+                "/projects/" +
+                (project?.slug ?? "") +
+                "/external/:provider-id"
+              }
+            />
+            <small>
+              DevGuard provides an API endpoint for ingesting SBOMs associated
+              with external entities. This allows external systems to submit
+              SBOM data while maintaining their own identifier scheme.
+              <br /> <br />
+              See the docs: See{" "}
+              <Link
+                href={
+                  "https://github.com/l3montree-dev/devguard-k8s-image-inventory"
+                }
+              >
+                https://github.com/l3montree-dev/devguard-k8s-image-inventory
+              </Link>{" "}
+              for a reference implementation.
+            </small>
+          </Section>
+          <hr />
           <Section
             description={
               "Manage the webhooks that are used to connect DevGuard with your Applications."
@@ -230,7 +289,7 @@ const Index: FunctionComponent = () => {
               />
             ))}
 
-            <hr />
+            {project.webhooks.length > 0 && <hr />}
             <ListItem
               Title={
                 <div className="flex flex-row items-center">Add a Webhook</div>
@@ -295,10 +354,12 @@ const Index: FunctionComponent = () => {
                     "/settings/config"
                   }
                 >
-                  <Button variant={"outline"}>Go to Configuration Files</Button>
+                  <Button variant={"secondary"}>
+                    Go to Configuration Files
+                  </Button>
                 </Link>
               ) : (
-                <Button variant={"outline"} disabled>
+                <Button variant={"secondary"} disabled>
                   Go to Configuration Files
                 </Button>
               )}
@@ -321,29 +382,13 @@ const Index: FunctionComponent = () => {
                   "/settings/dependency-proxy"
                 }
               >
-                <Button variant={"outline"}>
+                <Button variant={"secondary"}>
                   Go to Dependency Proxy Settings{" "}
                 </Button>
               </Link>
             </div>
           </Card>
         </Section>
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(handleUpdate)}>
-            <ProjectForm
-              onConfirmDelete={
-                Boolean(project.externalEntityProviderId)
-                  ? undefined
-                  : handleDeleteProject
-              }
-              forceVerticalSections={false}
-              form={form}
-            />
-            <div className="mt-4 flex flex-row justify-end">
-              <Button>Update</Button>
-            </div>
-          </form>
-        </FormProvider>
       </div>
     </Page>
   );
