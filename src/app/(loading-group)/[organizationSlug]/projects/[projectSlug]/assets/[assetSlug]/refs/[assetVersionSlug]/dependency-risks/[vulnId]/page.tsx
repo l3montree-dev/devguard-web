@@ -83,6 +83,7 @@ import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/us
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import WarningWithDescription from "@/components/common/WarningWithDescription";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -681,6 +682,25 @@ const Index: FunctionComponent = () => {
                   <VulnState state={vuln?.state ?? "open"} />
                 ) : (
                   <Skeleton className="w-20 h-6 rounded-full" />
+                )}
+                {vuln?.cve?.cisaExploitAdd || vuln?.cve?.euvdExploitAdd ? (
+                  <WarningWithDescription
+                    description={
+                      <>
+                        This vulnerability is actively being exploited!
+                        <br />
+                        Sources:{" "}
+                        {[
+                          vuln.cve?.euvdExploitAdd && "EUVD",
+                          vuln.cve?.cisaExploitAdd && "CISA KEV",
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </>
+                    }
+                  />
+                ) : (
+                  <></>
                 )}
               </div>
               <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">

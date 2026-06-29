@@ -408,6 +408,7 @@ export interface CVE {
   cisaActionDue?: string;
   cisaRequiredAction?: string;
   cisaVulnerabilityName?: string;
+  euvdExploitAdd?: string;
 
   vector?: string;
 }
