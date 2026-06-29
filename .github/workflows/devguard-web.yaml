@@ -89,9 +89,9 @@ jobs:
       nix-target-arm64: devguard-web-arm64
       nix-version: '2.34.4'
       image-name: ghcr.io/${{ github.repository }}
-      asset-name: l3montree-cybersecurity/projects/devguard/assets/devguard-web
-      api-url: https://api.main.devguard.org
-      web-ui: https://main.devguard.org
+      devguard-asset-name: l3montree-cybersecurity/projects/devguard/assets/devguard-web
+      devguard-api-url: https://api.main.devguard.org
+      devguard-web-ui: https://main.devguard.org
       fail-on-cvss: never
       fail-on-risk: never
       nix-cache-substituter: https://nix.garage.l3montree.cloud
