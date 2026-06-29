@@ -53,6 +53,20 @@ const PatManagementSection: FunctionComponent = () => {
     SeeOncePatWithPrivKey | SeeOncePatWithBearerToken | null
   >(null);
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
+  const [expiryError, setExpiryError] = useState<string | null>(null);
+
+  const handleExpiryDateChange = (date: Date | undefined) => {
+    setExpiryDate(date);
+    if (!date) {
+      setExpiryError(null);
+    } else if (date < new Date(new Date().setHours(0, 0, 0, 0))) {
+      setExpiryError("Expiry date cannot be in the past.");
+    } else if (date > addYears(new Date(), 1)) {
+      setExpiryError("Expiry date cannot be more than 1 year in the future.");
+    } else {
+      setExpiryError(null);
+    }
+  };
 
   const { register, handleSubmit, reset, setValue, watch } = useForm<{
     description: string;
@@ -106,6 +120,13 @@ const PatManagementSection: FunctionComponent = () => {
       return;
     }
 
+    if (expiryError) {
+      toast.error("Invalid expiry date", {
+        description: expiryError,
+      });
+      return;
+    }
+
     try {
       const createdToken = await onCreatePat({
         description: data.description,
@@ -115,6 +136,7 @@ const PatManagementSection: FunctionComponent = () => {
       });
       setNewToken(createdToken);
       setExpiryDate(undefined);
+      setExpiryError(null);
       reset();
     } catch {
       toast.error("Failed to create token", {
@@ -197,33 +219,21 @@ const PatManagementSection: FunctionComponent = () => {
                   <div className="flex items-center gap-3">
                     <DatePicker
                       date={expiryDate}
-                      onDateChange={setExpiryDate}
+                      onDateChange={handleExpiryDateChange}
                     />
-                    {expiryDate &&
-                      !(expiryDate > addYears(new Date(), 1)) &&
-                      !(
-                        expiryDate < new Date(new Date().setHours(0, 0, 0, 0))
-                      ) && (
-                        <span className="text-xs text-muted-foreground">
-                          Token valid until{" "}
-                          {expiryDate.toLocaleDateString(undefined, {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })}
-                        </span>
-                      )}
-                  </div>
-                  {expiryDate &&
-                    expiryDate < new Date(new Date().setHours(0, 0, 0, 0)) && (
-                      <p className="text-xs text-destructive">
-                        Expiry date cannot be in the past.
-                      </p>
+                    {expiryDate && !expiryError && (
+                      <span className="text-xs text-muted-foreground">
+                        Token valid until{" "}
+                        {expiryDate.toLocaleDateString(undefined, {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </span>
                     )}
-                  {expiryDate && expiryDate > addYears(new Date(), 1) && (
-                    <p className="text-xs text-destructive">
-                      Expiry date cannot be more than 1 year in the future.
-                    </p>
+                  </div>
+                  {expiryError && (
+                    <p className="text-xs text-destructive">{expiryError}</p>
                   )}
                 </div>
               </FormSection>
