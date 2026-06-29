@@ -7,7 +7,9 @@ import useDecodedParams from "@/hooks/useDecodedParams";
 import Section from "@/components/common/Section";
 import { Button } from "@/components/ui/button";
 import AuthGuard from "@/components/AuthGuard";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useRouterQuery from "@/hooks/useRouterQuery";
 import EmptyParty from "@/components/common/EmptyParty";
 import { Loader2 } from "lucide-react";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -85,12 +87,23 @@ const Index: FunctionComponent = () => {
 
   const advisoryUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`;
 
+  const searchParams = useSearchParams();
+  const push = useRouterQuery();
+
+  const visibility =
+    searchParams?.get("visibility") === "public" ? "public" : "draft";
+
+  const page = searchParams?.get("page") || "1";
+  const pageSize = searchParams?.get("pageSize") || "10";
+
+  const advisoryListUrl = `${advisoryUrl}?visibility=${visibility}&page=${page}&pageSize=${pageSize}`;
+
   const {
     data: advisories,
     isLoading,
     error,
   } = useSWR<Paged<SecurityAdvisory>>(
-    advisoryUrl,
+    advisoryListUrl,
     (url: string) =>
       fetcher(url).then((res: SecurityAdvisory[] | Paged<SecurityAdvisory>) =>
         Array.isArray(res)
@@ -114,7 +127,7 @@ const Index: FunctionComponent = () => {
     });
     if (resp.ok) {
       toast.success("Security Advisory created successfully!");
-      mutate(advisoryUrl);
+      mutate(advisoryListUrl);
     } else {
       const msg = await resp.text();
       toast.error("Failed to create advisory: " + msg);
@@ -149,6 +162,24 @@ const Index: FunctionComponent = () => {
         description="This table shows all the created security advisories of this repository."
         className="mb-4 mt-4"
       >
+        <div className="flex flex-1 flex-col gap-2">
+          <Tabs value={visibility}>
+            <TabsList>
+              <TabsTrigger
+                onClick={() => push({ visibility: "draft", page: 1 })}
+                value="draft"
+              >
+                Draft
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() => push({ visibility: "public", page: 1 })}
+                value="public"
+              >
+                Public
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
         <div className="absolute right-2 top-1/2 -translate-y-1/2 ">
           {isLoading && (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />

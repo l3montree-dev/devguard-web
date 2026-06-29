@@ -3,6 +3,7 @@ export type CvssMetric = {
   label: string;
   group?: string;
   options: { v: string; l: string }[];
+  description?: string;
 };
 
 export const CVSS31_METRICS: CvssMetric[] = [
@@ -10,71 +11,87 @@ export const CVSS31_METRICS: CvssMetric[] = [
     key: "AV",
     label: "Attack Vector",
     options: [
-      { v: "N", l: "Network" },
-      { v: "A", l: "Adjacent" },
-      { v: "L", l: "Local" },
-      { v: "P", l: "Physical" },
+      { v: "(N)", l: "Network" },
+      { v: "(A)", l: "Adjacent" },
+      { v: "(L)", l: "Local" },
+      { v: "(P)", l: "Physical" },
     ],
+    description:
+      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
   },
   {
     key: "AC",
     label: "Attack Complexity",
     options: [
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
   },
   {
     key: "PR",
     label: "Privileges Required",
     options: [
-      { v: "N", l: "None" },
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(N)", l: "None" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric describes the level of privileges an attacker must possess prior to successfully exploiting the vulnerability. The method by which the attacker obtains privileged credentials prior to the attack (e.g., free trial accounts), is outside the scope of this metric. Generally, self-service provisioned accounts do not constitute a privilege requirement if the attacker can grant themselves privileges as part of the attack.",
   },
   {
     key: "UI",
     label: "User Interaction",
     options: [
-      { v: "N", l: "None" },
-      { v: "R", l: "Required" },
+      { v: "(N)", l: "None" },
+      { v: "(R)", l: "Required" },
     ],
+    description:
+      "This metric captures the requirement for a human user, other than the attacker, to participate in the successful compromise of the vulnerable system. This metric determines whether the vulnerability can be exploited solely at the will of the attacker, or whether a separate user (or user-initiated process) must participate in some manner.",
   },
   {
     key: "S",
     label: "Scope",
     options: [
-      { v: "U", l: "Unchanged" },
-      { v: "C", l: "Changed" },
+      { v: "(U)", l: "Unchanged" },
+      { v: "(C)", l: "Changed" },
     ],
+    description:
+      "Does a successful attack impact a component other than the vulnerable component? If so, the Base Score increases and the Confidentiality, Integrity and Authentication metrics should be scored relative to the impacted component.",
   },
   {
     key: "C",
     label: "Confidentiality Impact",
     options: [
-      { v: "N", l: "None" },
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(N)", l: "None" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric measures the impact to the confidentiality of the information resources managed by a software component due to a successfully exploited vulnerability. Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones.",
   },
   {
     key: "I",
     label: "Integrity Impact",
     options: [
-      { v: "N", l: "None" },
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(N)", l: "None" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric measures the impact to integrity of a successfully exploited vulnerability. Integrity refers to the trustworthiness and veracity of information.",
   },
   {
     key: "A",
     label: "Availability Impact",
     options: [
-      { v: "N", l: "None" },
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(N)", l: "None" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric measures the impact to the availability of the impacted component resulting from a successfully exploited vulnerability. It refers to the loss of availability of the impacted component itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of an impacted component.",
   },
 ];
 
@@ -83,105 +100,127 @@ export const CVSS40_METRICS: CvssMetric[] = [
     key: "AV",
     label: "Attack Vector",
     options: [
-      { v: "N", l: "Network" },
-      { v: "A", l: "Adjacent" },
-      { v: "L", l: "Local" },
-      { v: "P", l: "Physical" },
+      { v: "(N)", l: "Network" },
+      { v: "(A)", l: "Adjacent" },
+      { v: "(L)", l: "Local" },
+      { v: "(P)", l: "Physical" },
     ],
+    description:
+      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
   },
   {
     key: "AC",
     label: "Attack Complexity",
     options: [
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
   },
   {
     key: "AT",
     label: "Attack Requirements",
     options: [
-      { v: "N", l: "None" },
-      { v: "P", l: "Present" },
+      { v: "(N)", l: "None" },
+      { v: "(P)", l: "Present" },
     ],
+    description:
+      "This metric captures the prerequisite deployment and execution conditions or variables of the vulnerable system that enable the attack. These differ from security-enhancing techniques/technologies (ref Attack Complexity) as the primary purpose of these conditions is not to explicitly mitigate attacks, but rather, emerge naturally as a consequence of the deployment and execution of the vulnerable system.",
   },
   {
     key: "PR",
     label: "Privileges Required",
     options: [
-      { v: "N", l: "None" },
-      { v: "L", l: "Low" },
-      { v: "H", l: "High" },
+      { v: "(N)", l: "None" },
+      { v: "(L)", l: "Low" },
+      { v: "(H)", l: "High" },
     ],
+    description:
+      "This metric describes the level of privileges an attacker must possess prior to successfully exploiting the vulnerability. The method by which the attacker obtains privileged credentials prior to the attack (e.g., free trial accounts), is outside the scope of this metric. Generally, self-service provisioned accounts do not constitute a privilege requirement if the attacker can grant themselves privileges as part of the attack.",
   },
   {
     key: "UI",
     label: "User Interaction",
     options: [
-      { v: "N", l: "None" },
-      { v: "P", l: "Passive" },
-      { v: "A", l: "Active" },
+      { v: "(N)", l: "None" },
+      { v: "(P)", l: "Passive" },
+      { v: "(A)", l: "Active" },
     ],
+    description:
+      "This metric captures the requirement for a human user, other than the attacker, to participate in the successful compromise of the vulnerable system. This metric determines whether the vulnerability can be exploited solely at the will of the attacker, or whether a separate user (or user-initiated process) must participate in some manner.",
   },
   {
     key: "VC",
     label: "Confidentiality",
     group: "Vulnerable System Impact Metrics",
     options: [
-      { v: "H", l: "High" },
-      { v: "L", l: "Low" },
-      { v: "N", l: "None" },
+      { v: "(H)", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(N)", l: "None" },
     ],
+    description:
+      "This metric measures the impact to the confidentiality of the information managed by the VULNERABLE SYSTEM due to a successfully exploited vulnerability. Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones.",
   },
   {
     key: "VI",
     label: "Integrity",
     group: "Vulnerable System Impact Metrics",
     options: [
-      { v: "H", l: "High" },
-      { v: "L", l: "Low" },
-      { v: "N", l: "None" },
+      { v: "(H)", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(N)", l: "None" },
     ],
+    description:
+      "This metric measures the impact to integrity of a successfully exploited vulnerability. Integrity refers to the trustworthiness and veracity of information. Integrity of the VULNERABLE SYSTEM is impacted when an attacker makes unauthorized modification of system data. Integrity is also impacted when a system user can repudiate critical actions taken in the context of the system (e.g. due to insufficient logging).",
   },
   {
     key: "VA",
     label: "Availability",
     group: "Vulnerable System Impact Metrics",
     options: [
-      { v: "H", l: "High" },
-      { v: "L", l: "Low" },
-      { v: "N", l: "None" },
+      { v: "(H)", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(N)", l: "None" },
     ],
+    description:
+      "This metric measures the impact to the availability of the VULNERABLE SYSTEM resulting from a successfully exploited vulnerability. While the Confidentiality and Integrity impact metrics apply to the loss of confidentiality or integrity of data (e.g., information, files) used by the system, this metric refers to the loss of availability of the impacted system itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of a system.",
   },
   {
     key: "SC",
     label: "Confidentiality",
     group: "Subsequent System Impact Metrics",
     options: [
-      { v: "H", l: "High" },
-      { v: "L", l: "Low" },
-      { v: "N", l: "None" },
+      { v: "(H)", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(N)", l: "None" },
     ],
+    description:
+      "This metric measures the impact to the confidentiality of the information managed by the SUBSEQUENT SYSTEM due to a successfully exploited vulnerability. Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones.",
   },
   {
     key: "SI",
     label: "Integrity",
     group: "Subsequent System Impact Metrics",
     options: [
-      { v: "H", l: "High" },
-      { v: "L", l: "Low" },
-      { v: "N", l: "None" },
+      { v: "(H)", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(N)", l: "None" },
     ],
+    description:
+      "This metric measures the impact to integrity of a successfully exploited vulnerability. Integrity refers to the trustworthiness and veracity of information. Integrity of the SUBSEQUENT SYSTEM is impacted when an attacker makes unauthorized modification of system data. Integrity is also impacted when a system user can repudiate critical actions taken in the context of the system (e.g. due to insufficient logging).",
   },
   {
     key: "SA",
     label: "Availability",
     group: "Subsequent System Impact Metrics",
     options: [
-      { v: "H", l: "High" },
-      { v: "L", l: "Low" },
-      { v: "N", l: "None" },
+      { v: "(H)", l: "High" },
+      { v: "(L)", l: "Low" },
+      { v: "(N)", l: "None" },
     ],
+    description:
+      "This metric measures the impact to the availability of the SUBSEQUENT SYSTEM resulting from a successfully exploited vulnerability. While the Confidentiality and Integrity impact metrics apply to the loss of confidentiality or integrity of data (e.g., information, files) used by the system, this metric refers to the loss of availability of the impacted system itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of a system.",
   },
 ];
 

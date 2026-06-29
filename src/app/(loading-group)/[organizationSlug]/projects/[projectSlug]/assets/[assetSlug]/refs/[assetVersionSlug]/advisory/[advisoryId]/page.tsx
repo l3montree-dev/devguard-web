@@ -223,7 +223,9 @@ const Index = () => {
                       const raw = parsed.metrics[metric.key];
                       if (!raw) return null;
                       const label =
-                        metric.options.find((o) => o.v === raw)?.l ?? raw;
+                        metric.options.find(
+                          (o) => o.v.replace(/[()]/g, "") === raw,
+                        )?.l ?? raw;
                       const isNewGroup =
                         metric.group && !seenGroups.has(metric.group);
                       if (metric.group) seenGroups.add(metric.group);

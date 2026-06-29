@@ -23,6 +23,8 @@ import {
   SelectValue,
 } from "./ui/select";
 import type { AdvisoryAffectedPackage } from "@/types/api/api";
+import { getSeverityClassNames } from "./common/Severity";
+import { classNames } from "@/utils/common";
 import {
   CVSS31_METRICS,
   CVSS40_METRICS,
@@ -33,6 +35,13 @@ import {
   scoreToSeverity,
   vectorStringToSeverity,
 } from "@/utils/cvss";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CircleHelp } from "lucide-react";
 
 export interface AdvisoryFormData {
   title: string;
@@ -214,7 +223,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
     SEMVER_RE.test((p.semverStart ?? "").trim()) &&
     SEMVER_RE.test((p.semverEnd ?? "").trim());
   const allPackagesValid = packages.every(isPackageComplete);
-  const submitLabel = editAdvisory ? "Save Changes" : "Create Advisory";
+  const submitLabel = editAdvisory ? "Save Changes" : "Create Draft Advisory";
   const submittingLabel = editAdvisory ? "Editing..." : "Creating...";
 
   return (
@@ -274,7 +283,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                       id="advisory-severity"
                       className={
                         severityFromVector
-                          ? "opacity-60 cursor-not-allowed"
+                          ? "opacity-80 cursor-not-allowed"
                           : ""
                       }
                     >
@@ -283,7 +292,14 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                     <SelectContent>
                       {SEVERITIES.map((s) => (
                         <SelectItem key={s} value={s}>
-                          {s}
+                          <span
+                            className={classNames(
+                              "inline-flex px-2 py-0.5 text-xs font-medium rounded-full",
+                              getSeverityClassNames(s.toUpperCase(), false),
+                            )}
+                          >
+                            {s}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -311,7 +327,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                   Cancel
                 </Button>
                 <Button disabled={!slide1Valid} onClick={() => api.scrollTo(2)}>
-                  Continue
+                  Add Packages
                 </Button>
               </div>
             </CarouselItem>
@@ -328,7 +344,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                       <button
                         key={ver}
                         type="button"
-                        className={`px-3 py-1 text-sm transition-colors ${
+                        className={`px-3 py-1 cursor-pointer text-sm transition-colors ${
                           cvssVersion === ver
                             ? "bg-primary text-primary-foreground"
                             : "hover:bg-muted"
@@ -349,12 +365,41 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                   )}
                 </div>
 
-                <div className="flex flex-col gap-3 max-h-[340px] overflow-y-auto pr-1">
+                <div className="flex flex-col gap-3 border rounded-lg p-3 max-h-[50vh] overflow-y-auto pr-1">
                   {cvssMetrics.map((metric) => (
                     <div key={metric.key} className="flex flex-col gap-1.5">
                       <Label className="text-xs text-muted-foreground">
-                        {metric.label}
+                        {metric.label}{" "}
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <CircleHelp className="w-3 h-3 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipPortal>
+                            <TooltipContent>
+                              <div className="relative font-normal">
+                                {metric.description}{" "}
+                                {cvssVersion === "4.0" && (
+                                  <a
+                                    target="_blank"
+                                    href="https://www.first.org/cvss/calculator/4.0"
+                                  >
+                                    More information.
+                                  </a>
+                                )}
+                                {cvssVersion === "3.1" && (
+                                  <a
+                                    target="_blank"
+                                    href="https://www.first.org/cvss/calculator/3.1"
+                                  >
+                                    More information.
+                                  </a>
+                                )}
+                              </div>
+                            </TooltipContent>
+                          </TooltipPortal>
+                        </Tooltip>
                       </Label>
+
                       <div className="flex flex-wrap gap-1.5">
                         {metric.options.map((opt) => (
                           <button
@@ -366,13 +411,13 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                                 [metric.key]: opt.v,
                               }))
                             }
-                            className={`rounded-md border px-3 py-1 text-xs transition-colors ${
+                            className={`rounded-md cursor-pointer border px-3 py-1 text-xs transition-colors ${
                               cvssVals[metric.key] === opt.v
                                 ? "border-primary bg-primary text-primary-foreground"
                                 : "hover:border-primary/50 hover:bg-muted"
                             }`}
                           >
-                            {opt.v} — {opt.l}
+                            {opt.l} {opt.v}
                           </button>
                         ))}
                       </div>
@@ -442,7 +487,12 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                   </div>
                 </div>
 
-                <div className="flex justify-center gap-1.5">
+                <div
+                  className={classNames(
+                    "flex justify-center gap-1.5",
+                    packages.length < 2 && "invisible",
+                  )}
+                >
                   {packages.map((_, i) => (
                     <button
                       key={i}
@@ -528,11 +578,6 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                   Back
                 </Button>
                 <div className="flex items-center gap-3">
-                  {!allPackagesValid && (
-                    <span className="text-xs text-muted-foreground">
-                      Each package needs a name and both versions (1.2.3).
-                    </span>
-                  )}
                   <Button
                     onClick={handleSubmit}
                     disabled={isSubmitting || !allPackagesValid}
