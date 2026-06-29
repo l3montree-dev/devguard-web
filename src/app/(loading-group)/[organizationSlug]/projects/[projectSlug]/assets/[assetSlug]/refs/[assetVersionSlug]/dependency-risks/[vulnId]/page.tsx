@@ -1202,25 +1202,43 @@ const Index: FunctionComponent = () => {
                   </div>
                   {vuln.cve?.euvdExploitAdd || vuln.cve?.cisaExploitAdd ? (
                     <div className="p-5">
-                      <Callout intent="danger">
-                        <p className="font-medium mx-2">
-                          This vulnerability is actively being exploited!
-                        </p>
-                        <div className="mt-1 mx-2 space-y-0.5">
-                          {vuln.cve?.euvdExploitAdd && (
-                            <div className="flex justify-between gap-4">
-                              <span>EUVD:</span>
-                              <span>{formatDate(vuln.cve.euvdExploitAdd)}</span>
-                            </div>
-                          )}
-                          {vuln.cve?.cisaExploitAdd && (
-                            <div className="flex justify-between gap-4">
-                              <span>CISA:</span>
-                              <span>{formatDate(vuln.cve.cisaExploitAdd)}</span>
-                            </div>
-                          )}
-                        </div>
-                      </Callout>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <Callout intent="danger">
+                              <p className="font-medium mx-2">
+                                This vulnerability is actively being exploited!
+                              </p>
+                              <div className="mt-1 mx-2 space-y-0.5">
+                                {vuln.cve?.euvdExploitAdd && (
+                                  <div className="flex justify-between gap-4">
+                                    <span>EUVD:</span>
+                                    <span>
+                                      {formatDate(vuln.cve.euvdExploitAdd)}
+                                    </span>
+                                  </div>
+                                )}
+                                {vuln.cve?.cisaExploitAdd && (
+                                  <div className="flex justify-between gap-4">
+                                    <span>CISA:</span>
+                                    <span>
+                                      {formatDate(vuln.cve.cisaExploitAdd)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </Callout>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          <p>
+                            A KEV catalog flags this vulnerability as one that
+                            has already been actively exploited by attackers.
+                            Below you can see the KEV source and the date the
+                            information was added.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   ) : (
                     <></>
