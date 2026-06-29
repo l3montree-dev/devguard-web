@@ -369,15 +369,11 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       <WarningWithDescription
                         description={
                           <>
-                            This vulnerability is actively being exploited!
+                            <span className="font-bold">
+                              This vulnerability is actively being exploited!
+                            </span>
                             <br />
-                            Sources:{" "}
-                            {[
-                              sortedVulns[0].cve?.euvdExploitAdd && "EUVD",
-                              sortedVulns[0].cve?.cisaExploitAdd && "CISA KEV",
-                            ]
-                              .filter(Boolean)
-                              .join(", ")}
+                            See the details page for more information
                           </>
                         }
                       />
