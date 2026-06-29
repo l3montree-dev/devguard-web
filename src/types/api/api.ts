@@ -1154,7 +1154,7 @@ export interface SecurityAdvisory {
   severity: string;
   vectorstring: string;
   assetID: string;
-  affectedPackages: AdvisoryAffectedPackage[];
+  affectedPackages: AdvisoryAffectedPackage[] | null;
 }
 
 export interface AdvisoryAffectedPackage {

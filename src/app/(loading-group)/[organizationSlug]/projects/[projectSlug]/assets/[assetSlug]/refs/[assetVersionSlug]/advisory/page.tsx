@@ -18,15 +18,20 @@ import {
 } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { SecurityAdvisory, Paged } from "@/types/api/api";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useTable from "@/hooks/useTable";
 import SortingCaret from "@/components/common/SortingCaret";
 import { classNames } from "@/utils/common";
-import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
+import { getSeverityClassNames } from "@/components/common/Severity";
 import type { FunctionComponent } from "react";
+import { useState } from "react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import AdvisoryDialog, {
+  type AdvisoryFormData,
+} from "@/components/AdvisoryDialog";
+import { toast } from "@/lib/toast";
 
 const columnHelper = createColumnHelper<SecurityAdvisory>();
 
@@ -37,7 +42,7 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
     cell: (info) => {
       return (
         info.getValue() && (
-          <div className="w-52 text-base text-muted-foreground">
+          <div className="w-full text-base text-muted-foreground">
             {info.getValue()}
           </div>
         )
@@ -49,9 +54,16 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
     header: "Severity",
     enableSorting: true,
     cell: (info) => {
+      const severity = info.getValue();
+      if (!severity) return null;
       return (
-        <span className="text-base text-muted-foreground">
-          {info.getValue()}
+        <span
+          className={classNames(
+            "inline-flex px-2 py-0.5 text-xs font-medium rounded-full",
+            getSeverityClassNames(String(severity).toUpperCase(), false),
+          )}
+        >
+          {severity}
         </span>
       );
     },
@@ -70,12 +82,15 @@ const Index: FunctionComponent = () => {
       assetSlug: string;
       assetVersionSlug: string;
     };
+
+  const advisoryUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`;
+
   const {
     data: advisories,
     isLoading,
     error,
   } = useSWR<Paged<SecurityAdvisory>>(
-    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`,
+    advisoryUrl,
     (url: string) =>
       fetcher(url).then((res: SecurityAdvisory[] | Paged<SecurityAdvisory>) =>
         Array.isArray(res)
@@ -89,54 +104,39 @@ const Index: FunctionComponent = () => {
     { columnsDef, data: advisories?.data || [] },
     { getSortedRowModel: getSortedRowModel(), manualSorting: false },
   );
-  if (error) return <div>Fehler beim Laden</div>;
 
-  const clickerPOST = async () => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/advisory/",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          title: "Das ist eine 67",
-          description:
-            "# Title This is a **bold** statement and *italic* text.- Item 1- Item 2> This is a blockquote.| Name | Age ||------|-----|| John | 30  |",
-          severity: "Critical",
-          vectorstring:
-            "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
-          affectedPackages: [
-            {
-              ecosystem: "go",
-              packageName: "pkg:gogogo",
-              semverStart: "0.0.0",
-              semverEnd: "1.2.0",
-            },
-            {
-              ecosystem: "afgo",
-              packageName: "pkg:afafaafgogogo",
-              semverStart: "0.0.1",
-              semverEnd: "1.2.0",
-            },
-          ],
-          assetId: assetId,
-        }),
-      },
-    );
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleCreateAdvisory = async (data: AdvisoryFormData) => {
+    const resp = await browserApiClient(advisoryUrl + "/", {
+      method: "POST",
+      body: JSON.stringify({ ...data, assetID: assetId }),
+    });
+    if (resp.ok) {
+      toast.success("Security Advisory created successfully!");
+      mutate(advisoryUrl);
+    } else {
+      const msg = await resp.text();
+      toast.error("Failed to create advisory: " + msg);
+      throw new Error(msg);
+    }
   };
+
+  if (error) return <div>Failed to load advisories</div>;
 
   return (
     <Page Menu={assetMenu} title={"Security Advisory"} Title={<AssetTitle />}>
+      {dialogOpen && (
+        <AdvisoryDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onSubmit={handleCreateAdvisory}
+        />
+      )}
       <div className="flex flex-row items-center justify-end">
         <div className="flex flex-row gap-2">
-          <AuthGuard require="member">
-            <Button onClick={clickerPOST} variant="default">
+          <AuthGuard require="admin">
+            <Button onClick={() => setDialogOpen(true)} variant="default">
               Create Security Advisory
             </Button>
           </AuthGuard>
@@ -198,28 +198,6 @@ const Index: FunctionComponent = () => {
                     ))}
                   </thead>
                   <tbody className="text-sm text-foreground">
-                    {!table.getRowModel().rows &&
-                      isLoading &&
-                      Array.from(Array(10).keys()).map((el, i, arr) => (
-                        <tr
-                          className={classNames(
-                            "relative cursor-pointer align-top transition-all",
-                            i === arr.length - 1 ? "" : "border-b",
-                            i % 2 !== 0 && "bg-card/50",
-                          )}
-                          key={el}
-                        >
-                          <td className="p-4">
-                            <Skeleton className="w-1/2 h-[20px]" />
-                          </td>
-                          <td className="p-4">
-                            <Skeleton className="w-full h-[20px]" />
-                          </td>
-                          <td className="p-4">
-                            <Skeleton className="w-1/2 h-[20px]" />
-                          </td>
-                        </tr>
-                      ))}
                     {table.getRowModel().rows.map((row, i, arr) => (
                       <tr
                         onClick={() =>
