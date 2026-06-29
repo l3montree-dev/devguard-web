@@ -37,6 +37,7 @@ import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
 import Link from "next/link";
+import WarningWithDescription from "../common/WarningWithDescription";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -342,7 +343,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       disabled={!isMemberRole}
                     />
                     <span className="font-medium text-foreground">{cveID}</span>
-
                     {isPathExplosion ? (
                       <Tooltip>
                         <TooltipTrigger>
@@ -364,6 +364,26 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         {vulns.length} path{vulns.length !== 1 ? "s" : ""}
                       </Badge>
                     ) : null}
+                    {sortedVulns[0].cve?.cisaExploitAdd ||
+                    sortedVulns[0].cve?.euvdExploitAdd ? (
+                      <WarningWithDescription
+                        description={
+                          <>
+                            This vulnerability is actively being exploited!
+                            <br />
+                            Sources:{" "}
+                            {[
+                              sortedVulns[0].cve?.euvdExploitAdd && "EUVD",
+                              sortedVulns[0].cve?.cisaExploitAdd && "CISA KEV",
+                            ]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </>
+                        }
+                      />
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 </td>
                 <td className="py-2 px-4 flex">
