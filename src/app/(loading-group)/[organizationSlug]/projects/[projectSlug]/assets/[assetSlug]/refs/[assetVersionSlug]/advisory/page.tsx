@@ -55,6 +55,7 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
   columnHelper.accessor("severity", {
     header: "Severity",
     enableSorting: true,
+    meta: { className: "w-40 whitespace-nowrap" },
     cell: (info) => {
       const severity = info.getValue();
       if (!severity) return null;
@@ -204,7 +205,10 @@ const Index: FunctionComponent = () => {
                       <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                           <th
-                            className="cursor-pointer whitespace-nowrap break-normal p-4 text-left"
+                            className={classNames(
+                              "cursor-pointer whitespace-nowrap break-normal p-4 text-left",
+                              (header.column.columnDef.meta as any)?.className,
+                            )}
                             onClick={
                               header.column.columnDef.enableSorting
                                 ? header.column.getToggleSortingHandler()
@@ -243,7 +247,13 @@ const Index: FunctionComponent = () => {
                         key={row.original.id}
                       >
                         {row.getVisibleCells().map((cell) => (
-                          <td className="p-4" key={cell.id}>
+                          <td
+                            className={classNames(
+                              "p-4",
+                              (cell.column.columnDef.meta as any)?.className,
+                            )}
+                            key={cell.id}
+                          >
                             {flexRender(
                               cell.column.columnDef.cell,
                               cell.getContext(),
