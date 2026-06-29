@@ -68,10 +68,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       return { codeStr: props.codeString, highlightLineNumbers: null };
     // we need the starting and ending line numbers of the match - and remove the special characters just with the match content
 
-    const reg = new RegExp(
-      props.highlightRegexPattern,
-      props.highlightRegexPattern.flags,
-    );
+    const reg = props.highlightRegexPattern;
     const matches = reg.exec(props.codeString);
 
     if (matches === null) {

@@ -6,6 +6,10 @@ on:
   workflow_dispatch:
   push:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   code-scanning:
     uses: l3montree-dev/devguard-ci-components/.github/workflows/code-scanning.yml@main
