@@ -25,7 +25,7 @@ import {
 import { TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/lib/toast";
-import { useRouter } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { CVSS31_METRICS, CVSS40_METRICS, parseCvssVector } from "@/utils/cvss";
 import AdvisoryDialog, {
   type AdvisoryFormData,
@@ -82,7 +82,11 @@ const Index = () => {
     }
   };
 
-  const { data: advisory, isLoading } = useSWR<SecurityAdvisory>(
+  const {
+    data: advisory,
+    isLoading,
+    error,
+  } = useSWR<SecurityAdvisory>(
     organizationSlug &&
       projectSlug &&
       assetSlug &&
@@ -93,7 +97,7 @@ const Index = () => {
     fetcher,
   );
 
-  if (isLoading || !advisory) {
+  if (isLoading) {
     return (
       <Page title="Loading...">
         <Skeleton className="w-64 h-8 mb-2" />
@@ -102,6 +106,10 @@ const Index = () => {
         <Skeleton className="w-full h-48" />
       </Page>
     );
+  }
+
+  if (error || !advisory) {
+    notFound();
   }
 
   const severityUpper = advisory.severity?.toUpperCase() ?? "";
