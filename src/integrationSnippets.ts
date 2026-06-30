@@ -27,9 +27,9 @@ const generateWorkflowSnippet = (
     ${jobName}:
         uses: l3montree-dev/devguard-ci-components/.github/workflows/${workflowFile}@main
         with:
-            asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-            api-url: "${apiUrl}"
-            ${jobName === "build-image" ? "" : `web-ui: "${frontendUrl}"`}
+            devguard-asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
+            devguard-api-url: "${apiUrl}"
+            ${jobName === "build-image" ? "" : `devguard-web-ui: "${frontendUrl}"`}
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`;
 
