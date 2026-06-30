@@ -274,7 +274,7 @@ const OrganizationHomePage: FunctionComponent = () => {
   const { showModal, handleStartTour, handleSkip } = useWelcomeTour();
 
   useEffect(() => {
-    if (searchParams?.get("startTour") === "1") {
+    if (searchParams?.get("startTour") === "org-home") {
       startTour();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
