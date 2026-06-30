@@ -3,26 +3,22 @@
 
 "use client";
 
-import { useFormContext } from "react-hook-form";
-import type { OryNodeInputProps } from "@ory/elements-react";
+import type { OryNodeCheckboxProps } from "@ory/elements-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
-export function OryCheckbox({ node, attributes }: OryNodeInputProps) {
-  const { register } = useFormContext();
-  const { value, name, ...rest } = attributes;
-  const { onChange, ...formProps } = register(name);
+export function OryCheckbox({ node, inputProps }: OryNodeCheckboxProps) {
+  const { name, checked, disabled, onChange, ref } = inputProps;
   return (
     <div className="flex items-center gap-2">
       <Checkbox
-        defaultChecked={Boolean(value)}
+        ref={ref}
         id={name}
-        required={rest.required}
-        disabled={rest.disabled}
-        onCheckedChange={(value) => {
-          onChange({ target: { name, value } });
-        }}
-        {...formProps}
+        name={name}
+        checked={checked}
+        required={node.attributes.required}
+        disabled={disabled}
+        onCheckedChange={(value) => onChange(value === true)}
       />
       {node.meta.label?.text && (
         <Label htmlFor={name} className="leading-none">

@@ -10,6 +10,7 @@ export function OryLabel({
   node,
   attributes,
   children,
+  fieldError: _fieldError,
   ...rest
 }: OryNodeLabelProps) {
   return (

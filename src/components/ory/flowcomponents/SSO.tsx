@@ -63,9 +63,8 @@ function SsoProviderIcon({ provider }: { provider: string }) {
 export function OrySsoButton({
   node,
   attributes,
-  onClick,
+  buttonProps,
   className,
-  ...rest
 }: OryNodeSsoButtonProps & { className?: string }) {
   const provider = String(attributes.value).split("-")[0];
   const displayName = providerDisplayNames[provider];
@@ -73,12 +72,11 @@ export function OrySsoButton({
     <Button
       variant="outline"
       className={`px-6 ${className ?? ""}`.trim()}
-      name={attributes.name}
-      type={attributes.type === "button" ? "button" : "submit"}
-      value={attributes.value?.toString()}
-      disabled={attributes.disabled}
-      onClick={onClick}
-      {...rest}
+      name={buttonProps.name}
+      type={buttonProps.type}
+      value={buttonProps.value?.toString()}
+      disabled={buttonProps.disabled}
+      onClick={buttonProps.onClick}
     >
       <SsoProviderIcon provider={provider} />
       {displayName ? `${displayName}` : node.meta.label?.text}
@@ -125,24 +123,19 @@ export function OrySsoSettings({
   return (
     <div className="flex flex-row flex-wrap gap-2">
       {linkButtons.map((button) => {
-        const attrs = button.attributes as {
-          name?: string;
-          type?: string;
-          value?: string;
-          disabled?: boolean;
-        };
-        const provider = String(attrs.value ?? "").split("-")[0];
+        const { name, type, value, disabled, onClick } = button.buttonProps;
+        const provider = String(value ?? "").split("-")[0];
         const displayName = providerDisplayNames[provider] ?? provider;
         return (
           <Button
-            key={`link:${attrs.name ?? ""}:${attrs.value ?? ""}`}
+            key={`link:${name}:${String(value ?? "")}`}
             variant="secondary"
             className="w-44"
-            name={attrs.name}
-            type={attrs.type === "button" ? "button" : "submit"}
-            value={attrs.value}
-            disabled={attrs.disabled}
-            onClick={button.onClick}
+            name={name}
+            type={type}
+            value={value?.toString()}
+            disabled={disabled}
+            onClick={onClick}
           >
             <SsoProviderIcon provider={provider} />
             Link {displayName}
@@ -153,24 +146,19 @@ export function OrySsoSettings({
         <Separator className="my-2" />
       )}
       {unlinkButtons.map((button) => {
-        const attrs = button.attributes as {
-          name?: string;
-          type?: string;
-          value?: string;
-          disabled?: boolean;
-        };
-        const provider = String(attrs.value ?? "").split("-")[0];
+        const { name, type, value, disabled, onClick } = button.buttonProps;
+        const provider = String(value ?? "").split("-")[0];
         const displayName = providerDisplayNames[provider] ?? provider;
         return (
           <Button
-            key={`unlink:${attrs.name ?? ""}:${attrs.value ?? ""}`}
+            key={`unlink:${name}:${String(value ?? "")}`}
             variant="secondary"
             className="w-44"
-            name={attrs.name}
-            type={attrs.type === "button" ? "button" : "submit"}
-            value={attrs.value}
-            disabled={attrs.disabled}
-            onClick={button.onClick}
+            name={name}
+            type={type}
+            value={value?.toString()}
+            disabled={disabled}
+            onClick={onClick}
           >
             <SsoProviderIcon provider={provider} />
             Unlink {displayName}
