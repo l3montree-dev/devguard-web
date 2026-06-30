@@ -102,21 +102,22 @@ const EntityProviderBanner = () => {
         </Link>
       </div>
     );
+  } else if (activeProject && activeProject.externalEntityProviderId) {
+    return (
+      <div className="flex !text-secondary-foreground items-center justify-center bg-secondary px-4 py-1 text-xs transition-all text-white">
+        External managed entity (
+        <Link
+          target="_blank"
+          className="hover:underline"
+          href="https://docs.devguard.org/reference/api/external-entity/"
+        >
+          Documentation
+        </Link>
+        )
+      </div>
+    );
   }
-
-  return (
-    <div className="flex !text-secondary-foreground items-center justify-center bg-secondary px-4 py-1 text-xs transition-all text-white">
-      External managed entity (
-      <Link
-        target="_blank"
-        className="hover:underline"
-        href="https://docs.devguard.org/reference/api/external-entity/"
-      >
-        Documentation
-      </Link>
-      )
-    </div>
-  );
+  return null;
 };
 
 export default EntityProviderBanner;
