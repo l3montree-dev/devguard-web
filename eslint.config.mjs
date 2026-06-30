@@ -13,7 +13,6 @@ export default defineConfig([
     plugins: {
       prettier,
     },
-
     rules: {
       "@next/next/no-img-element": "off",
       "prettier/prettier": "error",

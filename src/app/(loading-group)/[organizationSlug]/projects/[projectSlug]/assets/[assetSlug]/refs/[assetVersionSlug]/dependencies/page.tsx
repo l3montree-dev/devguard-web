@@ -60,7 +60,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
@@ -87,7 +87,7 @@ import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { dependencyInsightsTourSteps } from "@/components/common/tours/dependency-insights-tour";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
@@ -331,7 +331,7 @@ const columnsDef: ColumnDef<
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
-  const { startTour } = usePageTour(dependencyInsightsTourSteps);
+  useAutoTour("dependency-insights", dependencyInsightsTourSteps);
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
   const [showVexModal, setShowVexModal] = useState(false);
