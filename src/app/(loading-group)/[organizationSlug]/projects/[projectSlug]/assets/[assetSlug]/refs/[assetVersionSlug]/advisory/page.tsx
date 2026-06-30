@@ -27,7 +27,8 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { classNames } from "@/utils/common";
 import { getSeverityClassNames } from "@/components/common/Severity";
 import type { FunctionComponent } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { buildFilterSearchParams } from "@/utils/url";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import AdvisoryDialog, {
@@ -97,10 +98,12 @@ const Index: FunctionComponent = () => {
   const visibility =
     searchParams?.get("visibility") === "public" ? "public" : "draft";
 
-  const page = searchParams?.get("page") || "1";
-  const pageSize = searchParams?.get("pageSize") || "10";
-
-  const advisoryListUrl = `${advisoryUrl}?visibility=${visibility}&page=${page}&pageSize=${pageSize}`;
+  const advisoryListUrl = useMemo(() => {
+    const p = buildFilterSearchParams(searchParams);
+    if (!searchParams?.has("pageSize")) p.set("pageSize", "10");
+    p.append("filterQuery[visibility][is]", visibility);
+    return `${advisoryUrl}?${p.toString()}`;
+  }, [searchParams, advisoryUrl, visibility]);
 
   const {
     data: advisories,
