@@ -1146,3 +1146,21 @@ export interface InstanceInfoDTO {
   runtime: InstanceRuntimeInfo;
   database: InstanceDatabaseInfo;
 }
+
+export interface SecurityAdvisory {
+  id: string;
+  title: string;
+  description: string;
+  severity: string;
+  vectorstring: string;
+  assetID: string;
+  affectedPackages: AdvisoryAffectedPackage[] | null;
+}
+
+export interface AdvisoryAffectedPackage {
+  id: string;
+  ecosystem: string;
+  packagename: string;
+  semverStart: string | null;
+  semverEnd: string | null;
+}
