@@ -37,6 +37,7 @@ import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { usePageTour } from "@/hooks/usePageTour";
 import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { browserApiClient } from "@/services/devGuardApi";
+import { formatDate } from "@/utils/format";
 import type {
   AssetDTO,
   DependencyVulnHints,
@@ -83,6 +84,7 @@ import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/us
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import WarningWithDescription from "@/components/common/WarningWithDescription";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -683,7 +685,7 @@ const Index: FunctionComponent = () => {
                   <Skeleton className="w-20 h-6 rounded-full" />
                 )}
               </div>
-              <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
+              <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <>
                     <Markdown>
@@ -1198,6 +1200,49 @@ const Index: FunctionComponent = () => {
                       </PieChart>
                     </ChartContainer>
                   </div>
+                  {vuln.cve?.euvdExploitAdd || vuln.cve?.cisaExploitAdd ? (
+                    <div className="p-5">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <Callout intent="danger">
+                              <p className="font-medium mx-2">
+                                This vulnerability is actively being exploited!
+                              </p>
+                              <div className="mt-1 mx-2 space-y-0.5">
+                                {vuln.cve?.euvdExploitAdd && (
+                                  <div className="flex justify-between gap-4">
+                                    <span>EUVD:</span>
+                                    <span>
+                                      {formatDate(vuln.cve.euvdExploitAdd)}
+                                    </span>
+                                  </div>
+                                )}
+                                {vuln.cve?.cisaExploitAdd && (
+                                  <div className="flex justify-between gap-4">
+                                    <span>CISA:</span>
+                                    <span>
+                                      {formatDate(vuln.cve.cisaExploitAdd)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </Callout>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          <p>
+                            A KEV catalog flags this vulnerability as one that
+                            has already been actively exploited by attackers.
+                            Below you can see the KEV source and the date the
+                            information was added.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                   <div className="p-5">
                     <Collapsible>
                       <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-sm font-semibold">
