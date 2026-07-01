@@ -1,0 +1,82 @@
+name: E2E Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions: read-all
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+
+      - name: Start backend services
+        working-directory: .github/e2e
+        run: docker compose up -d
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create frontend .env.local
+        run: |
+          cat > .env.local << 'EOF'
+          ORY_SDK_URL=http://localhost:4433
+          ORY_SDK_PUBLIC_URL=http://localhost:3000
+          DEVGUARD_API_URL=http://localhost:8080
+          DEVGUARD_API_URL_PUBLIC_INTERNET=http://localhost:8080
+          FRONTEND_URL=http://localhost:3000
+          REGISTRATION_ENABLED=true
+          EOF
+
+      - name: Build frontend
+        run: NEXT_TELEMETRY_DISABLED=1 npm run build
+
+      - name: Start frontend
+        run: NEXT_TELEMETRY_DISABLED=1 npm run start &
+
+      - name: Wait for backend to be ready
+        run: |
+          echo "Waiting for devguard-api..."
+          timeout 120 bash -c 'until curl -sf http://localhost:8080/api/v1/health/ > /dev/null 2>&1; do sleep 3; done'
+          echo "Backend ready."
+
+      - name: Wait for frontend to be ready
+        run: |
+          echo "Waiting for frontend dev server..."
+          timeout 120 bash -c 'until curl -sf http://localhost:3000 > /dev/null 2>&1; do sleep 3; done'
+          echo "Frontend ready."
+
+      - name: Create e2e .env
+        run: |
+          cat > e2e/.env << 'EOF'
+          DEVGUARD_DOMAIN=http://localhost:3000
+          DEVGUARD_EMAIL_LOGIN_USERNAME=test-user-XXX
+          DEVGUARD_EMAIL_LOGIN_PASSWORD=Test1234!secure
+          OPEN_CODE_USERNAME=placeholder
+          OPEN_CODE_PASSWORD=placeholder
+          OPEN_CODE_TOTP_SECRET=placeholder
+          EOF
+
+      - name: Run E2E tests
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}:/work \
+            -w /work \
+            -u $(id -u):$(id -g) \
+            -e CI=true \
+            -e HOME=/tmp \
+            mcr.microsoft.com/playwright:v1.61.0-noble@sha256:57b65fdc9ceabe0ef613124c7bbe2babcf9362c4d85e382fe3b03604e84b428a \
+            bash e2e/run-devguard-tests.sh

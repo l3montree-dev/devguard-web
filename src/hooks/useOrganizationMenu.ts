@@ -41,6 +41,7 @@ export const useOrganizationMenu = () => {
       href: "/" + decodedOrgSlug + "/overview",
       Icon: ChartBarIcon,
       isActive: decodedPathName === "/" + decodedOrgSlug + "/overview",
+      testId: "nav-org-overview",
     });
   }
 
@@ -49,6 +50,7 @@ export const useOrganizationMenu = () => {
     href: "/" + decodedOrgSlug,
     Icon: ListBulletIcon,
     isActive: decodedPathName === "/" + decodedOrgSlug,
+    testId: "nav-org-groups",
   });
 
   menu.push({
@@ -66,6 +68,7 @@ export const useOrganizationMenu = () => {
       href: "/" + decodedOrgSlug + "/settings",
       Icon: CogIcon,
       isActive: decodedPathName.startsWith("/" + decodedOrgSlug + "/settings"),
+      testId: "nav-org-settings",
     });
   }
   return menu;

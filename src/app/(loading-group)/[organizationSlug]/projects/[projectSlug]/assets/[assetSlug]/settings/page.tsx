@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import Alert from "../../../../../../../../components/common/Alert";
 import DangerZone from "../../../../../../../../components/common/DangerZone";
@@ -40,7 +40,7 @@ import DateString from "../../../../../../../../components/common/DateString";
 import Section from "@/components/common/Section";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
@@ -313,7 +313,7 @@ const Index: FunctionComponent = () => {
   const { parentRepositoryId, parentRepositoryName } =
     getParentRepositoryIdAndName(project);
 
-  const { startTour } = usePageTour(repoSettingsTourSteps);
+  useAutoTour("repo-settings", repoSettingsTourSteps);
 
   return (
     <Page
@@ -341,6 +341,10 @@ const Index: FunctionComponent = () => {
               parentRepositoryName={parentRepositoryName}
               repositoryName={asset.repositoryName}
               repositoryId={asset.repositoryId}
+              organizationSlug={organizationSlug}
+              projectSlug={projectSlug}
+              assetSlug={assetSlug}
+              repositoryProvider={asset.repositoryProvider}
               members={asset.members}
               onRemoveMember={handleRemoveMember}
               onChangeMemberRole={handleChangeMemberRole}
@@ -487,7 +491,12 @@ const Index: FunctionComponent = () => {
                     description="This action cannot be undone. All data associated with this repository will be deleted."
                     onConfirm={handleDeleteAsset}
                   >
-                    <Button variant={"destructive"}>Delete</Button>
+                    <Button
+                      variant={"destructive"}
+                      data-testid="delete-repository-button"
+                    >
+                      Delete
+                    </Button>
                   </Alert>
                 }
               />

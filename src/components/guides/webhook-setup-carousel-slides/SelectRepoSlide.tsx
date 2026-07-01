@@ -9,7 +9,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 
@@ -128,6 +128,7 @@ export default function SelectRepoSlide({
                 className={`flex-1 min-w-0  ${!hasIntegration ? "pointer-events-none opacity-50" : ""}`}
               >
                 <Combobox
+                  data-testid="repo-selector"
                   onValueChange={handleSearchRepos}
                   placeholder="Search repository..."
                   items={repositories ?? []}
@@ -161,6 +162,7 @@ export default function SelectRepoSlide({
                   </Button>
                 ) : (
                   <Button
+                    data-testid="connect-repository-button"
                     onClick={async () => {
                       if (selectedRepo) {
                         await handleUpdateSelectedRepository({
@@ -190,6 +192,7 @@ export default function SelectRepoSlide({
           Back
         </Button>
         <Button
+          data-testid="continue-connect-repository-button"
           disabled={!asset.repositoryId}
           onClick={() => api?.scrollTo(afterSuccessfulConnectionSlideIndex)}
         >

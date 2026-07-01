@@ -1,7 +1,15 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type {
+  SeeOncePatWithBearerToken,
+  SeeOncePatWithPrivKey,
+} from "@/types/api/api";
 import type { FunctionComponent } from "react";
+import Callout from "./common/Callout";
+import CopyInput from "./common/CopyInput";
+import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,20 +18,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
-import type { PatWithPrivKey } from "@/types/api/api";
-import { Button } from "./ui/button";
-import CopyInput from "./common/CopyInput";
-import { Badge } from "./ui/badge";
-import Callout from "./common/Callout";
+import { useConfig } from "../context/ConfigContext";
+import CopyCode from "./common/CopyCode";
+import useScannerImage from "../hooks/useScannerImage";
 
 interface Props {
-  token: PatWithPrivKey | null;
+  token: SeeOncePatWithPrivKey | SeeOncePatWithBearerToken | null;
   open: boolean;
   onClose: () => void;
 }
 
+const isAsymmetric = (
+  t: SeeOncePatWithPrivKey | SeeOncePatWithBearerToken,
+): t is SeeOncePatWithPrivKey => "privKey" in t;
+
 const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
+  const config = useConfig();
+  const latestScannerImage = useScannerImage();
   if (!token) return null;
+
+  const asymmetric = isAsymmetric(token);
+  const secret = asymmetric ? token.privKey : token.bearerToken;
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -54,27 +69,50 @@ const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
           <div>
             <div className="text-sm font-medium">Scopes</div>
             <div className="mt-1 flex flex-wrap gap-1">
-              {token.scopes.split(" ").filter((scope) => scope.trim() !== "")
-                .length > 0 ? (
-                token.scopes
-                  .split(" ")
-                  .filter((scope) => scope.trim() !== "")
-                  .map((scope, index) => (
-                    <Badge key={`${scope}-${index}`} variant="secondary">
-                      {scope}
-                    </Badge>
-                  ))
-              ) : (
-                <span className="text-sm text-muted-foreground">No scopes</span>
-              )}
+              {token.scopes
+                .split(" ")
+                .filter((s) => s.trim() !== "")
+                .map((scope, index) => (
+                  <Badge key={`${scope}-${index}`} variant="secondary">
+                    {scope}
+                  </Badge>
+                ))}
             </div>
           </div>
 
           <div>
-            <div className="text-sm font-medium">Token</div>
-            <div className="mt-1">
-              <CopyInput value={token.privKey} />
+            <div className="text-sm font-medium">
+              {asymmetric ? "Private key" : "Bearer token"}
             </div>
+            <div className="mt-1">
+              <CopyInput value={secret} />
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-2 text-sm font-medium">Usage example</div>
+            {asymmetric ? (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Pass the private key to the DevGuard Scanner CLI. The CLI
+                  signs each request automatically — the key itself is never
+                  transmitted.
+                </p>
+                <CopyCode
+                  codeString={`docker run -v $PWD:/workspace ${latestScannerImage} devguard-scanner sca --token ${secret} --assetName="<INCLUDE YOUR ASSET NAME>" --path=/workspace --apiUrl=${config.devguardApiUrlPublicInternet}`}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Send the token as a standard HTTP Authorization header. Use
+                  this wherever your tooling does not support request signing.
+                </p>
+                <CopyCode
+                  codeString={`curl -H "Authorization: Bearer ${secret}" ${config.devguardApiUrlPublicInternet}/api/v1/whoami`}
+                />
+              </div>
+            )}
           </div>
         </div>
 

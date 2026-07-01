@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { useLoader } from "@/hooks/useLoader";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import type { GitLabIntegrationDTO } from "@/types/api/api";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -97,6 +97,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
+                  data-testid="gitlab-pat-name"
                   placeholder="My GitLab Access Token"
                   autoComplete="url"
                   {...field}
@@ -116,6 +117,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>GitLab Base URL</FormLabel>
               <FormControl>
                 <Input
+                  data-testid="gitlab-base-url-input"
                   placeholder={
                     "https://gitlab.com/ or https://gitlab.opencode.de/"
                   }
@@ -142,7 +144,11 @@ export default function GitLabIntegrationForm({
                 Access-Token (Project or Personal Access Token)
               </FormLabel>
               <FormControl>
-                <Input placeholder="glpat-xxxxxxxxxxx-xxxx" {...field} />
+                <Input
+                  data-testid="gitlab-pat-input"
+                  placeholder="glpat-xxxxxxxxxxx-xxxx"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 Use a <strong>Project Access Token</strong> (recommended) or a
@@ -167,7 +173,11 @@ export default function GitLabIntegrationForm({
                   Back
                 </Button>
               )}
-              <Button disabled={isLoading} type="submit">
+              <Button
+                data-testid="gitlab-pat-save-button"
+                disabled={isLoading}
+                type="submit"
+              >
                 <Loader />
                 Test and Save
               </Button>

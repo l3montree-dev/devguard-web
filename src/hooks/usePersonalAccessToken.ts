@@ -1,18 +1,29 @@
 import { browserApiClient } from "@/services/devGuardApi";
 import { createPat } from "@/services/patService";
-import type { PatWithPrivKey, PersonalAccessTokenDTO } from "@/types/api/api";
+import type {
+  AsymmetricPersonalAccessTokenDTO,
+  PersonalAccessTokenDTO,
+  SeeOncePatWithBearerToken,
+  SeeOncePatWithPrivKey,
+  SymmetricPersonalAccessTokenDTO,
+} from "@/types/api/api";
 import { useEffect, useState, useRef } from "react";
 import { EventEmitter } from "events";
 import { uniqBy, isEqual } from "lodash";
 
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
-  existingPats?: PersonalAccessTokenDTO[],
+  existingPats?: Array<PersonalAccessTokenDTO>,
 ) {
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
-    Array<PersonalAccessTokenDTO | PatWithPrivKey>
+    Array<
+      | AsymmetricPersonalAccessTokenDTO
+      | SymmetricPersonalAccessTokenDTO
+      | SeeOncePatWithPrivKey
+      | SeeOncePatWithBearerToken
+    >
   >(existingPats ?? []);
-  const prevExistingPatsRef = useRef<PersonalAccessTokenDTO[] | undefined>(
+  const prevExistingPatsRef = useRef<Array<PersonalAccessTokenDTO> | undefined>(
     undefined,
   );
 
@@ -31,9 +42,11 @@ export default function usePersonalAccessToken(
   useEffect(() => {
     const pat = sessionStorage.getItem("pat");
     if (pat) {
-      setPersonalAccessTokens((prev) =>
-        uniqBy([...prev, JSON.parse(pat)], "fingerprint"),
-      );
+      const parsed = JSON.parse(pat) as
+        | SeeOncePatWithPrivKey
+        | SeeOncePatWithBearerToken;
+
+      setPersonalAccessTokens((prev) => [...prev, parsed]);
     }
     newPatEventEmitter.on("pat", (pat) => {
       setPersonalAccessTokens((prev) => uniqBy([...prev, pat], "fingerprint"));
@@ -51,17 +64,37 @@ export default function usePersonalAccessToken(
     }
   };
 
-  const handleCreatePat = async (data: {
+  async function handleCreatePat(data: {
     description: string;
     scopes: string;
-  }) => {
+    expiryDateUnix: number;
+    symmetric: true;
+  }): Promise<SeeOncePatWithBearerToken>;
+  async function handleCreatePat(data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: false;
+  }): Promise<SeeOncePatWithPrivKey>;
+  async function handleCreatePat(data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: boolean;
+  }): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken>;
+  async function handleCreatePat(data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: boolean;
+  }): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken> {
     const pat = await createPat(data);
 
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));
     newPatEventEmitter.emit("pat", pat);
     return pat;
-  };
+  }
 
   return {
     personalAccessTokens,
@@ -71,7 +104,7 @@ export default function usePersonalAccessToken(
       personalAccessTokens.length > 0
         ? (personalAccessTokens[
             personalAccessTokens.length - 1
-          ] as PatWithPrivKey)
+          ] as SeeOncePatWithPrivKey)
         : undefined,
   };
 }

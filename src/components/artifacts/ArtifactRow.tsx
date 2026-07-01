@@ -143,16 +143,31 @@ const ArtifactRow: FunctionComponent<Props> = ({
             <DropdownMenu>
               <AuthGuard require="admin">
                 <DropdownMenuTrigger className="artifact-options" asChild>
-                  <Button variant="ghost" size={"icon"}>
+                  <Button
+                    variant="ghost"
+                    size={"icon"}
+                    data-testid="artifact-options-button"
+                  >
                     <EllipsisHorizontalIcon className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={onEdit}>Edit</DropdownMenuItem>
-                  <DropdownMenuItem onClick={onSync}>
+                  <DropdownMenuItem
+                    onClick={onEdit}
+                    data-testid="edit-artifact-menu-item"
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={onSync}
+                    data-testid="sync-sbom-urls-menu-item"
+                  >
                     Sync SBOM URLs
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onDelete}>
+                  <DropdownMenuItem
+                    data-testid="delete-artifact-menu-item"
+                    onClick={onDelete}
+                  >
                     <span className="text-destructive">Delete</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

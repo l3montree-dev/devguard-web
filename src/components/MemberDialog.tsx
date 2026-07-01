@@ -12,7 +12,7 @@ import {
 import { browserApiClient } from "@/services/devGuardApi";
 import type { InviteRequest } from "@/types/api/api";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import Callout from "./common/Callout";
 import { Button } from "./ui/button";
 import { Form, FormItem, FormLabel } from "./ui/form";
@@ -74,11 +74,17 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
           <form onSubmit={form.handleSubmit(handleInvite)}>
             <FormItem>
               <FormLabel>E-Mail Address</FormLabel>
-              <Input type="email" {...form.register("email")} />
+              <Input
+                data-testid="mail-input"
+                type="email"
+                {...form.register("email")}
+              />
             </FormItem>
             <DialogFooter className="mt-4">
               <div className="flex flex-col items-end justify-end gap-2">
-                <Button type="submit">Invite</Button>
+                <Button data-testid="invite-member-button" type="submit">
+                  Invite
+                </Button>
                 {Boolean(invitationCode) && (
                   <Callout intent="info">
                     <p>

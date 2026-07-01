@@ -26,7 +26,7 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
             "text-secondary-foreground",
           )}
         >
-          <CheckCircleIcon className="-ml-1 inline-block h-4 w-4" />
+          <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
           Fixed
         </Badge>
       );

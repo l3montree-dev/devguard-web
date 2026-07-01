@@ -5,7 +5,7 @@ import { groupBy } from "lodash";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../../components/ArtifactSelector";
 import Avatar from "../../../../../../components/Avatar";

@@ -11,7 +11,7 @@ export function useWhyDidYouMemo(name: string, deps: any[]) {
 
     deps.forEach((dep, i) => {
       if (dep !== prevDeps.current![i]) {
-        console.log(`[${name}] dependency changed`, {
+        console.log("[dependency changed]", name, {
           index: i,
           before: prevDeps.current![i],
           after: dep,

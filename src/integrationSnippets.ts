@@ -25,11 +25,11 @@ const generateWorkflowSnippet = (
   frontendUrl: string,
 ) => `
     ${jobName}:
-        uses: l3montree-dev/devguard-action/.github/workflows/${workflowFile}@main
+        uses: l3montree-dev/devguard-ci-components/.github/workflows/${workflowFile}@main
         with:
-            asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
-            api-url: "${apiUrl}"
-            ${jobName === "build-image" ? "" : `web-ui: "${frontendUrl}"`}
+            devguard-asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
+            devguard-api-url: "${apiUrl}"
+            ${jobName === "build-image" ? "" : `devguard-web-ui: "${frontendUrl}"`}
         secrets:
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`;
 
@@ -361,7 +361,7 @@ export const integrationSnippets = ({
 
     sarif: `
     code-risk-identification:
-        uses: l3montree-dev/devguard-action/.github/workflows/code-risk-identification.yml@main
+        uses: l3montree-dev/devguard-ci-components/.github/workflows/code-risk-identification.yml@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"
@@ -371,7 +371,7 @@ export const integrationSnippets = ({
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}"`,
     sbom: `
     dependency-risk-identification:
-        uses: l3montree-dev/devguard-action/.github/workflows/dependency-risk-identification.yml@main
+        uses: l3montree-dev/devguard-ci-components/.github/workflows/dependency-risk-identification.yml@main
         with:
             asset-name: "${orgSlug}/projects/${projectSlug}/assets/${assetSlug}"
             api-url: "${apiUrl}"

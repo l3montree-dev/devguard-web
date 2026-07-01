@@ -9,18 +9,20 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
 import { Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 
 const defaultConfigFiles = [
   { value: "trivy", label: "Trivy", language: "yaml" },
-  { value: "gitleaks-config", label: "Gitleaks", language: "toml" },
-  { value: "semgrep-config", label: "Semgrep", language: "toml" },
-  { value: "checkov-config", label: "Checkov", language: "yaml" },
+  { value: "gitleaks", label: "Gitleaks", language: "toml" },
+  { value: ".semgrep", label: "Semgrep", language: "yaml" },
+  { value: ".checkov", label: "Checkov", language: "yaml", extension: "yml" },
 ];
 
-export type ConfigFile = (typeof defaultConfigFiles)[number];
+export type ConfigFile = (typeof defaultConfigFiles)[number] & {
+  extension?: string;
+};
 
 interface Props {
   baseUrl: string | null;
@@ -34,15 +36,15 @@ const ConfigFileEditor = ({
   const [selectedConfigId, setSelectedConfigId] = useState(
     configFiles[0].value,
   );
-  const [editorValue, setEditorValue] = useState("");
+  const [localEdit, setLocalEdit] = useState<string | null>(null);
   const [codeError, setCodeError] = useState<string | null>(null);
 
-  const selectedLanguage = (configFiles.find(
-    (c) => c.value === selectedConfigId,
-  )?.language ?? "json") as Language;
+  const selectedConfig = configFiles.find((c) => c.value === selectedConfigId);
+  const selectedLanguage = (selectedConfig?.language ?? "json") as Language;
+  const selectedExtension = selectedConfig?.extension ?? selectedLanguage;
 
   const configFileUrl = baseUrl
-    ? baseUrl + "/config-files/" + selectedConfigId + "." + selectedLanguage
+    ? baseUrl + "/config-files/" + selectedConfigId + "." + selectedExtension
     : null;
 
   const { data: configFile, mutate } = useSWR<string | null>(
@@ -56,16 +58,11 @@ const ConfigFileEditor = ({
     },
   );
 
-  useEffect(() => {
-    if (configFile) {
-      setEditorValue(configFile);
-    } else {
-      setEditorValue("");
-    }
-  }, [configFile]);
+  const editorValue = localEdit ?? configFile ?? "";
 
   const handleSelectedConfigChange = (configId: string) => {
     setSelectedConfigId(configId);
+    setLocalEdit(null);
     setCodeError(null);
   };
 
@@ -85,7 +82,7 @@ const ConfigFileEditor = ({
       return;
     }
     toast.success("Config saved successfully");
-    setEditorValue(newConfig);
+    setLocalEdit(newConfig);
     setCodeError(null);
     mutate();
   };
@@ -127,7 +124,7 @@ const ConfigFileEditor = ({
       <div className="flex flex-col gap-2">
         <CodeEditor
           value={editorValue}
-          onChange={setEditorValue}
+          onChange={setLocalEdit}
           onValidation={handleEditorValidation}
           onSave={() => {
             if (

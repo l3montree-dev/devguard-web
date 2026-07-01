@@ -37,7 +37,10 @@ const Alert: FunctionComponent<PropsWithChildren<Props>> = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
+          <AlertDialogAction
+            onClick={onConfirm}
+            data-testid="alert-confirm-button"
+          >
             <span>Confirm</span>
           </AlertDialogAction>
         </AlertDialogFooter>

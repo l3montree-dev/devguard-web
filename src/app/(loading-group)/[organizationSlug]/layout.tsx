@@ -3,12 +3,10 @@ import React, { Suspense } from "react";
 import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
 
 import OrgHeader from "@/components/common/OrgHeader";
-import { redirect } from "next/navigation";
-import { config } from "../../../config";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
-import { HttpError } from "../../../data-fetcher/http-error";
+import { handleHttpError } from "../../../data-fetcher/handle-http-error";
 
 export default function OrganizationLayout({
   // Layouts must accept a children prop.
@@ -35,38 +33,28 @@ async function OrganizationShell({
   children: React.ReactNode;
   params: Promise<{ organizationSlug: string }>;
 }) {
-  let org, contentTree;
   let organizationSlug = "";
   try {
     const { organizationSlug: slug } = await params;
     organizationSlug = slug;
-    [org, contentTree] = await Promise.all([
+    const [org, contentTree] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
       fetchContentTree(decodeURIComponent(organizationSlug)),
     ]);
+
+    return (
+      <ClientContextWrapper
+        Provider={OrganizationProvider}
+        value={{
+          organization: org,
+          contentTree,
+        }}
+      >
+        <OrgHeader />
+        {children}
+      </ClientContextWrapper>
+    );
   } catch (error) {
-    if (error instanceof HttpError && error.statusCode === 402) {
-      const billingUrl = new URL(config.billingUrl);
-      billingUrl.searchParams.set("expired", "1");
-      if (organizationSlug) {
-        billingUrl.searchParams.set("orgName", organizationSlug);
-      }
-      redirect(billingUrl.toString());
-    } else {
-      console.error("An unexpected error occurred:", error);
-    }
-    redirect("/");
+    handleHttpError(error, organizationSlug);
   }
-  return (
-    <ClientContextWrapper
-      Provider={OrganizationProvider}
-      value={{
-        organization: org,
-        contentTree,
-      }}
-    >
-      <OrgHeader />
-      {children}
-    </ClientContextWrapper>
-  );
 }

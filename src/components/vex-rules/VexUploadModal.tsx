@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "../ui/dialog";
 import {
   Card,
@@ -23,7 +22,6 @@ import { Input } from "../ui/input";
 import { BranchTagSelector } from "../BranchTagSelector";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useDropzone } from "react-dropzone";
-import { classNames } from "@/utils/common";
 import { LinkIcon } from "@heroicons/react/24/outline";
 import {
   Loader2,
@@ -35,7 +33,7 @@ import {
 } from "lucide-react";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { browserApiClient } from "@/services/devGuardApi";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import type { ExternalReference } from "@/types/api/api";
@@ -63,8 +61,6 @@ interface VexUploadModalProps {
   }) => Promise<void>;
 }
 
-type UploadMethod = "file" | "source-url" | undefined;
-
 const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   open,
   onOpenChange,
@@ -74,7 +70,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   const params = useDecodedParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
 
-  const [uploadMethod, setUploadMethod] = useState<UploadMethod>();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [branchOrTagName, setBranchOrTagName] = useState("");
   const [branchOrTagSlug, setBranchOrTagSlug] = useState("");
@@ -140,7 +135,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     setTimeout(() => {
       carouselApi?.reInit();
     }, 0);
-  }, [uploadMethod, carouselApi, activeTab]);
+  }, [carouselApi, activeTab]);
 
   const handleUploadClick = async () => {
     if (!vexFile) return;
@@ -155,7 +150,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
       });
       // Reset form
       setVexFile(null);
-      setUploadMethod(undefined);
       onOpenChange(false);
     } catch (error) {
       console.error("Upload failed:", error);
@@ -294,7 +288,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
           <CarouselContent className="border-0">
             {/* Step 1: Method Selection */}
             <CarouselItem>
-              <div className="px-1">
+              <div className="px-1 pb-2">
                 <DialogHeader>
                   <DialogTitle>Manage VEX</DialogTitle>
                   <DialogDescription>
@@ -305,14 +299,12 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
                 <div className="space-y-4 mt-6">
                   <Card
-                    onClick={() => setUploadMethod("file")}
-                    className={`cursor-pointer ${
-                      uploadMethod === "file"
-                        ? "border border-primary"
-                        : "border border-transparent"
-                    }`}
+                    onClick={() => {
+                      carouselApi?.scrollTo(1);
+                    }}
+                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
                   >
-                    <CardHeader>
+                    <CardHeader data-testid="upload-vex-file">
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
                         <CloudUpload className="w-5 h-5" />
                         Upload a VEX File
@@ -325,12 +317,10 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   </Card>
 
                   <Card
-                    onClick={() => setUploadMethod("source-url")}
-                    className={`cursor-pointer ${
-                      uploadMethod === "source-url"
-                        ? "border border-primary"
-                        : "border border-transparent"
-                    }`}
+                    onClick={() => {
+                      carouselApi?.scrollTo(2);
+                    }}
+                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
@@ -345,33 +335,11 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     </CardHeader>
                   </Card>
                 </div>
-
-                <div className="mt-8 flex flex-wrap flex-row gap-2 justify-end">
-                  <Button
-                    variant="secondary"
-                    onClick={() => onOpenChange(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    disabled={uploadMethod === undefined}
-                    onClick={() => {
-                      if (uploadMethod === "file") {
-                        carouselApi?.scrollTo(1);
-                      } else {
-                        carouselApi?.scrollTo(2);
-                      }
-                    }}
-                  >
-                    {uploadMethod === undefined
-                      ? "Select an option"
-                      : "Continue"}
-                  </Button>
-                </div>
               </div>
             </CarouselItem>
 
             {/* Step 2: File Upload */}
+
             <CarouselItem>
               <div className="px-1">
                 <DialogHeader>
@@ -417,7 +385,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      setUploadMethod(undefined);
                       setVexFile(null);
                       carouselApi?.scrollTo(0);
                     }}
@@ -426,6 +393,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     Back
                   </Button>
                   <Button
+                    data-testid="upload-vex-file-selected-button"
                     onClick={handleUploadClick}
                     disabled={isFileUploadDisabled}
                     isSubmitting={isUploading}
@@ -638,7 +606,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   <Button
                     variant="secondary"
                     onClick={() => {
-                      setUploadMethod(undefined);
                       setNewVexUrl("");
                       setNewCsafUrl("");
                       setCsafPackageScope("");

@@ -50,7 +50,12 @@ export const ProjectForm: FunctionComponent<Props> = ({
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input disabled={disabled} required={true} {...field} />
+                <Input
+                  data-testid="group-name"
+                  disabled={disabled}
+                  required={true}
+                  {...field}
+                />
               </FormControl>
               <FormDescription>The name of the group.</FormDescription>
               <FormMessage />
@@ -64,7 +69,11 @@ export const ProjectForm: FunctionComponent<Props> = ({
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input disabled={disabled} {...field} />
+                <Input
+                  data-testid="group-description"
+                  disabled={disabled}
+                  {...field}
+                />
               </FormControl>
               <FormDescription>The description of the group.</FormDescription>
               <FormMessage />

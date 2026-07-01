@@ -37,7 +37,7 @@ import { cn } from "@/lib/utils";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { validateArtifactNameAgainstPurlSpec } from "../../../utils/common";
 import { ClipboardDocumentIcon } from "@heroicons/react/20/solid";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
 
@@ -749,6 +749,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 Button={
                   <FormControl>
                     <Switch
+                      data-testid="enable-public-access-switch"
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       className="mt-6"
@@ -770,6 +771,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
       {handleUpdate && (
         <div className="mt-4 flex flex-row justify-end">
           <AsyncButton
+            data-testid="save-vulnerability-management-settings-button"
             type="button"
             disabled={
               !(

@@ -17,9 +17,7 @@ import {
   DocumentArrowUpIcon,
 } from "@heroicons/react/24/outline";
 import type { FunctionComponent } from "react";
-import { classNames } from "../../../utils/common";
 import { Badge } from "../../ui/badge";
-import { Button } from "../../ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogHeader, DialogTitle } from "../../ui/dialog";
@@ -28,8 +26,6 @@ interface IntegrationMethodSelectionSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
-  variant: "manual" | "auto";
-  prevIndex: number;
   setVariant: (variant: "manual" | "auto") => void;
   cliSlideIndex: number;
   fileUploadSlideIndex: number;
@@ -37,14 +33,7 @@ interface IntegrationMethodSelectionSlideProps {
 
 const IntegrationMethodSelectionSlide: FunctionComponent<
   IntegrationMethodSelectionSlideProps
-> = ({
-  api,
-  variant,
-  setVariant,
-  prevIndex,
-  cliSlideIndex,
-  fileUploadSlideIndex,
-}) => {
+> = ({ api, setVariant, cliSlideIndex, fileUploadSlideIndex }) => {
   return (
     <CarouselItem>
       <div className="">
@@ -53,11 +42,11 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
         </DialogHeader>
         <div className="mt-10">
           <Card
-            className={classNames(
-              "cursor-pointer",
-              variant === "auto" ? "border-primary" : "",
-            )}
-            onClick={() => setVariant("auto")}
+            className="cursor-pointer"
+            onClick={() => {
+              setVariant("auto");
+              api?.scrollTo(cliSlideIndex);
+            }}
           >
             <CardHeader>
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -74,11 +63,12 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
             </CardHeader>
           </Card>
           <Card
-            className={classNames(
-              "cursor-pointer mt-2",
-              variant === "manual" ? "border-primary" : "",
-            )}
-            onClick={() => setVariant("manual")}
+            className="cursor-pointer mt-2"
+            data-testid="upload-manually"
+            onClick={() => {
+              setVariant("manual");
+              api?.scrollTo(fileUploadSlideIndex);
+            }}
           >
             <CardHeader>
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -94,25 +84,6 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               </CardDescription>
             </CardHeader>
           </Card>
-        </div>
-        <div className="mt-10 flex flex-row gap-2 justify-end">
-          <Button
-            variant="secondary"
-            id="integration-method-selection-back"
-            onClick={() => api?.scrollTo(prevIndex)}
-          >
-            Back
-          </Button>
-          <Button
-            id="integration-method-selection-continue"
-            onClick={() =>
-              api?.scrollTo(
-                variant === "auto" ? cliSlideIndex : fileUploadSlideIndex,
-              )
-            }
-          >
-            Continue
-          </Button>
         </div>
       </div>
     </CarouselItem>

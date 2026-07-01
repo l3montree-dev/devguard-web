@@ -43,3 +43,11 @@ image.tar
 
 # nix
 result
+
+# playwright
+playwright-report/
+test-results/
+playwright/
+
+!test-secret.pem
+

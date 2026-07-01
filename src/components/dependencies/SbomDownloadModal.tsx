@@ -99,6 +99,7 @@ export default function SbomDownloadModal({
         </p>
         <div className="flex items-start justify-start gap-4 mt-2">
           <DelayedDownloadButton
+            data-testid="download-sbom-json-format"
             href={
               pathname +
               `/../sbom.json?${new URLSearchParams({

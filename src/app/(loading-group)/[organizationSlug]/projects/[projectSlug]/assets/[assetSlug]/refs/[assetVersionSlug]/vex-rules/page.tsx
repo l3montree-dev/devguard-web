@@ -34,7 +34,7 @@ import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
 import { useArtifacts } from "@/context/AssetVersionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import Callout from "@/components/common/Callout";
 import useSWR from "swr";
@@ -257,7 +257,10 @@ const VexRulesPage: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <AuthGuard require="member">
-          <Button onClick={() => setUploadVexModal(true)}>
+          <Button
+            data-testid="upload-vex-button"
+            onClick={() => setUploadVexModal(true)}
+          >
             Upload a VEX-File or add a VEX-URL
           </Button>
         </AuthGuard>

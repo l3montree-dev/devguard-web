@@ -22,7 +22,7 @@ import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
@@ -319,13 +319,14 @@ const Artifacts = () => {
         } else {
           errorCount++;
           console.error(
-            `Failed to update artifact ${artifactName}:`,
+            "Failed to update artifact:",
+            artifactName,
             response.statusText,
           );
         }
       } catch (error) {
         errorCount++;
-        console.error(`Error updating artifact ${artifactName}:`, error);
+        console.error("Error updating artifact:", artifactName, error);
       }
     }
 
@@ -349,7 +350,12 @@ const Artifacts = () => {
           <div className="mb-4 flex items-center justify-between">
             <BranchTagSelector branches={branches} tags={tags} />
             <AuthGuard require="admin">
-              <Button onClick={openCreateDialog}>Create new Artifact</Button>
+              <Button
+                data-testid="create-artifact-button"
+                onClick={openCreateDialog}
+              >
+                Create new Artifact
+              </Button>
             </AuthGuard>
           </div>
           <Section
@@ -480,7 +486,10 @@ const Artifacts = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleDelete()}>
+            <AlertDialogAction
+              data-testid="confirm-artifact-deletion"
+              onClick={() => handleDelete()}
+            >
               <span>Confirm</span>
             </AlertDialogAction>
           </AlertDialogFooter>

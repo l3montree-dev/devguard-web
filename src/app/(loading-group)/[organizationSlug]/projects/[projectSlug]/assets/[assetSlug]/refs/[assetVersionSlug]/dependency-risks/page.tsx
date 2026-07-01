@@ -37,7 +37,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
@@ -419,10 +419,18 @@ const Index: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">
-          <Button variant={"secondary"} onClick={() => setShowSBOMModal(true)}>
+          <Button
+            data-testid="share-sbom-button"
+            variant={"secondary"}
+            onClick={() => setShowSBOMModal(true)}
+          >
             Share your SBOM
           </Button>
-          <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
+          <Button
+            data-testid="share-vex-button"
+            variant={"secondary"}
+            onClick={() => setShowVexModal(true)}
+          >
             Share your VEX
           </Button>
           <AuthGuard require="member">
@@ -455,6 +463,7 @@ const Index: FunctionComponent = () => {
           >
             <TabsList>
               <TabsTrigger
+                data-testid="dependency-risk-open-button"
                 onClick={() =>
                   push({
                     state: "open",
@@ -465,6 +474,7 @@ const Index: FunctionComponent = () => {
                 Open
               </TabsTrigger>
               <TabsTrigger
+                data-testid="dependency-risk-closed-button"
                 onClick={() =>
                   push({
                     state: "closed",
@@ -637,6 +647,7 @@ const Index: FunctionComponent = () => {
                               </Tooltip>
                             ) : null}
                             <SortingCaret
+                              data-testid="sorting-cvss-value"
                               sortDirection={header.column.getIsSorted()}
                             />
                           </div>

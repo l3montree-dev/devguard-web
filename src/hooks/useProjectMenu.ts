@@ -43,12 +43,14 @@ export const useProjectMenu = () => {
         isActive: pathname.startsWith(
           `/${orgSlug}/projects/${projectSlug}/overview`,
         ),
+        testId: "nav-group-overview",
       },
       {
         title: "Releases",
         href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
         Icon: ContainerIcon,
         isActive: pathname === `/${orgSlug}/projects/${projectSlug}/releases`,
+        testId: "nav-group-releases",
       },
     );
   }
@@ -60,6 +62,7 @@ export const useProjectMenu = () => {
     href: "/" + orgSlug + "/projects/" + projectSlug,
     Icon: ListBulletIcon,
     isActive: pathname === `/${orgSlug}/projects/${projectSlug}`,
+    testId: "nav-group-subgroups-repositories",
   });
 
   menu.push({
@@ -82,12 +85,14 @@ export const useProjectMenu = () => {
           isActive:
             pathname ===
             `/${orgSlug}/projects/${projectSlug}/dependency-search`,
+          testId: "nav-group-package-search",
         },
         {
           title: "Settings",
           href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
           Icon: CogIcon,
           isActive: pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
+          testId: "nav-group-settings",
         },
       ],
     );

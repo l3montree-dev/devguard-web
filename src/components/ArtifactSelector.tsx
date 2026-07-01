@@ -6,7 +6,7 @@ import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ContainerIcon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { useUpdateAssetVersionState } from "../context/AssetVersionContext";
 import useDecodedParams from "../hooks/useDecodedParams";
 import useRouterQuery from "../hooks/useRouterQuery";

@@ -17,7 +17,8 @@ import { CopyIcon } from "@radix-ui/react-icons";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
+import { Copy } from "lucide-react";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
 
 export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
@@ -67,10 +68,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       return { codeStr: props.codeString, highlightLineNumbers: null };
     // we need the starting and ending line numbers of the match - and remove the special characters just with the match content
 
-    const reg = new RegExp(
-      props.highlightRegexPattern,
-      props.highlightRegexPattern.flags,
-    );
+    const reg = props.highlightRegexPattern;
     const matches = reg.exec(props.codeString);
 
     if (matches === null) {
@@ -105,9 +103,9 @@ const CopyCode: FunctionComponent<Props> = (props) => {
   return (
     <span
       style={{
-        height: 14 /*padding*/ + codeStr?.split("\n").length * 20,
+        height: 18 /*padding*/ + codeStr?.split("\n").length * 20,
       }}
-      className="relative block w-full overflow-hidden rounded-lg border"
+      className="relative block w-full overflow-hidden rounded-md border"
     >
       <span className="absolute bottom-0 left-0 right-0 top-0 animate-pulse bg-card" />
       <span className="relative">
@@ -132,9 +130,9 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       </span>
       <button
         onClick={handleCopy}
-        className="absolute cursor-pointer right-1 top-1 z-10 rounded-lg bg-card p-1 px-2 text-xs text-foreground transition-all opacity-75 hover:opacity-100"
+        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-card p-2 text-xs text-foreground transition-all hover:opacity-80"
       >
-        Copy
+        <Copy className="h-4 w-4" />
       </button>
     </span>
   );

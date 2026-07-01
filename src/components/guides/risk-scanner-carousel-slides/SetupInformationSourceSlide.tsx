@@ -5,7 +5,7 @@ import type { ArtifactCreateUpdateRequest } from "@/types/api/api";
 import { useEffect } from "react";
 import type { FunctionComponent } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import ArtifactForm from "../../common/ArtifactForm";
 import { Form } from "../../ui/form";
 
@@ -78,15 +78,6 @@ export const SetupInformationSourceSlide: FunctionComponent<
         >
           <ArtifactForm form={form} isEditMode={false} />
           <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
-            <Button
-              variant={"secondary"}
-              id="setup-information-sources-back"
-              onClick={() => {
-                api?.scrollTo(prevIndex);
-              }}
-            >
-              Back
-            </Button>
             <Button
               isSubmitting={form.formState.isSubmitting}
               id="setup-information-sources-create"
