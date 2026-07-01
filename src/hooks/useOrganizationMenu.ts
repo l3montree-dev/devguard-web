@@ -14,7 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
-import { ChartBarIcon } from "lucide-react";
+import { ChartBarIcon, ShieldCheck } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useActiveOrg } from "./useActiveOrg";
 import useDecodedParams from "./useDecodedParams";
@@ -49,6 +49,15 @@ export const useOrganizationMenu = () => {
     href: "/" + decodedOrgSlug,
     Icon: ListBulletIcon,
     isActive: decodedPathName === "/" + decodedOrgSlug,
+  });
+
+  menu.push({
+    title: "Compliance Postures",
+    href: "/" + decodedOrgSlug + "/compliance-postures",
+    Icon: ShieldCheck,
+    isActive: decodedPathName.startsWith(
+      "/" + decodedOrgSlug + "/compliance-postures",
+    ),
   });
 
   if (isAdmin(currentUserRole) && !org.externalEntityProviderId) {

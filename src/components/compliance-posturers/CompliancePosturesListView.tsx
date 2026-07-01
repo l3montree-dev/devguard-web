@@ -1,140 +1,82 @@
 "use client";
 
 import SortingCaret from "@/components/common/SortingCaret";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-
 import Page from "@/components/Page";
-import type {
-  ComplianceRiskDTO,
-  Paged,
-  PolicyFrameworks,
-} from "@/types/api/api";
+import type { CompliancePostureWithControlDTO, Paged } from "@/types/api/api";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 
 import { classNames } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import Filter from "@/components/Filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { CaretDownIcon } from "@radix-ui/react-icons";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
-import useDecodedParams from "@/hooks/useDecodedParams";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
-import { Loader2, Download, CircleCheck, CircleX } from "lucide-react";
+import { Loader2, Download } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
-import ComplianceDistribution from "./ComplianceDistribution";
-import { Card } from "@/components/ui/card";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
-const columnHelper = createColumnHelper<ComplianceRiskDTO>();
+const columnHelper = createColumnHelper<CompliancePostureWithControlDTO>();
 
-// Sorting is disabled on every column: the backend ignores per-column sort
-// params for compliance risks.
-const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
-  // Leading compliance indicator derived from the row's own state: open risks
-  // are not compliant (red ✗), any closed/resolved state is compliant (green ✓).
-  columnHelper.accessor("state", {
-    header: "",
-    id: "compliant",
-    enableSorting: false,
-    cell: (info) =>
-      info.getValue() === "open" ? (
-        <CircleX className="h-5 w-5 text-red-500" aria-label="Not compliant" />
-      ) : (
-        <CircleCheck
-          className="h-5 w-5 text-green-500"
-          aria-label="Compliant"
-        />
-      ),
-  }),
-  columnHelper.accessor("policyTitle", {
-    header: "Policy",
-    id: "policy_title",
-    enableSorting: false,
+const columnsDef: ColumnDef<CompliancePostureWithControlDTO, any>[] = [
+  columnHelper.accessor("title", {
+    header: "Title",
+    id: "title",
+    enableSorting: true,
     cell: (info) => (
       <div className="flex flex-col">
         <span className="font-medium">{info.getValue()}</span>
-        {info.row.original.policyDescription && (
-          <span className="line-clamp-1 text-xs text-muted-foreground">
-            {info.row.original.policyDescription}
-          </span>
-        )}
       </div>
     ),
   }),
-  columnHelper.accessor("policyFrameworks", {
-    header: "Frameworks",
-    id: "policy_frameworks",
-    enableSorting: false,
-    cell: (info) => {
-      const frameworks = info.getValue() ?? [];
-      if (!frameworks.length) {
-        return <span className="text-muted-foreground">—</span>;
-      }
-      return (
-        <div className="flex flex-row flex-wrap gap-1">
-          {frameworks.map((f: PolicyFrameworks) => (
-            <Badge
-              key={f.framework}
-              variant="secondary"
-              className="flex items-center gap-1.5 whitespace-nowrap"
-            >
-              <FrameworkIcon framework={f.framework} />
-              <span>{f.framework}</span>
-            </Badge>
-          ))}
-        </div>
-      );
-    },
+  columnHelper.accessor("framework", {
+    header: "Framework",
+    id: "framework",
+    enableSorting: true,
+    cell: (info) => (
+      <div className="flex flex-row items-center gap-2">
+        <FrameworkIcon framework={info.getValue()} />
+        <span>{info.getValue()}</span>
+      </div>
+    ),
   }),
-  columnHelper.accessor("policyFrameworks", {
-    header: "Controls",
-    id: "controls",
-    enableSorting: false,
-    cell: (info) => {
-      const controls = (info.getValue() ?? []).flatMap(
-        (f: PolicyFrameworks) => f.controls ?? [],
-      );
-      if (!controls.length) {
-        return <span className="text-muted-foreground">—</span>;
-      }
-      return (
-        <div className="flex flex-row flex-wrap gap-1">
-          {controls.map((control: string) => (
-            <Badge
-              key={control}
-              variant="outline"
-              className="whitespace-nowrap font-mono text-xs"
-            >
-              {control}
-            </Badge>
-          ))}
-        </div>
-      );
-    },
+  columnHelper.accessor("controlId", {
+    header: "Control ID",
+    id: "control_id",
+    enableSorting: true,
+    cell: (info) => (
+      <Badge
+        key={info.getValue()}
+        variant="outline"
+        className="whitespace-nowrap font-mono text-xs"
+      >
+        {info.getValue()}
+      </Badge>
+    ),
   }),
   columnHelper.accessor("state", {
     header: "State",
@@ -148,23 +90,21 @@ const columnsDef: ColumnDef<ComplianceRiskDTO, any>[] = [
   }),
 ];
 
-const Index: FunctionComponent = () => {
+interface Props {
+  apiBaseUrl: string;
+  Menu?: any[];
+  Title?: ReactNode;
+}
+
+const CompliancePosturesListView: FunctionComponent<Props> = ({
+  apiBaseUrl,
+  Menu,
+  Title,
+}) => {
   const router = useRouter();
-
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useDecodedParams() as {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
-
   const searchParams = useSearchParams();
+  const asset = useActiveAsset();
 
-  // The URL is the single source of truth: search, Filter chips and the
-  // framework dropdown all write independent filterQuery/search params, which
-  // buildFilterSearchParams forwards to the backend. The Open/Closed tab adds a
-  // server-side state filter so pagination works per tab (same as other tabs).
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
@@ -176,67 +116,17 @@ const Index: FunctionComponent = () => {
     return p;
   }, [searchParams]);
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/";
-
   const { data: vulns, isLoading } = useSWR<
-    Paged<ComplianceRiskDTO> & { frameworks: string[] }
-  >(
-    uri + "refs/" + assetVersionSlug + "/compliance-risks/?" + query.toString(),
-    fetcher,
-    {
-      keepPreviousData: true,
-    },
-  );
+    Paged<CompliancePostureWithControlDTO>
+  >(apiBaseUrl + "?" + query.toString(), fetcher, { keepPreviousData: false });
+
+  const { data: stats, isLoading: statsLoading } = useSWR<{
+    open: number;
+    implemented: number;
+    notApplicable: number;
+  }>(apiBaseUrl + "stats/", fetcher);
 
   const isClosed = searchParams?.get("state") === "closed";
-
-  // NOTE: filter `value`s map to the backend's filterable columns
-  // (filterQuery[<value>][<op>]). The "Framework" option uses the JSONB
-  // `frameworkContains` operator; it also gives the framework dropdown's
-  // selection a human-readable native chip label.
-  const filterOptions = useMemo(() => {
-    return [
-      {
-        label: "Policy",
-        value: "policy_title",
-        operators: [
-          { value: "ilike", label: "contains" },
-          { value: "is" },
-          { value: "is not" },
-        ],
-      },
-      {
-        // Driven by the dedicated FrameworkSelect dropdown, not the builder —
-        // hidden from the field list but still used for the native chip label.
-        label: "Framework",
-        value: "policyFrameworks",
-        operators: [{ value: "frameworkContains", label: "is" }],
-        hidden: true,
-      },
-      // On the Closed tab, let the user narrow by the specific closed state.
-      ...(isClosed
-        ? [
-            {
-              label: "State",
-              value: "state",
-              operators: [{ value: "is" }],
-              filterValues: [
-                { value: "accepted", label: "Accepted" },
-                { value: "falsePositive", label: "False Positive" },
-                { value: "fixed", label: "Fixed" },
-              ],
-            },
-          ]
-        : []),
-    ];
-  }, [isClosed]);
 
   const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
     columnsDef,
@@ -244,48 +134,100 @@ const Index: FunctionComponent = () => {
   });
   const handleSearch = useDebouncedQuerySearch();
 
-  const assetMenu = useAssetMenu();
-
   const { branches, tags } = useAssetBranchesAndTags();
 
   const params = useSearchParams();
   const pathname = usePathname();
   const push = useRouterQuery();
 
+  const frameworks = useMemo(() => {
+    const result: string[] = [];
+    vulns?.data.forEach((v) => {
+      if (!result.includes(v.framework)) {
+        result.push(v.framework);
+      }
+    });
+    return result;
+  }, [vulns?.data]);
+
+  const filterOptions = useMemo(() => {
+    return [
+      {
+        label: "Title",
+        value: "title",
+        operators: [{ value: "ilike", label: "contains" }],
+      },
+      {
+        label: "Framework",
+        value: "framework",
+        operators: [
+          { value: "is" },
+          { value: "is not" },
+          { value: "ilike", label: "contains" },
+        ],
+        filterValues: frameworks.map((f) => ({ value: f })),
+      },
+      {
+        label: "Control ID",
+        value: "controlId",
+        operators: [
+          { value: "is" },
+          { value: "is not" },
+          { value: "ilike", label: "contains" },
+        ],
+      },
+      ...(isClosed
+        ? [
+            {
+              label: "State",
+              value: "state",
+              operators: [{ value: "is" }],
+              filterValues: [
+                { value: "implemented", label: "Implemented" },
+                { value: "notApplicable", label: "Not Applicable" },
+              ],
+            },
+          ]
+        : []),
+    ];
+  }, [isClosed, frameworks]);
+  console.log("params state", params?.has("state"));
+
   return (
-    <Page Menu={assetMenu} title={"Compliance"} Title={<AssetTitle />}>
+    <Page Menu={Menu} title={"Compliance Postures"} Title={Title}>
       <div className="flex flex-row items-center justify-between">
-        <BranchTagSelector branches={branches} tags={tags} />
-        <Button variant={"secondary"} onClick={() => alert("Share your VEX")}>
-          <Download className="mr-2 h-4 w-4" />
-          Export OSCAL
-        </Button>
+        {asset && <BranchTagSelector branches={branches} tags={tags} />}
+        <div className={"ml-auto"}>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button variant={"secondary"} disabled>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export OSCAL
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Coming soon</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
       <Section
         forceVertical
         primaryHeadline
-        title="Identified Compliance Risks"
-        description="This table shows all the identified compliance risks for this repository."
+        title="Compliance Postures Assessment"
+        description="This table shows the compliance postures."
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-col gap-2">
-          <Card>
-            <Collapsible className="my-2">
-              <CollapsibleTrigger className="flex w-full items-center justify-between p-2 cursor-pointer rounded-md transition-colors">
-                <ComplianceStats
-                  uri={uri}
-                  assetVersionSlug={assetVersionSlug}
-                />
-                <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="my-4 p-2">
-                <ComplianceDistribution
-                  uri={uri}
-                  assetVersionSlug={assetVersionSlug}
-                />
-              </CollapsibleContent>
-            </Collapsible>
-          </Card>
+          <ComplianceStats
+            open={stats?.open ?? 0}
+            implemented={stats?.implemented ?? 0}
+            notApplicable={stats?.notApplicable ?? 0}
+            isLoading={statsLoading}
+          />
+
           <Tabs
             defaultValue={
               params?.has("state") ? (params.get("state") as string) : "open"
@@ -305,7 +247,7 @@ const Index: FunctionComponent = () => {
           </Tabs>
           <div className="flex flex-row items-center gap-2">
             <div className="flex-1 space-y-2">
-              <FrameworkSelect frameworks={vulns?.frameworks ?? []} />
+              <FrameworkSelect frameworks={frameworks} />
               <Filter
                 options={filterOptions}
                 onFilter={handleFilter}
@@ -330,7 +272,7 @@ const Index: FunctionComponent = () => {
         <div>
           <EmptyParty
             title="No matching results."
-            description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
+            description="Try adjusting your search or filter to find what you're looking for."
           />
           <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
@@ -403,7 +345,9 @@ const Index: FunctionComponent = () => {
                     {table.getRowModel().rows.map((row, i, arr) => (
                       <tr
                         onClick={() =>
-                          router?.push(pathname + "/" + row.original.id)
+                          router?.push(
+                            pathname + "/" + row.original.frameworkControlId,
+                          )
                         }
                         className={classNames(
                           "relative cursor-pointer align-center transition-all",
@@ -411,7 +355,7 @@ const Index: FunctionComponent = () => {
                           i % 2 != 0 && "bg-card/50",
                           "hover:bg-muted",
                         )}
-                        key={row.original.id}
+                        key={row.original.frameworkControlId}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <td className="p-4" key={cell.id}>
@@ -437,4 +381,4 @@ const Index: FunctionComponent = () => {
   );
 };
 
-export default Index;
+export default CompliancePosturesListView;

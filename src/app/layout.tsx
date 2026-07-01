@@ -101,7 +101,7 @@ export default function RootLayout({
   );
 }
 
-async function  SessionShell({ children }: { children: React.ReactNode }) {
+async function SessionShell({ children }: { children: React.ReactNode }) {
   try {
     const session = await fetchSession();
     let orgs: OrganizationDTO[] = [];

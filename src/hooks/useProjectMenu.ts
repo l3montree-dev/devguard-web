@@ -18,7 +18,7 @@ import {
   CogIcon,
   ListBulletIcon,
 } from "@heroicons/react/24/outline";
-import { ContainerIcon, FolderSearch } from "lucide-react";
+import { ContainerIcon, FolderSearch, ShieldCheck } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
 import useDecodedParams from "./useDecodedParams";
 import useDecodedPathname from "./useDecodedPathname";
@@ -61,6 +61,16 @@ export const useProjectMenu = () => {
     Icon: ListBulletIcon,
     isActive: pathname === `/${orgSlug}/projects/${projectSlug}`,
   });
+
+  menu.push({
+    title: "Compliance Postures",
+    href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance-postures",
+    Icon: ShieldCheck,
+    isActive: pathname.startsWith(
+      `/${orgSlug}/projects/${projectSlug}/compliance-postures`,
+    ),
+  });
+
   if (isAdmin(currentUserRole)) {
     menu.push(
       ...[

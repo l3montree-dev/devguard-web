@@ -11,11 +11,7 @@ import useRouterQuery from "@/hooks/useRouterQuery";
 import { useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 
-// The dropdown writes the backend's JSONB filter operator directly, so the
-// selection renders as a native Filter chip (the page registers a matching
-// "Framework" filter option for the human-readable label).
-export const FRAMEWORK_FILTER_KEY =
-  "filterQuery[policyFrameworks][frameworkContains]";
+const FRAMEWORK_FILTER_KEY = "filterQuery[framework][is]";
 const ALL_FRAMEWORKS = "__all__";
 
 interface Props {

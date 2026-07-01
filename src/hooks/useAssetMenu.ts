@@ -180,7 +180,7 @@ export const useAssetMenu = () => {
         isActive: pathname.includes("license-risks"),
       },
       {
-        title: "Compliance",
+        title: "Compliance Postures",
         href:
           "/" +
           orgSlug +
@@ -190,9 +190,9 @@ export const useAssetMenu = () => {
           assetSlug +
           "/refs/" +
           assetVersionSlug +
-          "/compliance-risks",
+          "/compliance-postures",
         Icon: ShieldCheck,
-        isActive: pathname.includes("compliance-risks"),
+        isActive: pathname.includes("compliance-postures"),
       },
       {
         title: "Dependency Insights",
