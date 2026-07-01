@@ -417,6 +417,8 @@ export const stateLabels: Record<DependencyVuln["state"], string> = {
   accepted: "Accepted",
   falsePositive: "False Positive",
   markedForTransfer: "Marked for Transfer",
+  implemented: "Implemented",
+  notApplicable: "Not Applicable",
 };
 
 // Utility function to truncate text in the middle with ellipsis

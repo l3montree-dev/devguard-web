@@ -70,7 +70,11 @@ import {
 } from "../ui/dropdown-menu";
 import FormatDate from "./FormatDate";
 
-function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
+export function EventTypeIcon({
+  eventType,
+}: {
+  eventType: VulnEventDTO["type"];
+}) {
   switch (eventType) {
     case "licenseDecision":
       return <Scale className="h-4 w-4" />;
@@ -81,10 +85,12 @@ function EventTypeIcon({ eventType }: { eventType: VulnEventDTO["type"] }) {
     case "accepted":
       return <SpeakerXMarkIcon className="h-4 w-4" />;
     case "fixed":
+    case "implemented":
       return <CheckIcon className="h-4 w-4" />;
     case "detected":
       return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "falsePositive":
+    case "notApplicable":
       return <StopIcon className="h-4 w-4" />;
     case "mitigate":
       return <WrenchIcon className="h-4 w-4" />;
@@ -387,7 +393,6 @@ export default function RiskAssessmentFeed({
   directDependencyFixedVersion?: string | null;
 }) {
   const groupedEvents = groupContiguousEventsByType(events);
-  console.log(groupedEvents);
 
   const org = useActiveOrg();
   const project = useActiveProject();

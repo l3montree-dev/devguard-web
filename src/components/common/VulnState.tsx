@@ -45,7 +45,20 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
           Accepted
         </Badge>
       );
-
+    case "implemented":
+      return (
+        <Badge
+          variant={"default"}
+          className={classNames(
+            defaultClasses,
+            evTypeBackground["accepted"],
+            "text-secondary-foreground",
+          )}
+        >
+          <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
+          Implemented
+        </Badge>
+      );
     case "falsePositive":
       return (
         <Badge
@@ -57,6 +70,19 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
         >
           <StopIcon className="-ml-1 inline-block h-4 w-4" />
           False Positive
+        </Badge>
+      );
+    case "notApplicable":
+      return (
+        <Badge
+          variant={"default"}
+          className={classNames(
+            defaultClasses,
+            evTypeBackground["falsePositive"],
+          )}
+        >
+          <StopIcon className="-ml-1 inline-block h-4 w-4" />
+          Not Applicable
         </Badge>
       );
 

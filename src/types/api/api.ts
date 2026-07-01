@@ -211,7 +211,14 @@ export interface BaseVulnDTO {
   id: string;
   createdAt: string;
   updatedAt: string;
-  state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
+  state:
+    | "open"
+    | "fixed"
+    | "accepted"
+    | "falsePositive"
+    | "markedForTransfer"
+    | "implemented"
+    | "notApplicable";
   priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;
@@ -272,7 +279,7 @@ interface BaseVulnEventDTO {
   createdAt: string;
   id: string;
   vulnId: string;
-  vulnType: "dependencyVuln" | "firstPartyVuln";
+  vulnType: "dependencyVuln" | "firstPartyVuln" | "compliancePosture";
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
@@ -294,6 +301,13 @@ export interface TicketClosedEventDTO extends BaseVulnEventDTO {
 
 export interface TickedDeletedEventDTO extends BaseVulnEventDTO {
   type: "ticketDeleted";
+}
+export interface ImplementedEventDTO extends BaseVulnEventDTO {
+  type: "implemented";
+}
+
+export interface NotApplicableEventDTO extends BaseVulnEventDTO {
+  type: "notApplicable";
 }
 
 export interface AcceptedEventDTO extends BaseVulnEventDTO {
@@ -376,7 +390,9 @@ export type VulnEventDTO =
   | CommentEventDTO
   | TicketClosedEventDTO
   | TickedDeletedEventDTO
-  | LicenseDecisionEventDTO;
+  | LicenseDecisionEventDTO
+  | ImplementedEventDTO
+  | NotApplicableEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -656,6 +672,55 @@ export interface ArtifactDTO {
 }
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
+  events: VulnEventDTO[];
+}
+
+export interface PolicyFrameworks {
+  framework: string;
+  controls: string[];
+}
+
+export interface CompliancePostureWithControlDTO {
+  frameworkControlId: string;
+  framework: string;
+  controlId: string;
+  title: string;
+  description: string;
+  compliancePostureId: string;
+  state: BaseVulnDTO["state"];
+  orgId?: string;
+  projectId?: string;
+  assetId?: string;
+  assetVersionName?: string;
+  ticketId?: string;
+  ticketUrl?: string;
+  manualTicketCreation: boolean;
+  createdAt: string; // ISO (Go time.Time)
+}
+
+export interface ComplianceRiskDTO {
+  id: string;
+  assetVersionName: string;
+  assetId: string;
+  artifacts: ArtifactDTO[];
+  policyId: string;
+  policyTitle: string;
+  policyDescription: string | null;
+  policyRelatedResources: string[];
+  policyTags: string[];
+  policyPriority: number;
+  policyFrameworks: PolicyFrameworks[];
+  state: BaseVulnDTO["state"];
+  createdAt: string; // ISO (Go time.Time)
+  ticketId: string | null;
+  ticketUrl: string | null;
+  manualTicketCreation: boolean;
+  message: string;
+  evidenceType: string;
+  violations: string[];
+}
+
+export interface DetailedComplianceRiskDTO extends CompliancePostureWithControlDTO {
   events: VulnEventDTO[];
 }
 
