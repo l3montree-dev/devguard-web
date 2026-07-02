@@ -7,9 +7,8 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SecurityAdvisory } from "@/types/api/api";
-import { getSeverityClassNames } from "@/components/common/Severity";
+import Severity from "@/components/common/Severity";
 import Markdown from "@/components/common/Markdown";
-import { classNames } from "@/utils/common";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
@@ -23,10 +22,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Eye, TriangleAlert } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { toast } from "@/lib/toast";
 import { notFound, useRouter } from "next/navigation";
-import { CVSS31_METRICS, CVSS40_METRICS, parseCvssVector } from "@/utils/cvss";
+import {
+  CVSS31_METRICS,
+  CVSS40_METRICS,
+  parseCvssVector,
+  vectorStringToScore,
+} from "@/utils/cvss";
 import AdvisoryDialog, {
   type AdvisoryFormData,
 } from "@/components/AdvisoryDialog";
@@ -148,7 +153,9 @@ const Index = () => {
     notFound();
   }
 
-  const severityUpper = advisory.severity?.toUpperCase() ?? "";
+  const severityScore = advisory.vectorstring
+    ? vectorStringToScore(advisory.vectorstring)
+    : null;
   const parsed = advisory.vectorstring
     ? parseCvssVector(advisory.vectorstring)
     : null;
@@ -192,6 +199,19 @@ const Index = () => {
 
   const activeConfirm = confirm ? confirmConfig[confirm] : null;
 
+  const visibilityConfig = {
+    draft: { label: "Draft", variant: "secondary" },
+    public: { label: "Published", variant: "success" },
+    withdrawn: { label: "Withdrawn", variant: "danger" },
+  } as const;
+
+  const visibilityBadge = visibilityConfig[
+    advisory.visibility as keyof typeof visibilityConfig
+  ] ?? {
+    label: advisory.visibility,
+    variant: "secondary" as const,
+  };
+
   return (
     <Page
       Menu={assetMenu}
@@ -200,8 +220,11 @@ const Index = () => {
     >
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         <div className="flex-1 min-w-0">
-          <div className="mb-6">
+          <div className="mb-6 flex flex-row gap-2 items-center">
             <h1 className="text-2xl font-semibold">{advisory.title}</h1>
+            <Badge className="h-full" variant={visibilityBadge.variant}>
+              {visibilityBadge.label}
+            </Badge>
           </div>
 
           {(advisory.affectedPackages?.length ?? 0) > 0 && (
@@ -279,14 +302,15 @@ const Index = () => {
               <div className="text-xs font-semibold text-muted-foreground mb-2">
                 Severity
               </div>
-              <span
-                className={classNames(
-                  "inline-flex px-2 py-0.5 text-xs font-medium rounded-full",
-                  getSeverityClassNames(severityUpper, false),
-                )}
-              >
-                {advisory.severity}
-              </span>
+              {severityScore !== null ? (
+                <div className="flex">
+                  <Severity risk={severityScore} />
+                </div>
+              ) : (
+                <span className="text-sm text-muted-foreground">
+                  {advisory.severity}
+                </span>
+              )}
             </div>
 
             {advisory.vectorstring && (
