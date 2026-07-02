@@ -45,6 +45,7 @@ import type {
   VulnEventDTO,
 } from "@/types/api/api";
 import { RequirementsLevel } from "@/types/api/api";
+import { getVexRulesSectionLabel } from "@/utils/vexRuleHelpers";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
   InformationCircleIcon,
@@ -930,7 +931,9 @@ const Index: FunctionComponent = () => {
                         </div>
                       )}
                       <span className="font-semibold block mb-2">
-                        Applied Rules ({vexRulesData?.length || 0})
+                        {vuln
+                          ? `${getVexRulesSectionLabel(vexRulesData ?? [], vuln)} (${vexRulesData?.length ?? 0})`
+                          : `Matching Rules (${vexRulesData?.length ?? 0})`}
                       </span>
                       {vexRulesData && vexRulesData.length > 0 && (
                         <div className="flex flex-col gap-2">
