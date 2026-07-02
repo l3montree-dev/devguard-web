@@ -18,11 +18,14 @@ export function usePasswordMismatch(): boolean {
   const { watch } = useFormContext();
   const password = watch("password");
   const confirmPassword = watch("confirmPassword");
-  return (
-    typeof confirmPassword === "string" &&
-    confirmPassword.length > 0 &&
-    password !== confirmPassword
-  );
+  if (!window.location.href.includes("registration")) {
+    return false;
+  }
+  if (password) {
+    return password !== confirmPassword;
+  } else {
+    return false;
+  }
 }
 
 export function PasswordField({
