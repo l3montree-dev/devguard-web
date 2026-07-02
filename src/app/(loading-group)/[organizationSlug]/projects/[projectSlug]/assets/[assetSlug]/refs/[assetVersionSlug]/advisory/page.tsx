@@ -95,8 +95,11 @@ const Index: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const push = useRouterQuery();
 
+  const visibilityParam = searchParams?.get("visibility");
   const visibility =
-    searchParams?.get("visibility") === "public" ? "public" : "draft";
+    visibilityParam === "public" || visibilityParam === "withdrawn"
+      ? visibilityParam
+      : "draft";
 
   const advisoryListUrl = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
@@ -183,6 +186,12 @@ const Index: FunctionComponent = () => {
                 value="public"
               >
                 Public
+              </TabsTrigger>
+              <TabsTrigger
+                onClick={() => push({ visibility: "withdrawn", page: 1 })}
+                value="withdrawn"
+              >
+                Withdrawn
               </TabsTrigger>
             </TabsList>
           </Tabs>
