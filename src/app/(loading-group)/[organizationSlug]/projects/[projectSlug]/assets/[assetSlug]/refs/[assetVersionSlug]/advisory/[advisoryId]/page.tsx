@@ -10,7 +10,7 @@ import type { SecurityAdvisory } from "@/types/api/api";
 import { getSeverityClassNames } from "@/components/common/Severity";
 import Markdown from "@/components/common/Markdown";
 import { classNames } from "@/utils/common";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   AlertDialog,
@@ -22,7 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { TriangleAlert } from "lucide-react";
+import { Eye, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/lib/toast";
 import { notFound, useRouter } from "next/navigation";
@@ -47,8 +47,10 @@ const Index = () => {
   const advisoryUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`;
   const advisoryListPath = `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`;
 
-  const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [confirm, setConfirm] = useState<
+    null | "delete" | "publish" | "withdraw"
+  >(null);
 
   const handleChangeAdvisory = async (data: AdvisoryFormData) => {
     const resp = await browserApiClient(`${advisoryUrl}` + `/${advisoryId}/`, {
@@ -67,6 +69,40 @@ const Index = () => {
     }
   };
 
+  const handlePublishAdvisory = async () => {
+    const resp = await browserApiClient(`${advisoryUrl}` + `/${advisoryId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ visibility: "public" }),
+    });
+    if (resp.ok) {
+      toast.success("Advisory published successfully");
+      mutate(`${advisoryUrl}` + `/${advisoryId}/`);
+      mutate(advisoryUrl);
+      setConfirm(null);
+    } else {
+      const msg = await resp.text();
+      toast.error("Failed to edit advisory: " + msg);
+      throw new Error(msg);
+    }
+  };
+
+  const handleWithdrawAdvisory = async () => {
+    const resp = await browserApiClient(`${advisoryUrl}` + `/${advisoryId}/`, {
+      method: "PATCH",
+      body: JSON.stringify({ visibility: "withdrawn" }),
+    });
+    if (resp.ok) {
+      toast.success("Advisory withdrawn successfully");
+      mutate(`${advisoryUrl}` + `/${advisoryId}/`);
+      mutate(advisoryUrl);
+      setConfirm(null);
+    } else {
+      const msg = await resp.text();
+      toast.error("Failed to withdraw advisory: " + msg);
+      throw new Error(msg);
+    }
+  };
+
   const handleDeleteAdvisory = async () => {
     const resp = await browserApiClient(`${advisoryUrl}` + `/${advisoryId}/`, {
       method: "DELETE",
@@ -75,7 +111,7 @@ const Index = () => {
     if (resp.ok) {
       toast.success("Advisory deleted successfully");
       mutate(advisoryUrl);
-      setOpen(false);
+      setConfirm(null);
       router.push(advisoryListPath);
     } else {
       toast.error("Failed to delete advisory");
@@ -122,6 +158,39 @@ const Index = () => {
       : parsed?.version === "3.1"
         ? CVSS31_METRICS
         : null;
+
+  const confirmConfig = {
+    delete: {
+      icon: (
+        <TriangleAlert className="mr-2 inline-block h-6 w-6 text-destructive" />
+      ),
+      title: "Are you sure you want to delete this advisory?",
+      description:
+        "This action cannot be undone. All data associated with this advisory will be deleted.",
+      confirmClassName: buttonVariants({ variant: "default" }),
+      onConfirm: handleDeleteAdvisory,
+    },
+    publish: {
+      icon: <Eye className="mr-2 inline-block h-6 w-6 text-primary" />,
+      title: "Are you sure you want to publish this advisory?",
+      description:
+        "This action cannot be undone. All data associated with this advisory will be published.",
+      confirmClassName: buttonVariants({ variant: "default" }),
+      onConfirm: handlePublishAdvisory,
+    },
+    withdraw: {
+      icon: (
+        <TriangleAlert className="mr-2 inline-block h-6 w-6 text-destructive" />
+      ),
+      title: "Are you sure you want to withdraw this advisory?",
+      description:
+        "This action cannot be undone. The advisory stays public but is marked as withdrawn and can no longer be changed.",
+      confirmClassName: buttonVariants({ variant: "destructive" }),
+      onConfirm: handleWithdrawAdvisory,
+    },
+  } as const;
+
+  const activeConfirm = confirm ? confirmConfig[confirm] : null;
 
   return (
     <Page
@@ -172,16 +241,36 @@ const Index = () => {
               <Markdown>{advisory.description}</Markdown>
             </div>
           )}
-          <div className="flex justify-end my-4 gap-2">
-            <AuthGuard require="admin">
-              <Button onClick={() => setEditOpen(true)} variant="outline">
-                Change Advisory
-              </Button>
-              <Button onClick={() => setOpen(true)} variant="destructive">
-                Delete Advisory
-              </Button>
-            </AuthGuard>
-          </div>
+          {advisory.visibility === "draft" && (
+            <div className="flex justify-end my-4 gap-2">
+              <AuthGuard require="admin">
+                <Button
+                  onClick={() => setConfirm("delete")}
+                  variant="destructive"
+                >
+                  Delete Draft
+                </Button>
+                <Button onClick={() => setEditOpen(true)} variant="outline">
+                  Change Draft
+                </Button>
+                <Button onClick={() => setConfirm("publish")} variant="default">
+                  Publish Draft
+                </Button>
+              </AuthGuard>
+            </div>
+          )}
+          {advisory.visibility === "public" && (
+            <div className="flex justify-end my-4 gap-2">
+              <AuthGuard require="admin">
+                <Button
+                  onClick={() => setConfirm("withdraw")}
+                  variant="destructive"
+                >
+                  Withdraw Advisory
+                </Button>
+              </AuthGuard>
+            </div>
+          )}
         </div>
 
         <div className="w-full lg:w-72 shrink-0">
@@ -264,25 +353,31 @@ const Index = () => {
             affectedPackages: (advisory.affectedPackages ?? []).map(
               ({ id, ...rest }) => rest,
             ),
+            visibility: advisory.visibility,
           }}
           onSubmit={handleChangeAdvisory}
         />
       )}
-      <AlertDialog open={open} onOpenChange={setOpen}>
+      <AlertDialog
+        open={activeConfirm !== null}
+        onOpenChange={(o) => !o && setConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              <TriangleAlert className="mr-2 inline-block h-6 w-6 text-destructive" />
-              Are you sure you want to delete this advisory?
+              {activeConfirm?.icon}
+              {activeConfirm?.title}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. All data associated with this
-              advisory will be deleted.
+              {activeConfirm?.description}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleDeleteAdvisory()}>
+            <AlertDialogAction
+              className={activeConfirm?.confirmClassName}
+              onClick={() => activeConfirm?.onConfirm()}
+            >
               <span>Confirm</span>
             </AlertDialogAction>
           </AlertDialogFooter>

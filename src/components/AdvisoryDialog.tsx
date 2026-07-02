@@ -49,6 +49,7 @@ export interface AdvisoryFormData {
   severity: string;
   vectorString: string;
   affectedPackages: Omit<AdvisoryAffectedPackage, "id">[];
+  visibility: string;
 }
 
 interface AdvisoryDialogProps {
@@ -207,6 +208,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
           semverStart: pkg.semverStart || null,
           semverEnd: pkg.semverEnd || null,
         })),
+        visibility: "draft",
       });
       handleClose(false);
     } finally {

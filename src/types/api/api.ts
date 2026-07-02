@@ -1155,6 +1155,7 @@ export interface SecurityAdvisory {
   vectorstring: string;
   assetID: string;
   affectedPackages: AdvisoryAffectedPackage[] | null;
+  visibility: string;
 }
 
 export interface AdvisoryAffectedPackage {
