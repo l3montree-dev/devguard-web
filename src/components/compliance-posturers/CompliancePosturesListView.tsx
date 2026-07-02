@@ -191,7 +191,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         : []),
     ];
   }, [isClosed, frameworks]);
-  console.log("params state", params?.has("state"));
 
   return (
     <Page Menu={Menu} title={"Compliance Postures"} Title={Title}>

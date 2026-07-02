@@ -684,6 +684,8 @@ export interface CompliancePostureWithControlDTO {
   frameworkControlId: string;
   framework: string;
   controlId: string;
+  parentFrameworkControlId: string | null;
+  class: string;
   title: string;
   description: string;
   compliancePostureId: string;
@@ -696,6 +698,7 @@ export interface CompliancePostureWithControlDTO {
   ticketUrl?: string;
   manualTicketCreation: boolean;
   createdAt: string; // ISO (Go time.Time)
+  additional: Record<string, any>;
 }
 
 export interface ComplianceRiskDTO {

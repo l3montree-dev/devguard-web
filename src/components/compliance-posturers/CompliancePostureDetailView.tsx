@@ -24,7 +24,29 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Markdown from "react-markdown";
 
-import { Badge } from "@/components/ui/badge";
+import { Badge, type badgeVariants } from "@/components/ui/badge";
+import type { VariantProps } from "class-variance-authority";
+
+type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
+
+function securityLevelVariant(value: string): BadgeVariant {
+  if (value === "erhöht") return "yellow";
+  return "outline";
+}
+
+function effortLevelVariant(value: string | number): BadgeVariant {
+  const n = Number(value);
+  if (n <= 1) return "success";
+  if (n <= 3) return "yellow";
+  return "danger";
+}
+
+function importanceVariant(value: string): BadgeVariant {
+  const lower = value.toLowerCase();
+  if (lower === "muss") return "danger";
+  if (lower === "sollte") return "yellow";
+  return "secondary";
+}
 import {
   Card,
   CardContent,
@@ -307,6 +329,12 @@ const CompliancePostureDetailView = ({
                   {vuln.description?.replaceAll("\n", "\n\n")}
                 </Markdown>
               </div>
+              {vuln.additional?.guidance && (
+                <div className="mt-4 text-muted-foreground">
+                  <p className="mb-1 font-semibold">Guidance</p>
+                  <Markdown>{vuln.additional.guidance}</Markdown>
+                </div>
+              )}
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm mb-4">
                 {vuln.ticketUrl && (
                   <Link href={vuln.ticketUrl} target="_blank">
@@ -586,20 +614,154 @@ const CompliancePostureDetailView = ({
               </AuthGuard>
             </div>
             <div className="col-span-1 border-l p-4 pt-0">
-              <h3 className="mb-4 text-lg font-semibold">Compliance Details</h3>
-              <dl className="space-y-4 text-sm">
+              <h3 className="mb-4 text-sm font-semibold">Compliance Details</h3>
+
+              <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center gap-3">
                   <FrameworkIcon
                     framework={vuln.framework}
-                    className="h-8 w-8 shrink-0"
+                    className="h-10 w-10 shrink-0"
                   />
                   <div>
-                    <dd className="font-medium">
-                      {vuln.framework} {vuln.controlId}
-                    </dd>
+                    <p className="text-xs text-muted-foreground">
+                      {vuln.framework}
+                    </p>
+                    <p className="font-semibold">{vuln.controlId}</p>
                   </div>
                 </div>
-              </dl>
+
+                <dl className="mt-4 flex flex-col gap-0 text-sm">
+                  <div className="flex flex-col items-start justify-between border-t py-3">
+                    <dt className="text-xs text-muted-foreground">Class</dt>
+                    <dd className="font-medium">{vuln.class}</dd>
+                  </div>
+
+                  {vuln.additional?.group_title && (
+                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">Group</dt>
+                      <dd className="font-medium">
+                        {vuln.additional.group_title}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.security_level && (
+                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Security Level
+                      </dt>
+                      <dd>
+                        <Badge
+                          variant={securityLevelVariant(
+                            vuln.additional.security_level.value,
+                          )}
+                        >
+                          {vuln.additional.security_level.ns ? (
+                            <Link
+                              href={vuln.additional.security_level.ns}
+                              target="_blank"
+                              style={{ color: "inherit" }}
+                            >
+                              {vuln.additional.security_level.value}
+                            </Link>
+                          ) : (
+                            vuln.additional.security_level.value
+                          )}
+                        </Badge>
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.importance && (
+                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Importance
+                      </dt>
+                      <dd>
+                        <Badge
+                          variant={importanceVariant(
+                            vuln.additional.importance.value,
+                          )}
+                        >
+                          {vuln.additional.importance.ns ? (
+                            <Link
+                              href={vuln.additional.importance.ns}
+                              target="_blank"
+                              style={{ color: "inherit" }}
+                            >
+                              {vuln.additional.importance.value}
+                            </Link>
+                          ) : (
+                            vuln.additional.importance.value
+                          )}
+                        </Badge>
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.effort_level && (
+                    <div className="flex flex-col items-start justify-between gap-4    border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Effort Level
+                      </dt>
+                      <dd>
+                        <Badge
+                          variant={effortLevelVariant(
+                            vuln.additional.effort_level.value,
+                          )}
+                        >
+                          {vuln.additional.effort_level.ns ? (
+                            <Link
+                              href={vuln.additional.effort_level.ns}
+                              target="_blank"
+                              style={{ color: "inherit" }}
+                            >
+                              {vuln.additional.effort_level.value}
+                            </Link>
+                          ) : (
+                            vuln.additional.effort_level.value
+                          )}
+                        </Badge>
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.result && (
+                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">Result</dt>
+                      <dd className="font-medium">
+                        {vuln.additional.result.ns ? (
+                          <Link
+                            href={vuln.additional.result.ns}
+                            target="_blank"
+                            style={{ color: "inherit" }}
+                          >
+                            {vuln.additional.result.value}
+                          </Link>
+                        ) : (
+                          vuln.additional.result.value
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.result_specification && (
+                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Result Specification
+                      </dt>
+                      <dd className="font-medium">
+                        {vuln.additional.result_specification.ns ? (
+                          <Link
+                            href={vuln.additional.result_specification.ns}
+                            target="_blank"
+                            style={{ color: "inherit" }}
+                          >
+                            {vuln.additional.result_specification.value}
+                          </Link>
+                        ) : (
+                          vuln.additional.result_specification.value
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
             </div>
           </div>
         </div>
