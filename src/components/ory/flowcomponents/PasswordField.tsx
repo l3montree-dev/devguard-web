@@ -15,17 +15,14 @@ const PASSWORD_FIELD_CLASS =
 export const CONFIRM_PASSWORD_LABEL = "Confirm Password";
 
 export function usePasswordMismatch(): boolean {
-  const { watch } = useFormContext();
+  const { watch, getValues } = useFormContext();
   const password = watch("password");
   const confirmPassword = watch("confirmPassword");
-  if (!window.location.href.includes("registration")) {
+  const hasConfirmField = "confirmPassword" in getValues();
+  if (!hasConfirmField) {
     return false;
   }
-  if (password) {
-    return password !== confirmPassword;
-  } else {
-    return false;
-  }
+  return password !== confirmPassword;
 }
 
 export function PasswordField({
