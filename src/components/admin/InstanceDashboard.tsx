@@ -269,7 +269,9 @@ export default forwardRef<InstanceDashboardHandle>(
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Top Vulnerable Projects</CardTitle>
+              <CardTitle className="text-base">
+                Top Vulnerable Projects
+              </CardTitle>
               <CardDescription>
                 Projects with the most open vulnerabilities across the instance.
               </CardDescription>
