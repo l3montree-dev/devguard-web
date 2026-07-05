@@ -250,7 +250,7 @@ export default forwardRef<InstanceDashboardHandle>(
                     key={key}
                     className="flex flex-col gap-2 rounded-md border p-3"
                   >
-                    <span className="text-2xl font-semibold tabular-nums">
+                    <span className="text-xl font-semibold tabular-nums">
                       {formatAvg(avgValue[key])}
                     </span>
                     <span
