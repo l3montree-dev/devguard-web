@@ -370,6 +370,10 @@ export const reduceRiskHistories = (
         acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
         acc.cvePurlHighCvss += curr.cvePurlHighCvss;
         acc.cvePurlCriticalCvss += curr.cvePurlCriticalCvss;
+        acc.cvePurlFixableLowCvss += curr.cvePurlFixableLowCvss ?? 0;
+        acc.cvePurlFixableMediumCvss += curr.cvePurlFixableMediumCvss ?? 0;
+        acc.cvePurlFixableHighCvss += curr.cvePurlFixableHighCvss ?? 0;
+        acc.cvePurlFixableCriticalCvss += curr.cvePurlFixableCriticalCvss ?? 0;
         return acc;
       },
       {
@@ -389,6 +393,10 @@ export const reduceRiskHistories = (
         cvePurlMediumCvss: 0,
         cvePurlHighCvss: 0,
         cvePurlCriticalCvss: 0,
+        cvePurlFixableLowCvss: 0,
+        cvePurlFixableMediumCvss: 0,
+        cvePurlFixableHighCvss: 0,
+        cvePurlFixableCriticalCvss: 0,
       } as RiskHistory,
     );
   });
