@@ -41,7 +41,11 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
       <FormField
         control={form.control}
         name="artifactName"
-        rules={{ required: "Artifact name is required" }}
+        rules={{
+          required: "Artifact name is required",
+          validate: (value) =>
+            !value?.includes("@") || "You shall not enter a version/branch",
+        }}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Artifact Name</FormLabel>
