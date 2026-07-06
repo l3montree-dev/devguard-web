@@ -139,25 +139,29 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                 >
                   Resolve Vulnerability
                 </Badge>
-                <div className="flex flex-row gap-1 items-center">
-                  <span>Fix the vulnerability </span>
-                  <span className="font-semibold">{vuln.cveID}</span>
-                  <span> by upgrading from: </span>
-                  <span className="flex flex-row gap-2">
-                    <Badge className="font-mono" variant={"outline"}>
-                      {purlToDisplayString(vulnerabilityPath)}
-                    </Badge>
-                    <ArrowRight className="w-4" />
-                    <Badge
-                      variant={"outline"}
-                      className="font-mono scale-100 relative border-2"
-                    >
-                      <DiffHighlighter
-                        oldVersionPurl={vulnerabilityPath}
-                        newVersionPurl={fixedVersionPurl ?? ""}
-                      />
-                    </Badge>
-                  </span>
+                <div className="flex flex-col gap-1 items-left">
+                  <div className="flex flex-row gap-1">
+                    <span>Fix the vulnerability </span>
+                    <span className="font-semibold">{vuln.cveID}</span>
+                  </div>
+                  <div className="flex flex-row gap-1">
+                    <span> by upgrading from: </span>
+                    <span className="flex flex-row gap-2">
+                      <Badge className="font-mono" variant={"outline"}>
+                        {purlToDisplayString(vulnerabilityPath)}
+                      </Badge>
+                      <ArrowRight className="w-4" />
+                      <Badge
+                        variant={"outline"}
+                        className="font-mono scale-100 relative border-2"
+                      >
+                        <DiffHighlighter
+                          oldVersionPurl={vulnerabilityPath}
+                          newVersionPurl={fixedVersionPurl ?? ""}
+                        />
+                      </Badge>
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-2 flex">
                   <CopyCode codeString={ecosystemUpdate} language="shell" />
