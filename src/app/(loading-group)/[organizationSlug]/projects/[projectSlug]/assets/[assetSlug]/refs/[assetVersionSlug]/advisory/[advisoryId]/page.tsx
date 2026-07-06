@@ -181,7 +181,7 @@ const Index = () => {
       icon: <Eye className="mr-2 inline-block h-6 w-6 text-primary" />,
       title: "Are you sure you want to publish this advisory?",
       description:
-        "This action cannot be undone. All data associated with this advisory will be published.",
+        "NOTE: This feature is still work in progress. This publishment will only add the Advisory to the CSAF report. This action cannot be undone. All data associated with this advisory will be published.",
       confirmClassName: buttonVariants({ variant: "default" }),
       onConfirm: handlePublishAdvisory,
     },
