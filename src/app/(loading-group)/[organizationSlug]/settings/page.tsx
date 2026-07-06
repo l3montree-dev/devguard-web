@@ -61,6 +61,7 @@ import {
 import Alert from "../../../../components/common/Alert";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
+import InvitedMembersTable from "@/components/InvitedMembersTable";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -275,6 +276,27 @@ const Home = () => {
       router.push("/");
     } else {
       toast.error("Failed to delete organization");
+    }
+  };
+
+  const handleRevokeInvitation = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/invitation/" + id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          invitedMembers: activeOrg.invitedMembers.filter((m) => m.id !== id),
+        },
+      });
+    } else {
+      toast.error("Failed to revoke invitation");
     }
   };
 
@@ -533,6 +555,15 @@ const Home = () => {
             Add Member
           </Button>
         </div>
+      </Section>
+      <Section
+        title="Invitations"
+        description="Manage pending invitations of your organization"
+      >
+        <InvitedMembersTable
+          members={activeOrg.invitedMembers}
+          onRevokeInvitation={handleRevokeInvitation}
+        />
       </Section>
       <hr />
       <div className="pb-12">

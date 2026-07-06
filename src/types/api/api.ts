@@ -41,6 +41,11 @@ export enum UserRole {
   Unknown = "unknown",
 }
 
+export enum InvitationStatus {
+  Pending = "pending",
+  Expired = "expired",
+}
+
 export enum RequirementsLevel {
   Low = "low",
   Medium = "medium",
@@ -123,6 +128,11 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     name: string;
     avatarUrl?: string;
     role?: UserRole.Owner | UserRole.Admin | UserRole.Member;
+  }>;
+  invitedMembers: Array<{
+    id: string;
+    email: string;
+    invitationStatus: InvitationStatus.Pending | InvitationStatus.Expired;
   }>;
 }
 

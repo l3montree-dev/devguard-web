@@ -88,9 +88,10 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
                 {Boolean(invitationCode) && (
                   <Callout intent="info">
                     <p>
-                      Accept the invitation by visiting this link:{" "}
+                      Accept the invitation by visiting this link :{" "}
                       <InlineCopy content={invitationCode!} />
                     </p>
+                    <p>(Invitations expire within 15 minutes)</p>
                   </Callout>
                 )}
               </div>
