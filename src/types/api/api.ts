@@ -132,6 +132,7 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
   invitedMembers: Array<{
     id: string;
     email: string;
+    expiryDate: string;
     invitationStatus: InvitationStatus.Pending | InvitationStatus.Expired;
   }>;
 }

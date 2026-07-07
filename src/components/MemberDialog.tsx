@@ -91,7 +91,6 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
                       Accept the invitation by visiting this link :{" "}
                       <InlineCopy content={invitationCode!} />
                     </p>
-                    <p>(Invitations expire within 15 minutes)</p>
                   </Callout>
                 )}
               </div>

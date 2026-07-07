@@ -15,6 +15,7 @@ interface Props {
   members: Array<{
     id: string;
     email: string;
+    expiryDate: string;
     invitationStatus: string;
   }>;
   onRevokeInvitation: (id: string) => void;
@@ -29,8 +30,9 @@ const InvitedMembersTable: FunctionComponent<Props> = ({
         <table className="w-full text-sm">
           <thead className={classNames("w-full text-left", "border-b bg-card")}>
             <tr className="">
-              <th className="p-4 w-2/3">E-Mail</th>
+              <th className="p-4">E-Mail</th>
               <th className="p-4">Status</th>
+              <th className="p-4">Expires at</th>
               <th className="p-4 text-right">Actions</th>
             </tr>
           </thead>
@@ -44,11 +46,21 @@ const InvitedMembersTable: FunctionComponent<Props> = ({
                   )}
                   key={m.id}
                 >
-                  <td className="p-4 w-2/3">{m.email}</td>
+                  <td className="p-4">{m.email}</td>
                   <td className="p-4 capitalize">
                     <Badge variant={"outline"}>
                       {m.invitationStatus || InvitationStatus.Pending}
                     </Badge>
+                  </td>
+                  <td className="p-4">
+                    {new Date(m.expiryDate).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
                   </td>
                   <td className="p-4 text-right">
                     <DropdownMenu>
