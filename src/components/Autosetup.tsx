@@ -46,7 +46,7 @@ const Autosetup: FunctionComponent<Props> = ({
         );
         setTimedOut(true);
       }
-    }, 18000);
+    }, 300000);
 
     return () => clearTimeout(timer);
   }, [isLoading]);
@@ -148,6 +148,12 @@ const Autosetup: FunctionComponent<Props> = ({
                     </div>
                   ))}
                 </div>
+                {isReallyLoading && (
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    Still setting up — this may take a few minutes. You can
+                    safely leave this page open.
+                  </p>
+                )}
               </CardFooter>
             </div>
           </div>
