@@ -4,11 +4,11 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import type { OryNodeInputProps } from "@ory/elements-react";
+import type { OryNodeCheckboxProps } from "@ory/elements-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
-export function OryCheckbox({ node, attributes }: OryNodeInputProps) {
+export function OryCheckbox({ node, attributes }: OryNodeCheckboxProps) {
   const { register } = useFormContext();
   const { value, name, ...rest } = attributes;
   const { onChange, ...formProps } = register(name);
