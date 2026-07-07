@@ -7,7 +7,7 @@ import type { Diagnostic } from "@codemirror/lint";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { vscodeDarkInit, vscodeLight } from "@uiw/codemirror-theme-vscode";
-import jsYaml from "js-yaml";
+import * as jsYaml from "js-yaml";
 import tomlParser from "@iarna/toml";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";

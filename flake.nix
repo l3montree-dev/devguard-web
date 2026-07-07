@@ -50,7 +50,7 @@
             export GIT_COMMIT_SHA="${self.rev or "dev"}"
             cp -r ${(import ./nix/bun-packages.nix { pkgs = targetPkgs; }).patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
-            bun ./node_modules/next/dist/bin/next build --turbopack
+            bun --bun ./node_modules/next/dist/bin/next build --turbopack
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
           '';
           installPhase = ''
