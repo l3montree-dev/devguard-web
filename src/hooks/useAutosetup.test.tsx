@@ -10,7 +10,15 @@ jest.mock("@/services/devGuardApi", () => ({
 
 jest.mock("sonner", () => ({
   toast: Object.assign(jest.fn(), {
+    success: jest.fn(),
     error: jest.fn(),
+    warning: jest.fn(),
+    info: jest.fn(),
+    message: jest.fn(),
+    loading: jest.fn(),
+    promise: jest.fn(),
+    custom: jest.fn(),
+    dismiss: jest.fn(),
   }),
 }));
 
@@ -63,6 +71,8 @@ describe("useAutosetup", () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(toast).toHaveBeenCalledWith("Failed to setup GitLab integration");
+    expect(toast).toHaveBeenCalledWith("Failed to setup GitLab integration", {
+      toasterId: "devguard",
+    });
   });
 });
