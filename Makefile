@@ -3,6 +3,10 @@ NIX_CACHE_ENDPOINT   ?= s3.garage.l3montree.cloud
 NIX_CACHE_REGION     ?= garage
 NIX_CACHE_SECRET_KEY ?= /etc/nix/cache-priv-key.pem
 
+bun-nix::
+	@echo "Regenerating nix/bun.nix from bun.lock..."
+	bunx bun2nix -o nix/bun.nix
+
 nix-cache-push::
 	@echo "Building node_modules..."
 	nix build --no-link .#node_modulesAmd64 .#node_modulesArm64

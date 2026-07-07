@@ -11,24 +11,29 @@
     flake-utils.url = "github:numtide/flake-utils";
     sbomnix.url = "github:tiiuae/sbomnix";
     sbomnix.inputs.nixpkgs.follows = "nixpkgs"; # share the same nixpkgs pin
+    bun2nix.url = "github:nix-community/bun2nix";
+    bun2nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, flake-utils, sbomnix }:
+  outputs = { self, nixpkgs, flake-utils, sbomnix, bun2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ bun2nix.overlays.default ];
+        };
         sbomnixPkgs = sbomnix.packages.${system};
-        npmPackages = (import ./nix/npm-packages.nix { inherit pkgs; });
-        pkgsLinuxAmd64 = nixpkgs.legacyPackages.x86_64-linux;
-        pkgsLinuxArm64 = nixpkgs.legacyPackages.aarch64-linux;
-        nodejs = import ./nix/nodejs.nix { inherit pkgs pkgsLinuxAmd64 pkgsLinuxArm64; };
-        nodejsLinuxLibs = nodejs.linuxLibs;
+        pkgsLinuxAmd64 = import nixpkgs { system = "x86_64-linux"; overlays = [ bun2nix.overlays.default ]; };
+        pkgsLinuxArm64 = import nixpkgs { system = "aarch64-linux"; overlays = [ bun2nix.overlays.default ]; };
 
-        devguardWeb = pkgs.stdenv.mkDerivation {
+        # `sharp` and `@next/swc` ship native addons, so node_modules must be
+        # built natively for the target platform (no cross-installing from a
+        # different host arch).
+        mkDevguardWeb = targetPkgs: targetPkgs.stdenv.mkDerivation {
           name = "devguard-web";
-          src = pkgs.lib.fileset.toSource {
+          src = targetPkgs.lib.fileset.toSource {
             root = ./.;
-            fileset = pkgs.lib.fileset.unions [
+            fileset = targetPkgs.lib.fileset.unions [
               ./src
               ./public
               ./next.config.js
@@ -40,13 +45,12 @@
               ./sentry.server.config.ts
             ];
           };
-          nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
+          nativeBuildInputs = [ targetPkgs.bun targetPkgs.cacert ];
           buildPhase = ''
-            export NODE_OPTIONS="--max-old-space-size=4096"
             export GIT_COMMIT_SHA="${self.rev or "dev"}"
-            cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
+            cp -r ${(import ./nix/bun-packages.nix { pkgs = targetPkgs; }).patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
-            node ./node_modules/next/dist/bin/next build --turbopack
+            bun ./node_modules/next/dist/bin/next build --turbopack
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
           '';
           installPhase = ''
@@ -60,23 +64,22 @@
           '';
         };
 
-        nodejsLinuxAmd64 = nodejs.x86_64-linux;
-        nodejsLinuxArm64 = nodejs.aarch64-linux;
+        devguardWeb = mkDevguardWeb pkgs;
 
-        mkDevguardWebOCI = linuxPkgs: node: pkgs.dockerTools.buildLayeredImage {
+        mkDevguardWebOCI = targetPkgs: pkgs.dockerTools.buildLayeredImage {
           name = "devguard-web-oci";
           tag = "latest";
-          contents = [ node pkgs.cacert ] ++ (nodejsLinuxLibs linuxPkgs);
+          contents = [ targetPkgs.bun targetPkgs.cacert ];
           fakeRootCommands = ''
             # Copy standalone output to /app (outside Nix store) so Next.js
             # can write its cache at runtime. The Nix store is read-only.
             mkdir -p app
-            cp -r ${devguardWeb}/.next/standalone/. app/
+            cp -r ${mkDevguardWeb targetPkgs}/.next/standalone/. app/
             mkdir -p app/.next/cache
             chown -R 53111:53111 app
           '';
           config = {
-            Cmd = [ "${node}/bin/node" "/app/server.js" ];
+            Cmd = [ "${targetPkgs.bun}/bin/bun" "/app/server.js" ];
             User = "53111:53111";
             Expose = [ "3000" ];
           };
@@ -85,10 +88,10 @@
       {
         packages = {
           default = devguardWeb;
-          node_modulesArm64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxArm64; }).patchedNodeModules;
-          node_modulesAmd64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxAmd64; }).patchedNodeModules;
-          "devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;
-          "devguard-web-arm64" = mkDevguardWebOCI pkgsLinuxArm64 nodejsLinuxArm64;
+          node_modulesArm64 = (import ./nix/bun-packages.nix { pkgs = pkgsLinuxArm64; }).patchedNodeModules;
+          node_modulesAmd64 = (import ./nix/bun-packages.nix { pkgs = pkgsLinuxAmd64; }).patchedNodeModules;
+          "devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64;
+          "devguard-web-arm64" = mkDevguardWebOCI pkgsLinuxArm64;
         };
       }
     );
