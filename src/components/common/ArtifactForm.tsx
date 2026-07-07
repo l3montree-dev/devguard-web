@@ -19,6 +19,7 @@ import { Input } from "../ui/input";
 import Callout from "./Callout";
 
 import { validateArtifactNameAgainstPurlSpec } from "../../utils/common";
+import { documentationLinks } from "@/const/documentationLinks";
 import { Alert, AlertDescription } from "../ui/alert";
 
 interface Props {
@@ -80,6 +81,21 @@ const ArtifactForm = ({ form, isEditMode = false }: Props) => {
               {"). Any Qualifiers can be added straight to the artifact name."}
             </FormDescription>
             <FormMessage />
+            {field.value?.includes("@") && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                DevGuard automatically appends the branch or version (the ref)
+                to the artifact name, so adding it here yourself causes a
+                duplicated reference (e.g. <code>@main@main</code>).{" "}
+                <Link
+                  target="_blank"
+                  className="underline"
+                  href={documentationLinks.artifactVersioning}
+                >
+                  Learn why
+                </Link>
+                .
+              </p>
+            )}
           </FormItem>
         )}
       />
