@@ -16,11 +16,6 @@
 const nextConfig = {
   reactStrictMode: true,
   generateBuildId: async () => process.env.GIT_COMMIT_SHA ?? "dev",
-  turbopack: {
-    resolveAlias: {
-      istextorbinary: "./src/lib/istextorbinary-wrapper.js",
-    },
-  },
   experimental: {
     turbopackModuleIds: "deterministic",
     turbopackFileSystemCacheForDev: true,
