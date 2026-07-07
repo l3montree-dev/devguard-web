@@ -61,7 +61,7 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
     cell: (info) => {
       const severity = info.getValue();
       if (!severity) return null;
-      const score = vectorStringToScore(info.row.original.vectorstring ?? "");
+      const score = vectorStringToScore(info.row.original.vectorString ?? "");
       return (
         <span
           className={classNames(

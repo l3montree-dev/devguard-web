@@ -65,7 +65,7 @@ type PackageRow = Omit<AdvisoryAffectedPackage, "id">;
 
 const emptyPackage = (): PackageRow => ({
   ecosystem: "",
-  packagename: "",
+  packageName: "",
   semverStart: "",
   semverEnd: "",
 });
@@ -126,6 +126,9 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
       reInit: () => emblaApi?.reInit(),
     });
   }, []);
+  React.useEffect(() => {
+    api.reInit();
+  }, [api, cvssVersion]);
 
   const handleVectorChange = (val: string) => {
     setVectorstring(val);
@@ -216,12 +219,12 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
     }
   };
 
-  const slide1Valid = title.trim() && severity;
+  const slide1Valid = title.trim() !== "" && severity !== "";
   const pkg = packages[pkgIndex] ?? emptyPackage();
   const semverStartValid = isSemverValid(pkg.semverStart ?? "");
   const semverEndValid = isSemverValid(pkg.semverEnd ?? "");
   const isPackageComplete = (p: PackageRow) =>
-    p.packagename.trim() !== "" &&
+    p.packageName.trim() !== "" &&
     SEMVER_RE.test((p.semverStart ?? "").trim()) &&
     SEMVER_RE.test((p.semverEnd ?? "").trim());
   const allPackagesValid = packages.every(isPackageComplete);
@@ -383,6 +386,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                                 {cvssVersion === "4.0" && (
                                   <a
                                     target="_blank"
+                                    rel="noreferrer noopener"
                                     href="https://www.first.org/cvss/calculator/4.0"
                                   >
                                     More information.
@@ -391,6 +395,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                                 {cvssVersion === "3.1" && (
                                   <a
                                     target="_blank"
+                                    rel="noreferrer noopener"
                                     href="https://www.first.org/cvss/calculator/3.1"
                                   >
                                     More information.
@@ -419,7 +424,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                                 : "hover:border-primary/50 hover:bg-muted"
                             }`}
                           >
-                            {opt.l} {opt.v}
+                            {opt.l} ({opt.v})
                           </button>
                         ))}
                       </div>
@@ -525,9 +530,9 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                       <Label className="text-xs">Package Name *</Label>
                       <Input
                         placeholder="pkg:example"
-                        value={pkg.packagename}
+                        value={pkg.packageName}
                         onChange={(e) =>
-                          updatePackage("packagename", e.target.value)
+                          updatePackage("packageName", e.target.value)
                         }
                       />
                     </div>

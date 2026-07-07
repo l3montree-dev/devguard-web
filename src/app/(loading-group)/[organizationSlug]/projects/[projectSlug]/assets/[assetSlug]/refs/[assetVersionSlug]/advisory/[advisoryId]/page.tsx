@@ -153,11 +153,11 @@ const Index = () => {
     notFound();
   }
 
-  const severityScore = advisory.vectorstring
-    ? vectorStringToScore(advisory.vectorstring)
+  const severityScore = advisory.vectorString
+    ? vectorStringToScore(advisory.vectorString)
     : null;
-  const parsed = advisory.vectorstring
-    ? parseCvssVector(advisory.vectorstring)
+  const parsed = advisory.vectorString
+    ? parseCvssVector(advisory.vectorString)
     : null;
   const metricDefs =
     parsed?.version === "4.0"
@@ -244,7 +244,7 @@ const Index = () => {
                 <tbody>
                   {advisory.affectedPackages?.map((pkg) => (
                     <tr key={pkg.id} className="border-b last:border-0">
-                      <td className="p-3 font-medium">{pkg.packagename}</td>
+                      <td className="p-3 font-medium">{pkg.packageName}</td>
                       <td className="p-3 text-muted-foreground">
                         {pkg.semverStart ? `< v${pkg.semverStart}` : "—"}
                       </td>
@@ -313,13 +313,13 @@ const Index = () => {
               )}
             </div>
 
-            {advisory.vectorstring && (
+            {advisory.vectorString && (
               <div>
                 <div className="text-xs font-semibold text-muted-foreground mb-2">
                   Vector
                 </div>
                 <code className="text-xs break-all text-muted-foreground">
-                  {advisory.vectorstring}
+                  {advisory.vectorString}
                 </code>
               </div>
             )}
@@ -373,7 +373,7 @@ const Index = () => {
             title: advisory.title,
             description: advisory.description,
             severity: advisory.severity,
-            vectorString: advisory.vectorstring,
+            vectorString: advisory.vectorString,
             affectedPackages: (advisory.affectedPackages ?? []).map(
               ({ id, ...rest }) => rest,
             ),
