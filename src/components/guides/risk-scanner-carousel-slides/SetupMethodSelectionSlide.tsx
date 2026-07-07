@@ -25,10 +25,7 @@ interface SetupMethodSelectionSlideProps {
   setupInformationSourceSlideIndex: number;
   asset: AssetDTO | null;
   selectedScanner:
-    | "custom-setup"
-    | "auto-setup"
-    | "information-source"
-    | undefined;
+    "custom-setup" | "auto-setup" | "information-source" | undefined;
   setSelectedScanner: (
     scanner: "custom-setup" | "auto-setup" | "information-source",
   ) => void;

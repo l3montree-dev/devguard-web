@@ -127,8 +127,7 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
 }
 
 export type PersonalAccessTokenDTO =
-  | AsymmetricPersonalAccessTokenDTO
-  | SymmetricPersonalAccessTokenDTO;
+  AsymmetricPersonalAccessTokenDTO | SymmetricPersonalAccessTokenDTO;
 
 interface PersonalAccessTokenBase {
   description: string;
@@ -193,9 +192,7 @@ export interface ProjectDTO {
   subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
 export type ExpandedVulnDTOState =
-  | DependencyVuln["state"]
-  | "not-found"
-  | "detected";
+  DependencyVuln["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;

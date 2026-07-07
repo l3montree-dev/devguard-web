@@ -38,9 +38,7 @@ export const config = {
     ? "devguard-bot-dev"
     : "devguard-bot",
   enforceTheme: (process.env.ENFORCE_THEME || false) as
-    | "white"
-    | "dark"
-    | false,
+    "white" | "dark" | false,
   errorTrackingDsn: process.env.ERROR_TRACKING_DSN || "",
   registrationEnabled: process.env.REGISTRATION_ENABLED !== "false",
   issueTrackerUrl:
