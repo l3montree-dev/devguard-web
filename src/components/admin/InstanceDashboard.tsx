@@ -21,7 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getSeverityClassNames } from "@/components/common/Severity";
-import { classNames } from "@/utils/common";
+import { classNames, truncateMiddle } from "@/utils/common";
 import {
   ExclamationTriangleIcon,
   ShieldExclamationIcon,
@@ -289,7 +289,7 @@ export default forwardRef<InstanceDashboardHandle>(
                       <div key={p.slug} className="flex items-end gap-3">
                         <div className="min-w-0 flex-1">
                           <span className="truncate text-sm font-medium">
-                            {p.name}
+                            {truncateMiddle(p.name, 55)}
                           </span>
                           <div className="mt-1 h-2 w-full overflow-hidden rounded-xs bg-secondary">
                             <div
@@ -301,14 +301,19 @@ export default forwardRef<InstanceDashboardHandle>(
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium tabular-nums">
+                          <span
+                            className="text-right text-sm font-medium tabular-nums"
+                            style={{
+                              minWidth: `${String(maxProjectTotal).length}ch`,
+                            }}
+                          >
                             {total}
                           </span>
-                          {p.critical > 0 && (
+                          {/* {p.critical > 0 && (
                             <Badge variant="danger" className="text-xs">
                               {p.critical} critical
                             </Badge>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     );
