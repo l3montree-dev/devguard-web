@@ -135,6 +135,12 @@ const ExternalEntityAutosetup: FunctionComponent<Props> = ({
             </div>
           ))}
         </div>
+        {isReallyLoading && (
+          <p className="mt-4 text-xs text-muted-foreground">
+            Still setting up — this may take a few minutes. You can safely keep
+            this dialog open.
+          </p>
+        )}
       </div>
       <div className="flex flex-row gap-2 justify-end">
         <Button
