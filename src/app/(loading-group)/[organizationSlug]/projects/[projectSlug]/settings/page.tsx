@@ -28,7 +28,6 @@ import Section from "../../../../../../components/common/Section";
 import { Label } from "../../../../../../components/ui/label";
 import { useUpdateProject } from "../../../../../../context/ProjectContext";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
-import Image from "next/image";
 import { useConfig } from "../../../../../../context/ConfigContext";
 
 const Index: FunctionComponent = () => {
@@ -37,7 +36,6 @@ const Index: FunctionComponent = () => {
   const updateProject = useUpdateProject();
   const currentUserRole = useCurrentUserRole();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
-
   const config = useConfig();
   const router = useRouter();
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
