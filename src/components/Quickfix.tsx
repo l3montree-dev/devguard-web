@@ -24,11 +24,15 @@ export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
     return <span className="font-mono text-xs">{oldVersionPurl}</span>;
   }
 
-  const { name, version } = PackageURL.fromString(oldVersionPurl);
+  const { namespace, name, version } = PackageURL.fromString(oldVersionPurl);
+  const fullName = namespace ? `${namespace}/${name}` : name;
 
   if (newVersionPurl && isValidPackagePurl(newVersionPurl)) {
     const { version: newVer } = PackageURL.fromString(newVersionPurl);
-    const differences = diffChars(name + "@" + version, name + "@" + newVer);
+    const differences = diffChars(
+      fullName + "@" + version,
+      fullName + "@" + newVer,
+    );
 
     return (
       <div className="font-mono text-xs">
@@ -64,8 +68,10 @@ function renderQuickFixText(
   switch (type) {
     case "npm":
       return `npm install ${fullName}@${version}`;
-    case "golang":
-      return `go get ${fullName}@v${version}`;
+    case "golang": {
+      const goVersion = version?.startsWith("v") ? version : `v${version}`;
+      return `go get ${fullName}@${goVersion}`;
+    }
     case "pypi":
       return `pip install ${fullName}==${version}`;
     case "cargo":
@@ -97,7 +103,6 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
 }) => {
   const fixedVersionPurl = getFixedVersionPurl(vuln);
-  console.log(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
   if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
