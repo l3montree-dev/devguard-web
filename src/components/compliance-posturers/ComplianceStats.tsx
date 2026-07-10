@@ -1,9 +1,9 @@
 "use client";
 
-import type { FunctionComponent, ReactNode } from "react";
-
+import type { FunctionComponent } from "react";
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -11,8 +11,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { classNames } from "@/utils/common";
-import { EventTypeIcon } from "../risk-assessment/RiskAssessmentFeed";
 import type { VulnEventDTO } from "@/types/api/api";
+import { getSeverityClassNames } from "../common/Severity";
+import useRouterQuery from "@/hooks/useRouterQuery";
 
 interface Props {
   open: number;
@@ -25,42 +26,64 @@ interface TileProps {
   amount: number;
   variant: VulnEventDTO["type"];
   isLoading: boolean;
+  onClick: () => void;
 }
 
 const StatTile: FunctionComponent<TileProps> = ({
   amount,
   variant,
   isLoading,
+  onClick,
 }) => {
   var label = "";
-  var numberClass = "";
+  var severity = "";
 
   switch (variant) {
     case "detected":
       label = "Not Implemented";
-      numberClass = "text-red-500";
+      severity = "CRITICAL";
       break;
     case "implemented":
       label = "Implemented";
-      numberClass = "text-green-500";
+      severity = "LOW";
       break;
     case "notApplicable":
       label = "Not applicable";
-      numberClass = "text-muted-foreground";
+      severity = "MEDIUM";
       break;
   }
   return (
-    <Card>
-      <CardHeader>
-        <CardDescription>{label}</CardDescription>
-        {isLoading ? (
-          <Skeleton className="h-10 w-12" />
-        ) : (
-          <CardTitle className={classNames("text-3xl font-bold ", numberClass)}>
-            {amount}
-          </CardTitle>
-        )}
+    <Card className="relative">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex flex-row items-start justify-between">
+          <span>
+            {isLoading ? (
+              <Skeleton className="h-10 w-12" />
+            ) : (
+              <span className="text-4xl">{amount}</span>
+            )}
+          </span>
+          <button onClick={onClick} className="text-xs !text-muted-foreground">
+            See all
+          </button>
+        </CardTitle>
+        <CardDescription>
+          Amount of compliance postures that are {label.toLowerCase()} for this
+          asset version
+        </CardDescription>
       </CardHeader>
+      <CardContent>
+        <div className="mr-2 flex">
+          <span
+            className={classNames(
+              "px-2 mr-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
+              getSeverityClassNames(severity, false),
+            )}
+          >
+            {label}
+          </span>
+        </div>
+      </CardContent>
     </Card>
   );
 };
@@ -71,19 +94,46 @@ const ComplianceStats: FunctionComponent<Props> = ({
   notApplicable,
   isLoading,
 }) => {
+  const push = useRouterQuery();
+
   return (
     <div className="grid w-full grid-cols-3 gap-4">
       <StatTile
-        variant="implemented"
-        amount={implemented}
+        variant="detected"
+        amount={open}
         isLoading={isLoading}
+        onClick={() =>
+          push({
+            state: "open",
+            "filterQuery[state][is]": null,
+            "filterQuery[state][is not]": null,
+          })
+        }
       />
       <StatTile
         variant="notApplicable"
         amount={notApplicable}
         isLoading={isLoading}
+        onClick={() =>
+          push({
+            state: "closed",
+            "filterQuery[state][is]": "notApplicable",
+            "filterQuery[state][is not]": null,
+          })
+        }
       />
-      <StatTile variant="detected" amount={open} isLoading={isLoading} />
+      <StatTile
+        variant="implemented"
+        amount={implemented}
+        isLoading={isLoading}
+        onClick={() =>
+          push({
+            state: "closed",
+            "filterQuery[state][is]": "implemented",
+            "filterQuery[state][is not]": null,
+          })
+        }
+      />
     </div>
   );
 };

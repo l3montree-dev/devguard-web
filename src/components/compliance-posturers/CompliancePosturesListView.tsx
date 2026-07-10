@@ -42,54 +42,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const columnHelper = createColumnHelper<CompliancePostureWithControlDTO>();
 
-const columnsDef: ColumnDef<CompliancePostureWithControlDTO, any>[] = [
-  columnHelper.accessor("title", {
-    header: "Title",
-    id: "title",
-    enableSorting: true,
-    cell: (info) => (
-      <div className="flex flex-col">
-        <span className="font-medium">{info.getValue()}</span>
-      </div>
-    ),
-  }),
-  columnHelper.accessor("framework", {
-    header: "Framework",
-    id: "framework",
-    enableSorting: true,
-    cell: (info) => (
-      <div className="flex flex-row items-center gap-2">
-        <FrameworkIcon framework={info.getValue()} />
-        <span>{info.getValue()}</span>
-      </div>
-    ),
-  }),
-  columnHelper.accessor("controlId", {
-    header: "Control ID",
-    id: "control_id",
-    enableSorting: true,
-    cell: (info) => (
-      <Badge
-        key={info.getValue()}
-        variant="outline"
-        className="whitespace-nowrap font-mono text-xs"
-      >
-        {info.getValue()}
-      </Badge>
-    ),
-  }),
-  columnHelper.accessor("state", {
-    header: "State",
-    id: "state",
-    enableSorting: false,
-    cell: (info) => (
-      <Badge variant="outline" className="whitespace-nowrap capitalize">
-        {info.getValue()}
-      </Badge>
-    ),
-  }),
-];
-
 interface Props {
   apiBaseUrl: string;
   Menu?: any[];
@@ -105,6 +57,112 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const searchParams = useSearchParams();
   const asset = useActiveAsset();
 
+  const activeFrameworkFilter = useMemo(() => {
+    if (!searchParams) return null;
+    for (const [key, value] of searchParams.entries()) {
+      if (key.startsWith("filterQuery[framework]")) return value;
+    }
+    return null;
+  }, [searchParams]);
+
+  const columnsDef: ColumnDef<CompliancePostureWithControlDTO, any>[] = useMemo(
+    () => [
+      columnHelper.accessor("title", {
+        header: "Title",
+        id: "title",
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex flex-col">
+            <span className="font-medium">{info.getValue()}</span>
+          </div>
+        ),
+      }),
+      columnHelper.accessor("framework", {
+        header: "Framework",
+        id: "framework",
+        enableSorting: true,
+        cell: (info) => (
+          <div className="flex flex-row items-center gap-2">
+            <FrameworkIcon framework={info.getValue()} />
+            <span>{info.getValue()}</span>
+          </div>
+        ),
+      }),
+      columnHelper.accessor("controlId", {
+        header: "Control ID",
+        id: "control_id",
+        enableSorting: true,
+        cell: (info) => (
+          <Badge
+            key={info.getValue()}
+            variant="outline"
+            className="whitespace-nowrap font-mono text-xs"
+          >
+            {info.getValue()}
+          </Badge>
+        ),
+      }),
+      columnHelper.accessor("mappedControls", {
+        header: "Mapped Controls",
+        id: "mapped_controls",
+        enableSorting: false,
+        cell: (info) => {
+          const controls = info.getValue() ?? [];
+          if (!controls.length) return null;
+          const sorted = (
+            activeFrameworkFilter
+              ? [...controls].sort((a, b) => {
+                  const aMatch =
+                    a.relatedFramework === activeFrameworkFilter ? -1 : 0;
+                  const bMatch =
+                    b.relatedFramework === activeFrameworkFilter ? -1 : 0;
+                  return aMatch - bMatch;
+                })
+              : controls
+          ).slice(0, 5);
+          const remaining = controls.length - sorted.length;
+          return (
+            <div className="flex flex-wrap gap-1">
+              {sorted.map(
+                (c: { relatedFramework: string; relatedControlId: string }) => {
+                  const label = `${c.relatedFramework}:${c.relatedControlId}`;
+                  const isActive =
+                    activeFrameworkFilter &&
+                    c.relatedFramework === activeFrameworkFilter;
+                  return (
+                    <Badge
+                      key={label}
+                      variant={isActive ? "secondary" : "outline"}
+                      className="whitespace-nowrap font-mono text-xs"
+                    >
+                      {label}
+                    </Badge>
+                  );
+                },
+              )}
+              {remaining > 0 && (
+                <Badge variant="outline" className="whitespace-nowrap text-xs">
+                  +{remaining} more
+                </Badge>
+              )}
+            </div>
+          );
+        },
+      }),
+      columnHelper.accessor("importance", {
+        header: "Importance",
+        id: "importance",
+        enableSorting: true,
+        cell: (info) => (
+          <Badge variant="outline" className="whitespace-nowrap capitalize">
+            {info.getValue()}
+          </Badge>
+        ),
+      }),
+    ],
+    [activeFrameworkFilter],
+  );
+
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
@@ -117,14 +175,14 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   }, [searchParams]);
 
   const { data: vulns, isLoading } = useSWR<
-    Paged<CompliancePostureWithControlDTO>
+    Paged<CompliancePostureWithControlDTO> & { frameworks: string[] }
   >(apiBaseUrl + "?" + query.toString(), fetcher, { keepPreviousData: false });
 
   const { data: stats, isLoading: statsLoading } = useSWR<{
     open: number;
     implemented: number;
     notApplicable: number;
-  }>(apiBaseUrl + "stats/", fetcher);
+  }>(apiBaseUrl + "stats/" + "?" + query.toString(), fetcher);
 
   const isClosed = searchParams?.get("state") === "closed";
 
@@ -140,15 +198,10 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const pathname = usePathname();
   const push = useRouterQuery();
 
-  const frameworks = useMemo(() => {
-    const result: string[] = [];
-    vulns?.data.forEach((v) => {
-      if (!result.includes(v.framework)) {
-        result.push(v.framework);
-      }
-    });
-    return result;
-  }, [vulns?.data]);
+  const frameworks = useMemo(
+    () => vulns?.frameworks ?? [],
+    [vulns?.frameworks],
+  );
 
   const filterOptions = useMemo(() => {
     return [
@@ -170,6 +223,15 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       {
         label: "Control ID",
         value: "controlId",
+        operators: [
+          { value: "is" },
+          { value: "is not" },
+          { value: "ilike", label: "contains" },
+        ],
+      },
+      {
+        label: "Importance",
+        value: "importance",
         operators: [
           { value: "is" },
           { value: "is not" },
@@ -220,6 +282,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         className="mb-4 mt-4"
       >
         <div className="relative flex flex-col gap-2">
+          <FrameworkSelect frameworks={frameworks} />
           <ComplianceStats
             open={stats?.open ?? 0}
             implemented={stats?.implemented ?? 0}
@@ -227,11 +290,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
             isLoading={statsLoading}
           />
 
-          <Tabs
-            defaultValue={
-              params?.has("state") ? (params.get("state") as string) : "open"
-            }
-          >
+          <Tabs value={params?.get("state") ?? "open"}>
             <TabsList>
               <TabsTrigger onClick={() => push({ state: "open" })} value="open">
                 Open
@@ -246,7 +305,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
           </Tabs>
           <div className="flex flex-row items-center gap-2">
             <div className="flex-1 space-y-2">
-              <FrameworkSelect frameworks={frameworks} />
               <Filter
                 options={filterOptions}
                 onFilter={handleFilter}

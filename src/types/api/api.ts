@@ -699,6 +699,11 @@ export interface CompliancePostureWithControlDTO {
   manualTicketCreation: boolean;
   createdAt: string; // ISO (Go time.Time)
   additional: Record<string, any>;
+  importance: string;
+  mappedControls: {
+    relatedFramework: string;
+    relatedControlId: string;
+  }[];
 }
 
 export interface ComplianceRiskDTO {

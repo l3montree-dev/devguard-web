@@ -14,6 +14,7 @@ import type {
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import { TokenizedText } from "@/components/compliance-posturers/TokenizedText";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -24,7 +25,7 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import Markdown from "react-markdown";
 
-import { Badge, type badgeVariants } from "@/components/ui/badge";
+import { Badge, badgeVariants } from "@/components/ui/badge";
 import type { VariantProps } from "class-variance-authority";
 
 type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
@@ -75,12 +76,50 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronRightIcon } from "lucide-react";
+
 import useDecodedParams from "@/hooks/useDecodedParams";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   { ssr: false },
 );
+
+function MappedControlsGroup({
+  framework,
+  controlIds,
+}: {
+  framework: string;
+  controlIds: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen} className="mb-2 w-full">
+      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
+        <ChevronRightIcon
+          className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`}
+        />
+
+        <span className="text-start">{framework}</span>
+        <span className="ml-1 text-xs text-muted-foreground whitespace-nowrap">
+          ({controlIds.length})
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-1 flex flex-wrap">
+        {controlIds.map((id) => (
+          <Badge key={id} variant="secondary" className="mr-2 mb-2">
+            {id}
+          </Badge>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 interface Props {
   apiBaseUrl: string;
@@ -315,6 +354,8 @@ const CompliancePostureDetailView = ({
     mutate();
   };
 
+  console.log("vuln", vuln);
+  console.log(vuln.additional?.mappedControls);
   return (
     <Page Menu={Menu} Title={Title} title={vuln.title}>
       <div className="flex flex-row gap-4">
@@ -325,14 +366,37 @@ const CompliancePostureDetailView = ({
                 <h1 className="text-2xl font-semibold">{vuln.title}</h1>
               </div>
               <div className="mt-4 text-muted-foreground">
-                <Markdown>
-                  {vuln.description?.replaceAll("\n", "\n\n")}
-                </Markdown>
+                <TokenizedText
+                  text={vuln.description?.replaceAll("\n", "\n\n") ?? ""}
+                  definitions={
+                    vuln.additional?.word_definition?.definitions ?? {}
+                  }
+                />
               </div>
               {vuln.additional?.guidance && (
                 <div className="mt-4 text-muted-foreground">
                   <p className="mb-1 font-semibold">Guidance</p>
-                  <Markdown>{vuln.additional.guidance}</Markdown>
+                  <TokenizedText
+                    text={vuln.additional.guidance}
+                    definitions={
+                      vuln.additional?.word_definition?.definitions ?? {}
+                    }
+                  />
+                </div>
+              )}
+              {vuln.additional?.assessment_objective && (
+                <div className="mt-4 text-muted-foreground">
+                  <p className="mt-4 mb-1 font-semibold">
+                    Assessment Objective
+                  </p>
+                  {vuln.additional.assessment_objective.map(
+                    (obj: any, index: number) => (
+                      <div key={index} className="mt-4 text-muted-foreground">
+                        <p className="mb-1 font-semibold">{obj?.id}</p>
+                        <TokenizedText text={obj?.prose} />
+                      </div>
+                    ),
+                  )}
                 </div>
               )}
               <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm mb-4">
@@ -631,21 +695,22 @@ const CompliancePostureDetailView = ({
                 </div>
 
                 <dl className="mt-4 flex flex-col gap-0 text-sm">
-                  <div className="flex flex-col items-start justify-between border-t py-3">
-                    <dt className="text-xs text-muted-foreground">Class</dt>
-                    <dd className="font-medium">{vuln.class}</dd>
-                  </div>
-
                   {vuln.additional?.group_title && (
-                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                    <div className="flex flex-col items-start justify-between  border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Group</dt>
                       <dd className="font-medium">
                         {vuln.additional.group_title}
                       </dd>
                     </div>
                   )}
+                  {vuln.class && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">Class</dt>
+                      <dd className="font-medium">{vuln.class}</dd>
+                    </div>
+                  )}
                   {vuln.additional?.security_level && (
-                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
                       <dt className="text-xs text-muted-foreground">
                         Security Level
                       </dt>
@@ -661,17 +726,30 @@ const CompliancePostureDetailView = ({
                               target="_blank"
                               style={{ color: "inherit" }}
                             >
-                              {vuln.additional.security_level.value}
+                              <TokenizedText
+                                text={vuln.additional.security_level.value}
+                                definitions={
+                                  vuln.additional.security_level.definitions
+                                }
+                                split={false}
+                              />
                             </Link>
                           ) : (
-                            vuln.additional.security_level.value
+                            <TokenizedText
+                              text={vuln.additional.security_level.value}
+                              definitions={
+                                vuln.additional.security_level.definitions
+                              }
+                              split={false}
+                            />
                           )}
                         </Badge>
                       </dd>
                     </div>
                   )}
+
                   {vuln.additional?.importance && (
-                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                    <div className="flex flex-col items-start justify-between  border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">
                         Importance
                       </dt>
@@ -687,17 +765,29 @@ const CompliancePostureDetailView = ({
                               target="_blank"
                               style={{ color: "inherit" }}
                             >
-                              {vuln.additional.importance.value}
+                              <TokenizedText
+                                text={vuln.additional.importance.value}
+                                definitions={
+                                  vuln.additional.importance.definitions
+                                }
+                                split={false}
+                              />
                             </Link>
                           ) : (
-                            vuln.additional.importance.value
+                            <TokenizedText
+                              text={vuln.additional.importance.value}
+                              definitions={
+                                vuln.additional.importance.definitions
+                              }
+                              split={false}
+                            />
                           )}
                         </Badge>
                       </dd>
                     </div>
                   )}
                   {vuln.additional?.effort_level && (
-                    <div className="flex flex-col items-start justify-between gap-4    border-t py-3">
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">
                         Effort Level
                       </dt>
@@ -713,17 +803,107 @@ const CompliancePostureDetailView = ({
                               target="_blank"
                               style={{ color: "inherit" }}
                             >
-                              {vuln.additional.effort_level.value}
+                              <TokenizedText
+                                text={vuln.additional.effort_level.value}
+                                definitions={
+                                  vuln.additional.effort_level.definitions
+                                }
+                                split={false}
+                              />
                             </Link>
                           ) : (
-                            vuln.additional.effort_level.value
+                            <TokenizedText
+                              text={vuln.additional.effort_level.value}
+                              definitions={
+                                vuln.additional.effort_level.definitions
+                              }
+                              split={false}
+                            />
                           )}
                         </Badge>
                       </dd>
                     </div>
                   )}
+                  {vuln.additional?.tags && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">Tags</dt>
+                      <dd className="font-medium">
+                        {vuln.additional.tags.ns
+                          ? vuln.additional.tags.value
+                              .split(",")
+                              .map((tag: string) => (
+                                <Link
+                                  href={vuln.additional.tags.ns}
+                                  target="_blank"
+                                  style={{ color: "inherit" }}
+                                  key={tag}
+                                >
+                                  <Badge
+                                    variant="secondary"
+                                    className="mr-2 mb-2"
+                                  >
+                                    <TokenizedText
+                                      text={tag}
+                                      definitions={
+                                        vuln.additional.tags.definitions
+                                      }
+                                      split={false}
+                                    />
+                                  </Badge>
+                                </Link>
+                              ))
+                          : vuln.additional.tags.value
+                              .split(",")
+                              .map((tag: string) => (
+                                <Badge
+                                  variant="secondary"
+                                  className="mr-2 mb-2"
+                                  key={tag}
+                                >
+                                  <TokenizedText
+                                    text={tag}
+                                    definitions={
+                                      vuln.additional.tags.definitions
+                                    }
+                                    split={false}
+                                  />
+                                </Badge>
+                              ))}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.documentation && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">
+                        Documentation
+                      </dt>
+                      <dd className="font-medium">
+                        {vuln.additional.documentation.ns ? (
+                          <Link
+                            href={vuln.additional.documentation.ns}
+                            target="_blank"
+                            style={{ color: "inherit" }}
+                          >
+                            <TokenizedText
+                              text={vuln.additional.documentation.value}
+                              definitions={
+                                vuln.additional.documentation.definitions
+                              }
+                            />
+                          </Link>
+                        ) : (
+                          <TokenizedText
+                            text={vuln.additional.documentation.value}
+                            definitions={
+                              vuln.additional.documentation.definitions
+                            }
+                          />
+                        )}
+                      </dd>
+                    </div>
+                  )}
                   {vuln.additional?.result && (
-                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                    <div className="flex flex-col items-start justify-betweens border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Result</dt>
                       <dd className="font-medium">
                         {vuln.additional.result.ns ? (
@@ -732,16 +912,22 @@ const CompliancePostureDetailView = ({
                             target="_blank"
                             style={{ color: "inherit" }}
                           >
-                            {vuln.additional.result.value}
+                            <TokenizedText
+                              text={vuln.additional.result.value}
+                              definitions={vuln.additional.result.definitions}
+                            />
                           </Link>
                         ) : (
-                          vuln.additional.result.value
+                          <TokenizedText
+                            text={vuln.additional.result.value}
+                            definitions={vuln.additional.result.definitions}
+                          />
                         )}
                       </dd>
                     </div>
                   )}
                   {vuln.additional?.result_specification && (
-                    <div className="flex flex-col items-start justify-between gap-4 border-t py-3">
+                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
                       <dt className="text-xs text-muted-foreground">
                         Result Specification
                       </dt>
@@ -752,11 +938,49 @@ const CompliancePostureDetailView = ({
                             target="_blank"
                             style={{ color: "inherit" }}
                           >
-                            {vuln.additional.result_specification.value}
+                            <TokenizedText
+                              text={vuln.additional.result_specification.value}
+                              definitions={
+                                vuln.additional.result_specification.definitions
+                              }
+                            />
                           </Link>
                         ) : (
-                          vuln.additional.result_specification.value
+                          <TokenizedText
+                            text={vuln.additional.result_specification.value}
+                            definitions={
+                              vuln.additional.result_specification.definitions
+                            }
+                          />
                         )}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.mappedControls && (
+                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Mapped Controls
+                      </dt>
+                      <dd className="font-medium w-full">
+                        {Object.entries(
+                          (
+                            vuln.mappedControls as {
+                              relatedFramework: string;
+                              relatedControlId: string;
+                            }[]
+                          ).reduce<Record<string, string[]>>((acc, control) => {
+                            (acc[control.relatedFramework] ??= []).push(
+                              control.relatedControlId,
+                            );
+                            return acc;
+                          }, {}),
+                        ).map(([framework, controlIds]) => (
+                          <MappedControlsGroup
+                            key={framework}
+                            framework={framework}
+                            controlIds={controlIds}
+                          />
+                        ))}
                       </dd>
                     </div>
                   )}
