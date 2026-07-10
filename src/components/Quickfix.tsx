@@ -97,7 +97,6 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
 }) => {
   const fixedVersionPurl = getFixedVersionPurl(vuln);
-  console.log(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
   if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {

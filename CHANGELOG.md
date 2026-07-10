@@ -4,6 +4,31 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.8.0] — 2026-07-01
+
+### Added
+
+- **External managed entities** — assets can be flagged as externally managed; a dedicated banner is shown for these entities and IAC/SAST findings are scoped correctly
+- **Release creation** — automated release creation integrated into the CI/CD pipeline, gated to main branch or tagged runs using job tokens
+- **Updated integration snippets** — setup and onboarding code snippets updated to the current scanner version
+
+### Fixed
+
+- **Dependency risk vulnerability page** — "Create Ticket" button visibility corrected (broken ternary nesting)
+- **Date-picker** — component behaviour corrected
+- **Onboarding comments and GitLab onboarding** — flow issues resolved
+- **Welcome modal** — tour-seen state now tracked correctly
+- **Card shadows and badge/font sizes** — visual regressions corrected
+- **Confirm-password check** — sign-up flow now validates matching passwords with a more reliable condition
+- **Instance dashboard** — large vulnerability counts no longer overflow their tile; text size adjusted
+
+### Changed
+
+- **Onboarding tour reworked** — tour starts automatically on first visit; onboarding cards are directly clickable; redundant "Continue" button and unnecessary back buttons removed; asset creation modal closes and resets after successful creation
+- **Average open code risks / fixing time charts** — added a legend to the open code risks chart and realigned the fixing time charts
+
+---
+
 ## [v1.7.0] — 2026-06-19
 
 ### Added

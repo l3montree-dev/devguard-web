@@ -4,6 +4,9 @@ const config: OryClientConfiguration = {
   sdk: {
     url: process.env.ORY_SDK_PUBLIC_URL ?? "",
   },
+  intl: {
+    locale: "en",
+  },
   project: {
     default_redirect_url: "/",
     error_ui_url: "/error",
@@ -16,8 +19,6 @@ const config: OryClientConfiguration = {
     recovery_ui_url: "/recovery",
     login_ui_url: "/login",
     settings_ui_url: "/user-settings",
-    default_locale: "en",
-    locale_behavior: "force_default",
   },
 };
 

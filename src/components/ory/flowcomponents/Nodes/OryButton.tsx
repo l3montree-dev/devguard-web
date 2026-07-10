@@ -10,12 +10,7 @@ import { FingerPrintIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { usePasswordMismatch } from "../PasswordField";
 
-export function OryButton({
-  node,
-  attributes,
-  onClick,
-  ...rest
-}: OryNodeButtonProps) {
+export function OryButton({ node, buttonProps }: OryNodeButtonProps) {
   const label = node.meta.label?.text ?? "";
   const [clicked, setClicked] = useState(false);
   const {
@@ -30,20 +25,19 @@ export function OryButton({
 
   return (
     <Button
-      name={attributes.name}
-      type={attributes.type === "button" ? "button" : "submit"}
-      value={attributes.value?.toString()}
-      disabled={attributes.disabled || isSubmitting || passwordsMismatch}
+      name={buttonProps.name}
+      type={buttonProps.type === "button" ? "button" : "submit"}
+      value={buttonProps.value?.toString()}
+      disabled={buttonProps.disabled || isSubmitting || passwordsMismatch}
       variant={node.group === "passkey" ? "default" : "secondary"}
       data-testid={`${node.group}-submit`}
       onClick={(e) => {
-        onClick?.(e);
+        buttonProps.onClick(e);
         setClicked(true);
-        if (attributes.type !== "button") {
-          setValue(attributes.name, attributes.value);
+        if (node.attributes.type !== "button") {
+          setValue(node.attributes.name, node.attributes.value);
         }
       }}
-      {...rest}
     >
       {clicked && isSubmitting ? (
         <span className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />

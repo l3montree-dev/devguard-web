@@ -7,6 +7,8 @@ export const documentationLinks = {
     "https://devguard.org/explanations/compliance/csaf-vex-explained",
   artifactExplaining:
     "https://devguard.org/explanations/core-concepts/artifacts",
+  artifactVersioning:
+    "https://docs.devguard.org/how-to-guides/scanning/branches-tags-and-artifacts/",
   acceptRisk:
     "https://devguard.org/explanations/vulnerability-management/vulnerability-events#4-accept-risk",
   riskCalculation:

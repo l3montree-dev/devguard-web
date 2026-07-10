@@ -282,7 +282,10 @@ export function allowedActionsCheck(
     return true;
   }
 
-  if (currentUserRole === UserRole.Admin && memberRole === UserRole.Member) {
+  if (
+    currentUserRole === UserRole.Admin &&
+    (memberRole === UserRole.Member || memberRole === UserRole.Admin)
+  ) {
     return true;
   }
 

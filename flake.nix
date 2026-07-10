@@ -7,7 +7,7 @@
   };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
     sbomnix.url = "github:tiiuae/sbomnix";
     sbomnix.inputs.nixpkgs.follows = "nixpkgs"; # share the same nixpkgs pin
