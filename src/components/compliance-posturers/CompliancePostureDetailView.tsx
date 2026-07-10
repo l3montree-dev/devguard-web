@@ -687,9 +687,19 @@ const CompliancePostureDetailView = ({
                     className="h-10 w-10 shrink-0"
                   />
                   <div>
-                    <p className="text-xs text-muted-foreground">
-                      {vuln.framework}
-                    </p>
+                    {vuln.framework && vuln.framework === "SCF" ? (
+                      <Link
+                        className="text-xs text-muted-foreground underline"
+                        href="https://scfconnect.com/frameworks"
+                        target="_blank"
+                      >
+                        {vuln.framework}
+                      </Link>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        {vuln.framework}
+                      </p>
+                    )}
                     <p className="font-semibold">{vuln.controlId}</p>
                   </div>
                 </div>
