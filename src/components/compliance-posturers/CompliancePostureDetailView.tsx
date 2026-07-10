@@ -690,10 +690,18 @@ const CompliancePostureDetailView = ({
                     {vuln.framework && vuln.framework === "SCF" ? (
                       <Link
                         className="text-xs text-muted-foreground underline"
-                        href="https://scfconnect.com/frameworks"
+                        href="https://securecontrolsframework.com/"
                         target="_blank"
                       >
-                        {vuln.framework}
+                        {vuln.framework} (CC-BY-ND-4.0)
+                      </Link>
+                    ) : vuln.framework && vuln.framework === "Grundschutz++" ? (
+                      <Link
+                        className="text-xs text-muted-foreground underline"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/tree/main/Anwenderkataloge/Grundschutz%2B%2B"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
                       </Link>
                     ) : (
                       <p className="text-xs text-muted-foreground">
