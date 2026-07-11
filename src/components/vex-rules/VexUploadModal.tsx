@@ -302,7 +302,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     onClick={() => {
                       carouselApi?.scrollTo(1);
                     }}
-                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
+                    className="cursor-pointer hover:border-primary"
                   >
                     <CardHeader data-testid="upload-vex-file">
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
@@ -320,7 +320,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     onClick={() => {
                       carouselApi?.scrollTo(2);
                     }}
-                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
+                    className="cursor-pointer hover:border-primary"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
