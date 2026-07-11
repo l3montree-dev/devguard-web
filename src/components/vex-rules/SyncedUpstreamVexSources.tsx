@@ -1,11 +1,10 @@
 import { useState } from "react";
 import type { FunctionComponent } from "react";
-import { Card } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from "@radix-ui/react-collapsible";
+} from "@/components/ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +26,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const SyncedUpstreamVexSources: FunctionComponent = () => {
   const params = useDecodedParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
-  const [isOpen, setIsOpen] = useState(false);
   const [newVexUrl, setNewVexUrl] = useState("");
   const [newCsafUrl, setNewCsafUrl] = useState("");
   const [csafPackageScope, setCsafPackageScope] = useState("");
@@ -168,135 +166,132 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   };
 
   if (error) {
-    return (
-      <Card className="px-4 py-3">
-        <p className="text-sm text-destructive">Failed to load VEX sources</p>
-      </Card>
-    );
+    return <p className="text-sm text-destructive">Failed to load VEX sources</p>;
   }
 
   return (
-    <Card className="px-4">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-2">
-        <CollapsibleTrigger className="group flex cursor-pointer items-center justify-between w-full rounded-md transition-colors p-2 -m-2">
-          <div>
-            <h3 className="flex items-center gap-2">
-              Synced Upstream VEX Sources
-              {vexSources.length > 0 && (
-                <span className="relative flex size-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75"></span>
-                  <span className="relative inline-flex size-3 rounded-full bg-success"></span>
-                </span>
-              )}
-            </h3>
+    <Collapsible className="my-2">
+      <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between rounded-md transition-colors">
+        <h3 className="font-semibold">Synced Upstream VEX Sources</h3>
+        <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="my-4">
+        <span className="mb-6 block text-sm text-muted-foreground">
+          Upstream VEX sources are URLs, usually provided by your suppliers,
+          that contain the latest VEX data relevant to the components used in
+          your software. Syncing these sources creates VEX rules that you can
+          review and manage below.
+        </span>
+
+        {isLoading ? (
+          <div className="py-8 text-center text-muted-foreground">
+            Loading...
           </div>
-          <div className="hover:bg-muted/50 p-1 rounded-md transition-colors">
-            <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-data-[state=closed]:rotate-[-90deg]" />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-4">
-          <span className="text-sm text-muted-foreground mb-6 block">
-            Upstream VEX sources are URLs, usually provided by your suppliers,
-            that contain latest VEX data relevant to the components used in your
-            software. By syncing these VEX URLs, DevGuard can automatically
-            incorporate the latest VEX information into your vulnerability
-            assessments, helping you to better understand the impact of known
-            vulnerabilities on your software supply chain. The assessment
-            results of the synced VEX data is transformed into VEX Rules that
-            you can review and manage here.
-          </span>
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">
-              Loading...
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {vexSources.length > 0 && (
-                <div className="overflow-hidden rounded-lg border">
-                  <table className="w-full text-sm">
-                    <thead className="border-b bg-muted/50">
-                      <tr>
-                        <th className="text-left p-3 font-medium">URL</th>
-                        <th className="text-left p-3 font-medium">Type</th>
-                        <th className="w-12"></th>
+        ) : (
+          <div className="space-y-4">
+            {vexSources.length > 0 && (
+              <div className="rounded-lg border shadow-sm overflow-hidden">
+                <table className="w-full text-left text-sm">
+                  <thead className="border-b bg-card text-foreground">
+                    <tr>
+                      <th className="p-4 font-medium">URL</th>
+                      <th className="p-4 font-medium">Type</th>
+                      <th className="w-12" />
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm text-foreground">
+                    {vexSources.map((source, i, arr) => (
+                      <tr
+                        key={source.id}
+                        className={i !== arr.length - 1 ? "border-b" : ""}
+                      >
+                        <td className="p-4">
+                          <span className="break-all font-mono text-xs">
+                            {source.url}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <span className="text-xs uppercase text-muted-foreground">
+                            {source.type === "csaf" ? "CSAF" : "CycloneDX VEX"}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => handleTriggerSync(source)}
+                              >
+                                <RefreshCw className="mr-2 h-4 w-4" />
+                                Trigger Sync
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(source)}
+                                className="text-destructive"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {vexSources.map((source, index) => (
-                        <tr
-                          key={source.id}
-                          className={
-                            index !== vexSources.length - 1 ? "border-b" : ""
-                          }
-                        >
-                          <td className="p-3">
-                            <span className="font-mono text-xs break-all">
-                              {source.url}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <span className="text-xs text-muted-foreground uppercase">
-                              {source.type === "csaf"
-                                ? "CSAF"
-                                : "CycloneDX VEX"}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm">
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem
-                                  onClick={() => handleTriggerSync(source)}
-                                >
-                                  <RefreshCw className="h-4 w-4 mr-2" />
-                                  Trigger Sync
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => handleDelete(source)}
-                                  className="text-destructive"
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {vexSources.length === 0 && (
+              <p className="text-sm text-muted-foreground">
+                No upstream VEX sources configured.
+              </p>
+            )}
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as ExternalReference["type"])}
+            >
+              <TabsList>
+                <TabsTrigger value="cyclonedxvex">VEX</TabsTrigger>
+                <TabsTrigger value="csaf">CSAF</TabsTrigger>
+              </TabsList>
+              <TabsContent value="cyclonedxvex">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="https://supplier.example.com/vex.json"
+                    value={newVexUrl}
+                    onChange={(e) => setNewVexUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddVexUrl()}
+                    className="flex-1"
+                  />
+                  <Button onClick={handleAddVexUrl} disabled={isAdding}>
+                    {isAdding ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-              )}
-              {vexSources.length === 0 && (
-                <p className="text-muted-foreground">
-                  No upstream VEX sources configured.
-                </p>
-              )}
-              <Tabs
-                value={activeTab}
-                onValueChange={(v) =>
-                  setActiveTab(v as ExternalReference["type"])
-                }
-              >
-                <TabsList>
-                  <TabsTrigger value="cyclonedxvex">VEX</TabsTrigger>
-                  <TabsTrigger value="csaf">CSAF</TabsTrigger>
-                </TabsList>
-                <TabsContent value="cyclonedxvex">
+              </TabsContent>
+              <TabsContent value="csaf">
+                <div className="space-y-2">
+                  <Input
+                    placeholder="https://supplier.example.com/csaf/provider-metadata.json"
+                    value={newCsafUrl}
+                    onChange={(e) => setNewCsafUrl(e.target.value)}
+                  />
                   <div className="flex gap-2">
                     <Input
-                      placeholder="https://supplier.example.com/vex.json"
-                      value={newVexUrl}
-                      onChange={(e) => setNewVexUrl(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleAddVexUrl()}
+                      placeholder="pkg:npm/express@4.0.0 (Package URL - PURL)"
+                      value={csafPackageScope}
+                      onChange={(e) => setCsafPackageScope(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleAddCsafUrl()}
                       className="flex-1"
-                      variant="onCard"
                     />
-                    <Button onClick={handleAddVexUrl} disabled={isAdding}>
+                    <Button onClick={handleAddCsafUrl} disabled={isAdding}>
                       {isAdding ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
@@ -304,42 +299,13 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                       )}
                     </Button>
                   </div>
-                </TabsContent>
-                <TabsContent value="csaf">
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="https://supplier.example.com/csaf/provider-metadata.json"
-                      value={newCsafUrl}
-                      onChange={(e) => setNewCsafUrl(e.target.value)}
-                      variant="onCard"
-                    />
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="pkg:npm/express@4.0.0 (Package URL - PURL)"
-                        value={csafPackageScope}
-                        onChange={(e) => setCsafPackageScope(e.target.value)}
-                        onKeyDown={(e) =>
-                          e.key === "Enter" && handleAddCsafUrl()
-                        }
-                        className="flex-1"
-                        variant="onCard"
-                      />
-                      <Button onClick={handleAddCsafUrl} disabled={isAdding}>
-                        {isAdding ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Plus className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
-    </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 
