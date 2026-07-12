@@ -100,8 +100,8 @@ We believe VEX information should be shared via a link due to its dynamic nature
 
 | Project                                                                | SBOM                                                                                                                                 | VeX                                                                                                                                |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| [Devguard Golang API](https://github.com/l3montree-dev/devguard)       | [SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/sbom.json?scanner=container-scanning)     | [VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard/vex.json?scanner=container-scanning)     |
-| [Devguard Web-Frontend](https://github.com/l3montree-dev/devguard-web) | [SBOM](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/sbom.json?scanner=container-scanning) | [VeX](https://main.devguard.org/l3montree-cybersecurity/projects/devguard/assets/devguard-web/vex.json?scanner=container-scanning) |
+| [Devguard Golang API](https://github.com/l3montree-dev/devguard)       | [SBOM](https://api.main.devguard.org/api/v1/public/e1f24270-6e68-4571-9168-9c151c639c97/refs/main/artifacts/source/sbom.json/)     | [VeX](https://api.main.devguard.org/api/v1/public/e1f24270-6e68-4571-9168-9c151c639c97/refs/main/artifacts/source/vex.json/)     |
+| [Devguard Web-Frontend](https://github.com/l3montree-dev/devguard-web) | [SBOM](https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/main/artifacts/source/sbom.json/) | [VeX](https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/main/artifacts/source/vex.json/) |
 
 ### Built With
 
