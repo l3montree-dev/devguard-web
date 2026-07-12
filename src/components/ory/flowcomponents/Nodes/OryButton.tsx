@@ -8,7 +8,7 @@ import { useFormContext } from "react-hook-form";
 import type { OryNodeButtonProps } from "@ory/elements-react";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
-import { usePasswordMismatch } from "../PasswordField";
+import { usePasswordMismatch } from "@/hooks/usePasswordMismatch";
 
 export function OryButton({ node, buttonProps }: OryNodeButtonProps) {
   const label = node.meta.label?.text ?? "";

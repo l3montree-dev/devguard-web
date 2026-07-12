@@ -50,6 +50,10 @@ test.describe("DevGuard Email login flows", () => {
         envConfig.devGuard.password,
       );
 
+    await expect(
+      page.getByText("Passwords do not match.", { exact: true }),
+    ).toBeHidden();
+
     await devguardPOM.auth().logout();
 
     await devguardPOM

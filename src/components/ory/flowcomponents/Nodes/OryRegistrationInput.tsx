@@ -7,11 +7,8 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { OryNodeInputProps } from "@ory/elements-react";
 import { Label } from "@/components/ui/label";
-import {
-  CONFIRM_PASSWORD_LABEL,
-  PasswordField,
-  usePasswordMismatch,
-} from "../PasswordField";
+import { usePasswordMismatch } from "@/hooks/usePasswordMismatch";
+import { CONFIRM_PASSWORD_LABEL, PasswordField } from "../PasswordField";
 import { OryInput } from "./OryInput";
 
 export function OryRegistrationInput(props: OryNodeInputProps) {
