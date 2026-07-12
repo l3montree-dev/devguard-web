@@ -67,7 +67,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
 
   const handleDelete = async (source: ExternalReference) => {
     try {
-      const response = await browserApiClient(apiUrl + "/" + source.id, {
+      const response = await browserApiClient(apiUrl + "/" + encodeURIComponent(source.url), {
         method: "DELETE",
       });
       if (!response.ok) {
@@ -102,7 +102,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: newVexUrl.trim(),
-          type: "cyclonedxvex",
+          type: "cyclonedx",
         }),
       });
 
