@@ -34,7 +34,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -96,8 +96,8 @@ jobs:
       devguard-asset-name: l3montree-cybersecurity/projects/devguard/assets/devguard-web
       devguard-api-url: https://api.main.devguard.org
       devguard-web-ui: https://main.devguard.org
-      fail-on-cvss: never
-      fail-on-risk: never
+      fail-on-cvss: high
+      fail-on-risk: high
       nix-cache-substituter: https://nix.garage.l3montree.cloud
       nix-cache-public-key: nix.garage.l3montree.cloud:MGlzfPQKA91/zxw91CN+GP7NpjAAwmKvWXlDYgeeI8k=
       nix-cache-s3-bucket: nix

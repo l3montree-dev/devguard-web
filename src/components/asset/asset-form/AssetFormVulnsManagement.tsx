@@ -431,12 +431,10 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
 };
 
 const CVSSBadgePreview: FunctionComponent<{
-  orgSlug: string;
-  projectSlug?: string;
-  assetSlug?: string;
+  badgePreviewUrl: string;
   publicBadgeUrl?: string;
   copyable: boolean;
-}> = ({ orgSlug, projectSlug, assetSlug, publicBadgeUrl, copyable }) => {
+}> = ({ badgePreviewUrl, publicBadgeUrl, copyable }) => {
   const handleCopy = async () => {
     if (!publicBadgeUrl) return;
     try {
@@ -456,7 +454,7 @@ const CVSSBadgePreview: FunctionComponent<{
   return (
     <div className="flex flex-row items-center gap-3 rounded-md border bg-background p-2 justify-between">
       <img
-        src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+        src={badgePreviewUrl}
         alt="CVSS Badge"
         className="rounded-md shadow-sm"
       />
@@ -639,6 +637,12 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   const publicBadgeUrl = basePath ? `${basePath}/badges/cvss/` : undefined;
 
+  const assetApiPath = `/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`;
+  const badgePreviewUrl =
+    selectedVersionSlug && selectedArtifact
+      ? `${assetApiPath}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/badges/cvss/`
+      : `${assetApiPath}/badges/cvss/`;
+
   return (
     <>
       <div className="rounded-lg border shadow-sm bg-card p-4">
@@ -697,9 +701,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                       onSelectArtifact={setSelectedArtifact}
                     />
                     <CVSSBadgePreview
-                      orgSlug={orgSlug}
-                      projectSlug={projectSlug}
-                      assetSlug={assetSlug}
+                      badgePreviewUrl={badgePreviewUrl}
                       publicBadgeUrl={publicBadgeUrl}
                       copyable={field.value}
                     />
