@@ -38,7 +38,7 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
 
   // Show the mismatch error only once the confirm field has been touched, but
   // keep it watch-driven so it clears live as soon as the values match.
-  const showMismatch = confirmTouched && mismatch;
+  const showMismatch = !isSubmitting && confirmTouched && mismatch;
 
   return (
     <div className="flex flex-col gap-1">
