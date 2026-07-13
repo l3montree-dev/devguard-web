@@ -4,12 +4,12 @@
 import { useFormContext } from "react-hook-form";
 
 export function usePasswordMismatch(): boolean {
-  const { watch } = useFormContext();
+  const { watch, getValues } = useFormContext();
   const password = watch("password");
   const confirmPassword = watch("confirmPassword");
+  const hasConfirmField = "confirmPassword" in getValues();
 
-  // Ory clears the password while redirecting after a successful submission.
-  if (!password || !confirmPassword) {
+  if (!hasConfirmField) {
     return false;
   }
   return password !== confirmPassword;

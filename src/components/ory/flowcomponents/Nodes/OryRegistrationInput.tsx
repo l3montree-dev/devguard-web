@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { OryNodeInputProps } from "@ory/elements-react";
 import { Label } from "@/components/ui/label";
@@ -13,10 +13,21 @@ import { OryInput } from "./OryInput";
 
 export function OryRegistrationInput(props: OryNodeInputProps) {
   const { node, attributes, onClick } = props;
-  const { register } = useFormContext();
+  const {
+    register,
+    resetField,
+    formState: { isSubmitting },
+  } = useFormContext();
   const mismatch = usePasswordMismatch();
   const [confirmTouched, setConfirmTouched] = useState(false);
   const { value, name, autocomplete, maxlength, ...rest } = attributes;
+
+  useEffect(() => {
+    if (isSubmitting) {
+      resetField("confirmPassword");
+      setConfirmTouched(false);
+    }
+  }, [isSubmitting, resetField]);
 
   // Only the password field gets the extra confirmation field. Every other
   // node (email, name, hidden, csrf, …) renders exactly like the standard
