@@ -34,7 +34,7 @@ export const config = {
     "https://gitlab.com/l3montree/devguard/-/raw/main",
   devguardGithubAppUrl: process.env.DEVGUARD_API_URL_PUBLIC_INTERNET?.includes(
     "main.devguard.org",
-  )
+  ) || process.env.DEVGUARD_API_URL_PUBLIC_INTERNET?.includes("localhost")
     ? "devguard-bot-dev"
     : "devguard-bot",
   enforceTheme: (process.env.ENFORCE_THEME || false) as
