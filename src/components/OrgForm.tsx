@@ -26,6 +26,7 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
         name="name"
         rules={{
           validate: (value) =>
+            // Allows every character as long as one letter or number is given.
             /[a-z0-9]/i.test(value ?? "") ||
             "The name must contain at least one letter or number.",
         }}
