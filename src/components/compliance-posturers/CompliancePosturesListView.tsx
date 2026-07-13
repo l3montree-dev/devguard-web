@@ -18,12 +18,6 @@ import Section from "@/components/common/Section";
 import Filter from "@/components/Filter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetcher } from "@/data-fetcher/fetcher";
@@ -39,6 +33,9 @@ import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
+import OscalDownloadModal from "./OscalDownloadModal";
+import { useState } from "react";
 
 const columnHelper = createColumnHelper<CompliancePostureWithControlDTO>();
 
@@ -190,9 +187,19 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     columnsDef,
     data: vulns?.data || [],
   });
+
+  const removeFilterAndClearStorage = (f: any) => {
+    localStorage.removeItem("compliance-framework-filter");
+    removeFilter(f);
+  };
+  const clearAllFiltersAndClearStorage = () => {
+    localStorage.removeItem("compliance-framework-filter");
+    clearAllFilters();
+  };
   const handleSearch = useDebouncedQuerySearch();
 
   const { branches, tags } = useAssetBranchesAndTags();
+  const [showOscalModal, setShowOscalModal] = useState(false);
 
   const params = useSearchParams();
   const pathname = usePathname();
@@ -259,21 +266,22 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       <div className="flex flex-row items-center justify-between">
         {asset && <BranchTagSelector branches={branches} tags={tags} />}
         <div className={"ml-auto"}>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span>
-                  <Button variant={"secondary"} disabled>
-                    <Download className="mr-2 h-4 w-4" />
-                    Export OSCAL
-                  </Button>
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>Coming soon</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <Button
+            variant="secondary"
+            onClick={() => setShowOscalModal(true)}
+            data-testid="download-oscal-format"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Download OSCAL
+          </Button>
         </div>
       </div>
+      <OscalDownloadModal
+        open={showOscalModal}
+        setOpen={setShowOscalModal}
+        oscalBaseUrl={`/api/devguard-tunnel/api/v1/` + apiBaseUrl + `oscal/`}
+        frameworks={frameworks}
+      />
       <Section
         forceVertical
         primaryHeadline
@@ -308,8 +316,8 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
               <Filter
                 options={filterOptions}
                 onFilter={handleFilter}
-                onRemoveFilter={removeFilter}
-                onClearAllFilters={clearAllFilters}
+                onRemoveFilter={removeFilterAndClearStorage}
+                onClearAllFilters={clearAllFiltersAndClearStorage}
                 search={{
                   onChange: handleSearch,
                   defaultValue: params?.get("search") ?? "",

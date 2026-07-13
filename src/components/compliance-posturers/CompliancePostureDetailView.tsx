@@ -353,9 +353,6 @@ const CompliancePostureDetailView = ({
     await deleteEvent(eventId);
     mutate();
   };
-
-  console.log("vuln", vuln);
-  console.log(vuln.additional?.mappedControls);
   return (
     <Page Menu={Menu} Title={Title} title={vuln.title}>
       <div className="flex flex-row gap-4">

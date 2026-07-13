@@ -20,19 +20,14 @@ const FrameworkSelect: FunctionComponent<Props> = ({ frameworks }) => {
   const FRAMEWORK_FILTER_KEY = "filterQuery[framework][is]";
   const ALL_FRAMEWORKS = "__all__";
   const LOCAL_STORAGE_KEY = "compliance-framework-filter";
-
   const searchParams = useSearchParams();
+
   const push = useRouterQuery();
   const [search, setSearch] = useState("");
 
-  const selected = searchParams?.get(FRAMEWORK_FILTER_KEY) ?? ALL_FRAMEWORKS;
-
-  useEffect(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved && saved !== ALL_FRAMEWORKS) {
-      push({ [FRAMEWORK_FILTER_KEY]: saved, page: 1 });
-    }
-  }, []);
+  const fromUrl = searchParams?.get(FRAMEWORK_FILTER_KEY);
+  const selectedFramework =
+    fromUrl ?? localStorage.getItem(LOCAL_STORAGE_KEY) ?? ALL_FRAMEWORKS;
 
   const filtered = frameworks.filter((f) =>
     f.toLowerCase().includes(search.toLowerCase()),
@@ -40,7 +35,7 @@ const FrameworkSelect: FunctionComponent<Props> = ({ frameworks }) => {
 
   return (
     <Select
-      value={selected}
+      value={selectedFramework}
       onValueChange={(value) => {
         if (value === ALL_FRAMEWORKS) {
           localStorage.removeItem(LOCAL_STORAGE_KEY);
