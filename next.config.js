@@ -3,6 +3,11 @@
 
 const isDev = process.env.NODE_ENV !== "production";
 
+// E2E tests run a production build but serve it over plain HTTP on localhost.
+// `upgrade-insecure-requests` (CSP) and HSTS would make the browser rewrite
+// every request to https://
+const partialE2E = process.env.E2E_TESTS === "true";
+
 // Extract the scheme+host (origin) of a configured URL so it can be added to
 // a CSP allow-list. Returns null for unset/invalid values.
 const toOrigin = (url) => {
@@ -67,7 +72,7 @@ const buildCsp = () => {
   const parts = Object.entries(directives).map(
     ([name, values]) => `${name} ${values.filter(Boolean).join(" ")}`,
   );
-  if (!isDev) parts.push("upgrade-insecure-requests");
+  if (!isDev && !partialE2E) parts.push("upgrade-insecure-requests");
   return parts.join("; ");
 };
 
@@ -91,8 +96,9 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
   },
-  // HSTS is only meaningful (and only honoured) over HTTPS
-  ...(isDev
+  // HSTS is only meaningful (and only honoured) over HTTPS, and is dropped for
+  // partial-E2E so the plain-HTTP test origin isn't pinned to https.
+  ...(isDev || partialE2E
     ? []
     : [
         {
@@ -110,6 +116,11 @@ if (securityHeadersEnabled) {
   console.log(
     "[security-headers] enabled — applying hardening headers to all routes",
   );
+  if (partialE2E) {
+    console.log(
+      "[security-headers] E2E_TESTS=true — omitting upgrade-insecure-requests and HSTS (plain-HTTP e2e)",
+    );
+  }
   const csp = securityHeaders.find(
     (h) => h.key === "Content-Security-Policy",
   );
