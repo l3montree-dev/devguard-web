@@ -24,12 +24,13 @@ import { OrgForm } from "./OrgForm";
 import { Button } from "./ui/button";
 
 import { toast } from "@/lib/toast";
-import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useUpdateSession } from "@/context/SessionContext";
 
-interface Props {}
+interface Props {
+  onHasInvitation?: () => void;
+}
 
-export default function OrgRegisterForm(props: Props) {
+export default function OrgRegisterForm({ onHasInvitation }: Props) {
   const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
 
@@ -62,6 +63,8 @@ export default function OrgRegisterForm(props: Props) {
 
     toast.success("Organization created successfully");
 
+    form.reset();
+
     localStorage.setItem("lastActiveOrg", orgDTO.slug);
     // move the user to the newly created organization
     setTimeout(() => router.push(`/${orgDTO.slug}`), 0);
@@ -75,7 +78,7 @@ export default function OrgRegisterForm(props: Props) {
       >
         <OrgForm />
 
-        <div className="-mt-4 flex items-center justify-end gap-x-6">
+        <div className="mt-6 flex items-center justify-end gap-x-6">
           <Button
             disabled={form.formState.isSubmitting}
             isSubmitting={form.formState.isSubmitting}
@@ -83,6 +86,15 @@ export default function OrgRegisterForm(props: Props) {
           >
             Create Organization
           </Button>
+        </div >
+        <div className="flex flex-row justify-end pt-2">
+         <button
+          className="text-xs cursor-pointer text-link"
+          type="button"
+          onClick={onHasInvitation}
+        >
+          Create Organization?
+        </button>
         </div>
       </form>
     </Form>
