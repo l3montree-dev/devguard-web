@@ -12,7 +12,7 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
   forceVertical = true,
 }) => {
   const activeOrg = useActiveOrg();
-  const orgID = activeOrg.id;
+  const orgID = activeOrg?.id;
 
   return (
     <Section
@@ -32,6 +32,7 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
             </FormItem>
           )}
         />
+        {activeOrg && (
         <InputWithButton
           label="Organization-ID"
           value={`${orgID}`}
@@ -40,6 +41,7 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
           copyable
           copyToastDescription="The organization ID has been copied to your clipboard."
         />
+        )}
       </div>
     </Section>
   );
