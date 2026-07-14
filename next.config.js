@@ -102,9 +102,9 @@ const securityHeaders = [
       ]),
 ];
 
-// Set SET_SECURITY_HEADERS=false to drop every
+// Set DISABLE_SECURITY_HEADERS=true to drop every
 // header below, e.g. when a reverse proxy already owns them.
-const securityHeadersEnabled = process.env.SET_SECURITY_HEADERS !== "false";
+const securityHeadersEnabled = process.env.DISABLE_SECURITY_HEADERS !== "true";
 
 if (securityHeadersEnabled) {
   console.log(
@@ -118,7 +118,7 @@ if (securityHeadersEnabled) {
   }
 } else {
   console.log(
-    "[security-headers] disabled via SET_SECURITY_HEADERS=false — no security headers will be sent",
+    "[security-headers] disabled via DISABLE_SECURITY_HEADERS=true — no security headers will be sent",
   );
 }
 
