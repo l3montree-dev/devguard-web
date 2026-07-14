@@ -4,6 +4,49 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.9.0] — 2026-07-14
+
+### Added
+
+- **Invitation status** — invitation status is now displayed, with the ability to revoke pending invitations
+- **Upstream VEX sync** — VEX rules page now syncs with upstream VEX data; VEX rule details dialog improved using `truncateMiddle` for long values
+- **Artifact-scoped CVSS badge** — badge preview now loads from the artifact-scoped endpoint
+- **Expiry date/time display** — added where relevant across the UI
+- **Bulk updates for code risks** — added selection support for bulk-updating code risks
+- **Asset names in downloads** — SBOM and VEX downloads now include asset names in the file name
+- **Minimum release age** — corrected interface and improved frontend validation for the min-release-age setting
+
+### Fixed
+
+- **Admin role management** — admins can now manage other admins
+- **Artifact input validation** — added input validation for artifacts
+- **Dashboard long names** — names are truncated and bars aligned on the dashboard; broken badge temporarily disabled
+- **VEX modal card borders** — restored upload card borders
+- **VEX external reference handling** — now uses URL as the primary key
+- **Auto setup / timeout** — timeout length and message improved for better UX
+- **Doc page link** — added missing link to documentation page
+- **Repository name in header** — long repository names are now truncated instead of overflowing
+- **Dependency graph** — expanded by default
+- **Copy button** — cursor now shows as a pointer
+- **Double toast** — duplicate toast notification removed
+- **Quick fixes** — corrected quick-fixes behaviour and reworked to a two-line view
+- **Asset name settings** — corrected interface and validation issues
+
+### Changed
+
+- **Dependencies** — npm packages updated; Nix flake updated to Node.js 26.04; removed `js recommended` lint config
+- **Cleanup** — removed stray console logs, removed the SBOM source type section
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@nicksan222](https://github.com/nicksan222)** (Nicholas Santi) — fixed VEX upload card borders and squashed a password-mismatch flash bug in the sign-up flow
+- **[@domzoric](https://github.com/domzoric)** — fixed the CVSS badge preview to load from the artifact-scoped endpoint
+- **[@khiem-nguyen-ict](https://github.com/khiem-nguyen-ict)** — fixed long repository names overflowing in the header
+
+---
+
 ## [v1.8.0] — 2026-07-01
 
 ### Added

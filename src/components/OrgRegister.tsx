@@ -62,6 +62,8 @@ export default function OrgRegisterForm(props: Props) {
 
     toast.success("Organization created successfully");
 
+    form.reset();
+
     localStorage.setItem("lastActiveOrg", orgDTO.slug);
     // move the user to the newly created organization
     setTimeout(() => router.push(`/${orgDTO.slug}`), 0);

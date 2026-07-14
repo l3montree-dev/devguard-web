@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import ProjectTitle from "./ProjectTitle";
 import { eventBus } from "@/events";
+import { truncateMiddle } from "@/utils/common";
 
 const AssetTitle = () => {
   const activeOrg = useActiveOrg();
@@ -63,7 +64,9 @@ const AssetTitle = () => {
         }
         title={asset?.name}
       >
-        <span className="truncate">{asset?.name}</span>
+        <span className="truncate">
+          {asset?.name ? truncateMiddle(asset.name) : ""}
+        </span>
         <Badge className="!text-header-foreground" variant="outline">
           Repository
         </Badge>

@@ -652,11 +652,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   return (
     <>
-      <div className="rounded-lg border shadow-sm bg-card p-4">
-        <h3 className="font-medium text-sm mb-3">SBOM Source Type</h3>
-        <SbomSourceTypeSelector form={form} />
-      </div>
-
       <FormField
         control={form.control}
         name="paranoidMode"

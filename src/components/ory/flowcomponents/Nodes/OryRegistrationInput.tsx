@@ -3,23 +3,31 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { OryNodeInputProps } from "@ory/elements-react";
 import { Label } from "@/components/ui/label";
-import {
-  CONFIRM_PASSWORD_LABEL,
-  PasswordField,
-  usePasswordMismatch,
-} from "../PasswordField";
+import { usePasswordMismatch } from "@/hooks/usePasswordMismatch";
+import { CONFIRM_PASSWORD_LABEL, PasswordField } from "../PasswordField";
 import { OryInput } from "./OryInput";
 
 export function OryRegistrationInput(props: OryNodeInputProps) {
   const { node, attributes, onClick } = props;
-  const { register } = useFormContext();
+  const {
+    register,
+    resetField,
+    formState: { isSubmitting },
+  } = useFormContext();
   const mismatch = usePasswordMismatch();
   const [confirmTouched, setConfirmTouched] = useState(false);
   const { value, name, autocomplete, maxlength, ...rest } = attributes;
+
+  useEffect(() => {
+    if (isSubmitting) {
+      resetField("confirmPassword");
+      setConfirmTouched(false);
+    }
+  }, [isSubmitting, resetField]);
 
   // Only the password field gets the extra confirmation field. Every other
   // node (email, name, hidden, csrf, …) renders exactly like the standard
@@ -30,7 +38,7 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
 
   // Show the mismatch error only once the confirm field has been touched, but
   // keep it watch-driven so it clears live as soon as the values match.
-  const showMismatch = confirmTouched && mismatch;
+  const showMismatch = !isSubmitting && confirmTouched && mismatch;
 
   return (
     <div className="flex flex-col gap-1">

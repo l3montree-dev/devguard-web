@@ -60,6 +60,9 @@ export default function VexDownloadModal({
     (artifacts ?? []).map((a) => a.artifactName),
   );
 
+  const jsonFileName = `${assetName}_vex.json`
+  const xmlFileName = `${assetName}_vex.xml`
+
   return (
     <Dialog open={showVexModal}>
       <DialogContent setOpen={setShowVexModal}>
@@ -123,6 +126,7 @@ export default function VexDownloadModal({
               />
             }
             label={"Download in JSON-Format"}
+            downloadFileName={jsonFileName}
           />
           <DelayedDownloadButton
             href={
@@ -133,6 +137,7 @@ export default function VexDownloadModal({
             }
             icon={<FileCode className="h-5 w-auto inline-block text-success" />}
             label={"Download in XML-Format"}
+            downloadFileName={xmlFileName}
           />
         </div>
         <hr className="mt-6" />
