@@ -27,11 +27,15 @@ export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
     return <span className="font-mono text-xs">{oldVersionPurl}</span>;
   }
 
-  const { name, version } = PackageURL.fromString(oldVersionPurl);
+  const { namespace, name, version } = PackageURL.fromString(oldVersionPurl);
+  const fullName = namespace ? `${namespace}/${name}` : name;
 
   if (newVersionPurl && isValidPackagePurl(newVersionPurl)) {
     const { version: newVer } = PackageURL.fromString(newVersionPurl);
-    const differences = diffChars(name + "@" + version, name + "@" + newVer);
+    const differences = diffChars(
+      fullName + "@" + version,
+      fullName + "@" + newVer,
+    );
 
     return (
       <div className="font-mono text-xs">
@@ -67,8 +71,10 @@ function renderQuickFixText(
   switch (type) {
     case "npm":
       return `npm install ${fullName}@${version}`;
-    case "golang":
-      return `go get ${fullName}@v${version}`;
+    case "golang": {
+      const goVersion = version?.startsWith("v") ? version : `v${version}`;
+      return `go get ${fullName}@${goVersion}`;
+    }
     case "pypi":
       return `pip install ${fullName}==${version}`;
     case "cargo":
@@ -168,25 +174,29 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
                 >
                   Resolve Vulnerability
                 </Badge>
-                <div className="flex flex-row gap-1 items-center">
-                  <span>Fix the vulnerability </span>
-                  <span className="font-semibold">{vuln.cveID}</span>
-                  <span> by upgrading from: </span>
-                  <span className="flex flex-row gap-2">
-                    <Badge className="font-mono" variant={"outline"}>
-                      {purlToDisplayString(vulnerabilityPath)}
-                    </Badge>
-                    <ArrowRight className="w-4" />
-                    <Badge
-                      variant={"outline"}
-                      className="font-mono scale-100 relative border-2"
-                    >
-                      <DiffHighlighter
-                        oldVersionPurl={vulnerabilityPath}
-                        newVersionPurl={fixedVersionPurl ?? ""}
-                      />
-                    </Badge>
-                  </span>
+                <div className="flex flex-col gap-1 items-left">
+                  <div className="flex flex-row gap-1">
+                    <span>Fix the vulnerability </span>
+                    <span className="font-semibold">{vuln.cveID}</span>
+                  </div>
+                  <div className="flex flex-row gap-1">
+                    <span> by upgrading from: </span>
+                    <span className="flex flex-row gap-2">
+                      <Badge className="font-mono" variant={"outline"}>
+                        {purlToDisplayString(vulnerabilityPath)}
+                      </Badge>
+                      <ArrowRight className="w-4" />
+                      <Badge
+                        variant={"outline"}
+                        className="font-mono scale-100 relative border-2"
+                      >
+                        <DiffHighlighter
+                          oldVersionPurl={vulnerabilityPath}
+                          newVersionPurl={fixedVersionPurl ?? ""}
+                        />
+                      </Badge>
+                    </span>
+                  </div>
                 </div>
                 <div className="mt-2 flex">
                   <CopyCode codeString={ecosystemUpdate} language="shell" />

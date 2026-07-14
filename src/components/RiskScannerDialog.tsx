@@ -445,7 +445,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
         );
         setTimedOut(true);
       }
-    }, 18000);
+    }, 300000);
 
     return () => clearTimeout(timer);
   }, [autosetup.isLoading]);

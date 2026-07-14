@@ -40,13 +40,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { osiLicenseHexColors } from "../../../../../../../../../../utils/view";
 import {
   Collapsible,
@@ -302,126 +295,106 @@ const Index: FunctionComponent = () => {
             docsUrl="https://docs.devguard.org/explanations/license-management/license-compliance/"
           />
         </div>
-        <Card className="px-4">
-          {/* License Distribution Radar Chart */}
-          <Collapsible className="my-2">
-            <CollapsibleTrigger className="flex w-full items-center justify-between p-2 cursor-pointer rounded-md transition-colors">
-              <h3 className="font-semibold">License Distribution</h3>
-              <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="my-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card className="bg-background">
-                  <CardHeader className="items-start pb-4">
-                    <CardTitle>Overview</CardTitle>
-                    <CardDescription>
-                      Distribution of {totalLicenses} dependencies by license
-                      type
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pb-0">
-                    {licensesLoading ? (
-                      <div className="flex items-center justify-center h-[250px]">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : radarChartData.length > 0 ? (
-                      <ChartContainer
-                        config={chartConfig}
-                        className="mx-auto max-h-[250px]"
-                      >
-                        <RadarChart data={radarChartData}>
-                          <ChartTooltip
-                            cursor={false}
-                            content={<ChartTooltipContent />}
-                          />
-                          <PolarAngleAxis dataKey="license" />
-                          <PolarGrid />
-                          <Radar
-                            dataKey="count"
-                            fill="hsl(var(--primary))"
-                            fillOpacity={0.6}
-                            dot={{
-                              r: 4,
-                              fillOpacity: 1,
-                            }}
-                          />
-                        </RadarChart>
-                      </ChartContainer>
-                    ) : (
-                      <div className="flex items-center justify-center h-[250px] text-muted-foreground">
-                        No license data available
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-background">
-                  <CardHeader>
-                    <CardTitle>Summary</CardTitle>
-                    <CardDescription>
-                      Quick overview of your license compliance status
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {licensesLoading ? (
-                      <div className="space-y-4">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-muted-foreground">
-                            Total Dependencies
-                          </span>
-                          <span className="text-sm font-semibold">
-                            <Badge variant="outline">{totalLicenses}</Badge>
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs text-muted-foreground">
-                            Unique Licenses
-                          </span>
-                          <span className="text-sm font-semibold">
-                            <Badge variant="outline">
-                              {licenses?.length ?? 0}
-                            </Badge>
-                          </span>
-                        </div>
-                        {unknownCount > 0 && (
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs text-muted-foreground">
-                              Unknown/Unasserted Licenses
-                            </span>
-                            <span className="text-sm font-semibold">
-                              <Badge variant="yellow">{unknownCount}</Badge>
-                            </span>
-                          </div>
-                        )}
-                        <div className="mt-6">
-                          <span className="text-xs text-muted-foreground mb-3 block">
-                            Top Licenses
-                          </span>
-                          <div className="flex flex-wrap gap-2">
-                            {radarChartData.slice(0, 10).map((item) => (
-                              <Badge
-                                key={item.license}
-                                variant={item.isRisky ? "yellow" : "outline"}
-                              >
-                                {item.license}: {item.count}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+        <Collapsible className="my-2">
+          <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between rounded-md transition-colors">
+            <h3 className="font-semibold">License Distribution</h3>
+            <CaretDownIcon className="h-5 w-5 text-muted-foreground transition-transform duration-200 [[data-state=closed]_&]:rotate-[-90deg]" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="my-4">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              <div>
+                <h4 className="text-sm font-medium">Overview</h4>
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Distribution of {totalLicenses} dependencies by license type
+                </p>
+                {licensesLoading ? (
+                  <div className="flex h-[250px] items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : radarChartData.length > 0 ? (
+                  <ChartContainer
+                    config={chartConfig}
+                    className="mx-auto max-h-[250px]"
+                  >
+                    <RadarChart data={radarChartData}>
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent />}
+                      />
+                      <PolarAngleAxis dataKey="license" />
+                      <PolarGrid />
+                      <Radar
+                        dataKey="count"
+                        fill="hsl(var(--primary))"
+                        fillOpacity={0.6}
+                        dot={{
+                          r: 4,
+                          fillOpacity: 1,
+                        }}
+                      />
+                    </RadarChart>
+                  </ChartContainer>
+                ) : (
+                  <div className="flex h-[250px] items-center justify-center text-muted-foreground">
+                    No license data available
+                  </div>
+                )}
               </div>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
+
+              <div>
+                <h4 className="text-sm font-medium">Summary</h4>
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Quick overview of your license compliance status
+                </p>
+                {licensesLoading ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        Total Dependencies
+                      </span>
+                      <Badge variant="outline">{totalLicenses}</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        Unique Licenses
+                      </span>
+                      <Badge variant="outline">{licenses?.length ?? 0}</Badge>
+                    </div>
+                    {unknownCount > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-muted-foreground">
+                          Unknown/Unasserted Licenses
+                        </span>
+                        <Badge variant="yellow">{unknownCount}</Badge>
+                      </div>
+                    )}
+                    <div className="mt-6">
+                      <span className="mb-3 block text-xs text-muted-foreground">
+                        Top Licenses
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {radarChartData.slice(0, 10).map((item) => (
+                          <Badge
+                            key={item.license}
+                            variant={item.isRisky ? "yellow" : "outline"}
+                          >
+                            {item.license}: {item.count}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
         <div className="relative flex flex-col gap-2">
           <Tabs
             defaultValue={
