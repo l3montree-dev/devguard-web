@@ -21,11 +21,18 @@ import { Form } from "./ui/form";
 
 import { InvitationForm } from "@/components/InvitationForm";
 import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
 
-import { toast } from "@/lib/toast"; 
+import { toast } from "@/lib/toast";
 
 interface Props {
-  onOrgSwitchToggle?: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 interface InvitationFormValues {
@@ -47,7 +54,7 @@ const extractInvitationCode = (input: string): string | undefined => {
   }
 };
 
-export default function AcceptInvitationForm({ onOrgSwitchToggle }: Props) {
+export default function AcceptInvitationDialog({ isOpen, onOpenChange }: Props) {
   const form = useForm<InvitationFormValues>();
 
   const router = useRouter();
@@ -84,38 +91,37 @@ export default function AcceptInvitationForm({ onOrgSwitchToggle }: Props) {
     toast.success("Successfully joined the organization");
 
     form.reset();
+    onOpenChange(false);
 
     localStorage.setItem("lastActiveOrg", slug);
     router.replace(`/${slug}`);
   };
 
   return (
-    <Form {...form}>
-      <form
-        className="text-black dark:text-white"
-        onSubmit={form.handleSubmit(handleJoinOrganization)}
-      >
-         <InvitationForm />
-
-        <div className="mt-6 flex items-center justify-end gap-x-6">
-          <Button
-            disabled={form.formState.isSubmitting}
-            isSubmitting={form.formState.isSubmitting}
-            type="submit"
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Join an Organization</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            className="text-black dark:text-white"
+            onSubmit={form.handleSubmit(handleJoinOrganization)}
           >
-            Join Organization
-          </Button>
-        </div >
-        <div className="flex flex-row justify-end pt-2">
-         <button
-          className="text-xs cursor-pointer text-link"
-          type="button"
-          onClick={onOrgSwitchToggle}
-        >
-          Create an Organization?
-        </button>
-        </div>
-      </form>
-    </Form>
+            <InvitationForm />
+
+            <div className="-mt-6 flex items-center justify-end gap-x-6">
+              <Button
+                disabled={form.formState.isSubmitting}
+                isSubmitting={form.formState.isSubmitting}
+                type="submit"
+              >
+                Join Organization
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

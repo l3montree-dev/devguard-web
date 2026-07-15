@@ -15,6 +15,7 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import type { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 
 import { browserApiClient } from "@/services/devGuardApi";
@@ -22,17 +23,15 @@ import { Form } from "./ui/form";
 
 import { OrgForm } from "./OrgForm";
 import { Button } from "./ui/button";
+import AcceptInvitationDialog from "./AcceptInvitationDialog";
 
 import { toast } from "@/lib/toast";
 import { useUpdateSession } from "@/context/SessionContext";
 
-interface Props {
-  onOrgSwitchToggle?: () => void;
-}
-
-export default function OrgRegisterForm({ onOrgSwitchToggle }: Props) {
+export default function OrgRegisterForm() {
   const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
+  const [acceptInvitationOpen, setAcceptInvitationOpen] = useState(false);
 
   const router = useRouter();
   const handleOrgCreation = async (data: OrganizationDTO) => {
@@ -78,7 +77,14 @@ export default function OrgRegisterForm({ onOrgSwitchToggle }: Props) {
       >
         <OrgForm />
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
+        <div className="mt-6 flex items-center justify-end gap-x-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setAcceptInvitationOpen(true)}
+          >
+            Join Organization
+          </Button>
           <Button
             disabled={form.formState.isSubmitting}
             isSubmitting={form.formState.isSubmitting}
@@ -87,16 +93,11 @@ export default function OrgRegisterForm({ onOrgSwitchToggle }: Props) {
             Create Organization
           </Button>
         </div >
-        <div className="flex flex-row justify-end pt-2">
-         <button
-          className="text-xs cursor-pointer text-link"
-          type="button"
-          onClick={onOrgSwitchToggle}
-        >
-          Have an Invitation?
-        </button>
-        </div>
       </form>
+      <AcceptInvitationDialog
+        isOpen={acceptInvitationOpen}
+        onOpenChange={setAcceptInvitationOpen}
+      />
     </Form>
   );
 }
