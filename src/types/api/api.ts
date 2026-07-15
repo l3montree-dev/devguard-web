@@ -1031,6 +1031,7 @@ export type ExternalReference = {
   assetVersionName: string;
   url: string;
   type: "cyclonedxvex" | "csaf";
+  error: string | null;
 };
 
 export type OrgStructure = {

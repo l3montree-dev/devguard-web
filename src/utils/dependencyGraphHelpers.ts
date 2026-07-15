@@ -415,7 +415,7 @@ export const autoExpandToMinimum = (
   childrenLimitMap: Map<string, number>,
 ): Set<string> => {
   const expanded = new Set<string>();
-  expanded.add(tree.name);
+  expanded.add(tree.id);
 
   let visibleCount = 1; // Start with root
   const queue: ViewDependencyTreeNode[] = [tree];

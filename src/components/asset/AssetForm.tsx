@@ -171,7 +171,7 @@ export const AssetSettingsForm: FunctionComponent<
               onOpenChange={setMemberDialogOpen}
             />
             <div className="flex flex-row justify-end">
-              <Button onClick={() => setMemberDialogOpen(true)}>
+              <Button type="button" onClick={() => setMemberDialogOpen(true)}>
                 Add Member
               </Button>
             </div>

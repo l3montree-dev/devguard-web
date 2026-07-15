@@ -539,16 +539,23 @@ const PublicUrlsSection: FunctionComponent<{
 }> = ({ devguardApiUrl, orgSlug, copyable, basePath }) => {
   const urls = [
     {
-      label: "VeX-URL (Always up to date vulnerability information)",
+      label: "VeX-URL (Always up to date vulnerability information in CycloneDX Format)",
       nameKey: "vex-url",
       value: basePath ? `${basePath}/vex.json/` : "",
       copyToastDescription: "The VeX-URL has been copied to your clipboard.",
+    },
+        {
+      label:
+        "OpenVex-URL (Always up to date vulnerability information in OpenVex format)",
+      nameKey: "openvex-url",
+      value: `${basePath}/openvex.json/`,
+      copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
       label:
         "CSAF-URL (Always up to date vulnerability information in CSAF format)",
       nameKey: "csaf-url",
-      value: `${devguardApiUrl}/api/v1/organizations/${orgSlug}/csaf/provider-metadata.json/`,
+      value: `${basePath}/csaf.json/`,
       copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
@@ -645,11 +652,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   return (
     <>
-      <div className="rounded-lg border shadow-sm bg-card p-4">
-        <h3 className="font-medium text-sm mb-3">SBOM Source Type</h3>
-        <SbomSourceTypeSelector form={form} />
-      </div>
-
       <FormField
         control={form.control}
         name="paranoidMode"
