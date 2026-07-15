@@ -717,28 +717,6 @@ export interface CompliancePostureWithControlDTO {
   }[];
 }
 
-export interface ComplianceRiskDTO {
-  id: string;
-  assetVersionName: string;
-  assetId: string;
-  artifacts: ArtifactDTO[];
-  policyId: string;
-  policyTitle: string;
-  policyDescription: string | null;
-  policyRelatedResources: string[];
-  policyTags: string[];
-  policyPriority: number;
-  policyFrameworks: PolicyFrameworks[];
-  state: BaseVulnDTO["state"];
-  createdAt: string; // ISO (Go time.Time)
-  ticketId: string | null;
-  ticketUrl: string | null;
-  manualTicketCreation: boolean;
-  message: string;
-  evidenceType: string;
-  violations: string[];
-}
-
 export interface DetailedComplianceRiskDTO extends CompliancePostureWithControlDTO {
   events: VulnEventDTO[];
 }
