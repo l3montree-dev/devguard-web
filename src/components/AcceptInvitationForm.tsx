@@ -1,4 +1,4 @@
-// Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
+// Copyright (C) 2026 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
@@ -15,68 +15,87 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import type { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 
 import { browserApiClient } from "@/services/devGuardApi";
 import { Form } from "./ui/form";
 
-import { OrgForm } from "./OrgForm";
+import { InvitationForm } from "@/components/InvitationForm";
 import { Button } from "./ui/button";
 
-import { toast } from "@/lib/toast";
-import { useUpdateSession } from "@/context/SessionContext";
+import { toast } from "@/lib/toast"; 
 
 interface Props {
   onOrgSwitchToggle?: () => void;
 }
 
-export default function OrgRegisterForm({ onOrgSwitchToggle }: Props) {
-  const updateSession = useUpdateSession();
-  const form = useForm<OrganizationDTO>();
+interface InvitationFormValues {
+  "invitation-url": string;
+}
+
+const extractInvitationCode = (input: string): string | undefined => {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  try {
+    const url = new URL(trimmed);
+    const code = url.searchParams.get("code");
+    return code ?? undefined;
+  } catch {
+    return trimmed;
+  }
+};
+
+export default function AcceptInvitationForm({ onOrgSwitchToggle }: Props) {
+  const form = useForm<InvitationFormValues>();
 
   const router = useRouter();
-  const handleOrgCreation = async (data: OrganizationDTO) => {
-    const resp = await browserApiClient("/organizations/", {
-      method: "POST",
-      body: JSON.stringify({
-        ...data,
-        numberOfEmployees: !!data.numberOfEmployees
-          ? Number(data.numberOfEmployees)
-          : undefined,
-      }),
-    });
 
-    if (resp.status !== 200) {
-      toast.error("Could not create organization", {
-        description:
-          "Organization creation is currently disabled or an error occurred. Please contact your administrator.",
+  const handleJoinOrganization = async (data: InvitationFormValues) => {
+    const code = extractInvitationCode(data["invitation-url"]);
+
+    if (!code) {
+      form.setError("invitation-url", {
+        type: "manual",
+        message: "Please enter a valid invitation url or code.",
       });
       return;
     }
 
-    const orgDTO: OrganizationDetailsDTO = await resp.json();
+    const resp = await browserApiClient("/accept-invitation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code }),
+    });
 
-    updateSession((prev) => ({
-      ...prev,
-      organizations: [...prev.organizations, orgDTO],
-    }));
+    if (!resp.ok) {
+      toast.error("Could not accept invitation", {
+        description:
+          "The invitation code is invalid or bound to a different account. Please check the code and make sure you are logged in with the correct account.",
+      });
+      return;
+    }
 
-    toast.success("Organization created successfully");
+    const { slug } = await resp.json();
+
+    toast.success("Successfully joined the organization");
 
     form.reset();
 
-    localStorage.setItem("lastActiveOrg", orgDTO.slug);
-    // move the user to the newly created organization
-    setTimeout(() => router.push(`/${orgDTO.slug}`), 0);
+    localStorage.setItem("lastActiveOrg", slug);
+    router.replace(`/${slug}`);
   };
 
   return (
     <Form {...form}>
       <form
         className="text-black dark:text-white"
-        onSubmit={form.handleSubmit(handleOrgCreation)}
+        onSubmit={form.handleSubmit(handleJoinOrganization)}
       >
-        <OrgForm />
+         <InvitationForm />
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
           <Button
@@ -84,7 +103,7 @@ export default function OrgRegisterForm({ onOrgSwitchToggle }: Props) {
             isSubmitting={form.formState.isSubmitting}
             type="submit"
           >
-            Create Organization
+            Join Organization
           </Button>
         </div >
         <div className="flex flex-row justify-end pt-2">
@@ -93,7 +112,7 @@ export default function OrgRegisterForm({ onOrgSwitchToggle }: Props) {
           type="button"
           onClick={onOrgSwitchToggle}
         >
-          Have an Invitation?
+          Create an Organization?
         </button>
         </div>
       </form>

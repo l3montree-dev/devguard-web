@@ -20,6 +20,8 @@ import { useSession } from "../../../context/SessionContext";
 import { redirect } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useInstanceSettings } from "@/hooks/useInstanceSettings";
+import { useState } from "react";
+import AcceptInvitationForm from "@/components/AcceptInvitationForm";
 
 const Lanyard = dynamic(
   () => import("@/components/misc/Lanyard").then((mod) => mod.default),
@@ -37,6 +39,8 @@ export default function SetupOrg() {
     redirect("/join");
   }
 
+  const [acceptInvitation, setAcceptInvitation] = useState<boolean>(false);
+
   return (
     <Page title="Setup Your Organization">
       <div className="">
@@ -49,11 +53,15 @@ export default function SetupOrg() {
           <div className="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-24">
             <div className="mx-auto max-w-xl lg:mr-0 lg:max-w-lg">
               <h2 className="text-3xl font-bold text-foreground">
-                Create your VIP-Area in the
+                {acceptInvitation ? "Join your team in the" : "Create your VIP-Area in the"}
                 <br />
                 DevGuard Universe
               </h2>
-              <OrgRegisterForm />
+              {acceptInvitation ? (
+                <AcceptInvitationForm onOrgSwitchToggle={() => setAcceptInvitation(false)} />
+              ) : (
+                <OrgRegisterForm onOrgSwitchToggle={() => setAcceptInvitation(true)} />
+              )}
             </div>
           </div>
         </div>
