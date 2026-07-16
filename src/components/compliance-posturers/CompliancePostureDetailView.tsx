@@ -6,6 +6,7 @@ import { browserApiClient } from "@/services/devGuardApi";
 import type {
   AssetDTO,
   AssetVersionDTO,
+  ComplianceComponentDetailsDTO,
   DetailedComplianceRiskDTO,
   OrganizationDetailsDTO,
   ProjectDTO,
@@ -14,7 +15,10 @@ import type {
 import Image from "next/image";
 
 import AuthGuard from "@/components/AuthGuard";
+import AddComplianceComponentStatementDialog from "@/components/compliance-posturers/AddComplianceComponentStatementDialog";
+import ComplianceComponentIcon from "@/components/compliance-posturers/ComplianceComponentIcon";
 import { TokenizedText } from "@/components/compliance-posturers/TokenizedText";
+import ListItem from "@/components/common/ListItem";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { useSession } from "@/context/SessionContext";
@@ -59,6 +63,16 @@ export function importanceVariant(value: string): BadgeVariant {
     if (n < 9) return "HIGH";
     return "CRITICAL";
   }
+  return "LOW";
+}
+
+export function implementationStatusVariant(value: string): BadgeVariant {
+  const lower = value.toLowerCase();
+  if (lower === "implemented") return "LOW";
+  if (lower === "partial") return "MEDIUM";
+  if (lower === "planned") return "MEDIUM";
+  if (lower === "alternative") return "MEDIUM";
+  if (lower === "not applicable") return "LOW";
   return "LOW";
 }
 
@@ -190,6 +204,26 @@ const CompliancePostureDetailView = ({
     fetcher,
   );
 
+  const { data: availableComponents } = useSWR<ComplianceComponentDetailsDTO[]>(
+    vuln
+      ? `/compliance-components/?filterQuery[frameworkControlId][is]=${encodeURIComponent(vuln.frameworkControlId)}`
+      : null,
+    fetcher,
+  );
+
+  const attachedComponentIds = useMemo(
+    () => (vuln?.byComponents ?? []).map((s) => s.complianceComponentId),
+    [vuln?.byComponents],
+  );
+
+  const hasAttachableComponents = useMemo(
+    () =>
+      (availableComponents ?? []).some(
+        (c) => !attachedComponentIds.includes(c.uuid),
+      ),
+    [availableComponents, attachedComponentIds],
+  );
+
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -202,6 +236,34 @@ const CompliancePostureDetailView = ({
     undefined,
   );
   const deleteEvent = useDeleteEvent();
+  const [showAddComponent, setShowAddComponent] = useState(false);
+
+  const handleDeleteStatement = async (statementId: string) => {
+    const resp = await browserApiClient(
+      `${apiBaseUrl}components/${statementId}/`,
+      {
+        method: "DELETE",
+      },
+    );
+    if (!resp.ok) {
+      toast("Failed to remove component", {
+        description: "Please try again later.",
+      });
+      return;
+    }
+    mutate(
+      (current) =>
+        current
+          ? {
+              ...current,
+              byComponents: current.byComponents.filter(
+                (s) => s.id !== statementId,
+              ),
+            }
+          : current,
+      { revalidate: false },
+    );
+  };
 
   const integrationName = useMemo(
     () =>
@@ -440,6 +502,128 @@ const CompliancePostureDetailView = ({
                 </div>
               )}
 
+              {availableComponents && availableComponents.length > 0 && (
+                <>
+                  <div className="my-8">
+                    {hasAttachableComponents && (
+                      <ListItem
+                        Button={
+                          <AuthGuard require="member">
+                            <Button
+                              variant="secondary"
+                              onClick={() => setShowAddComponent(true)}
+                            >
+                              Attach Component
+                            </Button>
+                          </AuthGuard>
+                        }
+                        Description={
+                          <div>
+                            <span>
+                              Components you are using that implement this
+                              control, and their implementation status.
+                            </span>
+
+                            {
+                              <div className="flex mt-2 flex-wrap gap-2">
+                                {availableComponents.map((c) => {
+                                  const claim = c.implementedControls.find(
+                                    (ic) =>
+                                      ic.frameworkControlId ===
+                                      vuln.frameworkControlId,
+                                  );
+                                  return (
+                                    <Tooltip key={c.uuid}>
+                                      <TooltipTrigger asChild>
+                                        <Badge
+                                          variant="outline"
+                                          className="flex cursor-help flex-row items-center gap-1.5"
+                                        >
+                                          <ComplianceComponentIcon
+                                            title={c.title}
+                                            className="h-3.5 -ml-1 w-3.5"
+                                          />
+                                          {c.title}
+                                        </Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        {claim?.description ?? c.description}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  );
+                                })}
+                              </div>
+                            }
+                          </div>
+                        }
+                        Title="Components"
+                      />
+                    )}
+
+                    {vuln.byComponents && vuln.byComponents.length > 0 && (
+                      <div className="flex mt-2 flex-col gap-2">
+                        {vuln.byComponents.map((statement) => (
+                          <ListItem
+                            key={statement.id}
+                            Title={
+                              <span className="flex flex-row items-center gap-2">
+                                <ComplianceComponentIcon
+                                  title={statement.complianceComponentTitle}
+                                />
+                                {statement.complianceComponentTitle}
+                                <FlatBadge
+                                  variant={implementationStatusVariant(
+                                    statement.implementationStatus,
+                                  )}
+                                >
+                                  {statement.implementationStatus.toUpperCase()}
+                                </FlatBadge>
+                              </span>
+                            }
+                            Description={statement.description}
+                            Button={
+                              <AuthGuard require="member">
+                                <AsyncButton
+                                  variant="ghost"
+                                  onClick={() =>
+                                    handleDeleteStatement(statement.id)
+                                  }
+                                >
+                                  Remove
+                                </AsyncButton>
+                              </AuthGuard>
+                            }
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <AddComplianceComponentStatementDialog
+                    open={showAddComponent}
+                    setOpen={setShowAddComponent}
+                    apiBaseUrl={apiBaseUrl}
+                    frameworkControlId={vuln.frameworkControlId}
+                    attachedComponentIds={(vuln.byComponents ?? []).map(
+                      (s) => s.complianceComponentId,
+                    )}
+                    onCreated={(statement) =>
+                      mutate(
+                        (current) =>
+                          current
+                            ? {
+                                ...current,
+                                byComponents: [
+                                  ...(current.byComponents ?? []),
+                                  statement,
+                                ],
+                              }
+                            : current,
+                        { revalidate: false },
+                      )
+                    }
+                  />
+                </>
+              )}
               <AuthGuard require="member">
                 <div>
                   <Card>

@@ -26,13 +26,15 @@ import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import useTable from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
-import { Loader2, Download } from "lucide-react";
+import { Loader2, Download, Component } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import OscalDownloadModal from "./OscalDownloadModal";
 import { useState } from "react";
@@ -55,6 +57,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const asset = useActiveAsset();
+  const org = useActiveOrg();
 
   const activeFrameworkFilter = useMemo(() => {
     if (!searchParams) return null;
@@ -233,7 +236,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       },
       {
         label: "Control ID",
-        value: "controlId",
+        value: "control_id",
         operators: [
           { value: "is" },
           { value: "is not" },
@@ -265,7 +268,15 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     <Page Menu={Menu} title={"Compliance Postures"} Title={Title}>
       <div className="flex flex-row items-center justify-between">
         {asset && <BranchTagSelector branches={branches} tags={tags} />}
-        <div className={"ml-auto"}>
+        <div className="ml-auto flex flex-row gap-2">
+          {org && (
+            <Link href={`/${org.slug}/compliance-postures/components`}>
+              <Button variant="secondary">
+                <Component className="mr-2 h-4 w-4" />
+                See all components
+              </Button>
+            </Link>
+          )}
           <Button
             variant="secondary"
             onClick={() => setShowOscalModal(true)}
