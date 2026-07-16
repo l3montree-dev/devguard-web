@@ -147,6 +147,12 @@ export const eventTypeMessages = (
     case "falsePositive":
       message = "marked " + flawName + " as false positive";
       break;
+    case "implemented":
+      message = "marked " + flawName + " as implemented";
+      break;
+    case "notApplicable":
+      message = "marked " + flawName + " as not applicable";
+      break;
     case "rawRiskAssessmentUpdated": {
       const oldRisk = event.arbitraryJSONData.oldRisk;
       if (events === undefined || (!oldRisk && oldRisk !== 0)) {
@@ -173,6 +179,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   fixed: "bg-success text-success-foreground!",
   detected: "bg-destructive text-destructive-foreground!",
   falsePositive: "bg-info text-info-foreground!",
+  notApplicable: "bg-info text-info-foreground!",
+  implemented: "bg-success text-success-foreground!",
   mitigate: "bg-success text-success-foreground!",
   markedForTransfer: "bg-info text-info-foreground!",
   rawRiskAssessmentUpdated: "bg-secondary text-secondary-foreground!",

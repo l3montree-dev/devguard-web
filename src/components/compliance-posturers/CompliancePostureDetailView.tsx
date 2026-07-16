@@ -1,0 +1,1018 @@
+"use client";
+
+import Page from "@/components/Page";
+
+import { browserApiClient } from "@/services/devGuardApi";
+import type {
+  AssetDTO,
+  AssetVersionDTO,
+  DetailedComplianceRiskDTO,
+  OrganizationDetailsDTO,
+  ProjectDTO,
+  VulnEventDTO,
+} from "@/types/api/api";
+import Image from "next/image";
+
+import AuthGuard from "@/components/AuthGuard";
+import { TokenizedText } from "@/components/compliance-posturers/TokenizedText";
+import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import { AsyncButton, Button } from "@/components/ui/button";
+import { useSession } from "@/context/SessionContext";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveProject } from "@/hooks/useActiveProject";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { useMemo, useState } from "react";
+
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+type BadgeVariant = "CRITICAL" | "MEDIUM" | "LOW" | "HIGH";
+
+function securityLevelVariant(value: string): BadgeVariant {
+  if (value === "erhöht") return "MEDIUM";
+  return "LOW";
+}
+
+function effortLevelVariant(value: string | number): BadgeVariant {
+  const n = Number(value);
+  if (n <= 1) return "LOW";
+  if (n <= 3) return "MEDIUM";
+  return "CRITICAL";
+}
+
+export function importanceVariant(value: string): BadgeVariant {
+  const lower = value.toLowerCase();
+  if (lower === "muss") return "CRITICAL";
+  if (lower === "sollte") return "MEDIUM";
+  // check if we can parse it as a number
+  const n = Number(value);
+  if (!isNaN(n)) {
+    if (n <= 3) return "LOW";
+    if (n <= 6) return "MEDIUM";
+    if (n < 9) return "HIGH";
+    return "CRITICAL";
+  }
+  return "LOW";
+}
+
+import Err from "@/components/common/Err";
+import VulnState from "@/components/common/VulnState";
+import GitProviderIcon from "@/components/GitProviderIcon";
+import EditorSkeleton from "@/components/risk-assessment/EditorSkeleton";
+import RiskAssessmentFeedSkeleton from "@/components/risk-assessment/RiskAssessmentFeedSkeleton";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
+import { ChevronRightIcon } from "lucide-react";
+import dynamic from "next/dynamic";
+import { toast } from "sonner";
+import useSWR from "swr";
+import FrameworkIcon from "./FrameworkIcon";
+
+import useDecodedParams from "@/hooks/useDecodedParams";
+import Callout from "../common/Callout";
+import { FlatBadge } from "../common/Severity";
+
+const MarkdownEditor = dynamic(
+  () => import("@/components/common/MarkdownEditor"),
+  { ssr: false },
+);
+
+function MappedControlsGroup({
+  framework,
+  controlIds,
+}: {
+  framework: string;
+  controlIds: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen} className="mb-2 w-full">
+      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
+        <ChevronRightIcon
+          className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`}
+        />
+
+        <span className="text-start">{framework}</span>
+        <span className="ml-1 text-xs text-muted-foreground whitespace-nowrap">
+          ({controlIds.length})
+        </span>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-1 flex flex-wrap">
+        {controlIds.map((id) => (
+          <Badge key={id} variant="secondary" className="mr-2 mb-2">
+            {id}
+          </Badge>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+interface Props {
+  apiBaseUrl: string;
+  vulnId: string;
+  Menu?: any[];
+  Title?: ReactNode;
+  showTicketCreation?: boolean;
+}
+
+const InheritedHandlingWarning = (
+  vuln: DetailedComplianceRiskDTO,
+  assetVersionName: AssetVersionDTO | undefined,
+  asset: AssetDTO | undefined,
+  project: ProjectDTO | undefined,
+  orgId: OrganizationDetailsDTO | undefined,
+) => {
+  if (
+    assetVersionName != null &&
+    asset != null &&
+    !vuln.assetVersionName &&
+    !vuln.assetId &&
+    vuln.events.length > 0
+  )
+    return (
+      <div className="mt-4">
+        <Callout intent="warning">
+          This compliance posture was handled at a higher level (project or
+          organization) and has been inherited here. Any changes you make will
+          only apply to this asset and all its children, and will not affect the
+          original handling at the higher level.
+        </Callout>
+      </div>
+    );
+  if (project != null && !vuln.projectId && vuln.events.length > 0)
+    return (
+      <div className="mt-4">
+        <Callout intent="warning">
+          This compliance posture was handled at the organization level and has
+          been inherited here. Any changes you make will only apply to this
+          project and all its children, and will not affect the
+          organization-level handling.
+        </Callout>
+      </div>
+    );
+};
+
+const CompliancePostureDetailView = ({
+  apiBaseUrl,
+  vulnId,
+  Menu,
+  Title,
+}: Props) => {
+  const {
+    data: vuln,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<DetailedComplianceRiskDTO>(
+    vulnId ? `${apiBaseUrl}${vulnId}/` : null,
+    fetcher,
+  );
+
+  const activeOrg = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
+  const { session } = useSession();
+  const params = useDecodedParams();
+  const { assetSlug, projectSlug } = params;
+
+  const [justification, setJustification] = useState<string | undefined>(
+    undefined,
+  );
+  const deleteEvent = useDeleteEvent();
+
+  const integrationName = useMemo(
+    () =>
+      getIntegrationNameFromRepositoryIdOrExternalProviderId(asset, project),
+    [asset, project],
+  );
+
+  if (isLoading || !vuln) {
+    return (
+      <Page title="Loading...">
+        <div className="grid grid-cols-4 gap-4">
+          <div className="col-span-3">
+            <Skeleton className="w-64 h-10" />
+            <Skeleton className="w-full mt-4 h-20" />
+            <div className="mt-4 flex flex-row gap-2">
+              <Skeleton className="w-20 h-4" />
+              <Skeleton className="w-20 h-4" />
+            </div>
+            <Skeleton className="w-full mt-10 mb-16 h-[200px]" />
+            <RiskAssessmentFeedSkeleton />
+            <div>
+              <EditorSkeleton />
+            </div>
+          </div>
+          <div className="border-l col-span-1 flex-col pl-4">
+            <Skeleton className="w-full h-[200px]" />
+          </div>
+        </div>
+      </Page>
+    );
+  }
+
+  if (error) {
+    return (
+      <Page title="Error Loading Vulnerability">
+        <Err />
+      </Page>
+    );
+  }
+
+  const handleSubmit = async (data: {
+    status?: VulnEventDTO["type"];
+    justification?: string;
+    mechanicalJustification?: string;
+  }) => {
+    if (data.status === undefined) {
+      return;
+    }
+
+    if (!Boolean(data.justification)) {
+      return toast("Please provide a justification", {
+        description: "You need to provide a justification for your decision.",
+      });
+    }
+
+    const optimisticState =
+      data.status === "implemented"
+        ? "implemented"
+        : data.status === "notApplicable"
+          ? "notApplicable"
+          : data.status === "reopened"
+            ? "open"
+            : data.status === "comment"
+              ? vuln.state
+              : undefined;
+
+    const optimisticEvent =
+      optimisticState !== undefined
+        ? ({
+            type: data.status,
+            id: "optimistic",
+            createdAt: new Date().toISOString(),
+            justification: data.justification ?? "",
+            mechanicalJustification: data.mechanicalJustification ?? "",
+            userId: session?.identity.id ?? "",
+            vulnType: "compliancePosture",
+            originalAssetVersionName: assetVersion?.name ?? "",
+          } as VulnEventDTO)
+        : undefined;
+
+    const mutatePromise = mutate(
+      async (current) => {
+        let json: any;
+        if (data.status === "mitigate") {
+          const resp = await browserApiClient(
+            `${apiBaseUrl}${vuln.frameworkControlId}/mitigate`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ comment: data.justification }),
+            },
+          );
+          json = await resp.json();
+        } else {
+          const resp = await browserApiClient(
+            `${apiBaseUrl}${vuln.frameworkControlId}/`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            },
+          );
+          json = await resp.json();
+        }
+
+        if (!json.events) {
+          toast("Failed to update vulnerability", {
+            description: "Please try again later.",
+          });
+          throw new Error("Failed to update vulnerability");
+        }
+
+        return {
+          ...current!,
+          ...json,
+          events: current!.events.concat([json.events.slice(-1)[0]]),
+        };
+      },
+      {
+        optimisticData: optimisticState
+          ? {
+              ...vuln,
+              state: optimisticState,
+              events: (vuln.events ?? []).concat(
+                optimisticEvent ? [optimisticEvent] : [],
+              ),
+            }
+          : undefined,
+        rollbackOnError: true,
+        revalidate: false,
+      },
+    );
+
+    if (optimisticState !== undefined) {
+      mutatePromise
+        .then(() =>
+          toast("Saved", { description: "Changes confirmed by server." }),
+        )
+        .catch(() => {});
+      setJustification("");
+      return true;
+    }
+
+    await mutatePromise;
+    setJustification("");
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    await deleteEvent(eventId);
+    mutate();
+  };
+  return (
+    <Page Menu={Menu} Title={Title} title={vuln.title}>
+      <div className="flex flex-row gap-4">
+        <div className="flex-1">
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-3">
+              <div className="flex flex-row items-start justify-between gap-4">
+                <h1 className="text-2xl font-semibold">{vuln.title}</h1>
+              </div>
+              <div className="mt-4 text-muted-foreground">
+                <TokenizedText
+                  text={vuln.description?.replaceAll("\n", "\n\n") ?? ""}
+                  definitions={
+                    vuln.additional?.word_definition?.definitions ?? {}
+                  }
+                />
+              </div>
+              {vuln.additional?.guidance && (
+                <div className="mt-4 text-muted-foreground">
+                  <p className="mb-1 font-semibold">Guidance</p>
+                  <TokenizedText
+                    text={vuln.additional.guidance}
+                    definitions={
+                      vuln.additional?.word_definition?.definitions ?? {}
+                    }
+                  />
+                </div>
+              )}
+              {vuln.additional?.assessment_objective && (
+                <div className="mt-4 text-muted-foreground">
+                  <p className="mt-4 mb-1 font-semibold">
+                    Assessment Objective
+                  </p>
+                  {vuln.additional.assessment_objective.map(
+                    (obj: any, index: number) => (
+                      <div key={index} className="mt-4 text-muted-foreground">
+                        <p className="mb-1 font-semibold">{obj?.id}</p>
+                        <TokenizedText text={obj?.prose} />
+                      </div>
+                    ),
+                  )}
+                </div>
+              )}
+              <div className="mt-4 flex flex-row flex-wrap gap-2 text-sm mb-4">
+                {vuln.ticketUrl && (
+                  <Link href={vuln.ticketUrl} target="_blank">
+                    <Badge className="h-full" variant={"secondary"}>
+                      {vuln.ticketId?.startsWith("github:") ? (
+                        <Image
+                          src="/assets/github.svg"
+                          alt="GitHub Logo"
+                          className="-ml-1 mr-2 dark:invert"
+                          width={15}
+                          height={15}
+                        />
+                      ) : (
+                        <div className="mr-2">
+                          <GitProviderIcon
+                            externalEntityProviderIdOrRepositoryId={
+                              asset?.externalEntityProviderId ??
+                              asset?.repositoryId ??
+                              "gitlab"
+                            }
+                          />
+                        </div>
+                      )}
+                      <span>{vuln.ticketUrl}</span>
+                    </Badge>
+                  </Link>
+                )}
+                <VulnState state={vuln.state} />
+                <Badge key={vuln.framework} variant={"secondary"}>
+                  {vuln.framework}
+                </Badge>
+              </div>
+
+              {vuln.events && vuln.events.length > 0 && (
+                <div className="mt-16">
+                  <RiskAssessmentFeed
+                    vulnerabilityName={vuln.frameworkControlId}
+                    events={vuln.events}
+                    page="compliance-posture"
+                    deleteEvent={handleDeleteEvent}
+                  />
+                </div>
+              )}
+
+              <AuthGuard require="member">
+                <div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {vuln.state === "open"
+                          ? "Add a comment"
+                          : "Mark as not implemented"}
+                      </CardTitle>
+                      <CardDescription></CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {vuln.state === "open" ? (
+                        <form
+                          className="flex flex-col gap-4"
+                          onSubmit={(e) => e.preventDefault()}
+                        >
+                          <div>
+                            <label className="mb-2 block text-sm font-semibold">
+                              Comment
+                            </label>
+                            <MarkdownEditor
+                              placeholder="Add your comment here..."
+                              value={justification ?? ""}
+                              setValue={setJustification}
+                            />
+                          </div>
+
+                          <div className="flex flex-row justify-end gap-1">
+                            <div className="flex flex-row items-start gap-2">
+                              {asset && (
+                                <>
+                                  {/* we need to implement the endpoint in the backend to create a ticket for this case */}
+                                  {vuln.ticketId === null &&
+                                    integrationName === undefined &&
+                                    false && (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span>
+                                            <Button
+                                              variant={"ghost"}
+                                              disabled
+                                              className=""
+                                            >
+                                              <span className="ml-1 text-muted-foreground">
+                                                Create Ticket
+                                              </span>
+                                            </Button>
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          No repository is linked. To create a
+                                          ticket, please integrate your issue
+                                          tracker in the{` `}
+                                          <Link
+                                            href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                            className="underline"
+                                          >
+                                            settings
+                                          </Link>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    )}
+                                  {vuln.ticketId === null &&
+                                    integrationName === "gitlab" && (
+                                      <AsyncButton
+                                        variant={"secondary"}
+                                        onClick={() =>
+                                          handleSubmit({
+                                            status: "mitigate",
+                                            justification,
+                                          })
+                                        }
+                                      >
+                                        <div className="flex flex-col">
+                                          <div className="flex">
+                                            <GitProviderIcon
+                                              externalEntityProviderIdOrRepositoryId={
+                                                asset.externalEntityProviderId ??
+                                                "gitlab"
+                                              }
+                                            />
+                                            Create Ticket
+                                          </div>
+                                        </div>
+                                      </AsyncButton>
+                                    )}
+                                  {vuln.ticketId === null &&
+                                    integrationName === "github" && (
+                                      <AsyncButton
+                                        variant={"secondary"}
+                                        onClick={() =>
+                                          handleSubmit({
+                                            status: "mitigate",
+                                            justification,
+                                          })
+                                        }
+                                      >
+                                        <div className="flex flex-col">
+                                          <div className="flex">
+                                            <Image
+                                              alt="GitHub Logo"
+                                              width={15}
+                                              height={15}
+                                              className="mr-2 dark:invert"
+                                              src={"/assets/github.svg"}
+                                            />
+                                            Create GitHub Ticket
+                                          </div>
+                                        </div>
+                                      </AsyncButton>
+                                    )}
+                                  {vuln.ticketId === null &&
+                                    integrationName === "jira" && (
+                                      <AsyncButton
+                                        variant={"secondary"}
+                                        onClick={() =>
+                                          handleSubmit({
+                                            status: "mitigate",
+                                            justification,
+                                          })
+                                        }
+                                      >
+                                        <div className="flex flex-col">
+                                          <div className="flex">
+                                            <Image
+                                              alt="Jira Logo"
+                                              width={15}
+                                              height={15}
+                                              className="mr-2"
+                                              src={
+                                                "/assets/jira-svgrepo-com.svg"
+                                              }
+                                            />
+                                            Create Jira Ticket
+                                          </div>
+                                        </div>
+                                      </AsyncButton>
+                                    )}
+                                </>
+                              )}
+                              <AsyncButton
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "implemented",
+                                    justification,
+                                  })
+                                }
+                                variant={"secondary"}
+                              >
+                                Implemented
+                              </AsyncButton>
+                              <AsyncButton
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "notApplicable",
+                                    justification,
+                                  })
+                                }
+                                variant={"secondary"}
+                              >
+                                Not Applicable
+                              </AsyncButton>
+                              <AsyncButton
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "comment",
+                                    justification,
+                                  })
+                                }
+                                variant={"default"}
+                              >
+                                Comment
+                              </AsyncButton>
+                            </div>
+                          </div>
+                        </form>
+                      ) : (
+                        <form
+                          className="flex flex-col gap-4"
+                          onSubmit={(e) => e.preventDefault()}
+                        >
+                          <div>
+                            <label className="mb-2 block text-sm font-semibold">
+                              Comment
+                            </label>
+                            <MarkdownEditor
+                              value={justification ?? ""}
+                              setValue={setJustification}
+                              placeholder="Add your comment here..."
+                            />
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            You can mark this compliance posture as not
+                            implemented if you made a mistake.
+                          </p>
+                          <div className="flex flex-row justify-end">
+                            <AsyncButton
+                              onClick={() =>
+                                handleSubmit({
+                                  status: "reopened",
+                                  justification,
+                                })
+                              }
+                              variant={"secondary"}
+                              type="submit"
+                            >
+                              Reopen
+                            </AsyncButton>
+                          </div>
+                        </form>
+                      )}
+                      {vuln.ticketUrl && (
+                        <small className="mt-2 block w-full text-right text-muted-foreground">
+                          Comment will be synced with{" "}
+                          <Link href={vuln.ticketUrl} target="_blank">
+                            {vuln.ticketUrl}
+                          </Link>
+                        </small>
+                      )}
+                      <div>
+                        {InheritedHandlingWarning(
+                          vuln,
+                          assetVersion,
+                          asset,
+                          project,
+                          activeOrg,
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </AuthGuard>
+            </div>
+            <div className="col-span-1 border-l p-4 pt-0">
+              <h3 className="mb-4 text-sm font-semibold">Compliance Details</h3>
+
+              <div className="rounded-lg border bg-card p-4">
+                <div className="flex items-center gap-3">
+                  <FrameworkIcon
+                    framework={vuln.framework}
+                    className="h-10 w-10 shrink-0"
+                  />
+                  <div>
+                    {vuln.framework && vuln.framework === "SCF" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://securecontrolsframework.com/"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-ND-4.0)
+                      </Link>
+                    ) : vuln.framework && vuln.framework === "Grundschutz++" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/tree/main/Anwenderkataloge/Grundschutz%2B%2B"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        {vuln.framework}
+                      </p>
+                    )}
+                    <p className="font-semibold">{vuln.controlId}</p>
+                  </div>
+                </div>
+
+                <dl className="mt-4 flex flex-col gap-0 text-sm">
+                  {vuln.additional?.group_title && (
+                    <div className="flex flex-col items-start justify-between  border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">Group</dt>
+                      <dd className="font-medium">
+                        {vuln.additional.group_title}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.class && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">Class</dt>
+                      <dd className="font-medium">{vuln.class}</dd>
+                    </div>
+                  )}
+                  {vuln.additional?.security_level && (
+                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Security Level
+                      </dt>
+                      <dd>
+                        <FlatBadge
+                          variant={securityLevelVariant(
+                            vuln.additional.security_level.value,
+                          )}
+                        >
+                          {vuln.additional.security_level.ns ? (
+                            <Link
+                              href={vuln.additional.security_level.ns}
+                              target="_blank"
+                              className="no-underline"
+                              style={{ color: "inherit" }}
+                            >
+                              <TokenizedText
+                                noUnderline
+                                text={vuln.additional.security_level.value}
+                                definitions={
+                                  vuln.additional.security_level.definitions
+                                }
+                                split={false}
+                              />
+                            </Link>
+                          ) : (
+                            <TokenizedText
+                              text={vuln.additional.security_level.value}
+                              noUnderline
+                              definitions={
+                                vuln.additional.security_level.definitions
+                              }
+                              split={false}
+                            />
+                          )}
+                        </FlatBadge>
+                      </dd>
+                    </div>
+                  )}
+
+                  {vuln.additional?.importance && (
+                    <div className="flex flex-col items-start justify-between  border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">
+                        Importance
+                      </dt>
+                      <dd>
+                        <FlatBadge
+                          variant={importanceVariant(
+                            vuln.additional.importance.value,
+                          )}
+                        >
+                          {vuln.additional.importance.ns ? (
+                            <Link
+                              href={vuln.additional.importance.ns}
+                              target="_blank"
+                              style={{ color: "inherit" }}
+                            >
+                              <TokenizedText
+                                noUnderline
+                                text={vuln.additional.importance.value}
+                                definitions={
+                                  vuln.additional.importance.definitions
+                                }
+                                split={false}
+                              />
+                            </Link>
+                          ) : (
+                            <TokenizedText
+                              text={vuln.additional.importance.value}
+                              definitions={
+                                vuln.additional.importance.definitions
+                              }
+                              split={false}
+                            />
+                          )}
+                        </FlatBadge>
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.effort_level && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">
+                        Effort Level
+                      </dt>
+                      <dd>
+                        <FlatBadge
+                          variant={effortLevelVariant(
+                            vuln.additional.effort_level.value,
+                          )}
+                        >
+                          {vuln.additional.effort_level.ns ? (
+                            <Link
+                              href={vuln.additional.effort_level.ns}
+                              target="_blank"
+                              style={{ color: "inherit" }}
+                            >
+                              <TokenizedText
+                                text={vuln.additional.effort_level.value}
+                                noUnderline
+                                definitions={
+                                  vuln.additional.effort_level.definitions
+                                }
+                                split={false}
+                              />
+                            </Link>
+                          ) : (
+                            <TokenizedText
+                              text={vuln.additional.effort_level.value}
+                              definitions={
+                                vuln.additional.effort_level.definitions
+                              }
+                              split={false}
+                            />
+                          )}
+                        </FlatBadge>
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.tags && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">Tags</dt>
+                      <dd className="font-medium">
+                        {vuln.additional.tags.ns
+                          ? vuln.additional.tags.value
+                              .split(",")
+                              .map((tag: string) => (
+                                <Link
+                                  href={vuln.additional.tags.ns}
+                                  target="_blank"
+                                  style={{ color: "inherit" }}
+                                  key={tag}
+                                >
+                                  <Badge
+                                    variant="secondary"
+                                    className="mr-2 mb-2"
+                                  >
+                                    <TokenizedText
+                                      text={tag}
+                                      noUnderline
+                                      definitions={
+                                        vuln.additional.tags.definitions
+                                      }
+                                      split={false}
+                                    />
+                                  </Badge>
+                                </Link>
+                              ))
+                          : vuln.additional.tags.value
+                              .split(",")
+                              .map((tag: string) => (
+                                <Badge
+                                  variant="secondary"
+                                  className="mr-2 mb-2"
+                                  key={tag}
+                                >
+                                  <TokenizedText
+                                    text={tag}
+                                    definitions={
+                                      vuln.additional.tags.definitions
+                                    }
+                                    split={false}
+                                  />
+                                </Badge>
+                              ))}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.documentation && (
+                    <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">
+                        Documentation
+                      </dt>
+                      <dd className="font-medium">
+                        {vuln.additional.documentation.ns ? (
+                          <Link
+                            href={vuln.additional.documentation.ns}
+                            target="_blank"
+                            style={{ color: "inherit" }}
+                          >
+                            <TokenizedText
+                              text={vuln.additional.documentation.value}
+                              definitions={
+                                vuln.additional.documentation.definitions
+                              }
+                            />
+                          </Link>
+                        ) : (
+                          <TokenizedText
+                            text={vuln.additional.documentation.value}
+                            definitions={
+                              vuln.additional.documentation.definitions
+                            }
+                          />
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.result && (
+                    <div className="flex flex-col items-start justify-betweens border-t py-3 gap-2">
+                      <dt className="text-xs text-muted-foreground">Result</dt>
+                      <dd className="font-medium">
+                        {vuln.additional.result.ns ? (
+                          <Link
+                            href={vuln.additional.result.ns}
+                            target="_blank"
+                            style={{ color: "inherit" }}
+                          >
+                            <TokenizedText
+                              text={vuln.additional.result.value}
+                              definitions={vuln.additional.result.definitions}
+                            />
+                          </Link>
+                        ) : (
+                          <TokenizedText
+                            text={vuln.additional.result.value}
+                            definitions={vuln.additional.result.definitions}
+                          />
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.additional?.result_specification && (
+                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Result Specification
+                      </dt>
+                      <dd className="font-medium">
+                        {vuln.additional.result_specification.ns ? (
+                          <Link
+                            href={vuln.additional.result_specification.ns}
+                            target="_blank"
+                            style={{ color: "inherit" }}
+                          >
+                            <TokenizedText
+                              text={vuln.additional.result_specification.value}
+                              definitions={
+                                vuln.additional.result_specification.definitions
+                              }
+                            />
+                          </Link>
+                        ) : (
+                          <TokenizedText
+                            text={vuln.additional.result_specification.value}
+                            definitions={
+                              vuln.additional.result_specification.definitions
+                            }
+                          />
+                        )}
+                      </dd>
+                    </div>
+                  )}
+                  {vuln.mappedControls?.length > 0 && (
+                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
+                      <dt className="text-xs text-muted-foreground">
+                        Mapped Controls
+                      </dt>
+                      <dd className="font-medium w-full">
+                        {Object.entries(
+                          (
+                            vuln.mappedControls as {
+                              relatedFramework: string;
+                              relatedControlId: string;
+                            }[]
+                          ).reduce<Record<string, string[]>>((acc, control) => {
+                            (acc[control.relatedFramework] ??= []).push(
+                              control.relatedControlId,
+                            );
+                            return acc;
+                          }, {}),
+                        ).map(([framework, controlIds]) => (
+                          <MappedControlsGroup
+                            key={framework}
+                            framework={framework}
+                            controlIds={controlIds}
+                          />
+                        ))}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Page>
+  );
+};
+
+export default CompliancePostureDetailView;

@@ -7,6 +7,7 @@ export default defineConfig([
     "**/postcss.config.js",
     "**/tailwind.config.js",
     "**/next.config.js",
+    ".next/**",
   ]),
   ...nextConfig,
   {
