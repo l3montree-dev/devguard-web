@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
@@ -19,6 +20,9 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Input } from "../ui/input";
+import { buttonVariants } from "../ui/button";
+import Link from "next/link";
+import { classNames } from "../../utils/common";
 
 const ALL_FRAMEWORKS = "__all__";
 
@@ -90,27 +94,11 @@ export default function OscalDownloadModal({
             <hr />
           </>
         )}
-        <h4 className="font-semibold mt-2">Download</h4>
-        <p className="text-sm text-muted-foreground">
-          The OSCAL export is available in JSON format, compatible with NIST
-          OSCAL tools and other compliance tooling.
-        </p>
-        <div className="flex items-start justify-start gap-4 mt-2">
-          <DelayedDownloadButton
-            data-testid="download-oscal-format"
-            href={downloadUrl}
-            icon={
-              <Image
-                src="/assets/NIST_logo.svg"
-                alt="OSCAL Logo"
-                width={12}
-                height={12}
-                className="h-4 w-auto inline-block"
-              />
-            }
-            label={"Download in JSON-Format"}
-          />
-        </div>
+        <DialogFooter>
+            <Link className={classNames(buttonVariants({variant: "default"}), "text-primary-foreground!")}  href={downloadUrl} target="_blank">
+              Download in JSON-Format
+            </Link>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

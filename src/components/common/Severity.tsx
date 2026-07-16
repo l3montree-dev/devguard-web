@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { classNames } from "../../utils/common";
 
 export const getSeverityClassNames = (severity: string, gray: boolean) => {
@@ -56,6 +57,27 @@ const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
       )}
     >
       {riskToSeverity(rounded)} ({rounded.toFixed(1)})
+    </span>
+  );
+};
+
+export const FlatBadge = ({
+  children,
+  variant,
+}: {
+  children: ReactNode;
+  variant: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+}) => {
+  const cls = getSeverityClassNames(variant, false);
+
+  return (
+    <span
+      className={classNames(
+        "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
+        cls,
+      )}
+    >
+      {children}
     </span>
   );
 };

@@ -13,41 +13,18 @@ import type {
 } from "@/types/api/api";
 import Image from "next/image";
 
-import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import AuthGuard from "@/components/AuthGuard";
 import { TokenizedText } from "@/components/compliance-posturers/TokenizedText";
+import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button } from "@/components/ui/button";
+import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useSession } from "@/context/SessionContext";
-import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
-import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import Markdown from "react-markdown";
+import { useMemo, useState } from "react";
 
-import { Badge, badgeVariants } from "@/components/ui/badge";
-import type { VariantProps } from "class-variance-authority";
-
-type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
-
-function securityLevelVariant(value: string): BadgeVariant {
-  if (value === "erhöht") return "yellow";
-  return "outline";
-}
-
-function effortLevelVariant(value: string | number): BadgeVariant {
-  const n = Number(value);
-  if (n <= 1) return "success";
-  if (n <= 3) return "yellow";
-  return "danger";
-}
-
-function importanceVariant(value: string): BadgeVariant {
-  const lower = value.toLowerCase();
-  if (lower === "muss") return "danger";
-  if (lower === "sollte") return "yellow";
-  return "secondary";
-}
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -56,34 +33,65 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
-import dynamic from "next/dynamic";
-import { toast } from "sonner";
-import VulnState from "@/components/common/VulnState";
-import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
-import GitProviderIcon from "@/components/GitProviderIcon";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
-import { Skeleton } from "@/components/ui/skeleton";
-import FrameworkIcon from "./FrameworkIcon";
+type BadgeVariant = "CRITICAL" | "MEDIUM" | "LOW" | "HIGH";
+
+function securityLevelVariant(value: string): BadgeVariant {
+  if (value === "erhöht") return "MEDIUM";
+  return "LOW";
+}
+
+function effortLevelVariant(value: string | number): BadgeVariant {
+  const n = Number(value);
+  if (n <= 1) return "LOW";
+  if (n <= 3) return "MEDIUM";
+  return "CRITICAL";
+}
+
+export function importanceVariant(value: string): BadgeVariant {
+  const lower = value.toLowerCase();
+  if (lower === "muss") return "CRITICAL";
+  if (lower === "sollte") return "MEDIUM";
+  // check if we can parse it as a number
+  const n = Number(value);
+  if (!isNaN(n)) {
+    if (n <= 3) return "LOW";
+    if (n <= 6) return "MEDIUM";
+    if (n < 9) return "HIGH";
+    return "CRITICAL";
+  }
+  return "LOW";
+}
+
 import Err from "@/components/common/Err";
-import RiskAssessmentFeedSkeleton from "@/components/risk-assessment/RiskAssessmentFeedSkeleton";
+import VulnState from "@/components/common/VulnState";
+import GitProviderIcon from "@/components/GitProviderIcon";
 import EditorSkeleton from "@/components/risk-assessment/EditorSkeleton";
-import { useDeleteEvent } from "@/hooks/useDeleteEvent";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
+import RiskAssessmentFeedSkeleton from "@/components/risk-assessment/RiskAssessmentFeedSkeleton";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import { ChevronRightIcon } from "lucide-react";
+import dynamic from "next/dynamic";
+import { toast } from "sonner";
+import useSWR from "swr";
+import FrameworkIcon from "./FrameworkIcon";
 
 import useDecodedParams from "@/hooks/useDecodedParams";
+import Callout from "../common/Callout";
+import { FlatBadge } from "../common/Severity";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -144,32 +152,24 @@ const InheritedHandlingWarning = (
     vuln.events.length > 0
   )
     return (
-      <div className="mt-3 flex items-start gap-2 rounded-md border border-warning-border bg-warning-muted px-3 py-2 text-xs text-warning">
-        <span aria-hidden="true" className="mt-0.5 shrink-0">
-          ⚠️
-        </span>
-        <span>
-          <span className="sr-only">Warning: </span>
+      <div className="mt-4">
+        <Callout intent="warning">
           This compliance posture was handled at a higher level (project or
           organization) and has been inherited here. Any changes you make will
           only apply to this asset and all its children, and will not affect the
           original handling at the higher level.
-        </span>
+        </Callout>
       </div>
     );
   if (project != null && !vuln.projectId && vuln.events.length > 0)
     return (
-      <div className="mt-3 flex items-start gap-2 rounded-md border border-warning-border bg-warning-muted px-3 py-2 text-xs text-warning">
-        <span aria-hidden="true" className="mt-0.5 shrink-0">
-          ⚠️
-        </span>
-        <span>
-          <span className="sr-only">Warning: </span>
+      <div className="mt-4">
+        <Callout intent="warning">
           This compliance posture was handled at the organization level and has
           been inherited here. Any changes you make will only apply to this
           project and all its children, and will not affect the
           organization-level handling.
-        </span>
+        </Callout>
       </div>
     );
 };
@@ -686,7 +686,7 @@ const CompliancePostureDetailView = ({
                   <div>
                     {vuln.framework && vuln.framework === "SCF" ? (
                       <Link
-                        className="text-xs text-muted-foreground underline"
+                        className="text-xs text-muted-foreground"
                         href="https://securecontrolsframework.com/"
                         target="_blank"
                       >
@@ -694,7 +694,7 @@ const CompliancePostureDetailView = ({
                       </Link>
                     ) : vuln.framework && vuln.framework === "Grundschutz++" ? (
                       <Link
-                        className="text-xs text-muted-foreground underline"
+                        className="text-xs text-muted-foreground"
                         href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/tree/main/Anwenderkataloge/Grundschutz%2B%2B"
                         target="_blank"
                       >
@@ -730,7 +730,7 @@ const CompliancePostureDetailView = ({
                         Security Level
                       </dt>
                       <dd>
-                        <Badge
+                        <FlatBadge
                           variant={securityLevelVariant(
                             vuln.additional.security_level.value,
                           )}
@@ -739,9 +739,11 @@ const CompliancePostureDetailView = ({
                             <Link
                               href={vuln.additional.security_level.ns}
                               target="_blank"
+                              className="no-underline"
                               style={{ color: "inherit" }}
                             >
                               <TokenizedText
+                                noUnderline
                                 text={vuln.additional.security_level.value}
                                 definitions={
                                   vuln.additional.security_level.definitions
@@ -752,13 +754,14 @@ const CompliancePostureDetailView = ({
                           ) : (
                             <TokenizedText
                               text={vuln.additional.security_level.value}
+                              noUnderline
                               definitions={
                                 vuln.additional.security_level.definitions
                               }
                               split={false}
                             />
                           )}
-                        </Badge>
+                        </FlatBadge>
                       </dd>
                     </div>
                   )}
@@ -769,7 +772,7 @@ const CompliancePostureDetailView = ({
                         Importance
                       </dt>
                       <dd>
-                        <Badge
+                        <FlatBadge
                           variant={importanceVariant(
                             vuln.additional.importance.value,
                           )}
@@ -781,6 +784,7 @@ const CompliancePostureDetailView = ({
                               style={{ color: "inherit" }}
                             >
                               <TokenizedText
+                                noUnderline
                                 text={vuln.additional.importance.value}
                                 definitions={
                                   vuln.additional.importance.definitions
@@ -797,7 +801,7 @@ const CompliancePostureDetailView = ({
                               split={false}
                             />
                           )}
-                        </Badge>
+                        </FlatBadge>
                       </dd>
                     </div>
                   )}
@@ -807,7 +811,7 @@ const CompliancePostureDetailView = ({
                         Effort Level
                       </dt>
                       <dd>
-                        <Badge
+                        <FlatBadge
                           variant={effortLevelVariant(
                             vuln.additional.effort_level.value,
                           )}
@@ -820,6 +824,7 @@ const CompliancePostureDetailView = ({
                             >
                               <TokenizedText
                                 text={vuln.additional.effort_level.value}
+                                noUnderline
                                 definitions={
                                   vuln.additional.effort_level.definitions
                                 }
@@ -835,7 +840,7 @@ const CompliancePostureDetailView = ({
                               split={false}
                             />
                           )}
-                        </Badge>
+                        </FlatBadge>
                       </dd>
                     </div>
                   )}
@@ -859,6 +864,7 @@ const CompliancePostureDetailView = ({
                                   >
                                     <TokenizedText
                                       text={tag}
+                                      noUnderline
                                       definitions={
                                         vuln.additional.tags.definitions
                                       }
@@ -971,7 +977,7 @@ const CompliancePostureDetailView = ({
                       </dd>
                     </div>
                   )}
-                  {vuln.mappedControls && (
+                  {vuln.mappedControls?.length > 0 && (
                     <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
                       <dt className="text-xs text-muted-foreground">
                         Mapped Controls

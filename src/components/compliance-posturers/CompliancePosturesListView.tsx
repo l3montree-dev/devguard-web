@@ -36,6 +36,8 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import OscalDownloadModal from "./OscalDownloadModal";
 import { useState } from "react";
+import { FlatBadge } from "../common/Severity";
+import { importanceVariant } from "./CompliancePostureDetailView";
 
 const columnHelper = createColumnHelper<CompliancePostureWithControlDTO>();
 
@@ -149,12 +151,14 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       columnHelper.accessor("importance", {
         header: "Importance",
         id: "importance",
-        enableSorting: true,
-        cell: (info) => (
-          <Badge variant="outline" className="whitespace-nowrap capitalize">
-            {info.getValue()}
-          </Badge>
-        ),
+        cell: (info) =>
+          info.getValue() === "" ? null : (
+            <div className="flex">
+              <FlatBadge variant={importanceVariant(info.getValue())}>
+                {info.getValue()}
+              </FlatBadge>
+            </div>
+          ),
       }),
     ],
     [activeFrameworkFilter],
@@ -239,11 +243,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       {
         label: "Importance",
         value: "importance",
-        operators: [
-          { value: "is" },
-          { value: "is not" },
-          { value: "ilike", label: "contains" },
-        ],
+        operators: [{ value: "ilike", label: "is" }],
       },
       ...(isClosed
         ? [

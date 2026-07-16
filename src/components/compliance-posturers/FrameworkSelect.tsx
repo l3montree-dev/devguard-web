@@ -1,25 +1,26 @@
 "use client";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, type FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 
 interface Props {
   frameworks: string[];
 }
+const FRAMEWORK_FILTER_KEY = "filterQuery[framework][is]";
+const ALL_FRAMEWORKS = "__all__";
+const LOCAL_STORAGE_KEY = "compliance-framework-filter";
 
 const FrameworkSelect: FunctionComponent<Props> = ({ frameworks }) => {
-  const FRAMEWORK_FILTER_KEY = "filterQuery[framework][is]";
-  const ALL_FRAMEWORKS = "__all__";
-  const LOCAL_STORAGE_KEY = "compliance-framework-filter";
+
   const searchParams = useSearchParams();
 
   const push = useRouterQuery();

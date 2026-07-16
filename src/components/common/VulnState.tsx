@@ -50,12 +50,11 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
         <Badge
           variant={"default"}
           className={classNames(
-            defaultClasses,
-            evTypeBackground["accepted"],
+            evTypeBackground["fixed"],
             "text-secondary-foreground",
           )}
         >
-          <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
+          <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
           Implemented
         </Badge>
       );
