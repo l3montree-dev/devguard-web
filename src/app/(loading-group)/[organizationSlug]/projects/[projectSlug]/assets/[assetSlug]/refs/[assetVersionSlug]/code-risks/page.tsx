@@ -33,6 +33,7 @@ import { Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { CopyCodeFragment } from "../../../../../../../../../../components/common/CopyCode";
+import { DelayedDownloadButton } from "../../../../../../../../../../components/common/DelayedDownloadButton";
 import RiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
@@ -333,11 +334,18 @@ const Index: FunctionComponent = () => {
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
+        <div className="flex gap-2">
+        <DelayedDownloadButton
+          href={pathname + "/../sarif.json"}
+          label={"Download Sarif"}
+          downloadFileName={assetSlug + "_sarif.json"}
+        />
         <AuthGuard require="admin">
           <Button onClick={() => setIsOpen(true)} variant="default">
             Identify Risks
           </Button>
         </AuthGuard>
+        </div>
       </div>
       <Section
         forceVertical
