@@ -12,6 +12,13 @@ import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
 import EntityProviderImage from "./EntityProviderImage";
 import dynamic from "next/dynamic";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const OrganizationDropDown = dynamic(() => import("../OrganizationDropDown"), {
   ssr: false,
@@ -32,15 +39,18 @@ function getLevelMapping(level: number) {
   return mapping;
 }
 
+interface MenuItem {
+  title: string;
+  href: string;
+  Icon: React.ComponentType<{ className?: string }>;
+  isActive?: boolean;
+  testId?: string;
+  children?: Array<MenuItem>;
+}
+
 interface Props {
   Title: ReactNode;
-  menu: Array<{
-    title: string;
-    href: string;
-    Icon: React.ComponentType<{ className?: string }>;
-    isActive?: boolean;
-    testId?: string;
-  }> | null;
+  menu: Array<MenuItem> | null;
   z: number;
 }
 export default function DynamicHeader({ Title, menu, z }: Props) {
@@ -80,24 +90,70 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
             data-tour="menu"
             className="flex flex-row items-end gap-6 text-sm"
           >
-            {menu.map((item) => (
-              <Link
-                className={classNames(
-                  "cursor-pointer relative hover:no-underline",
-                )}
-                key={item.title}
-                href={item.href}
-                data-testid={item.testId}
-              >
-                {(item.isActive || pathname == item.href) && (
-                  <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
-                )}
-                <div className="mt-4 flex flex-row items-center gap-1">
-                  <item.Icon className="h-5 w-5 text-gray-400" />
-                  <span className="text-header-foreground">{item.title}</span>
-                </div>
-              </Link>
-            ))}
+            {menu.map((item) =>
+              item.children && item.children.length > 0 ? (
+                <DropdownMenu key={item.title}>
+                  <div
+                    className="cursor-pointer relative hover:no-underline outline-none"
+                    data-testid={item.testId}
+                  >
+                    {(item.isActive ||
+                      item.children.some(
+                        (child) => child.isActive || pathname == child.href,
+                      )) && (
+                      <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
+                    )}
+                    <div className="mt-4 flex flex-row items-center gap-1">
+                      <Link
+                        href={item.href}
+                        className="flex flex-row items-center gap-1 hover:no-underline"
+                      >
+                        <item.Icon className="h-5 w-5 text-gray-400" />
+                        <span className="text-header-foreground">
+                          {item.title}
+                        </span>
+                      </Link>
+                      <DropdownMenuTrigger asChild>
+                        <button type="button" className="outline-none">
+                          <ChevronDownIcon className="h-4 w-4 text-gray-400" />
+                        </button>
+                      </DropdownMenuTrigger>
+                    </div>
+                  </div>
+                  <DropdownMenuContent align="start">
+                    {item.children.map((child) => (
+                      <DropdownMenuItem key={child.title} asChild>
+                        <Link
+                          href={child.href}
+                          data-testid={child.testId}
+                          className="flex !text-foreground flex-row items-center gap-2"
+                        >
+                          <child.Icon className="h-4 w-4 text-gray-400" />
+                          <span>{child.title}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link
+                  className={classNames(
+                    "cursor-pointer relative hover:no-underline",
+                  )}
+                  key={item.title}
+                  href={item.href}
+                  data-testid={item.testId}
+                >
+                  {(item.isActive || pathname == item.href) && (
+                    <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
+                  )}
+                  <div className="mt-4 flex flex-row items-center gap-1">
+                    <item.Icon className="h-5 w-5 text-gray-400" />
+                    <span className="text-header-foreground">{item.title}</span>
+                  </div>
+                </Link>
+              ),
+            )}
           </div>
         )}
       </div>
