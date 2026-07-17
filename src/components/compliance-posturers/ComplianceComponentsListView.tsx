@@ -19,19 +19,62 @@ import Page from "@/components/Page";
 import EmptyParty from "@/components/common/EmptyParty";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetcher } from "@/data-fetcher/fetcher";
-import type { ComplianceComponentDetailsDTO } from "@/types/api/api";
+import type {
+  ComplianceComponentDetailsDTO,
+  ComplianceComponentImplementsControlDTO,
+} from "@/types/api/api";
 import type { FunctionComponent } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import ComplianceComponentIcon from "./ComplianceComponentIcon";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import InfoTooltip from "../common/InfoTooltip";
-import {
-  OSCAL_CATALOG_CLAIM_EXPLANATION,
-  OSCAL_COMPONENT_EXPLANATION,
-} from "./oscalGlossary";
+import { OSCAL_COMPONENT_EXPLANATION } from "./oscalGlossary";
+import ImplementsControlBadge from "./ImplementsControlBadge";
+
+const COLLAPSED_COUNT = 8;
+
+const ComponentControlBadges: FunctionComponent<{
+  implementedControls: ComplianceComponentImplementsControlDTO[];
+}> = ({ implementedControls }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  if (!implementedControls?.length) return null;
+
+  const visible = expanded
+    ? implementedControls
+    : implementedControls.slice(0, COLLAPSED_COUNT);
+  const remaining = implementedControls.length - visible.length;
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-1.5">
+      {visible.map((ic) => (
+        <Tooltip key={ic.frameworkControlId}>
+          <TooltipTrigger>
+            <ImplementsControlBadge
+              frameworkControlId={ic.frameworkControlId}
+            />
+          </TooltipTrigger>
+          <TooltipContent>{ic.description}</TooltipContent>
+        </Tooltip>
+      ))}
+      {(remaining > 0 || expanded) &&
+        implementedControls.length > COLLAPSED_COUNT && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-4 px-2 text-xs"
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? "Show less" : `+${remaining} more`}
+          </Button>
+        )}
+    </div>
+  );
+};
 
 interface Props {
   Menu?: any[];
@@ -95,23 +138,9 @@ const ComplianceComponentsListView: FunctionComponent<Props> = ({ Menu }) => {
                 Description={
                   <>
                     <p>{component.description}</p>
-                    {component.implementedControls?.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1">
-                        {component.implementedControls.map((ic) => (
-                          <Tooltip key={ic.frameworkControlId}>
-                            <TooltipTrigger>
-                              <Badge
-                                variant="outline"
-                                className="whitespace-nowrap font-mono text-xs"
-                              >
-                                {ic.frameworkControlId}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>{ic.description}</TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
-                    )}
+                    <ComponentControlBadges
+                      implementedControls={component.implementedControls}
+                    />
                   </>
                 }
               />

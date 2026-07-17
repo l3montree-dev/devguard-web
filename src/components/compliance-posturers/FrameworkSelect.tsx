@@ -2,11 +2,11 @@
 
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { useSearchParams } from "next/navigation";
@@ -20,7 +20,6 @@ const ALL_FRAMEWORKS = "__all__";
 const LOCAL_STORAGE_KEY = "compliance-framework-filter";
 
 const FrameworkSelect: FunctionComponent<Props> = ({ frameworks }) => {
-
   const searchParams = useSearchParams();
 
   const push = useRouterQuery();

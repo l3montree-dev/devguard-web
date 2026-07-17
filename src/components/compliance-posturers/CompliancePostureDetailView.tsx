@@ -151,12 +151,29 @@ interface Props {
   showTicketCreation?: boolean;
 }
 
+const isInherited = (
+  vuln: DetailedComplianceRiskDTO | undefined,
+  assetVersionName: AssetVersionDTO | undefined,
+  asset: AssetDTO | undefined,
+  project: ProjectDTO | undefined,
+) => {
+  if (!vuln) return false;
+
+  return (
+    (assetVersionName != null &&
+      asset != null &&
+      !vuln.assetVersionName &&
+      !vuln.assetId &&
+      vuln.events.length > 0) ||
+    (project != null && !vuln.projectId && vuln.events.length > 0)
+  );
+};
+
 const InheritedHandlingWarning = (
   vuln: DetailedComplianceRiskDTO,
   assetVersionName: AssetVersionDTO | undefined,
   asset: AssetDTO | undefined,
   project: ProjectDTO | undefined,
-  orgId: OrganizationDetailsDTO | undefined,
 ) => {
   if (
     assetVersionName != null &&
@@ -232,6 +249,8 @@ const CompliancePostureDetailView = ({
   const params = useDecodedParams();
   const { assetSlug, projectSlug } = params;
 
+  const inherited = isInherited(vuln, assetVersion, asset, project);
+
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
@@ -239,6 +258,10 @@ const CompliancePostureDetailView = ({
   const [showAddComponent, setShowAddComponent] = useState(false);
 
   const handleDeleteStatement = async (statementId: string) => {
+    const removedStatement = vuln?.byComponents.find(
+      (s) => s.id === statementId,
+    );
+
     const resp = await browserApiClient(
       `${apiBaseUrl}components/${statementId}/`,
       {
@@ -251,6 +274,29 @@ const CompliancePostureDetailView = ({
       });
       return;
     }
+
+    if (inherited) {
+      // the posture we'd patch locally may be a different record than the
+      // one the server just created/updated at this scope - skip the
+      // optimistic patch entirely and just refetch.
+      mutate();
+      return;
+    }
+
+    const optimisticEvent = {
+      type: "removedComplianceComponent",
+      id: "optimistic-" + statementId,
+      createdAt: new Date().toISOString(),
+      justification: "",
+      mechanicalJustification: "",
+      userId: session?.identity.id ?? "",
+      vulnType: "compliancePosture",
+      originalAssetVersionName: assetVersion?.name ?? "",
+      arbitraryJSONData: {
+        componentTitle: removedStatement?.complianceComponentTitle ?? "",
+      },
+    } as VulnEventDTO;
+
     mutate(
       (current) =>
         current
@@ -259,6 +305,7 @@ const CompliancePostureDetailView = ({
               byComponents: current.byComponents.filter(
                 (s) => s.id !== statementId,
               ),
+              events: [...(current.events ?? []), optimisticEvent],
             }
           : current,
       { revalidate: false },
@@ -383,15 +430,20 @@ const CompliancePostureDetailView = ({
         };
       },
       {
-        optimisticData: optimisticState
-          ? {
-              ...vuln,
-              state: optimisticState,
-              events: (vuln.events ?? []).concat(
-                optimisticEvent ? [optimisticEvent] : [],
-              ),
-            }
-          : undefined,
+        // when inherited, the update targets a new posture at this scope
+        // (not the parent record we're currently displaying) - showing an
+        // optimistic patch of the parent's state/events would be
+        // misleading, so just wait for the real server response.
+        optimisticData:
+          !inherited && optimisticState
+            ? {
+                ...vuln,
+                state: optimisticState,
+                events: (vuln.events ?? []).concat(
+                  optimisticEvent ? [optimisticEvent] : [],
+                ),
+              }
+            : undefined,
         rollbackOnError: true,
         revalidate: false,
       },
@@ -491,17 +543,6 @@ const CompliancePostureDetailView = ({
                 </Badge>
               </div>
 
-              {vuln.events && vuln.events.length > 0 && (
-                <div className="mt-16">
-                  <RiskAssessmentFeed
-                    vulnerabilityName={vuln.frameworkControlId}
-                    events={vuln.events}
-                    page="compliance-posture"
-                    deleteEvent={handleDeleteEvent}
-                  />
-                </div>
-              )}
-
               {availableComponents && availableComponents.length > 0 && (
                 <>
                   <div className="my-8">
@@ -562,39 +603,60 @@ const CompliancePostureDetailView = ({
 
                     {vuln.byComponents && vuln.byComponents.length > 0 && (
                       <div className="flex mt-2 flex-col gap-2">
-                        {vuln.byComponents.map((statement) => (
-                          <ListItem
-                            key={statement.id}
-                            Title={
-                              <span className="flex flex-row items-center gap-2">
-                                <ComplianceComponentIcon
-                                  title={statement.complianceComponentTitle}
-                                />
-                                {statement.complianceComponentTitle}
-                                <FlatBadge
-                                  variant={implementationStatusVariant(
-                                    statement.implementationStatus,
-                                  )}
-                                >
-                                  {statement.implementationStatus.toUpperCase()}
-                                </FlatBadge>
-                              </span>
-                            }
-                            Description={statement.description}
-                            Button={
-                              <AuthGuard require="member">
-                                <AsyncButton
-                                  variant="ghost"
-                                  onClick={() =>
-                                    handleDeleteStatement(statement.id)
-                                  }
-                                >
-                                  Remove
-                                </AsyncButton>
-                              </AuthGuard>
-                            }
-                          />
-                        ))}
+                        {vuln.byComponents.map((statement) => {
+                          const component = availableComponents.find(
+                            (c) => c.uuid === statement.complianceComponentId,
+                          );
+
+                          const control = component?.implementedControls.find(
+                            (ic) =>
+                              ic.frameworkControlId === vuln.frameworkControlId,
+                          );
+                          if (!control || !component) return null;
+
+                          return (
+                            <ListItem
+                              key={statement.id}
+                              Title={
+                                <span className="flex flex-row items-center gap-2">
+                                  <ComplianceComponentIcon
+                                    title={component?.title}
+                                  />
+                                  {component?.title}
+                                  <FlatBadge
+                                    variant={implementationStatusVariant(
+                                      statement.implementationStatus,
+                                    )}
+                                  >
+                                    {statement.implementationStatus.toUpperCase()}
+                                  </FlatBadge>
+                                </span>
+                              }
+                              Description={
+                                <div>
+                                  <span className="border-l-2 pl-2 block mb-4">
+                                    {control.description}
+                                  </span>
+                                  <span className="text-foreground">
+                                    {statement.description}
+                                  </span>
+                                </div>
+                              }
+                              Button={
+                                <AuthGuard require="member">
+                                  <AsyncButton
+                                    variant="ghost"
+                                    onClick={() =>
+                                      handleDeleteStatement(statement.id)
+                                    }
+                                  >
+                                    Remove
+                                  </AsyncButton>
+                                </AuthGuard>
+                              }
+                            />
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -606,7 +668,30 @@ const CompliancePostureDetailView = ({
                     attachedComponentIds={(vuln.byComponents ?? []).map(
                       (s) => s.complianceComponentId,
                     )}
-                    onCreated={(statement) =>
+                    onCreated={(statement) => {
+                      if (inherited) {
+                        // the posture we'd patch locally may be a different
+                        // record than the one the server just created at
+                        // this scope - skip the optimistic patch entirely
+                        // and just refetch.
+                        mutate();
+                        return;
+                      }
+
+                      const optimisticEvent = {
+                        type: "attachedComplianceComponent",
+                        id: "optimistic-" + statement.id,
+                        createdAt: new Date().toISOString(),
+                        justification: "",
+                        mechanicalJustification: "",
+                        userId: session?.identity.id ?? "",
+                        vulnType: "compliancePosture",
+                        originalAssetVersionName: assetVersion?.name ?? "",
+                        arbitraryJSONData: {
+                          componentTitle: statement.complianceComponentTitle,
+                        },
+                      } as VulnEventDTO;
+
                       mutate(
                         (current) =>
                           current
@@ -616,13 +701,27 @@ const CompliancePostureDetailView = ({
                                   ...(current.byComponents ?? []),
                                   statement,
                                 ],
+                                events: [
+                                  ...(current.events ?? []),
+                                  optimisticEvent,
+                                ],
                               }
                             : current,
                         { revalidate: false },
-                      )
-                    }
+                      );
+                    }}
                   />
                 </>
+              )}
+              {vuln.events && vuln.events.length > 0 && (
+                <div className="mt-16">
+                  <RiskAssessmentFeed
+                    vulnerabilityName={vuln.frameworkControlId}
+                    events={vuln.events}
+                    page="compliance-posture"
+                    deleteEvent={handleDeleteEvent}
+                  />
+                </div>
               )}
               <AuthGuard require="member">
                 <div>
@@ -850,7 +949,6 @@ const CompliancePostureDetailView = ({
                           assetVersion,
                           asset,
                           project,
-                          activeOrg,
                         )}
                       </div>
                     </CardContent>

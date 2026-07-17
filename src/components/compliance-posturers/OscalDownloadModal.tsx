@@ -95,9 +95,16 @@ export default function OscalDownloadModal({
           </>
         )}
         <DialogFooter>
-            <Link className={classNames(buttonVariants({variant: "default"}), "text-primary-foreground!")}  href={downloadUrl} target="_blank">
-              Download in JSON-Format
-            </Link>
+          <Link
+            className={classNames(
+              buttonVariants({ variant: "default" }),
+              "text-primary-foreground!",
+            )}
+            href={downloadUrl}
+            target="_blank"
+          >
+            Download in JSON-Format
+          </Link>
         </DialogFooter>
       </DialogContent>
     </Dialog>

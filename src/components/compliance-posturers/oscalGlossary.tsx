@@ -21,10 +21,10 @@
 export const OSCAL_COMPONENT_EXPLANATION = (
   <>
     <p>
-      A <strong>Component</strong> is a reusable building block for
+      A <strong>Component</strong>&nbsp;is a reusable building block for
       compliance - think of it like a feature, service, or piece of tooling
-      (e.g. &ldquo;branch protection&rdquo;, &ldquo;dependency
-      firewall&rdquo;) rather than a compliance document.
+      (e.g. &ldquo;branch protection&rdquo;, &ldquo;dependency firewall&rdquo;)
+      rather than a compliance document.
     </p>
     <p className="mt-2">
       Each component can claim to help satisfy one or more controls just by
@@ -39,8 +39,8 @@ export const OSCAL_COMPONENT_EXPLANATION = (
         OSCAL
       </a>{" "}
       spec (NIST&apos;s machine-readable compliance format): a component
-      published once, describing which controls it helps with and how - so
-      it can be reused across every system that uses it.
+      published once, describing which controls it helps with and how - so it
+      can be reused across every system that uses it.
     </p>
   </>
 );
@@ -49,15 +49,15 @@ export const OSCAL_ATTACH_COMPONENT_EXPLANATION = (
   <>
     <p>
       &ldquo;Attaching&rdquo; a component here records that{" "}
-      <strong>your system</strong> actually uses it to help satisfy this
+      <strong>your system</strong>&nbsp;actually uses it to help satisfy this
       control - and at what status.
     </p>
     <p className="mt-2">
-      In OSCAL terms, this creates a <code>by-component</code> entry under
-      the control&apos;s <code>implemented-requirement</code>. A control can
-      have several of these: DevGuard always tracks its own direct
-      assessment, and you can add more for any real component (branch
-      protection, a signing tool, etc.) you rely on.
+      In OSCAL terms, this creates a <code>by-component</code> entry under the
+      control&apos;s <code>implemented-requirement</code>. A control can have
+      several of these: DevGuard always tracks its own direct assessment, and
+      you can add more for any real component (branch protection, a signing
+      tool, etc.) you rely on.
     </p>
   </>
 );
@@ -65,8 +65,8 @@ export const OSCAL_ATTACH_COMPONENT_EXPLANATION = (
 export const OSCAL_IMPLEMENTATION_STATUS_EXPLANATION = (
   <>
     <p>
-      How far along <strong>this component</strong> is in actually
-      satisfying the control for your system right now (OSCAL&apos;s{" "}
+      How far along <strong>this component</strong> is in actually satisfying
+      the control for your system right now (OSCAL&apos;s{" "}
       <code>implementation-status</code> field):
     </p>
     <ul className="mt-2 list-disc pl-4">
@@ -74,8 +74,7 @@ export const OSCAL_IMPLEMENTATION_STATUS_EXPLANATION = (
         <strong>Implemented</strong> - fully enabled/configured.
       </li>
       <li>
-        <strong>Partial</strong> - enabled, but not covering the full
-        control.
+        <strong>Partial</strong> - enabled, but not covering the full control.
       </li>
       <li>
         <strong>Planned</strong> - not enabled yet, but on the roadmap.
@@ -95,7 +94,7 @@ export const OSCAL_CATALOG_CLAIM_EXPLANATION = (
   <>
     A component&apos;s own claim (from its OSCAL{" "}
     <code>component-definition</code>) that it helps implement this control -
-    written by whoever published the component, before you&apos;ve said
-    anything about how you&apos;re actually using it.
+    written by whoever published the component, before you&apos;ve said anything
+    about how you&apos;re actually using it.
   </>
 );

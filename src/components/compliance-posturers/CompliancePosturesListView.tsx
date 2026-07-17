@@ -2,7 +2,11 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import Page from "@/components/Page";
-import type { CompliancePostureWithControlDTO, Paged } from "@/types/api/api";
+import type {
+  ComplianceComponentDetailsDTO,
+  CompliancePostureWithControlDTO,
+  Paged,
+} from "@/types/api/api";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -40,6 +44,12 @@ import OscalDownloadModal from "./OscalDownloadModal";
 import { useState } from "react";
 import { FlatBadge } from "../common/Severity";
 import { importanceVariant } from "./CompliancePostureDetailView";
+import ComplianceComponentIcon from "./ComplianceComponentIcon";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const columnHelper = createColumnHelper<CompliancePostureWithControlDTO>();
 
@@ -59,6 +69,30 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const asset = useActiveAsset();
   const org = useActiveOrg();
 
+  const { data: components } = useSWR<ComplianceComponentDetailsDTO[]>(
+    "/compliance-components/",
+    fetcher,
+  );
+
+  const componentsByControl = useMemo(() => {
+    const map = new Map<
+      string,
+      { uuid: string; title: string; description: string }[]
+    >();
+    for (const component of components ?? []) {
+      for (const ic of component.implementedControls) {
+        const existing = map.get(ic.frameworkControlId) ?? [];
+        existing.push({
+          uuid: component.uuid,
+          title: component.title,
+          description: ic.description,
+        });
+        map.set(ic.frameworkControlId, existing);
+      }
+    }
+    return map;
+  }, [components]);
+
   const activeFrameworkFilter = useMemo(() => {
     if (!searchParams) return null;
     for (const [key, value] of searchParams.entries()) {
@@ -75,7 +109,16 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         enableSorting: true,
         cell: (info) => (
           <div className="flex flex-col">
-            <span className="font-medium">{info.getValue()}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="font-medium text-left">{info.getValue()}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span className="font-normal">
+                  {info.row.original.description}
+                </span>
+              </TooltipContent>
+            </Tooltip>
           </div>
         ),
       }),
@@ -86,7 +129,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         cell: (info) => (
           <div className="flex flex-row items-center gap-2">
             <FrameworkIcon framework={info.getValue()} />
-            <span>{info.getValue()}</span>
+            <span className="whitespace-nowrap">{info.getValue()}</span>
           </div>
         ),
       }),
@@ -103,6 +146,51 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
             {info.getValue()}
           </Badge>
         ),
+      }),
+
+      columnHelper.accessor("importance", {
+        header: "Importance",
+        id: "importance",
+        cell: (info) =>
+          info.getValue() === "" ? null : (
+            <div className="flex">
+              <FlatBadge variant={importanceVariant(info.getValue())}>
+                {info.getValue()}
+              </FlatBadge>
+            </div>
+          ),
+      }),
+      columnHelper.accessor("frameworkControlId", {
+        header: "Component",
+        id: "component",
+        enableSorting: false,
+        cell: (info) => {
+          const solvingComponents = componentsByControl.get(info.getValue());
+          if (!solvingComponents?.length) {
+            return <span className="text-muted-foreground"></span>;
+          }
+          return (
+            <div className="flex flex-row flex-wrap gap-1">
+              {solvingComponents.map((c) => (
+                <Tooltip key={c.uuid}>
+                  <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+                    <Badge
+                      variant="outline"
+                      className="flex flex-row items-center gap-1.5 whitespace-nowrap"
+                    >
+                      <ComplianceComponentIcon title={c.title} size="sm" />
+                      {c.title}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <span className="font-semibold">{c.title}</span>
+                    {c.description ? `: ${c.description}` : ""}
+                  </TooltipContent>
+                </Tooltip>
+              ))}
+            </div>
+          );
+        },
       }),
       columnHelper.accessor("mappedControls", {
         header: "Mapped Controls",
@@ -151,20 +239,9 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
           );
         },
       }),
-      columnHelper.accessor("importance", {
-        header: "Importance",
-        id: "importance",
-        cell: (info) =>
-          info.getValue() === "" ? null : (
-            <div className="flex">
-              <FlatBadge variant={importanceVariant(info.getValue())}>
-                {info.getValue()}
-              </FlatBadge>
-            </div>
-          ),
-      }),
     ],
-    [activeFrameworkFilter],
+
+    [activeFrameworkFilter, componentsByControl],
   );
 
   const query = useMemo(() => {
@@ -247,6 +324,15 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         label: "Importance",
         value: "importance",
         operators: [{ value: "ilike", label: "is" }],
+      },
+      {
+        label: "Solvable by Component",
+        value: "has_component_coverage",
+        operators: [{ value: "is" }],
+        filterValues: [
+          { value: "true", label: "Yes" },
+          { value: "false", label: "No" },
+        ],
       },
       ...(isClosed
         ? [

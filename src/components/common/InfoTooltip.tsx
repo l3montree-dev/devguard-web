@@ -48,7 +48,7 @@ const InfoTooltip: FunctionComponent<Props> = ({ children, className }) => {
           <span className="sr-only">More info</span>
         </button>
       </TooltipTrigger>
-      <TooltipContent className="max-w-sm">{children}</TooltipContent>
+      <TooltipContent className="font-normal">{children}</TooltipContent>
     </Tooltip>
   );
 };

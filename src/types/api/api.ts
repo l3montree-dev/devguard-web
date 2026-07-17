@@ -386,6 +386,20 @@ export interface LicenseDecisionEventDTO extends BaseVulnEventDTO {
   };
 }
 
+export interface AttachedComplianceComponentEventDTO extends BaseVulnEventDTO {
+  type: "attachedComplianceComponent";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    componentTitle: string;
+  };
+}
+
+export interface RemovedComplianceComponentEventDTO extends BaseVulnEventDTO {
+  type: "removedComplianceComponent";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    componentTitle: string;
+  };
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -400,7 +414,9 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | LicenseDecisionEventDTO
   | ImplementedEventDTO
-  | NotApplicableEventDTO;
+  | NotApplicableEventDTO
+  | AttachedComplianceComponentEventDTO
+  | RemovedComplianceComponentEventDTO;
 
 export interface CWE {
   cwe: string;

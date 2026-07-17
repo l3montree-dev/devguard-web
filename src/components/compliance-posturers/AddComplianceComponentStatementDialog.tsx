@@ -222,7 +222,7 @@ const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
               Description
             </label>
             <MarkdownEditor
-              className="bg-background"
+              className="!bg-card"
               placeholder="How is this component configured to implement the control?"
               value={description}
               setValue={(v) => setDescription(v ?? "")}

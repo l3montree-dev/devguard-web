@@ -23,6 +23,9 @@ import type { FunctionComponent } from "react";
 // DevGuard mark for any title not listed here.
 const TITLE_ICONS: Record<string, string> = {
   DevGuard: "/logo_icon.svg",
+  openCode: "/logos/opencode.svg",
+  "container.gov.de": "/logos/container-gov-de.svg",
+  "Badge-Programm": "/logos/badge.svg",
 };
 
 const DEFAULT_ICON = "/logo_icon.svg";
