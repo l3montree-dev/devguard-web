@@ -77,7 +77,7 @@ export default function OrgRegisterForm(props: Props) {
       >
         <OrgForm />
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
+        <div className="-mt-4 flex items-center justify-end gap-x-6">
           <Button
             disabled={form.formState.isSubmitting}
             isSubmitting={form.formState.isSubmitting}
