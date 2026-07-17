@@ -4,18 +4,9 @@ export class SetupFlow {
   constructor(private page: Page) {}
 
   async setupOwnRiskScanning() {
-    await this.page.getByTestId("setup-risk-scanning-button").click();
-    await this.page.waitForTimeout(500);
-    await this.page.getByTestId("own-setup-card").click();
-    await this.page.getByTestId("scanner-selection-continue").click();
-  }
-
-  async selectManualUpload() {
-    await this.page.waitForTimeout(500);
     await this.page.getByTestId("manual-upload-card").click();
-    await this.page
-      .getByTestId("integration-method-selection-continue")
-      .click();
+    await this.page.waitForTimeout(500);
+    await this.page.getByTestId("upload-manually").click();
   }
 
   async uploadSbomFile(inputFile: string) {
@@ -28,10 +19,8 @@ export class SetupFlow {
   }
 
   async setupAutoRiskScanning() {
-    await this.page.getByTestId("setup-risk-scanning-button").click();
     await this.page.waitForTimeout(500);
-    await this.page.getByTestId("auto-setup-gitlab").click();
-    await this.page.getByTestId("setup-method-continue").click();
+    await this.page.getByTestId("gitlab-connect-repository").click();
   }
 
   async createGitLabIntegration(name: string, url: string, token: string) {

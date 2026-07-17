@@ -7,13 +7,13 @@ export default defineConfig([
     "**/postcss.config.js",
     "**/tailwind.config.js",
     "**/next.config.js",
+    ".next/**",
   ]),
   ...nextConfig,
   {
     plugins: {
       prettier,
     },
-
     rules: {
       "@next/next/no-img-element": "off",
       "prettier/prettier": "error",

@@ -111,9 +111,10 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2",
             selectedSetup === "own-setup" ? "border-primary" : "",
           )}
+          data-testid="own-setup-card"
           onClick={() => setSelectedSetup("own-setup")}
         >
-          <CardHeader data-testid="own-setup-card">
+          <CardHeader>
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <CubeTransparentIcon
                 width={20}

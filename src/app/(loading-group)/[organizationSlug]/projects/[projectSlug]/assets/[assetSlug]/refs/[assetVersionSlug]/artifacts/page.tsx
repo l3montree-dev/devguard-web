@@ -319,13 +319,14 @@ const Artifacts = () => {
         } else {
           errorCount++;
           console.error(
-            `Failed to update artifact ${artifactName}:`,
+            "Failed to update artifact:",
+            artifactName,
             response.statusText,
           );
         }
       } catch (error) {
         errorCount++;
-        console.error(`Error updating artifact ${artifactName}:`, error);
+        console.error("Error updating artifact:", artifactName, error);
       }
     }
 

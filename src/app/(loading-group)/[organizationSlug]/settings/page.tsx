@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Page from "../../../../components/Page";
 
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
@@ -59,8 +59,9 @@ import {
   useUpdateOrganization,
 } from "../../../../context/OrganizationContext";
 import Alert from "../../../../components/common/Alert";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
+import InvitedMembersTable from "@/components/InvitedMembersTable";
 
 const Home = () => {
   const orgCtx = useOrganization();
@@ -278,7 +279,28 @@ const Home = () => {
     }
   };
 
-  const { startTour } = usePageTour(orgSettingsTourSteps);
+  const handleRevokeInvitation = async (id: string) => {
+    const resp = await browserApiClient(
+      "/organizations/" + activeOrg.slug + "/invitation/" + id,
+      {
+        method: "DELETE",
+      },
+    );
+
+    if (resp.ok) {
+      updateOrgCtx({
+        ...orgCtx,
+        organization: {
+          ...activeOrg,
+          invitedMembers: activeOrg.invitedMembers.filter((m) => m.id !== id),
+        },
+      });
+    } else {
+      toast.error("Failed to revoke invitation");
+    }
+  };
+
+  useAutoTour("org-settings", orgSettingsTourSteps);
 
   const config = useConfig();
 
@@ -533,6 +555,15 @@ const Home = () => {
             Add Member
           </Button>
         </div>
+      </Section>
+      <Section
+        title="Invitations"
+        description="Manage pending invitations of your organization"
+      >
+        <InvitedMembersTable
+          members={activeOrg.invitedMembers}
+          onRevokeInvitation={handleRevokeInvitation}
+        />
       </Section>
       <hr />
       <div className="pb-12">

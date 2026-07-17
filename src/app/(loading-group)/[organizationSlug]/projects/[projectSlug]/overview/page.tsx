@@ -206,34 +206,50 @@ const OverviewPage = () => {
   const criticalFixableAmount = useMemo(() => {
     if (completeRiskHistory.length === 0) return 0;
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlFixableCritical ?? 0),
+      (sum, r) =>
+        sum +
+        (mode === "cvss"
+          ? (r?.cvePurlFixableCriticalCvss ?? 0)
+          : (r?.cvePurlFixableCritical ?? 0)),
       0,
     );
-  }, [completeRiskHistory]);
+  }, [completeRiskHistory, mode]);
 
   const highFixableAmount = useMemo(() => {
     if (completeRiskHistory.length === 0) return 0;
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlFixableHigh ?? 0),
+      (sum, r) =>
+        sum +
+        (mode === "cvss"
+          ? (r?.cvePurlFixableHighCvss ?? 0)
+          : (r?.cvePurlFixableHigh ?? 0)),
       0,
     );
-  }, [completeRiskHistory]);
+  }, [completeRiskHistory, mode]);
 
   const mediumFixableAmount = useMemo(() => {
     if (completeRiskHistory.length === 0) return 0;
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlFixableMedium ?? 0),
+      (sum, r) =>
+        sum +
+        (mode === "cvss"
+          ? (r?.cvePurlFixableMediumCvss ?? 0)
+          : (r?.cvePurlFixableMedium ?? 0)),
       0,
     );
-  }, [completeRiskHistory]);
+  }, [completeRiskHistory, mode]);
 
   const lowFixableAmount = useMemo(() => {
     if (completeRiskHistory.length === 0) return 0;
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlFixableLow ?? 0),
+      (sum, r) =>
+        sum +
+        (mode === "cvss"
+          ? (r?.cvePurlFixableLowCvss ?? 0)
+          : (r?.cvePurlFixableLow ?? 0)),
       0,
     );
-  }, [completeRiskHistory]);
+  }, [completeRiskHistory, mode]);
 
   const vulnerableArtifacts = useMemo(() => {
     if (completeRiskHistory.length === 0) return [];

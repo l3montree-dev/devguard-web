@@ -113,7 +113,6 @@ export class DevGuardPOM {
   async setupSbomUpload() {
     const inputFile = path.join(__dirname, "../../assets/", "sbom.json");
     await this.setup().setupOwnRiskScanning();
-    await this.setup().selectManualUpload();
     await this.setup().uploadSbomFile(inputFile);
   }
 

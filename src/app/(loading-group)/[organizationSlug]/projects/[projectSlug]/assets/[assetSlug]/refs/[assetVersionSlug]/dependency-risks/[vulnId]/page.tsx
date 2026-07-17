@@ -82,6 +82,8 @@ import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
+import { useTourSeen } from "@/hooks/useTourSeen";
+import { DocDrawer } from "@/components/common/DocDrawer";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const MarkdownEditor = dynamic(
@@ -319,6 +321,8 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
   const { startTour, registerSteps } = usePageTour(dependencyRiskTourSteps);
+  const { showModal: shouldStartTour, markSeen } =
+    useTourSeen("dependency-risk");
   const [
     acceptVexRuleRecommendationDialogOpen,
     setAcceptVexRuleRecommendationDialogOpen,
@@ -377,20 +381,27 @@ const Index: FunctionComponent = () => {
   );
 
   const handleGraphReady = useCallback(() => {
-    if (searchParams?.get("startTour") !== "4") return;
+    if (
+      searchParams?.get("startTour") !== "dependency-risk" &&
+      !shouldStartTour
+    )
+      return;
+    markSeen();
     registerSteps(dependencyRiskTourSteps);
     startTour();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, shouldStartTour]);
 
   // Path explosion: no graph is rendered so onReady never fires — start tour directly
   useEffect(() => {
     if (
-      searchParams?.get("startTour") !== "4" ||
+      (searchParams?.get("startTour") !== "dependency-risk" &&
+        !shouldStartTour) ||
       graphLoading ||
       (vuln?.vulnerabilityPath.length || 0) !== 0
     )
       return;
+    markSeen();
     registerSteps([
       {
         ...dependencyRiskTourSteps[0],
@@ -401,7 +412,7 @@ const Index: FunctionComponent = () => {
     ]);
     startTour();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [graphLoading]);
+  }, [graphLoading, shouldStartTour]);
 
   const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
     if (!vuln || vuln.vulnerabilityPath.length === 0) {
@@ -972,72 +983,73 @@ const Index: FunctionComponent = () => {
                                   <div className="flex flex-row justify-end gap-1">
                                     <div className="flex flex-row items-start gap-2 pt-2">
                                       {vuln.ticketId === null &&
-                                      integrationName === undefined ? (
-                                        <Tooltip>
-                                          <TooltipTrigger asChild>
-                                            <span>
-                                              <Button
-                                                variant={"ghost"}
-                                                disabled
-                                                className=""
+                                        (integrationName === undefined ? (
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <span>
+                                                <Button
+                                                  variant={"ghost"}
+                                                  disabled
+                                                  className=""
+                                                >
+                                                  <span className="ml-1 text-muted-foreground">
+                                                    Create Ticket
+                                                  </span>
+                                                </Button>
+                                              </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              No repository is linked. To create
+                                              a ticket, please integrate your
+                                              issue tracker in the {` `}
+                                              <Link
+                                                href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                                className="underline"
                                               >
-                                                <span className="ml-1 text-muted-foreground">
-                                                  Create Ticket
-                                                </span>
-                                              </Button>
+                                                settings
+                                              </Link>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        ) : (
+                                          <Button
+                                            variant={"secondary"}
+                                            onClick={() =>
+                                              setMitigateDialogOpen(true)
+                                            }
+                                          >
+                                            {integrationName === "gitlab" && (
+                                              <GitProviderIcon
+                                                externalEntityProviderIdOrRepositoryId={
+                                                  asset.externalEntityProviderId ??
+                                                  "gitlab"
+                                                }
+                                              />
+                                            )}
+                                            {integrationName === "github" && (
+                                              <Image
+                                                alt="GitHub Logo"
+                                                width={15}
+                                                height={15}
+                                                className="dark:invert"
+                                                src={"/assets/github.svg"}
+                                              />
+                                            )}
+                                            {integrationName === "jira" && (
+                                              <Image
+                                                alt="Jira Logo"
+                                                width={15}
+                                                height={15}
+                                                src={
+                                                  "/assets/jira-svgrepo-com.svg"
+                                                }
+                                              />
+                                            )}
+                                            <span className="ml-1">
+                                              Create Ticket{" "}
                                             </span>
-                                          </TooltipTrigger>
-                                          <TooltipContent>
-                                            No repository is linked. To create a
-                                            ticket, please integrate your issue
-                                            tracker in the {` `}
-                                            <Link
-                                              href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                              className="underline"
-                                            >
-                                              settings
-                                            </Link>
-                                          </TooltipContent>
-                                        </Tooltip>
-                                      ) : (
-                                        <Button
-                                          variant={"secondary"}
-                                          onClick={() =>
-                                            setMitigateDialogOpen(true)
-                                          }
-                                        >
-                                          {integrationName === "gitlab" && (
-                                            <GitProviderIcon
-                                              externalEntityProviderIdOrRepositoryId={
-                                                asset.externalEntityProviderId ??
-                                                "gitlab"
-                                              }
-                                            />
-                                          )}
-                                          {integrationName === "github" && (
-                                            <Image
-                                              alt="GitHub Logo"
-                                              width={15}
-                                              height={15}
-                                              className="dark:invert"
-                                              src={"/assets/github.svg"}
-                                            />
-                                          )}
-                                          {integrationName === "jira" && (
-                                            <Image
-                                              alt="Jira Logo"
-                                              width={15}
-                                              height={15}
-                                              src={
-                                                "/assets/jira-svgrepo-com.svg"
-                                              }
-                                            />
-                                          )}
-                                          <span className="ml-1">
-                                            Create Ticket{" "}
-                                          </span>
-                                        </Button>
-                                      )}
+                                          </Button>
+                                        ))}
+
                                       <Button
                                         data-testid="mark-false-positive"
                                         onClick={() =>

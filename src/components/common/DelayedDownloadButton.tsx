@@ -8,6 +8,7 @@ interface DelayedDownloadButtonProps {
   label: string;
   className?: string;
   "data-testid"?: string;
+  downloadFileName?: string;
 }
 
 export function DelayedDownloadButton({
@@ -16,6 +17,7 @@ export function DelayedDownloadButton({
   label,
   className = "",
   "data-testid": dataTestId,
+  downloadFileName,
 }: DelayedDownloadButtonProps) {
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +31,7 @@ export function DelayedDownloadButton({
       const parts = href.split("/");
       const filename = parts[parts.length - 1].split("?")[0];
 
-      link.download = filename;
+      link.download = downloadFileName ?? filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

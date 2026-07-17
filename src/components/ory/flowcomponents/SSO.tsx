@@ -63,9 +63,8 @@ function SsoProviderIcon({ provider }: { provider: string }) {
 export function OrySsoButton({
   node,
   attributes,
-  onClick,
+  buttonProps,
   className,
-  ...rest
 }: OryNodeSsoButtonProps & { className?: string }) {
   const provider = String(attributes.value).split("-")[0];
   const displayName = providerDisplayNames[provider];
@@ -73,12 +72,11 @@ export function OrySsoButton({
     <Button
       variant="outline"
       className={`px-6 ${className ?? ""}`.trim()}
-      name={attributes.name}
-      type={attributes.type === "button" ? "button" : "submit"}
-      value={attributes.value?.toString()}
+      name={buttonProps.name}
+      type={buttonProps.type === "button" ? "button" : "submit"}
+      value={buttonProps.value?.toString()}
       disabled={attributes.disabled}
-      onClick={onClick}
-      {...rest}
+      onClick={buttonProps.onClick}
     >
       <SsoProviderIcon provider={provider} />
       {displayName ? `${displayName}` : node.meta.label?.text}

@@ -8,7 +8,7 @@ import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import useSWR from "swr";
 import AssetForm, {
@@ -49,7 +49,7 @@ import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
-import { usePageTour } from "@/hooks/usePageTour";
+import { useAutoTour } from "@/hooks/useAutoTour";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -133,14 +133,7 @@ export default function RepositoriesPage() {
     () => groupHomeTourSteps(isAdmin(currentUserRole)),
     [currentUserRole],
   );
-  const { startTour } = usePageTour(tourSteps);
-
-  useEffect(() => {
-    if (searchParams?.get("startTour") === "2") {
-      startTour();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useAutoTour("group-home", tourSteps);
 
   const debouncedHandleSearch = useCallback(
     debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,6 +198,8 @@ export default function RepositoriesPage() {
       const res: AssetDTO & {
         env: Array<EnvDTO>;
       } = await resp.json();
+      setShowModal(false);
+      form.reset();
       // navigate to the new application
       router.push(
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,

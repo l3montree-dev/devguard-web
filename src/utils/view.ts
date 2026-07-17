@@ -147,6 +147,26 @@ export const eventTypeMessages = (
     case "falsePositive":
       message = "marked " + flawName + " as false positive";
       break;
+    case "implemented":
+      message = "marked " + flawName + " as implemented";
+      break;
+    case "notApplicable":
+      message = "marked " + flawName + " as not applicable";
+      break;
+    case "attachedComplianceComponent":
+      message =
+        "attached " +
+        event.arbitraryJSONData.componentTitle +
+        " to " +
+        flawName;
+      break;
+    case "removedComplianceComponent":
+      message =
+        "removed " +
+        event.arbitraryJSONData.componentTitle +
+        " from " +
+        flawName;
+      break;
     case "rawRiskAssessmentUpdated": {
       const oldRisk = event.arbitraryJSONData.oldRisk;
       if (events === undefined || (!oldRisk && oldRisk !== 0)) {
@@ -173,6 +193,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   fixed: "bg-success text-success-foreground!",
   detected: "bg-destructive text-destructive-foreground!",
   falsePositive: "bg-info text-info-foreground!",
+  notApplicable: "bg-info text-info-foreground!",
+  implemented: "bg-success text-success-foreground!",
   mitigate: "bg-success text-success-foreground!",
   markedForTransfer: "bg-info text-info-foreground!",
   rawRiskAssessmentUpdated: "bg-secondary text-secondary-foreground!",
@@ -181,6 +203,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   ticketClosed: "bg-destructive text-destructive-foreground!",
   ticketDeleted: "bg-destructive text-destructive-foreground!",
   licenseDecision: "bg-warning text-warning-foreground!",
+  attachedComplianceComponent: "bg-success text-success-foreground!",
+  removedComplianceComponent: "bg-secondary text-secondary-foreground!",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {
@@ -370,6 +394,10 @@ export const reduceRiskHistories = (
         acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
         acc.cvePurlHighCvss += curr.cvePurlHighCvss;
         acc.cvePurlCriticalCvss += curr.cvePurlCriticalCvss;
+        acc.cvePurlFixableLowCvss += curr.cvePurlFixableLowCvss ?? 0;
+        acc.cvePurlFixableMediumCvss += curr.cvePurlFixableMediumCvss ?? 0;
+        acc.cvePurlFixableHighCvss += curr.cvePurlFixableHighCvss ?? 0;
+        acc.cvePurlFixableCriticalCvss += curr.cvePurlFixableCriticalCvss ?? 0;
         return acc;
       },
       {
@@ -389,6 +417,10 @@ export const reduceRiskHistories = (
         cvePurlMediumCvss: 0,
         cvePurlHighCvss: 0,
         cvePurlCriticalCvss: 0,
+        cvePurlFixableLowCvss: 0,
+        cvePurlFixableMediumCvss: 0,
+        cvePurlFixableHighCvss: 0,
+        cvePurlFixableCriticalCvss: 0,
       } as RiskHistory,
     );
   });
