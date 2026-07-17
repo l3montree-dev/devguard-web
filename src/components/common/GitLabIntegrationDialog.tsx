@@ -28,7 +28,7 @@ export const GitLabIntegrationDialog: FunctionComponent<Props> = ({
           <DialogTitle>Integrate with GitLab</DialogTitle>
           <DialogDescription>
             To integrate with GitLab a personal access token, a group access
-            token or a project access token is necessary.
+            token or a repository access token is necessary.
           </DialogDescription>
         </DialogHeader>
         <GitLabIntegrationForm

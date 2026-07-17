@@ -368,9 +368,9 @@ const Index: FunctionComponent = () => {
       <AccessTokenManagement
         url={`${url}`}
         section={{
-          title: "Generate your Asset Access Tokens",
+          title: "Generate your Repository Access Tokens",
           description:
-            "Manage your project access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+            "Manage your repository access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
         }}
       />
       <div>

@@ -474,7 +474,7 @@ const Home = () => {
                 Integrate with GitLab
               </div>
             }
-            Description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Description="DevGuard uses a personal, organization, group or repository access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
             Button={
               <GitLabIntegrationDialog
                 onNewIntegration={handleNewGitLabIntegration}
@@ -631,7 +631,7 @@ const Home = () => {
           section={{
             title: "Generate your Organization Access Tokens",
             description:
-              "Manage your project access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+              "Manage your organization access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
           }}
         />
       </div>

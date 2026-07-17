@@ -76,7 +76,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
             />
           </>
         </Section>
-        <PatSection description="Local DevGuard CLI" {...pat} />
+        <PatSection description="Local DevGuard CLI" />
         <Tabs
           value={tab}
           onValueChange={(v) => setTab(v as "sca" | "sast")}

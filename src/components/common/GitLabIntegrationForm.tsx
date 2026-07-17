@@ -151,7 +151,7 @@ export default function GitLabIntegrationForm({
                 />
               </FormControl>
               <FormDescription>
-                Use a <strong>Project Access Token</strong> (recommended) or a
+                Use a <strong>Repository Access Token</strong> (recommended) or a
                 Personal Access Token with the <strong>api scope</strong> and at
                 least the <strong>Maintainer role</strong>.
                 <br />

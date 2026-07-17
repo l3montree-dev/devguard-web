@@ -44,9 +44,9 @@ const NewTokenDialog: FunctionComponent<Props> = ({ token, open, onClose }) => {
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Personal Access Token Created</DialogTitle>
+          <DialogTitle>Access Token Created</DialogTitle>
           <DialogDescription>
-            Your new personal access token has been created successfully.
+            Your new access token has been created successfully.
           </DialogDescription>
         </DialogHeader>
 

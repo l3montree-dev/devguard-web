@@ -355,9 +355,9 @@ These identifiers are managed by the external system and are treated as immutabl
         <AccessTokenManagement
           url={`${url}`}
           section={{
-            title: "Generate your Project Access Tokens",
+            title: "Generate your Group Access Tokens",
             description:
-              "Manage your project access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+              "Manage your group access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
           }}
         />
         <Section

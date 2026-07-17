@@ -114,10 +114,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
       </Tabs>
 
       <div className="mt-10">
-        <PatSection
-          {...pat}
-          description="Risk Identification using CLI Setup"
-        />
+        <PatSection description="Risk Identification using CLI Setup" />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
         <Button id="automated-integration-continue" onClick={onClose}>

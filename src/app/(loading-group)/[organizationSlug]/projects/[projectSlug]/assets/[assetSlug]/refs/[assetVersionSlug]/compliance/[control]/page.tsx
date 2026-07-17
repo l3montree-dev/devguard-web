@@ -214,10 +214,7 @@ const Index = () => {
                       ></CopyCodeFragment>
                     </div>
                     <div className="mt-10">
-                      <PatSection
-                        description="Personal access token to create attestations"
-                        {...pat}
-                      />
+                      <PatSection description="Repository access token to create attestations" />
                     </div>
                   </div>
                 </CardContent>
