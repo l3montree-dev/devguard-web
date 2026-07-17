@@ -43,10 +43,12 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import {
+  Component,
   GitBranchIcon,
   GitPullRequestCreateArrowIcon,
   Scale,
   Sparkles,
+  Unlink,
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
@@ -102,6 +104,10 @@ export function EventTypeIcon({
       return <MagnifyingGlassIcon className="h-4 w-4" />;
     case "comment":
       return <ChatBubbleOvalLeftEllipsisIcon className="h-4 w-4" />;
+    case "attachedComplianceComponent":
+      return <Component className="h-4 w-4" />;
+    case "removedComplianceComponent":
+      return <Unlink className="h-4 w-4" />;
   }
 }
 

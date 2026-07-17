@@ -138,8 +138,7 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
 }
 
 export type PersonalAccessTokenDTO =
-  | AsymmetricPersonalAccessTokenDTO
-  | SymmetricPersonalAccessTokenDTO;
+  AsymmetricPersonalAccessTokenDTO | SymmetricPersonalAccessTokenDTO;
 
 interface PersonalAccessTokenBase {
   description: string;
@@ -204,9 +203,7 @@ export interface ProjectDTO {
   subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
 export type ExpandedVulnDTOState =
-  | DependencyVuln["state"]
-  | "not-found"
-  | "detected";
+  DependencyVuln["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -389,6 +386,20 @@ export interface LicenseDecisionEventDTO extends BaseVulnEventDTO {
   };
 }
 
+export interface AttachedComplianceComponentEventDTO extends BaseVulnEventDTO {
+  type: "attachedComplianceComponent";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    componentTitle: string;
+  };
+}
+
+export interface RemovedComplianceComponentEventDTO extends BaseVulnEventDTO {
+  type: "removedComplianceComponent";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    componentTitle: string;
+  };
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -403,7 +414,9 @@ export type VulnEventDTO =
   | TickedDeletedEventDTO
   | LicenseDecisionEventDTO
   | ImplementedEventDTO
-  | NotApplicableEventDTO;
+  | NotApplicableEventDTO
+  | AttachedComplianceComponentEventDTO
+  | RemovedComplianceComponentEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -717,8 +730,40 @@ export interface CompliancePostureWithControlDTO {
   }[];
 }
 
+export type ImplementationStatus =
+  "implemented" | "partial" | "planned" | "alternative" | "notApplicable";
+
+export interface ComplianceComponentDTO {
+  uuid: string;
+  title: string;
+  description: string;
+}
+
+export interface ComplianceComponentImplementsControlDTO {
+  frameworkControlId: string;
+  complianceComponentId: string;
+  complianceComponentTitle: string;
+  description: string;
+}
+
+export interface ComplianceComponentDetailsDTO extends ComplianceComponentDTO {
+  implementedControls: ComplianceComponentImplementsControlDTO[];
+}
+
+export interface ComplianceComponentImplementsControlStatementDTO {
+  id: string;
+  compliancePostureId: string;
+  complianceComponentId: string;
+  complianceComponentTitle: string;
+  complianceComponentDescription: string;
+  frameworkControlId: string;
+  implementationStatus: ImplementationStatus;
+  description: string;
+}
+
 export interface DetailedComplianceRiskDTO extends CompliancePostureWithControlDTO {
   events: VulnEventDTO[];
+  byComponents: ComplianceComponentImplementsControlStatementDTO[];
 }
 
 interface snippetContents {

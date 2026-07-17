@@ -153,6 +153,20 @@ export const eventTypeMessages = (
     case "notApplicable":
       message = "marked " + flawName + " as not applicable";
       break;
+    case "attachedComplianceComponent":
+      message =
+        "attached " +
+        event.arbitraryJSONData.componentTitle +
+        " to " +
+        flawName;
+      break;
+    case "removedComplianceComponent":
+      message =
+        "removed " +
+        event.arbitraryJSONData.componentTitle +
+        " from " +
+        flawName;
+      break;
     case "rawRiskAssessmentUpdated": {
       const oldRisk = event.arbitraryJSONData.oldRisk;
       if (events === undefined || (!oldRisk && oldRisk !== 0)) {
@@ -189,6 +203,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   ticketClosed: "bg-destructive text-destructive-foreground!",
   ticketDeleted: "bg-destructive text-destructive-foreground!",
   licenseDecision: "bg-warning text-warning-foreground!",
+  attachedComplianceComponent: "bg-success text-success-foreground!",
+  removedComplianceComponent: "bg-secondary text-secondary-foreground!",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

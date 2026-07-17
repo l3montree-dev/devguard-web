@@ -1,0 +1,46 @@
+<svg width="62" height="68" viewBox="0 0 61.348 67.414" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path opacity="0.6" d="M61.002 50.914L61.316 14.928L30.674 0V37.745C30.642 37.745 61.002 50.914 61.002 50.914Z" fill="url(#paint0_linear_gov_kube)"/>
+<path opacity="0.8" d="M30.674 0L61.348 14.928L30.674 30.957L0 14.928L30.674 0Z" fill="url(#paint1_linear_gov_kube)"/>
+<path opacity="0.5" d="M30.641 37.746L61.001 50.914L30.673 67.414L0.344 50.914L30.641 37.746Z" fill="url(#paint2_linear_gov_kube)"/>
+<path opacity="0.8" d="M61.002 50.913L61.316 14.927L30.674 30.956V67.413L61.002 50.913Z" fill="url(#paint3_linear_gov_kube)"/>
+<path opacity="0.8" d="M30.673 67.413V30.956L0.03 14.927L0.344 50.913L30.673 67.413Z" fill="url(#paint4_linear_gov_kube)"/>
+<defs>
+<linearGradient id="paint0_linear_gov_kube" x1="61.285" y1="25.457" x2="30.611" y2="25.457" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0088E6" stop-opacity="0"/>
+<stop offset="0.3" stop-color="#0084E6" stop-opacity="0"/>
+<stop offset="0.5" stop-color="#0279DE" stop-opacity="0"/>
+<stop offset="0.6" stop-color="#046BDA" stop-opacity="0"/>
+<stop offset="0.7" stop-color="#075CDD" stop-opacity="0.2"/>
+<stop offset="0.8" stop-color="#0B4EE7" stop-opacity="0.3"/>
+<stop offset="0.9" stop-color="#1049F4" stop-opacity="0.4"/>
+<stop offset="1" stop-color="#1544FF" stop-opacity="0.5"/>
+</linearGradient>
+<linearGradient id="paint1_linear_gov_kube" x1="11.22" y1="7.197" x2="47.362" y2="22.565" gradientUnits="userSpaceOnUse">
+<stop stop-color="#F9FBFE"/>
+<stop offset="0.2" stop-color="#E8F2FC"/>
+<stop offset="0.4" stop-color="#CCE3FA"/>
+<stop offset="0.5" stop-color="#A6D0F6"/>
+<stop offset="0.7" stop-color="#75B8F1"/>
+<stop offset="0.9" stop-color="#399BEB"/>
+<stop offset="1" stop-color="#0088E6"/>
+</linearGradient>
+<linearGradient id="paint2_linear_gov_kube" x1="30.673" y1="38.406" x2="30.673" y2="65.277" gradientUnits="userSpaceOnUse">
+<stop stop-color="#DEE0E6"/>
+<stop offset="1" stop-color="#203257"/>
+</linearGradient>
+<linearGradient id="paint3_linear_gov_kube" x1="30.674" y1="41.17" x2="61.316" y2="41.17" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0088E6"/>
+<stop offset="0.4" stop-color="#599AEE"/>
+<stop offset="1" stop-color="white"/>
+</linearGradient>
+<linearGradient id="paint4_linear_gov_kube" x1="-2.359" y1="53.27" x2="29.824" y2="31.27" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0589E6"/>
+<stop offset="0.2" stop-color="#168CE8"/>
+<stop offset="0.4" stop-color="#3293EA"/>
+<stop offset="0.5" stop-color="#589CEE"/>
+<stop offset="0.7" stop-color="#89AFF3"/>
+<stop offset="0.9" stop-color="#C5D3F9"/>
+<stop offset="1" stop-color="white"/>
+</linearGradient>
+</defs>
+</svg>
