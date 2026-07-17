@@ -11,7 +11,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { convertRepos } from "@/hooks/useRepositorySearch";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -42,6 +42,7 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import AccessTokenManagement from "@/components/AccessTokenManagement";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -80,6 +81,17 @@ const Index: FunctionComponent = () => {
       "/secrets",
     fetcher,
   );
+
+  const uri =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/";
+
+  const url = uri + "pats/";
 
   const { data: repoResp } = useSWR<any[]>(
     "/organizations/" + organizationSlug + "/integrations/repositories",
@@ -353,6 +365,14 @@ const Index: FunctionComponent = () => {
         </FormProvider>
       </div>
       <hr />
+      <AccessTokenManagement
+        url={`${url}`}
+        section={{
+          title: "Generate your Asset Access Tokens",
+          description:
+            "Manage your project access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+        }}
+      />
       <div>
         <Section
           data-tour="repo-settings-webhook"

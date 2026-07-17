@@ -17,7 +17,7 @@ import Link from "next/link";
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
 import MembersTable from "../../../../../../components/MembersTable";
@@ -29,6 +29,7 @@ import { Label } from "../../../../../../components/ui/label";
 import { useUpdateProject } from "../../../../../../context/ProjectContext";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useConfig } from "../../../../../../context/ConfigContext";
+import AccessTokenManagement from "@/components/AccessTokenManagement";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -38,6 +39,22 @@ const Index: FunctionComponent = () => {
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const config = useConfig();
   const router = useRouter();
+
+  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const searchParams = useSearchParams();
+
+  const uri = "/organizations/" + organizationSlug + "/projects/" + projectSlug;
+  ("/");
+
+  const url = uri + "/pats/";
+
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     if (!project) {
       return;
@@ -335,6 +352,14 @@ These identifiers are managed by the external system and are treated as immutabl
           </>
         )}
         <hr />
+        <AccessTokenManagement
+          url={`${url}`}
+          section={{
+            title: "Generate your Project Access Tokens",
+            description:
+              "Manage your project access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+          }}
+        />
         <Section
           id="config-files"
           title="Configuration Files"

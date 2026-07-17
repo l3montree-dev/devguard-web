@@ -50,7 +50,7 @@ import type {
 } from "@/types/api/api";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
 import { useConfig } from "../../../../context/ConfigContext";
@@ -62,8 +62,24 @@ import Alert from "../../../../components/common/Alert";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
 import InvitedMembersTable from "@/components/InvitedMembersTable";
+import AccessTokenManagement from "@/components/AccessTokenManagement";
+import useDecodedParams from "@/hooks/useDecodedParams";
 
 const Home = () => {
+  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
+
+  const searchParams = useSearchParams();
+
+  const uri = "/organizations/" + organizationSlug + "/";
+
+  const url = uri + "pats/";
+
   const orgCtx = useOrganization();
   const activeOrg = orgCtx?.organization as OrganizationDetailsDTO;
   const updateOrgCtx = useUpdateOrganization();
@@ -610,6 +626,14 @@ const Home = () => {
             </div>
           </Card>
         </Section>
+        <AccessTokenManagement
+          url={`${url}`}
+          section={{
+            title: "Generate your Organization Access Tokens",
+            description:
+              "Manage your project access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+          }}
+        />
       </div>
       <hr />
       <FormProvider {...form}>
