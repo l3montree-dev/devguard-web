@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface DelayedDownloadButtonProps {
   href: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   label: string;
   className?: string;
   "data-testid"?: string;
@@ -50,7 +50,7 @@ export function DelayedDownloadButton({
       {loading ? (
         <Loader2Icon className="animate-spin h-5 w-auto inline-block mr-2" />
       ) : (
-        <span className="mr-2">{icon}</span>
+        icon && <span className="mr-2">{icon}</span>
       )}
       {label}
     </Button>
