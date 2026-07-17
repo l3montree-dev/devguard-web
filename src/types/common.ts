@@ -26,10 +26,7 @@ export type State =
   | "verifiedTransfered";
 
 export type ClosedState =
-  | "verifiedFix"
-  | "avoided"
-  | "accepted"
-  | "verifiedTransfered";
+  "verifiedFix" | "avoided" | "accepted" | "verifiedTransfered";
 
 export type PendingState = "pendingFix" | "pendingTransfered";
 

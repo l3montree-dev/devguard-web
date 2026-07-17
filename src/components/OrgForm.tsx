@@ -30,11 +30,11 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
         <FormField
           name="name"
           rules={{
-          validate: (value) =>
-            // Allows every character as long as one letter or number is given.
-            /[a-z0-9]/i.test(value ?? "") ||
-            "The name must contain at least one letter or number.",
-        }}
+            validate: (value) =>
+              // Allows every character as long as one letter or number is given.
+              /[a-z0-9]/i.test(value ?? "") ||
+              "The name must contain at least one letter or number.",
+          }}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Organization name*</FormLabel>
@@ -46,14 +46,14 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
           )}
         />
         {activeOrg && (
-        <InputWithButton
-          label="Organization-ID"
-          value={`${orgID}`}
-          nameKey="settings-org-id"
-          variant="default"
-          copyable
-          copyToastDescription="The organization ID has been copied to your clipboard."
-        />
+          <InputWithButton
+            label="Organization-ID"
+            value={`${orgID}`}
+            nameKey="settings-org-id"
+            variant="default"
+            copyable
+            copyToastDescription="The organization ID has been copied to your clipboard."
+          />
         )}
       </div>
     </Section>

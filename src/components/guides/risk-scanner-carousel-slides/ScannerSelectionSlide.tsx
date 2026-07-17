@@ -19,20 +19,14 @@ interface ScannerSelectionSlideProps {
   };
   prevIndex: number;
   selectedSetup?:
-    | "devguard-tools"
-    | "own-setup"
-    | "information-source"
-    | "devguard-cli";
+    "devguard-tools" | "own-setup" | "information-source" | "devguard-cli";
   devguardToolsSlideIndex: number;
   devguardCliSlideIndex: number;
   customSetupSlideIndex: number;
   informationSourceSlideIndex: number;
   setSelectedSetup: (
     setup:
-      | "devguard-tools"
-      | "own-setup"
-      | "information-source"
-      | "devguard-cli",
+      "devguard-tools" | "own-setup" | "information-source" | "devguard-cli",
   ) => void;
 }
 

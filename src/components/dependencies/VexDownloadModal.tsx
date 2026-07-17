@@ -60,8 +60,8 @@ export default function VexDownloadModal({
     (artifacts ?? []).map((a) => a.artifactName),
   );
 
-  const jsonFileName = `${assetName}_vex.json`
-  const xmlFileName = `${assetName}_vex.xml`
+  const jsonFileName = `${assetName}_vex.json`;
+  const xmlFileName = `${assetName}_vex.xml`;
 
   return (
     <Dialog open={showVexModal}>

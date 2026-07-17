@@ -195,14 +195,17 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
               Title="VEX Source"
               Description="The source or document that defines this VEX rule"
               Button={
-              <Tooltip>
-                <TooltipTrigger>
-              <Badge variant="outline">{truncateMiddle(vexRule.vexSource, 20)}</Badge>
-              </TooltipTrigger>
-                <TooltipContent className="whitespace-normal">
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Badge variant="outline">
+                      {truncateMiddle(vexRule.vexSource, 20)}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent className="whitespace-normal">
                     {vexRule.vexSource}
-                </TooltipContent>
-              </Tooltip>}
+                  </TooltipContent>
+                </Tooltip>
+              }
             />
           )}
 

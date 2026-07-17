@@ -27,12 +27,7 @@ export function useAutosetup(
   listenForChanges: boolean,
   devguardApiUrl: string,
   scanner:
-    | "full"
-    | "sca"
-    | "container-scanning"
-    | "secret-scanning"
-    | "iac"
-    | "sast",
+    "full" | "sca" | "container-scanning" | "secret-scanning" | "iac" | "sast",
 ) {
   const { waitFor, isLoading, Loader } = useLoader();
   const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
