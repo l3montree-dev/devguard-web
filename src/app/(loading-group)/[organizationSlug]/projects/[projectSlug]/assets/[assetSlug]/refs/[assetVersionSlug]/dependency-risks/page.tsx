@@ -197,7 +197,6 @@ const Index: FunctionComponent = () => {
   } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
     keepPreviousData: true,
   });
-
   const handleBulkAction = useCallback(
     async (params: {
       vulnIds: string[];

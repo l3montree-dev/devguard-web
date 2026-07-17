@@ -273,7 +273,10 @@ const Home = () => {
 
     if (res.ok) {
       toast.success("Organization deleted successfully");
-      router.push("/");
+      // Full navigation instead of router.push so the organization list is
+      // refetched — otherwise the stale list redirects back into the
+      // just-deleted organization.
+      window.location.href = "/";
     } else {
       toast.error("Failed to delete organization");
     }

@@ -67,9 +67,12 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
 
   const handleDelete = async (source: ExternalReference) => {
     try {
-      const response = await browserApiClient(apiUrl + "/" + encodeURIComponent(source.url), {
-        method: "DELETE",
-      });
+      const response = await browserApiClient(
+        apiUrl + "/" + encodeURIComponent(source.url),
+        {
+          method: "DELETE",
+        },
+      );
       if (!response.ok) {
         throw new Error(`Delete failed: ${response.statusText}`);
       }
@@ -166,7 +169,9 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   };
 
   if (error) {
-    return <p className="text-sm text-destructive">Failed to load VEX sources</p>;
+    return (
+      <p className="text-sm text-destructive">Failed to load VEX sources</p>
+    );
   }
 
   return (
@@ -252,7 +257,9 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
             )}
             <Tabs
               value={activeTab}
-              onValueChange={(v) => setActiveTab(v as ExternalReference["type"])}
+              onValueChange={(v) =>
+                setActiveTab(v as ExternalReference["type"])
+              }
             >
               <TabsList>
                 <TabsTrigger value="cyclonedxvex">VEX</TabsTrigger>

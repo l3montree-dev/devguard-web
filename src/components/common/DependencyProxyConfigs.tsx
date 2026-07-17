@@ -472,8 +472,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                   codeError ||
                   isSaving ||
                   (rulesText === (data ?? defaultConfig).rules &&
-                    minReleaseAge ===
-                      (data ?? defaultConfig).minReleaseAge) ||
+                    minReleaseAge === (data ?? defaultConfig).minReleaseAge) ||
                   data === undefined
                     ? undefined
                     : handleSave

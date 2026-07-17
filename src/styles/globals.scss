@@ -213,6 +213,11 @@
     }
 }
 
+button {
+    cursor: pointer;
+}
+
+
 @layer utilities {
     .font-thin {
         font-weight: var(--font-weight-thin);

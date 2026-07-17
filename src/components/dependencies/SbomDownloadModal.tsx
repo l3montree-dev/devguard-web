@@ -60,8 +60,8 @@ export default function SbomDownloadModal({
     (artifacts ?? []).map((a) => a.artifactName),
   );
 
-  const jsonFileName = `${assetName}_sbom.json`
-  const xmlFileName = `${assetName}_sbom.xml`
+  const jsonFileName = `${assetName}_sbom.json`;
+  const xmlFileName = `${assetName}_sbom.xml`;
 
   return (
     <Dialog open={showSBOMModal}>
