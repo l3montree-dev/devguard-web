@@ -25,8 +25,8 @@ import { useArtifacts } from "@/context/AssetVersionContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import {
-    useActiveAssetVersion,
-    useAssetBranchesAndTags,
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
@@ -300,7 +300,6 @@ const VexRulesPage: FunctionComponent = () => {
         </div>
       </Section>
 
-    
       {!vexRules?.length ? (
         <div>
           <EmptyParty

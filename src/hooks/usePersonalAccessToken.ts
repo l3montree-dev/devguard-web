@@ -43,8 +43,7 @@ export default function usePersonalAccessToken(
     const pat = sessionStorage.getItem("pat");
     if (pat) {
       const parsed = JSON.parse(pat) as
-        | SeeOncePatWithPrivKey
-        | SeeOncePatWithBearerToken;
+        SeeOncePatWithPrivKey | SeeOncePatWithBearerToken;
 
       setPersonalAccessTokens((prev) => [...prev, parsed]);
     }

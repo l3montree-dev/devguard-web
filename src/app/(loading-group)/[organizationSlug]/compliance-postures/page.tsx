@@ -11,14 +11,10 @@ const Index = () => {
 
   const orgMenu = useOrganizationMenu();
 
-  const apiBaseUrl = "/organizations/" + organizationSlug + "/compliance-postures/";
+  const apiBaseUrl =
+    "/organizations/" + organizationSlug + "/compliance-postures/";
 
-  return (
-    <CompliancePosturesListView
-      apiBaseUrl={apiBaseUrl}
-      Menu={orgMenu}
-    />
-  );
+  return <CompliancePosturesListView apiBaseUrl={apiBaseUrl} Menu={orgMenu} />;
 };
 
 export default Index;

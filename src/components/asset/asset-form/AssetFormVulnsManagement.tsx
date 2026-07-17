@@ -539,12 +539,13 @@ const PublicUrlsSection: FunctionComponent<{
 }> = ({ devguardApiUrl, orgSlug, copyable, basePath }) => {
   const urls = [
     {
-      label: "VeX-URL (Always up to date vulnerability information in CycloneDX Format)",
+      label:
+        "VeX-URL (Always up to date vulnerability information in CycloneDX Format)",
       nameKey: "vex-url",
       value: basePath ? `${basePath}/vex.json/` : "",
       copyToastDescription: "The VeX-URL has been copied to your clipboard.",
     },
-        {
+    {
       label:
         "OpenVex-URL (Always up to date vulnerability information in OpenVex format)",
       nameKey: "openvex-url",

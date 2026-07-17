@@ -47,8 +47,7 @@ const Sort: FunctionComponent<Props> = ({ sortOptions }) => {
 
   const sortDirection = initialSortOption
     ? ((searchParams?.get(`sort[${initialSortOption.value}]`) as
-        | "asc"
-        | "desc") ?? "asc")
+        "asc" | "desc") ?? "asc")
     : "asc";
 
   const selectedLabel =
