@@ -440,7 +440,7 @@ const Index: FunctionComponent = () => {
     ).sort((a, b) => a.localeCompare(b));
 
     if (artifactNames.length === 0) {
-      return [vuln.vulnerabilityPath];
+      return [["ROOT", ...vuln.vulnerabilityPath]];
     }
 
     return artifactNames.map((artifactName) => [
