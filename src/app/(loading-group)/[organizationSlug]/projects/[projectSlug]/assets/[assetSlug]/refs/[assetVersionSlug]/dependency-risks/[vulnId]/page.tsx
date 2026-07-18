@@ -85,6 +85,7 @@ import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedP
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 import WarningWithDescription from "@/components/common/WarningWithDescription";
+import AdvisoriesCard from "@/components/risk-handling/AdvisoriesCard";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -749,6 +750,14 @@ const Index: FunctionComponent = () => {
                     artifactName={a.artifactName}
                   />
                 ))}
+              </div>
+              <div className="mt-8">
+                {vuln?.advisories && (
+                  <AdvisoriesCard
+                    advisories={vuln?.advisories}
+                    variant="collapsible"
+                  />
+                )}
               </div>
               <div data-tour="path">
                 {!graphLoading && (

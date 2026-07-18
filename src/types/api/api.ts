@@ -454,8 +454,14 @@ export interface VulnWithCVE extends DependencyVuln {
     | null;
 }
 
+export interface Advisory {
+  cve: string;
+  description: string;
+}
+
 export interface DetailedDependencyVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
+  advisories?: Advisory[];
 }
 
 export interface DependencyVulnHints {
