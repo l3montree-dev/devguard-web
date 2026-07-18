@@ -358,6 +358,22 @@ const Index: FunctionComponent = () => {
     fetcher,
   );
 
+  const isLastEventVexRule = useMemo(() => {
+    if (!vuln || !vuln.events || vuln.events.length === 0) {
+      return false;
+    }
+    for (let i = vuln.events.length - 1; i >= 0; i--) {
+      if (vuln.events[i].type === "rawRiskAssessmentUpdated") {
+        continue;
+      } else if (vuln.events[i].createdByVexRule) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
+  }, [vuln]);
+
   // Handler to create false-positive rules from the dependency graph context menu
   const createFalsePositive = useCreateVexRule({
     activeOrgSlug: activeOrg.slug,
@@ -1080,6 +1096,11 @@ const Index: FunctionComponent = () => {
                                     </div>
                                   </div>
                                 </form>
+                              ) : isLastEventVexRule ? (
+                                <p className="text-sm text-muted-foreground">
+                                  This vuln was handled by a VEX rule. Remove
+                                  or adjust the VEX rule to reopen it.
+                                </p>
                               ) : (
                                 <form
                                   className="flex flex-col gap-4"
@@ -1097,7 +1118,6 @@ const Index: FunctionComponent = () => {
                                       placeholder="Add your comment here..."
                                     />
                                   </div>
-
                                   <p className="text-sm text-muted-foreground">
                                     You can reopen this vuln, if you plan to
                                     mitigate the risk now, or accepted this vuln
