@@ -25,7 +25,8 @@ import { fetcher } from "@/data-fetcher/fetcher";
 import useTable from "@/hooks/useTable";
 import SortingCaret from "@/components/common/SortingCaret";
 import { classNames } from "@/utils/common";
-import { getSeverityClassNames } from "@/components/common/Severity";
+import { CVSSBadge } from "@/components/common/Severity";
+import FormatDate from "@/components/risk-assessment/FormatDate";
 import type { FunctionComponent } from "react";
 import { useMemo, useState } from "react";
 import { buildFilterSearchParams } from "@/utils/url";
@@ -36,10 +37,20 @@ import AdvisoryDialog, {
 } from "@/components/AdvisoryDialog";
 import { toast } from "@/lib/toast";
 import { vectorStringToScore } from "@/utils/cvss";
+import { useConfig } from "@/context/ConfigContext";
 
 const columnHelper = createColumnHelper<SecurityAdvisory>();
 
-const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
+const updatedAtHeader: Record<string, string> = {
+  draft: "Opened",
+  public: "Published",
+  withdrawn: "Withdrawn",
+};
+
+const buildColumnsDef = (
+  visibility: string,
+  csafBaseUrl: string,
+): ColumnDef<SecurityAdvisory, any>[] => [
   columnHelper.accessor("title", {
     header: "Title",
     enableSorting: true,
@@ -62,16 +73,40 @@ const columnsDef: ColumnDef<SecurityAdvisory, any>[] = [
       const severity = info.getValue();
       if (!severity) return null;
       const score = vectorStringToScore(info.row.original.vectorString ?? "");
+      if (score === null) return null;
+      return <CVSSBadge cvss={score} />;
+    },
+  }),
+
+  columnHelper.accessor("updatedAt", {
+    header: updatedAtHeader[visibility] ?? "Updated",
+    enableSorting: true,
+    meta: { className: "w-40 whitespace-nowrap" },
+    cell: (info) => {
+      const value = info.getValue();
+      return value && <FormatDate dateString={value} />;
+    },
+  }),
+
+  columnHelper.display({
+    id: "csaf",
+    header: "CSAF",
+    meta: { className: "w-24 whitespace-nowrap" },
+    cell: (info) => {
+      const advisory = info.row.original;
+      if (advisory.visibility !== "public") return null;
+      const year = new Date(advisory.createdAt).getFullYear();
+      const href = `${csafBaseUrl}/csaf/white/${year}/dgsa-${year}-${advisory.id}.json`;
       return (
-        <span
-          className={classNames(
-            "inline-flex px-2 py-0.5 text-xs font-medium rounded-full",
-            getSeverityClassNames(String(severity).toUpperCase(), false),
-          )}
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="text-sm text-link"
+          onClick={(e) => e.stopPropagation()}
         >
-          {severity}
-          {score !== null && ` (${score.toFixed(1)})`}
-        </span>
+          View
+        </a>
       );
     },
   }),
@@ -82,6 +117,7 @@ const Index: FunctionComponent = () => {
   const assetId = asset?.id;
   const router = useRouter();
   const pathname = usePathname();
+  const config = useConfig();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     useDecodedParams() as {
       organizationSlug: string;
@@ -91,6 +127,7 @@ const Index: FunctionComponent = () => {
     };
 
   const advisoryUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`;
+  const csafBaseUrl = `${config.devguardApiUrlPublicInternet}/api/v1/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}`;
 
   const searchParams = useSearchParams();
   const push = useRouterQuery();
@@ -123,6 +160,10 @@ const Index: FunctionComponent = () => {
     { keepPreviousData: true },
   );
   const assetMenu = useAssetMenu();
+  const columnsDef = useMemo(
+    () => buildColumnsDef(visibility, csafBaseUrl),
+    [visibility, csafBaseUrl],
+  );
   const { table } = useTable(
     { columnsDef, data: advisories?.data || [] },
     { getSortedRowModel: getSortedRowModel(), manualSorting: false },

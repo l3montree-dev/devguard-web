@@ -1,38 +1,30 @@
-import AutoHeight from "embla-carousel-auto-height";
-import Fade from "embla-carousel-fade";
-import React, { type FunctionComponent, useCallback, useState } from "react";
-import {
-  PlusIcon,
-  TrashIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
+import React, { type FunctionComponent, useState } from "react";
+import dynamic from "next/dynamic";
+import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "./ui/button";
-import { Carousel, CarouselContent, CarouselItem } from "./ui/carousel";
-import type { CarouselApi } from "./ui/carousel";
-import { Dialog, DialogContent } from "./ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "./ui/dialog";
 import { DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "./ui/form";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import type { AdvisoryAffectedPackage } from "@/types/api/api";
-import { getSeverityClassNames } from "./common/Severity";
-import { classNames } from "@/utils/common";
+import { CVSSBadge } from "./common/Severity";
+import { compareSemver } from "@/services/versionCheck";
 import {
   CVSS31_METRICS,
   CVSS40_METRICS,
   buildVectorString,
-  calcCvss31,
-  calcCvss40,
   parseCvssVector,
-  scoreToSeverity,
+  vectorStringToScore,
   vectorStringToSeverity,
 } from "@/utils/cvss";
 import {
@@ -42,6 +34,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CircleHelp } from "lucide-react";
+
+const MarkdownEditor = dynamic(
+  () => import("@/components/common/MarkdownEditor"),
+  { ssr: false },
+);
 
 export interface AdvisoryFormData {
   title: string;
@@ -59,8 +56,6 @@ interface AdvisoryDialogProps {
   initialValues?: AdvisoryFormData;
 }
 
-const SEVERITIES = ["Critical", "High", "Medium", "Low", "None"];
-
 type PackageRow = Omit<AdvisoryAffectedPackage, "id">;
 
 const emptyPackage = (): PackageRow => ({
@@ -70,11 +65,19 @@ const emptyPackage = (): PackageRow => ({
   semverEnd: "",
 });
 
-const SEMVER_RE = /^\d+\.\d+\.\d+$/;
+const SEMVER_RE = /^v?\d+\.\d+\.\d+$/;
 
-function isSemverValid(v: string): boolean {
-  return v === "" || SEMVER_RE.test(v);
-}
+const defaultValues = (initialValues?: AdvisoryFormData): AdvisoryFormData => ({
+  title: initialValues?.title ?? "",
+  description: initialValues?.description ?? "",
+  severity: initialValues?.severity ?? "",
+  vectorString: initialValues?.vectorString ?? "",
+  affectedPackages:
+    initialValues?.affectedPackages && initialValues.affectedPackages.length > 0
+      ? initialValues.affectedPackages
+      : [emptyPackage()],
+  visibility: initialValues?.visibility ?? "draft",
+});
 
 const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
   open,
@@ -87,32 +90,16 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
     ? parseCvssVector(initialValues.vectorString)
     : null;
 
-  const [api, setApi] = React.useState<{
-    scrollTo: (index: number) => void;
-    reInit: () => void;
-  }>({ scrollTo: () => {}, reInit: () => {} });
+  const form = useForm<AdvisoryFormData>({
+    defaultValues: defaultValues(initialValues),
+    mode: "onChange",
+  });
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "affectedPackages",
+  });
 
-  const [title, setTitle] = useState(initialValues?.title ?? "");
-  const [description, setDescription] = useState(
-    initialValues?.description ?? "",
-  );
-  const [severity, setSeverity] = useState(initialValues?.severity ?? "");
-  const [vectorstring, setVectorstring] = useState(
-    initialValues?.vectorString ?? "",
-  );
-  const [severityFromVector, setSeverityFromVector] = useState(
-    !!initialValues?.vectorString &&
-      !!vectorStringToSeverity(initialValues.vectorString),
-  );
-  const initialPackages = initialValues?.affectedPackages;
-  const [packages, setPackages] = useState<PackageRow[]>(
-    initialPackages && initialPackages.length > 0
-      ? initialPackages
-      : [emptyPackage()],
-  );
-  const [pkgIndex, setPkgIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [cvssVersion, setCvssVersion] = useState<"3.1" | "4.0">(
     parsedInitialVector?.version ?? "3.1",
   );
@@ -120,93 +107,48 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
     parsedInitialVector?.metrics ?? {},
   );
 
-  const setProxyApi = useCallback((emblaApi: CarouselApi) => {
-    setApi({
-      scrollTo: (index: number) => emblaApi?.scrollTo(index),
-      reInit: () => emblaApi?.reInit(),
-    });
-  }, []);
-  React.useEffect(() => {
-    api.reInit();
-  }, [api, cvssVersion]);
+  const vectorstring = form.watch("vectorString");
 
   const handleVectorChange = (val: string) => {
-    setVectorstring(val);
-    const sev = vectorStringToSeverity(val);
-    if (sev) {
-      setSeverity(sev);
-      setSeverityFromVector(true);
-    } else {
-      setSeverityFromVector(false);
-      if (severity && severityFromVector) setSeverity("");
+    form.setValue("vectorString", val, { shouldValidate: true });
+    const parsed = parseCvssVector(val);
+    if (parsed) {
+      setCvssVersion(parsed.version);
+      setCvssVals(parsed.metrics);
     }
   };
 
   const handleCvssVersionChange = (ver: "3.1" | "4.0") => {
     setCvssVersion(ver);
     setCvssVals({});
+    form.setValue("vectorString", "", { shouldValidate: true });
+  };
+
+  const setMetricValue = (metricKey: string, value: string) => {
+    const next = { ...cvssVals, [metricKey]: value };
+    setCvssVals(next);
+    form.setValue("vectorString", buildVectorString(cvssVersion, next), {
+      shouldValidate: true,
+    });
   };
 
   const cvssMetrics = cvssVersion === "3.1" ? CVSS31_METRICS : CVSS40_METRICS;
-  const cvssComplete = cvssMetrics.every((m) => cvssVals[m.key]);
-  const cvssScore = cvssComplete
-    ? cvssVersion === "3.1"
-      ? calcCvss31(cvssVals)
-      : calcCvss40(cvssVals)
-    : null;
-
-  const applyCvssBuilder = () => {
-    const vec = buildVectorString(cvssVersion, cvssVals);
-    setVectorstring(vec);
-    const sev = scoreToSeverity(cvssScore ?? 0);
-    setSeverity(sev);
-    setSeverityFromVector(true);
-    api.scrollTo(0);
-  };
-
-  const updatePackage = (field: keyof PackageRow, value: string) => {
-    setPackages((prev) =>
-      prev.map((pkg, i) => (i === pkgIndex ? { ...pkg, [field]: value } : pkg)),
-    );
-  };
-
-  const addPackage = () => {
-    if (packages.length >= 10) return;
-    setPackages((prev) => [...prev, emptyPackage()]);
-    setPkgIndex(packages.length);
-  };
-
-  const removePackage = (index: number) => {
-    setPackages((prev) => {
-      const next = prev.filter((_, i) => i !== index);
-      if (next.length === 0) return [emptyPackage()];
-      return next;
-    });
-    setPkgIndex((prev) => Math.min(prev, packages.length - 2));
-  };
+  const cvssScore = vectorStringToScore(vectorstring);
 
   const handleClose = (open: boolean) => {
     if (open) return;
-    setTitle("");
-    setDescription("");
-    setSeverity("");
-    setVectorstring("");
-    setSeverityFromVector(false);
-    setPackages([emptyPackage()]);
-    setPkgIndex(0);
+    form.reset(defaultValues());
     setCvssVals({});
     onOpenChange(false);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = form.handleSubmit(async (data) => {
     setIsSubmitting(true);
     try {
       await onSubmit({
-        title,
-        description,
-        severity,
-        vectorString: vectorstring,
-        affectedPackages: packages.map((pkg) => ({
+        ...data,
+        severity: vectorStringToSeverity(data.vectorString) ?? "",
+        affectedPackages: data.affectedPackages.map((pkg) => ({
           ...pkg,
           semverStart: pkg.semverStart || null,
           semverEnd: pkg.semverEnd || null,
@@ -217,23 +159,14 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  });
 
-  const slide1Valid = title.trim() !== "" && severity !== "";
-  const pkg = packages[pkgIndex] ?? emptyPackage();
-  const semverStartValid = isSemverValid(pkg.semverStart ?? "");
-  const semverEndValid = isSemverValid(pkg.semverEnd ?? "");
-  const isPackageComplete = (p: PackageRow) =>
-    p.packageName.trim() !== "" &&
-    SEMVER_RE.test((p.semverStart ?? "").trim()) &&
-    SEMVER_RE.test((p.semverEnd ?? "").trim());
-  const allPackagesValid = packages.every(isPackageComplete);
   const submitLabel = editAdvisory ? "Save Changes" : "Create Draft Advisory";
   const submittingLabel = editAdvisory ? "Editing..." : "Creating...";
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="overflow-y-auto">
+      <DialogContent className="overflow-y-auto max-w-3xl">
         <DialogHeader>
           <DialogTitle>
             {editAdvisory
@@ -241,334 +174,274 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
               : "Create Security Advisory"}
           </DialogTitle>
         </DialogHeader>
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="advisory-title">Title *</Label>
-            <Input
-              id="advisory-title"
-              placeholder="Advisory title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
+            <FormField
+              control={form.control}
+              name="title"
+              rules={{ required: "Title is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Advisory title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="advisory-description">Description *</Label>
-            <Textarea
-              id="advisory-description"
-              placeholder={`### Summary\nShort summary of the problem. Make the impact and severity as clear as possible.\n\n### Details\nGive all details on the vulnerability.`}
-              className="resize-none"
-              rows={6}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+
+            <FormField
+              control={form.control}
+              name="description"
+              rules={{ required: "Description is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <MarkdownEditor
+                      className="!bg-card"
+                      placeholder={`### Summary\nShort summary of the problem. Make the impact and severity as clear as possible.\n\n### Details\nGive all details on the vulnerability.`}
+                      value={field.value}
+                      setValue={(value) => field.onChange(value ?? "")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="advisory-severity">Severity *</Label>
-              <span
-                className={`text-xs text-muted-foreground transition-opacity ${severityFromVector ? "opacity-100" : "opacity-0"}`}
-              >
-                — derived from vector string
-              </span>
-            </div>
-            <Select
-              value={severity}
-              onValueChange={severityFromVector ? undefined : setSeverity}
-              disabled={severityFromVector}
-            >
-              <SelectTrigger
-                id="advisory-severity"
-                className={
-                  severityFromVector ? "opacity-80 cursor-not-allowed" : ""
+
+            <FormField
+              control={form.control}
+              name="vectorString"
+              rules={{
+                validate: (value) =>
+                  vectorStringToSeverity(value) !== null ||
+                  "Enter a valid CVSS vector string, or use the calculator below",
+              }}
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center gap-2">
+                    <FormLabel>Vector string</FormLabel>
+                    {cvssScore !== null && !isNaN(cvssScore) && (
+                      <CVSSBadge cvss={cvssScore} />
+                    )}
+                  </div>
+                  <FormControl>
+                    <Input
+                      placeholder="CVSS:4.0/AV:N/AC:L/…"
+                      {...field}
+                      onChange={(e) => handleVectorChange(e.target.value)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="flex flex-col gap-3 rounded-lg border p-4">
+              <Tabs
+                value={cvssVersion}
+                onValueChange={(v) =>
+                  handleCvssVersionChange(v as "3.1" | "4.0")
                 }
               >
-                <SelectValue placeholder="Select severity" />
-              </SelectTrigger>
-              <SelectContent>
-                {SEVERITIES.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    <span
-                      className={classNames(
-                        "inline-flex px-2 py-0.5 text-xs font-medium rounded-full",
-                        getSeverityClassNames(s.toUpperCase(), false),
-                      )}
-                    >
-                      {s}
-                    </span>
-                  </SelectItem>
+                <TabsList>
+                  <TabsTrigger value="3.1">CVSS 3.1</TabsTrigger>
+                  <TabsTrigger value="4.0">CVSS 4.0</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              <div className="flex flex-col gap-3">
+                {cvssMetrics.map((metric) => (
+                  <div key={metric.key} className="flex flex-col gap-1.5">
+                    <Label className="text-xs text-muted-foreground">
+                      {metric.label}{" "}
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <CircleHelp className="w-3 h-3 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipPortal>
+                          <TooltipContent>
+                            <div className="relative font-normal">
+                              {metric.description}{" "}
+                              <a
+                                target="_blank"
+                                rel="noreferrer noopener"
+                                href={`https://www.first.org/cvss/calculator/${cvssVersion}`}
+                              >
+                                More information.
+                              </a>
+                            </div>
+                          </TooltipContent>
+                        </TooltipPortal>
+                      </Tooltip>
+                    </Label>
+
+                    <div className="flex flex-wrap gap-1.5">
+                      {metric.options.map((opt) => (
+                        <Button
+                          key={opt.v}
+                          variant="outline"
+                          type="button"
+                          size={"sm"}
+                          onClick={() => setMetricValue(metric.key, opt.v)}
+                          className={` ${
+                            cvssVals[metric.key] === opt.v
+                              ? "bg-secondary text-secondary-foreground"
+                              : ""
+                          }`}
+                        >
+                          {opt.l} ({opt.v})
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="advisory-vectorstring">Vector string</Label>
-            <Input
-              id="advisory-vectorstring"
-              placeholder="CVSS:4.0/AV:N/AC:L/…"
-              value={vectorstring}
-              onChange={(e) => handleVectorChange(e.target.value)}
-            />
-            <button
-              type="button"
-              className="text-xs cursor-pointer text-link text-left"
-              onClick={() => api.scrollTo(1)}
-            >
-              Calculate vector string
-            </button>
-          </div>
-        </div>
-        <div className="mt-8 flex justify-end gap-2">
-          <Button variant="secondary" onClick={() => handleClose(false)}>
-            Cancel
-          </Button>
-          <Button disabled={!slide1Valid} onClick={() => api.scrollTo(2)}>
-            Add Packages
-          </Button>
-        </div>
-
-        <DialogHeader>
-          <DialogTitle>Calculate Vector String</DialogTitle>
-        </DialogHeader>
-        <div className="mt-4 flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <Label className="text-sm shrink-0">CVSS Version</Label>
-            <div className="flex rounded-md border overflow-hidden">
-              {(["3.1", "4.0"] as const).map((ver) => (
-                <button
-                  key={ver}
-                  type="button"
-                  className={`px-3 py-1 cursor-pointer text-sm transition-colors ${
-                    cvssVersion === ver
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
-                  }`}
-                  onClick={() => handleCvssVersionChange(ver)}
-                >
-                  {ver}
-                </button>
-              ))}
-            </div>
-            {cvssScore !== null && (
-              <span className="ml-auto text-sm font-medium">
-                Score: {cvssScore.toFixed(1)} —{" "}
-                <span className="font-semibold">
-                  {scoreToSeverity(cvssScore)}
-                </span>
-              </span>
-            )}
-          </div>
-
-          <div className="flex flex-col gap-3 border rounded-lg p-3 max-h-[50vh] overflow-y-auto pr-1">
-            {cvssMetrics.map((metric) => (
-              <div key={metric.key} className="flex flex-col gap-1.5">
-                <Label className="text-xs text-muted-foreground">
-                  {metric.label}{" "}
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <CircleHelp className="w-3 h-3 text-muted-foreground cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipPortal>
-                      <TooltipContent>
-                        <div className="relative font-normal">
-                          {metric.description}{" "}
-                          {cvssVersion === "4.0" && (
-                            <a
-                              target="_blank"
-                              rel="noreferrer noopener"
-                              href="https://www.first.org/cvss/calculator/4.0"
-                            >
-                              More information.
-                            </a>
-                          )}
-                          {cvssVersion === "3.1" && (
-                            <a
-                              target="_blank"
-                              rel="noreferrer noopener"
-                              href="https://www.first.org/cvss/calculator/3.1"
-                            >
-                              More information.
-                            </a>
-                          )}
-                        </div>
-                      </TooltipContent>
-                    </TooltipPortal>
-                  </Tooltip>
-                </Label>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {metric.options.map((opt) => (
-                    <Button
-                      key={opt.v}
-                      variant="outline"
-                      type="button"
-                      size={"sm"}
-                      onClick={() =>
-                        setCvssVals((prev) => ({
-                          ...prev,
-                          [metric.key]: opt.v,
-                        }))
-                      }
-                      className={` ${
-                        cvssVals[metric.key] === opt.v
-                          ? "bg-secondary text-secondary-foreground"
-                          : ""
-                      }`}
-                    >
-                      {opt.l} ({opt.v})
-                    </Button>
-                  ))}
-                </div>
               </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-6 flex justify-between gap-2">
-          <Button variant="secondary" onClick={() => api.scrollTo(0)}>
-            Back
-          </Button>
-          <Button disabled={!cvssComplete} onClick={applyCvssBuilder}>
-            Apply & Continue
-          </Button>
-        </div>
-
-        <DialogHeader>
-          <DialogTitle>Affected Packages</DialogTitle>
-        </DialogHeader>
-
-        <div className="mt-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                disabled={pkgIndex === 0}
-                onClick={() => setPkgIndex((i) => i - 1)}
-                className="rounded-md p-1 hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeftIcon className="h-4 w-4" />
-              </button>
-              <span className="text-sm font-medium">
-                Package {pkgIndex + 1} / {packages.length}
-              </span>
-              <button
-                type="button"
-                disabled={pkgIndex === packages.length - 1}
-                onClick={() => setPkgIndex((i) => i + 1)}
-                className="rounded-md p-1 hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRightIcon className="h-4 w-4" />
-              </button>
             </div>
-            <div className="flex items-center gap-1">
+
+            <div className="flex flex-col gap-3">
+              <Label>Affected Packages</Label>
+              {fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="rounded-lg border p-4 flex flex-col gap-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">
+                      Package {index + 1}
+                    </span>
+                    {fields.length > 1 && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => remove(index)}
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 items-start">
+                    <FormField
+                      control={form.control}
+                      name={`affectedPackages.${index}.ecosystem`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Ecosystem</FormLabel>
+                          <FormControl>
+                            <Input placeholder="go, npm, pypi…" {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`affectedPackages.${index}.packageName`}
+                      rules={{ required: "Package name is required" }}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Package Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="pkg:example" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`affectedPackages.${index}.semverStart`}
+                      rules={{
+                        required: "Semver Start is required",
+                        pattern: {
+                          value: SEMVER_RE,
+                          message: "Format: 1.2.3",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Semver Start</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="0.0.0"
+                              {...field}
+                              value={field.value ?? ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`affectedPackages.${index}.semverEnd`}
+                      rules={{
+                        required: "Semver End is required",
+                        pattern: {
+                          value: SEMVER_RE,
+                          message: "Format: 1.2.3",
+                        },
+                        validate: (value) => {
+                          const start = form.getValues(
+                            `affectedPackages.${index}.semverStart`,
+                          );
+                          if (
+                            !value ||
+                            !start ||
+                            !SEMVER_RE.test(value) ||
+                            !SEMVER_RE.test(start)
+                          ) {
+                            return true;
+                          }
+                          return (
+                            compareSemver(value, start) > 0 ||
+                            "Must be greater than Semver Start"
+                          );
+                        },
+                      }}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Semver End</FormLabel>
+                          <FormControl>
+                            <Input placeholder="1.0.0" {...(field as any)} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              ))}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={addPackage}
-                disabled={packages.length >= 10}
+                type="button"
+                onClick={() => append(emptyPackage())}
+                disabled={fields.length >= 10}
+                className={fields.length >= 10 ? "opacity-50" : ""}
               >
                 <PlusIcon className="mr-1 h-4 w-4" />
                 Add Package
               </Button>
-              {packages.length > 1 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-destructive hover:text-destructive"
-                  onClick={() => removePackage(pkgIndex)}
-                >
-                  <TrashIcon className="h-4 w-4" />
-                </Button>
-              )}
             </div>
-          </div>
 
-          <div
-            className={classNames(
-              "flex justify-center gap-1.5",
-              packages.length < 2 && "invisible",
-            )}
-          >
-            {packages.map((_, i) => (
-              <button
-                key={i}
+            <DialogFooter className="mt-2">
+              <Button
                 type="button"
-                onClick={() => setPkgIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === pkgIndex
-                    ? "w-4 bg-primary"
-                    : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/60"
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="rounded-lg border p-4 flex flex-col gap-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1">
-                <Label className="text-xs">Ecosystem</Label>
-                <Input
-                  placeholder="go, npm, pypi…"
-                  value={pkg.ecosystem}
-                  onChange={(e) => updatePackage("ecosystem", e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-xs">Package Name *</Label>
-                <Input
-                  placeholder="pkg:example"
-                  value={pkg.packageName}
-                  onChange={(e) => updatePackage("packageName", e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-xs">Semver Start *</Label>
-                <Input
-                  placeholder="0.0.0"
-                  value={pkg.semverStart ?? ""}
-                  onChange={(e) => updatePackage("semverStart", e.target.value)}
-                  className={
-                    !semverStartValid
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : ""
-                  }
-                />
-                {!semverStartValid && (
-                  <p className="text-xs text-destructive">Format: 1.2.3</p>
-                )}
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label className="text-xs">Semver End *</Label>
-                <Input
-                  placeholder="1.0.0"
-                  value={pkg.semverEnd ?? ""}
-                  onChange={(e) => updatePackage("semverEnd", e.target.value)}
-                  className={
-                    !semverEndValid
-                      ? "border-destructive focus-visible:ring-destructive"
-                      : ""
-                  }
-                />
-                {!semverEndValid && (
-                  <p className="text-xs text-destructive">Format: 1.2.3</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 flex items-center justify-between gap-2">
-          <Button variant="secondary" onClick={() => api.scrollTo(0)}>
-            Back
-          </Button>
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !allPackagesValid}
-            >
-              {isSubmitting ? submittingLabel : submitLabel}
-            </Button>
-          </div>
-        </div>
+                variant="secondary"
+                onClick={() => handleClose(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? submittingLabel : submitLabel}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

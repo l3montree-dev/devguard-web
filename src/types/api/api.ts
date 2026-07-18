@@ -1264,6 +1264,8 @@ export interface SecurityAdvisory {
   assetID: string;
   affectedPackages: AdvisoryAffectedPackage[] | null;
   visibility: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdvisoryAffectedPackage {

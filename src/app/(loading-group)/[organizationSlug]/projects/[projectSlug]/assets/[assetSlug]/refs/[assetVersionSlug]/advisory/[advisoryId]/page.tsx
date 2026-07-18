@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { SecurityAdvisory } from "@/types/api/api";
 import Severity from "@/components/common/Severity";
 import Markdown from "@/components/common/Markdown";
+import FormatDate from "@/components/risk-assessment/FormatDate";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
@@ -36,10 +37,12 @@ import AdvisoryDialog, {
   type AdvisoryFormData,
 } from "@/components/AdvisoryDialog";
 import AuthGuard from "@/components/AuthGuard";
+import { useConfig } from "@/context/ConfigContext";
 
 const Index = () => {
   const router = useRouter();
   const params = useDecodedParams();
+  const config = useConfig();
   const {
     organizationSlug,
     projectSlug,
@@ -159,6 +162,8 @@ const Index = () => {
   const parsed = advisory.vectorString
     ? parseCvssVector(advisory.vectorString)
     : null;
+  const csafYear = new Date(advisory.createdAt).getFullYear();
+  const csafUrl = `${config.devguardApiUrlPublicInternet}/api/v1/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/csaf/white/${csafYear}/dgsa-${csafYear}-${advisory.id}.json`;
   const metricDefs =
     parsed?.version === "4.0"
       ? CVSS40_METRICS
@@ -217,6 +222,10 @@ const Index = () => {
       Menu={assetMenu}
       Title={"Security Advisory"}
       title={advisory.title ?? advisory.id}
+      breadcrumbs={[
+        { title: "Security Advisories", href: "./" },
+        { title: advisory.title ?? advisory.id, href: "" },
+      ]}
     >
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         <div className="flex-1 min-w-0">
@@ -225,6 +234,16 @@ const Index = () => {
             <Badge className="h-full" variant={visibilityBadge.variant}>
               {visibilityBadge.label}
             </Badge>
+            {advisory.visibility !== "draft" && (
+              <a
+                href={csafUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="ml-auto text-sm text-link"
+              >
+                See in CSAF format
+              </a>
+            )}
           </div>
 
           {(advisory.affectedPackages?.length ?? 0) > 0 && (
@@ -259,7 +278,7 @@ const Index = () => {
           )}
 
           {advisory.description && (
-            <div className="rounded-lg border p-4">
+            <div className="rounded-lg">
               <h2 className="text-base font-semibold mb-3">Description</h2>
               <Markdown>{advisory.description}</Markdown>
             </div>
