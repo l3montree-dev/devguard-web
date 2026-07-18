@@ -4,10 +4,11 @@ import { useState } from "react";
 
 interface DelayedDownloadButtonProps {
   href: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   label: string;
   className?: string;
   "data-testid"?: string;
+  downloadFileName?: string;
 }
 
 export function DelayedDownloadButton({
@@ -16,6 +17,7 @@ export function DelayedDownloadButton({
   label,
   className = "",
   "data-testid": dataTestId,
+  downloadFileName,
 }: DelayedDownloadButtonProps) {
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +31,7 @@ export function DelayedDownloadButton({
       const parts = href.split("/");
       const filename = parts[parts.length - 1].split("?")[0];
 
-      link.download = filename;
+      link.download = downloadFileName ?? filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -48,7 +50,7 @@ export function DelayedDownloadButton({
       {loading ? (
         <Loader2Icon className="animate-spin h-5 w-auto inline-block mr-2" />
       ) : (
-        <span className="mr-2">{icon}</span>
+        icon && <span className="mr-2">{icon}</span>
       )}
       {label}
     </Button>

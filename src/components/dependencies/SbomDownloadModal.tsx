@@ -60,6 +60,9 @@ export default function SbomDownloadModal({
     (artifacts ?? []).map((a) => a.artifactName),
   );
 
+  const jsonFileName = `${assetName}_sbom.json`;
+  const xmlFileName = `${assetName}_sbom.xml`;
+
   return (
     <Dialog open={showSBOMModal}>
       <DialogContent setOpen={setShowSBOMModal}>
@@ -116,6 +119,7 @@ export default function SbomDownloadModal({
               />
             }
             label={"Download in JSON-Format"}
+            downloadFileName={jsonFileName}
           />
           <DelayedDownloadButton
             href={
@@ -126,6 +130,7 @@ export default function SbomDownloadModal({
             }
             icon={<FileCode className="h-5 w-auto inline-block text-success" />}
             label={"Download in XML-Format"}
+            downloadFileName={xmlFileName}
           />
         </div>
         <hr className="mt-6" />

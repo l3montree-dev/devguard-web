@@ -83,12 +83,12 @@ function checkRulesAgainstPackages(
 
 interface DependencyProxyConfig {
   rules: string;
-  minReleaseTime: number;
+  minReleaseAge: number;
 }
 
 const defaultConfig: DependencyProxyConfig = {
   rules: "",
-  minReleaseTime: 60,
+  minReleaseAge: 60,
 };
 
 const getEcosystemContent = (key: string, url: string) => {
@@ -202,8 +202,8 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   );
 
   const [rulesText, setRulesText] = useState("");
-  const [minReleaseTime, setMinReleaseTime] = useState(
-    defaultConfig.minReleaseTime,
+  const [minReleaseAge, setMinReleaseAge] = useState(
+    defaultConfig.minReleaseAge,
   );
   const [codeError, setCodeError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -237,7 +237,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
     if (data !== undefined && initializedForUrl.current !== configUrl) {
       const config = data ?? defaultConfig;
       setRulesText(config.rules);
-      setMinReleaseTime(config.minReleaseTime);
+      setMinReleaseAge(config.minReleaseAge);
       initializedForUrl.current = configUrl;
     }
   }, [data, configUrl]);
@@ -267,7 +267,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
     if (!configUrl) return;
     const config: DependencyProxyConfig = {
       rules: rulesText,
-      minReleaseTime: minReleaseTime,
+      minReleaseAge: minReleaseAge,
     };
     setIsSaving(true);
     const resp = await browserApiClient(configUrl, {
@@ -472,8 +472,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                   codeError ||
                   isSaving ||
                   (rulesText === (data ?? defaultConfig).rules &&
-                    minReleaseTime ===
-                      (data ?? defaultConfig).minReleaseTime) ||
+                    minReleaseAge === (data ?? defaultConfig).minReleaseAge) ||
                   data === undefined
                     ? undefined
                     : handleSave
@@ -497,8 +496,10 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
                 min={0}
                 variant="onCard"
                 className="w-24"
-                value={minReleaseTime}
-                onChange={(e) => setMinReleaseTime(Number(e.target.value))}
+                value={minReleaseAge}
+                onChange={(e) =>
+                  setMinReleaseAge(Math.max(0, Number(e.target.value) || 0))
+                }
               />
               <span className="whitespace-nowrap text-sm text-muted-foreground">
                 hours
@@ -520,7 +521,7 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
               data === undefined ||
               !!codeError ||
               (rulesText === (data ?? defaultConfig).rules &&
-                minReleaseTime === (data ?? defaultConfig).minReleaseTime)
+                minReleaseAge === (data ?? defaultConfig).minReleaseAge)
             }
           >
             {isSaving ? "Saving..." : "Save"}

@@ -81,11 +81,25 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="text-base">{title}</CardTitle>
-        <CardDescription>{description}.</CardDescription>
+        <div className="flex gap-2 justify-end">
+          <div>
+            <CardTitle className="text-base">{title}</CardTitle>
+            <CardDescription>{description}.</CardDescription>
+          </div>
+          <div className="">
+            <span
+              className={classNames(
+                "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
+                getSeverityClassNames(variant.toUpperCase(), false),
+              )}
+            >
+              {variant.toUpperCase()}
+            </span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col flex-1">
-        <div className="flex flex-col items-center justify-center flex-1 gap-1">
+        <div className="flex flex-col items-start justify-center flex-1 gap-1">
           {hasData ? (
             <>
               <span className="text-3xl font-semibold">{duration}</span>
@@ -99,8 +113,8 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
           )}
         </div>
         {openHuman && (
-          <div className="mt-2 flex items-baseline justify-center gap-1 border-t pt-2 text-sm">
-            <span className="text-muted-foreground">Avg. age of open:</span>
+          <div className="mt-4 gap-1 border-t pt-4 text-sm">
+            <span className="text-muted-foreground">Avg. age of open: </span>
             {openSeconds && openSeconds > 0 ? (
               <span className="font-medium tabular-nums">
                 {openHuman.duration} {openHuman.type}
@@ -110,16 +124,6 @@ const AverageFixingTimeChart: FunctionComponent<Props> = ({
             )}
           </div>
         )}
-        <div className="mt-2 flex">
-          <span
-            className={classNames(
-              "px-2 text-xs font-medium items-center flex flex-row whitespace-nowrap rounded-full p-1",
-              getSeverityClassNames(variant.toUpperCase(), false),
-            )}
-          >
-            {variant.toUpperCase()}
-          </span>
-        </div>
       </CardContent>
     </Card>
   );

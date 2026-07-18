@@ -21,6 +21,8 @@ import Section from "@/components/common/Section";
 import DependencyGraph from "../DependencyGraph";
 import { convertPathsToTree } from "../../utils/dependencyGraphHelpers";
 import ListItem from "../common/ListItem";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { truncateMiddle } from "../../utils/common";
 
 interface VexRuleDetailsDialogProps {
   vexRule: VexRule | null;
@@ -192,7 +194,18 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
             <ListItem
               Title="VEX Source"
               Description="The source or document that defines this VEX rule"
-              Button={<Badge variant="outline">{vexRule.vexSource}</Badge>}
+              Button={
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Badge variant="outline">
+                      {truncateMiddle(vexRule.vexSource, 20)}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent className="whitespace-normal">
+                    {vexRule.vexSource}
+                  </TooltipContent>
+                </Tooltip>
+              }
             />
           )}
 

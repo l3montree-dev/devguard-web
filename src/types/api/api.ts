@@ -41,6 +41,11 @@ export enum UserRole {
   Unknown = "unknown",
 }
 
+export enum InvitationStatus {
+  Pending = "pending",
+  Expired = "expired",
+}
+
 export enum RequirementsLevel {
   Low = "low",
   Medium = "medium",
@@ -124,11 +129,16 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
     avatarUrl?: string;
     role?: UserRole.Owner | UserRole.Admin | UserRole.Member;
   }>;
+  invitedMembers: Array<{
+    id: string;
+    email: string;
+    expiryDate: string;
+    invitationStatus: InvitationStatus.Pending | InvitationStatus.Expired;
+  }>;
 }
 
 export type PersonalAccessTokenDTO =
-  | AsymmetricPersonalAccessTokenDTO
-  | SymmetricPersonalAccessTokenDTO;
+  AsymmetricPersonalAccessTokenDTO | SymmetricPersonalAccessTokenDTO;
 
 interface PersonalAccessTokenBase {
   description: string;
@@ -193,9 +203,7 @@ export interface ProjectDTO {
   subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
 export type ExpandedVulnDTOState =
-  | DependencyVuln["state"]
-  | "not-found"
-  | "detected";
+  DependencyVuln["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -211,7 +219,14 @@ export interface BaseVulnDTO {
   id: string;
   createdAt: string;
   updatedAt: string;
-  state: "open" | "fixed" | "accepted" | "falsePositive" | "markedForTransfer";
+  state:
+    | "open"
+    | "fixed"
+    | "accepted"
+    | "falsePositive"
+    | "markedForTransfer"
+    | "implemented"
+    | "notApplicable";
   priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;
@@ -272,7 +287,7 @@ interface BaseVulnEventDTO {
   createdAt: string;
   id: string;
   vulnId: string;
-  vulnType: "dependencyVuln" | "firstPartyVuln";
+  vulnType: "dependencyVuln" | "firstPartyVuln" | "compliancePosture";
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
@@ -294,6 +309,13 @@ export interface TicketClosedEventDTO extends BaseVulnEventDTO {
 
 export interface TickedDeletedEventDTO extends BaseVulnEventDTO {
   type: "ticketDeleted";
+}
+export interface ImplementedEventDTO extends BaseVulnEventDTO {
+  type: "implemented";
+}
+
+export interface NotApplicableEventDTO extends BaseVulnEventDTO {
+  type: "notApplicable";
 }
 
 export interface AcceptedEventDTO extends BaseVulnEventDTO {
@@ -364,6 +386,20 @@ export interface LicenseDecisionEventDTO extends BaseVulnEventDTO {
   };
 }
 
+export interface AttachedComplianceComponentEventDTO extends BaseVulnEventDTO {
+  type: "attachedComplianceComponent";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    componentTitle: string;
+  };
+}
+
+export interface RemovedComplianceComponentEventDTO extends BaseVulnEventDTO {
+  type: "removedComplianceComponent";
+  arbitraryJSONData: EventArbitraryJsonData & {
+    componentTitle: string;
+  };
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -376,7 +412,11 @@ export type VulnEventDTO =
   | CommentEventDTO
   | TicketClosedEventDTO
   | TickedDeletedEventDTO
-  | LicenseDecisionEventDTO;
+  | LicenseDecisionEventDTO
+  | ImplementedEventDTO
+  | NotApplicableEventDTO
+  | AttachedComplianceComponentEventDTO
+  | RemovedComplianceComponentEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -664,6 +704,73 @@ export interface ArtifactDTO {
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
   events: VulnEventDTO[];
+}
+
+export interface PolicyFrameworks {
+  framework: string;
+  controls: string[];
+}
+
+export interface CompliancePostureWithControlDTO {
+  frameworkControlId: string;
+  framework: string;
+  controlId: string;
+  parentFrameworkControlId: string | null;
+  class: string;
+  title: string;
+  description: string;
+  compliancePostureId: string;
+  state: BaseVulnDTO["state"];
+  orgId?: string;
+  projectId?: string;
+  assetId?: string;
+  assetVersionName?: string;
+  ticketId?: string;
+  ticketUrl?: string;
+  manualTicketCreation: boolean;
+  createdAt: string; // ISO (Go time.Time)
+  additional: Record<string, any>;
+  importance: string;
+  mappedControls: {
+    relatedFramework: string;
+    relatedControlId: string;
+  }[];
+}
+
+export type ImplementationStatus =
+  "implemented" | "partial" | "planned" | "alternative" | "notApplicable";
+
+export interface ComplianceComponentDTO {
+  uuid: string;
+  title: string;
+  description: string;
+}
+
+export interface ComplianceComponentImplementsControlDTO {
+  frameworkControlId: string;
+  complianceComponentId: string;
+  complianceComponentTitle: string;
+  description: string;
+}
+
+export interface ComplianceComponentDetailsDTO extends ComplianceComponentDTO {
+  implementedControls: ComplianceComponentImplementsControlDTO[];
+}
+
+export interface ComplianceComponentImplementsControlStatementDTO {
+  id: string;
+  compliancePostureId: string;
+  complianceComponentId: string;
+  complianceComponentTitle: string;
+  complianceComponentDescription: string;
+  frameworkControlId: string;
+  implementationStatus: ImplementationStatus;
+  description: string;
+}
+
+export interface DetailedComplianceRiskDTO extends CompliancePostureWithControlDTO {
+  events: VulnEventDTO[];
+  byComponents: ComplianceComponentImplementsControlStatementDTO[];
 }
 
 interface snippetContents {
@@ -954,6 +1061,7 @@ export type ExternalReference = {
   assetVersionName: string;
   url: string;
   type: "cyclonedxvex" | "csaf";
+  error: string | null;
 };
 
 export type OrgStructure = {

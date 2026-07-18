@@ -1,54 +1,50 @@
 "use client";
 
-import Page from "@/components/Page";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
-import type { Paged, VexRule } from "@/types/api/api";
-import React, { type FunctionComponent, useMemo, useState } from "react";
+import AuthGuard from "@/components/AuthGuard";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
+import Callout from "@/components/common/Callout";
+import { DocDrawer } from "@/components/common/DocDrawer";
 import EmptyParty from "@/components/common/EmptyParty";
 import Err from "@/components/common/Err";
 import Section from "@/components/common/Section";
 import SortingCaret from "@/components/common/SortingCaret";
+import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
+import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import SyncedUpstreamVexSources from "@/components/vex-rules/SyncedUpstreamVexSources";
+import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";
+import VexPathPattern from "@/components/vex-rules/VexPathPattern";
+import VexRuleActionsCell from "@/components/vex-rules/VexRuleActionsCell";
+import VexRuleResult from "@/components/vex-rules/VexRuleResult";
+import VexRulesRow from "@/components/vex-rules/VexRulesRow";
+import VexUploadModal from "@/components/vex-rules/VexUploadModal";
+import { useArtifacts } from "@/context/AssetVersionContext";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
+import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import useTable from "@/hooks/useTable";
-import { classNames } from "@/utils/common";
-import { buildFilterSearchParams } from "@/utils/url";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
-import { Loader2 } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
-import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";
-import VexPathPattern from "@/components/vex-rules/VexPathPattern";
-import VexRuleResult from "@/components/vex-rules/VexRuleResult";
-import VexRulesRow from "@/components/vex-rules/VexRulesRow";
-import VexUploadModal from "@/components/vex-rules/VexUploadModal";
-import VexDownloadModal from "@/components/dependencies/VexDownloadModal";
-import { useArtifacts } from "@/context/AssetVersionContext";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import Callout from "@/components/common/Callout";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
-import Link from "next/link";
-import VexRuleActionsCell from "@/components/vex-rules/VexRuleActionsCell";
+import type { Paged, VexRule } from "@/types/api/api";
+import { classNames } from "@/utils/common";
+import { buildFilterSearchParams } from "@/utils/url";
+import type { ColumnDef } from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import { groupBy } from "lodash";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import AuthGuard from "@/components/AuthGuard";
-import { DocDrawer } from "@/components/common/DocDrawer";
+import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { type FunctionComponent, useMemo, useState } from "react";
+import useSWR from "swr";
 
 const columnHelper = createColumnHelper<VexRule>();
 
@@ -289,6 +285,7 @@ const VexRulesPage: FunctionComponent = () => {
             </span>
           </Callout>
         </div>
+        <SyncedUpstreamVexSources />
         <div className="relative flex flex-row gap-2">
           <Input
             onChange={(e) => handleSearch(e.target.value)}

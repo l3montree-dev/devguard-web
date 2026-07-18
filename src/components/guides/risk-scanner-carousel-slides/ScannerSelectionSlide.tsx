@@ -19,20 +19,14 @@ interface ScannerSelectionSlideProps {
   };
   prevIndex: number;
   selectedSetup?:
-    | "devguard-tools"
-    | "own-setup"
-    | "information-source"
-    | "devguard-cli";
+    "devguard-tools" | "own-setup" | "information-source" | "devguard-cli";
   devguardToolsSlideIndex: number;
   devguardCliSlideIndex: number;
   customSetupSlideIndex: number;
   informationSourceSlideIndex: number;
   setSelectedSetup: (
     setup:
-      | "devguard-tools"
-      | "own-setup"
-      | "information-source"
-      | "devguard-cli",
+      "devguard-tools" | "own-setup" | "information-source" | "devguard-cli",
   ) => void;
 }
 
@@ -111,9 +105,10 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2",
             selectedSetup === "own-setup" ? "border-primary" : "",
           )}
+          data-testid="own-setup-card"
           onClick={() => setSelectedSetup("own-setup")}
         >
-          <CardHeader data-testid="own-setup-card">
+          <CardHeader>
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <CubeTransparentIcon
                 width={20}

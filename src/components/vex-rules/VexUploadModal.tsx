@@ -80,7 +80,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   // Upstream VEX sources state
   const [newVexUrl, setNewVexUrl] = useState("");
   const [newCsafUrl, setNewCsafUrl] = useState("");
-  const [csafPackageScope, setCsafPackageScope] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [activeTab, setActiveTab] = useState<"cyclonedxvex" | "csaf">(
     "cyclonedxvex",
@@ -195,18 +194,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
       return;
     }
 
-    if (!csafPackageScope.trim()) {
-      toast.error("Please enter a CSAF package scope (PURL)");
-      return;
-    }
-
-    if (!isPurlValid(csafPackageScope.trim())) {
-      toast.error(
-        "Invalid PURL format. Must start with 'pkg:' (e.g., pkg:npm/express@4.0.0)",
-      );
-      return;
-    }
-
     setIsAdding(true);
     try {
       const response = await browserApiClient(`${apiUrl}/`, {
@@ -215,17 +202,14 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
         body: JSON.stringify({
           url: newCsafUrl.trim(),
           type: "csaf",
-          csafPackageScope: csafPackageScope.trim(),
         }),
       });
 
       if (!response.ok) {
         throw new Error(`Failed to add: ${response.statusText}`);
       }
-
       toast.success("CSAF source added successfully");
       setNewCsafUrl("");
-      setCsafPackageScope("");
       refsMutate();
     } catch (error) {
       toast.error("Failed to add CSAF source");
@@ -302,7 +286,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     onClick={() => {
                       carouselApi?.scrollTo(1);
                     }}
-                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
+                    className="cursor-pointer hover:border-primary border"
                   >
                     <CardHeader data-testid="upload-vex-file">
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
@@ -320,7 +304,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     onClick={() => {
                       carouselApi?.scrollTo(2);
                     }}
-                    className="cursor-pointer hover:border hover:border-primary border border-transparent"
+                    className="cursor-pointer hover:border-primary border"
                   >
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
@@ -481,7 +465,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
                       {/* Add New Source Section */}
                       <div className="space-y-3">
-                        <Label className="text-sm font-semibold">
+                        <Label className="text-sm mb-2 block font-semibold">
                           Add New Source
                         </Label>
                         <Tabs
@@ -548,35 +532,16 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                                       htmlFor="csaf-url"
                                       className="text-xs"
                                     >
-                                      CSAF Provider URL
-                                    </Label>
-                                    <Input
-                                      id="csaf-url"
-                                      placeholder="https://supplier.example.com/csaf/provider-metadata.json"
-                                      value={newCsafUrl}
-                                      onChange={(e) =>
-                                        setNewCsafUrl(e.target.value)
-                                      }
-                                      className="mt-2"
-                                    />
-                                  </div>
-                                  <div>
-                                    <Label htmlFor="purl" className="text-xs">
-                                      Package URL (PURL)
+                                      CSAF URL
                                     </Label>
                                     <div className="flex gap-2 mt-2">
                                       <Input
-                                        id="purl"
-                                        placeholder="pkg:npm/express@4.0.0"
-                                        value={csafPackageScope}
+                                        id="csaf-url"
+                                        placeholder="https://supplier.example.com/csaf.json"
+                                        value={newCsafUrl}
                                         onChange={(e) =>
-                                          setCsafPackageScope(e.target.value)
+                                          setNewCsafUrl(e.target.value)
                                         }
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            handleAddCsafUrl();
-                                          }
-                                        }}
                                         className="flex-1"
                                       />
                                       <Button
@@ -608,7 +573,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     onClick={() => {
                       setNewVexUrl("");
                       setNewCsafUrl("");
-                      setCsafPackageScope("");
                       carouselApi?.scrollTo(0);
                     }}
                   >

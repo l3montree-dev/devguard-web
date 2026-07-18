@@ -431,12 +431,10 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
 };
 
 const CVSSBadgePreview: FunctionComponent<{
-  orgSlug: string;
-  projectSlug?: string;
-  assetSlug?: string;
+  badgePreviewUrl: string;
   publicBadgeUrl?: string;
   copyable: boolean;
-}> = ({ orgSlug, projectSlug, assetSlug, publicBadgeUrl, copyable }) => {
+}> = ({ badgePreviewUrl, publicBadgeUrl, copyable }) => {
   const handleCopy = async () => {
     if (!publicBadgeUrl) return;
     try {
@@ -456,7 +454,7 @@ const CVSSBadgePreview: FunctionComponent<{
   return (
     <div className="flex flex-row items-center gap-3 rounded-md border bg-background p-2 justify-between">
       <img
-        src={`/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/badges/cvss/`}
+        src={badgePreviewUrl}
         alt="CVSS Badge"
         className="rounded-md shadow-sm"
       />
@@ -541,16 +539,24 @@ const PublicUrlsSection: FunctionComponent<{
 }> = ({ devguardApiUrl, orgSlug, copyable, basePath }) => {
   const urls = [
     {
-      label: "VeX-URL (Always up to date vulnerability information)",
+      label:
+        "VeX-URL (Always up to date vulnerability information in CycloneDX Format)",
       nameKey: "vex-url",
       value: basePath ? `${basePath}/vex.json/` : "",
       copyToastDescription: "The VeX-URL has been copied to your clipboard.",
     },
     {
       label:
+        "OpenVex-URL (Always up to date vulnerability information in OpenVex format)",
+      nameKey: "openvex-url",
+      value: `${basePath}/openvex.json/`,
+      copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
+    },
+    {
+      label:
         "CSAF-URL (Always up to date vulnerability information in CSAF format)",
       nameKey: "csaf-url",
-      value: `${devguardApiUrl}/api/v1/organizations/${orgSlug}/csaf/provider-metadata.json/`,
+      value: `${basePath}/csaf.json/`,
       copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
@@ -639,13 +645,14 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   const publicBadgeUrl = basePath ? `${basePath}/badges/cvss/` : undefined;
 
+  const assetApiPath = `/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`;
+  const badgePreviewUrl =
+    selectedVersionSlug && selectedArtifact
+      ? `${assetApiPath}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/badges/cvss/`
+      : `${assetApiPath}/badges/cvss/`;
+
   return (
     <>
-      <div className="rounded-lg border shadow-sm bg-card p-4">
-        <h3 className="font-medium text-sm mb-3">SBOM Source Type</h3>
-        <SbomSourceTypeSelector form={form} />
-      </div>
-
       <FormField
         control={form.control}
         name="paranoidMode"
@@ -697,9 +704,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                       onSelectArtifact={setSelectedArtifact}
                     />
                     <CVSSBadgePreview
-                      orgSlug={orgSlug}
-                      projectSlug={projectSlug}
-                      assetSlug={assetSlug}
+                      badgePreviewUrl={badgePreviewUrl}
                       publicBadgeUrl={publicBadgeUrl}
                       copyable={field.value}
                     />

@@ -1,5 +1,5 @@
 import type { VexRule } from "@/types/api/api";
-import { classNames } from "@/utils/common";
+import { classNames, truncateMiddle } from "@/utils/common";
 import { flexRender } from "@tanstack/react-table";
 import type { Row } from "@tanstack/react-table";
 import { useState } from "react";
@@ -17,6 +17,7 @@ import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "@/lib/toast";
 import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 interface VexRulesRowProps {
   row: Row<VexRule>;
@@ -92,13 +93,23 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
           return (
             <td className="p-4" key={cell.id}>
               {isFirstCell ? (
-                <div className="flex items-center gap-2">
+                <div className="flex whitespace-nowrap items-center gap-2">
                   {isGroupOpen ? (
                     <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   ) : (
                     <ChevronRightIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   )}
-                  <span className="font-medium">Source: {vexSource}</span>
+                  <span className="font-medium">
+                    Source:{" "}
+                    <Tooltip>
+                      <TooltipTrigger>
+                        {truncateMiddle(vexSource, 20)}
+                      </TooltipTrigger>
+                      <TooltipContent className="whitespace-normal">
+                        {vexSource}
+                      </TooltipContent>
+                    </Tooltip>
+                  </span>
                   <Badge variant="outline" className="w-fit">
                     {vexRulesInGroup.length}{" "}
                     {vexRulesInGroup.length === 1 ? "rule" : "rules"}

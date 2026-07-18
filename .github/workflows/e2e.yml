@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+permissions: read-all
+
 jobs:
   e2e:
     runs-on: ubuntu-latest
@@ -39,10 +41,10 @@ jobs:
           EOF
 
       - name: Build frontend
-        run: NEXT_TELEMETRY_DISABLED=1 npm run build
+        run: NEXT_TELEMETRY_DISABLED=1 E2E_TESTS=true npm run build
 
       - name: Start frontend
-        run: NEXT_TELEMETRY_DISABLED=1 npm run start &
+        run: NEXT_TELEMETRY_DISABLED=1 E2E_TESTS=true npm run start &
 
       - name: Wait for backend to be ready
         run: |

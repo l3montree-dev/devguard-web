@@ -32,15 +32,14 @@ export const config = {
   devguardCIComponentBase:
     process.env.DEVGUARD_CI_COMPONENT_BASE ||
     "https://gitlab.com/l3montree/devguard/-/raw/main",
-  devguardGithubAppUrl: process.env.DEVGUARD_API_URL_PUBLIC_INTERNET?.includes(
-    "main.devguard.org",
-  )
-    ? "devguard-bot-dev"
-    : "devguard-bot",
+  devguardGithubAppUrl:
+    process.env.DEVGUARD_API_URL_PUBLIC_INTERNET?.includes(
+      "main.devguard.org",
+    ) || process.env.DEVGUARD_API_URL_PUBLIC_INTERNET?.includes("localhost")
+      ? "devguard-bot-dev"
+      : "devguard-bot",
   enforceTheme: (process.env.ENFORCE_THEME || false) as
-    | "white"
-    | "dark"
-    | false,
+    "white" | "dark" | false,
   errorTrackingDsn: process.env.ERROR_TRACKING_DSN || "",
   registrationEnabled: process.env.REGISTRATION_ENABLED !== "false",
   issueTrackerUrl:

@@ -68,10 +68,7 @@ const CopyCode: FunctionComponent<Props> = (props) => {
       return { codeStr: props.codeString, highlightLineNumbers: null };
     // we need the starting and ending line numbers of the match - and remove the special characters just with the match content
 
-    const reg = new RegExp(
-      props.highlightRegexPattern,
-      props.highlightRegexPattern.flags,
-    );
+    const reg = props.highlightRegexPattern;
     const matches = reg.exec(props.codeString);
 
     if (matches === null) {
@@ -132,8 +129,9 @@ const CopyCode: FunctionComponent<Props> = (props) => {
         )}
       </span>
       <button
+        type="button"
         onClick={handleCopy}
-        className="absolute right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-card p-2 text-xs text-foreground transition-all hover:opacity-80"
+        className="absolute cursor-pointer right-1 top-1/2 z-10 -translate-y-1/2 rounded-lg bg-card p-2 text-xs text-foreground transition-all hover:opacity-80"
       >
         <Copy className="h-4 w-4" />
       </button>

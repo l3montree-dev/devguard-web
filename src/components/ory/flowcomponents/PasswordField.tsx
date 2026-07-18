@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import type { FocusEventHandler, MouseEventHandler } from "react";
-import { useFormContext, type UseFormRegisterReturn } from "react-hook-form";
+import type { UseFormRegisterReturn } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,17 +13,6 @@ const PASSWORD_FIELD_CLASS =
   "bg-background/70 flex h-10 w-full rounded-md border border-input text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 items-center";
 
 export const CONFIRM_PASSWORD_LABEL = "Confirm Password";
-
-export function usePasswordMismatch(): boolean {
-  const { watch } = useFormContext();
-  const password = watch("password");
-  const confirmPassword = watch("confirmPassword");
-  return (
-    typeof confirmPassword === "string" &&
-    confirmPassword.length > 0 &&
-    password !== confirmPassword
-  );
-}
 
 export function PasswordField({
   field,
