@@ -82,6 +82,17 @@ function getPathSuffix(
   return path;
 }
 
+function isHighlightedEdge(
+  parentId: string,
+  childId: string,
+  highlightPaths: string[][],
+) {
+  return highlightPaths.some((path) => {
+    const parentIndex = path.indexOf(parentId);
+    return parentIndex !== -1 && path[parentIndex + 1] === childId;
+  });
+}
+
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
 
@@ -114,6 +125,8 @@ const nodeTypes = {
   loadMoreNode: LoadMoreNode,
 };
 
+const EMPTY_HIGHLIGHT_PATHS: string[][] = [];
+
 const DependencyGraph: FunctionComponent<{
   width: number;
   height: number;
@@ -124,7 +137,7 @@ const DependencyGraph: FunctionComponent<{
   // Handler for context-menu VEX actions. Can be async and should return `true` if it handled the action
   // (for example by creating a false-positive rule). If it returns falsy / undefined, component will still close the menu.
   onVexSelect?: (selection: VexSelection) => Promise<boolean> | void;
-  highlightPath?: string[];
+  highlightPaths?: string[][];
   vexRules?: VexRule[];
   onReady?: () => void;
 }> = ({
@@ -135,7 +148,7 @@ const DependencyGraph: FunctionComponent<{
   variant,
   onVexSelect,
   enableContextMenu,
-  highlightPath,
+  highlightPaths,
   vexRules,
   onReady,
 }) => {
@@ -148,6 +161,9 @@ const DependencyGraph: FunctionComponent<{
 
   // Context menu state
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
+
+  const pathsToHighlight = highlightPaths ?? EMPTY_HIGHLIGHT_PATHS;
+  const highlightPath = pathsToHighlight[0];
 
   // Pre-compute child counts for auto-expansion
   const childCountMapRef = useRef<Map<string, number>>(new Map());
@@ -228,8 +244,12 @@ const DependencyGraph: FunctionComponent<{
     );
     previousNodesRef.current = nodes;
 
-    // get the root node - we use it for the initial position of the viewport
-    const rootNode = nodes.find((n) => n.id === graph.id);
+    const graphRoot = nodes.find((node) => node.id === graph.id);
+    const visibleRoots = nodes
+      .filter((node) => graph.children.some((child) => child.id === node.id))
+      .sort((a, b) => a.position.y - b.position.y);
+    const rootNode =
+      graphRoot ?? visibleRoots[Math.floor(visibleRoots.length / 2)];
     return [nodes, edges, rootNode];
   }, [
     graph,
@@ -278,18 +298,14 @@ const DependencyGraph: FunctionComponent<{
     }
 
     for (const edge of initialEdges) {
-      // Check if edge is in highlight path
-      let isHighlightEdge = false;
-      if (highlightPath && highlightPath.length > 0) {
-        const parentIndex = highlightPath.indexOf(edge.target);
-        const childIndex = highlightPath.indexOf(edge.source);
-        isHighlightEdge =
-          parentIndex !== -1 &&
-          childIndex !== -1 &&
-          parentIndex === childIndex - 1;
-        if (isHighlightEdge) {
-          highlightPathEdges.add(edge.id);
-        }
+      // Check if edge is in one of the highlighted paths
+      const isHighlightEdge = isHighlightedEdge(
+        edge.target,
+        edge.source,
+        pathsToHighlight,
+      );
+      if (isHighlightEdge) {
+        highlightPathEdges.add(edge.id);
       }
 
       // Check if edge matches a VEX rule (false positive)
@@ -337,7 +353,7 @@ const DependencyGraph: FunctionComponent<{
       highlightPathEdges,
       falsePositiveEdges,
     };
-  }, [initialEdges, highlightPath, vexRules]);
+  }, [initialEdges, pathsToHighlight, vexRules]);
 
   useEffect(() => {
     setNodes(initialNodes);
@@ -345,16 +361,7 @@ const DependencyGraph: FunctionComponent<{
     const styledEdges = initialEdges.map((edge) => {
       const isFp = edgeMaps.falsePositiveEdges.has(edge.id);
 
-      // Check if this edge is part of the vulnerability path
-      let isInPath = false;
-      if (highlightPath && highlightPath.length > 0) {
-        const parentIndex = highlightPath.indexOf(edge.target);
-        const childIndex = highlightPath.indexOf(edge.source);
-        isInPath =
-          parentIndex !== -1 &&
-          childIndex !== -1 &&
-          parentIndex === childIndex - 1;
-      }
+      const isInPath = edgeMaps.highlightPathEdges.has(edge.id);
 
       if (isFp) {
         return {
@@ -403,7 +410,7 @@ const DependencyGraph: FunctionComponent<{
     rootNode,
     height,
     width,
-    highlightPath,
+    edgeMaps.highlightPathEdges,
     edgeMaps.falsePositiveEdges,
   ]);
 
@@ -581,8 +588,8 @@ const DependencyGraph: FunctionComponent<{
 
       const pathEdgeIds = new Set<string>();
 
-      // When a highlight path is active, only highlight the single hovered edge (and only if it's blue)
-      if (highlightPath && highlightPath.length > 0) {
+      // When highlight paths are active, only highlight the hovered path edge.
+      if (pathsToHighlight.length > 0) {
         if (!edgeMaps.highlightPathEdges.has(edge.id)) return;
         pathEdgeIds.add(edge.id);
         applyHoverHighlight(pathEdgeIds);
@@ -617,7 +624,7 @@ const DependencyGraph: FunctionComponent<{
 
       applyHoverHighlight(pathEdgeIds);
     },
-    [edgeMaps, applyHoverHighlight, highlightPath, enableContextMenu],
+    [edgeMaps, applyHoverHighlight, pathsToHighlight, enableContextMenu],
   );
 
   const handleEdgeMouseLeave = useCallback(() => {
