@@ -10,6 +10,14 @@ describe("beautifyPurl", () => {
       "@ory/integrations",
     );
   });
+
+  it("displays artifact nodes without their internal prefix", () => {
+    expect(beautifyPurl("artifact:scanner")).toBe("scanner");
+  });
+
+  it("displays an empty artifact name as the default artifact", () => {
+    expect(beautifyPurl("artifact:")).toBe("Default");
+  });
 });
 
 describe("extractPurlQualifiers", () => {
