@@ -37,6 +37,15 @@ describe("buildVexPathPattern", () => {
         "*",
       ]);
     });
+
+    it("does not create rules for structural nodes", () => {
+      const selection: VexSelection = {
+        type: "node",
+        justification: "not_present",
+        path: ["artifact:scanner", "pkg:golang/vuln-lib"],
+      };
+      expect(buildVexPathPattern(selection)).toBeNull();
+    });
   });
 
   describe("edge selection", () => {
@@ -65,6 +74,20 @@ describe("buildVexPathPattern", () => {
         "*",
         "pkg:golang/a",
         "pkg:golang/b",
+        "pkg:golang/vuln-lib",
+      ]);
+    });
+
+    it("excludes structural nodes from the dependency path", () => {
+      const selection: VexSelection = {
+        type: "edge",
+        justification: "does_not_call_vulnerable_function",
+        path: ["artifact:scanner", "pkg:golang/middle", "pkg:golang/vuln-lib"],
+        childIndex: 1,
+      };
+      expect(buildVexPathPattern(selection)).toEqual([
+        "*",
+        "pkg:golang/middle",
         "pkg:golang/vuln-lib",
       ]);
     });
