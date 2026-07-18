@@ -120,7 +120,17 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
                       </DropdownMenuTrigger>
                     </div>
                   </div>
-                  <DropdownMenuContent align="start">
+                  <DropdownMenuContent align="center">
+                    <DropdownMenuItem key={item.title} asChild>
+                      <Link
+                        href={item.href}
+                        data-testid={item.testId}
+                        className="flex !text-foreground flex-row items-center gap-2"
+                      >
+                        <item.Icon className="h-4 w-4 text-gray-400" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </DropdownMenuItem>
                     {item.children.map((child) => (
                       <DropdownMenuItem key={child.title} asChild>
                         <Link
