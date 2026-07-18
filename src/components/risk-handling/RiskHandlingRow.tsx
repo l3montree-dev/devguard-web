@@ -364,8 +364,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         {vulns.length} path{vulns.length !== 1 ? "s" : ""}
                       </Badge>
                     ) : null}
-                    {sortedVulns[0].cve?.cisaExploitAdd ||
-                    sortedVulns[0].cve?.euvdExploitAdd ? (
+                    {sortedVulns[0]?.cve?.cisaExploitAdd ||
+                    sortedVulns[0]?.cve?.euvdExploitAdd ? (
                       <WarningWithDescription
                         description={
                           <>
@@ -377,9 +377,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                           </>
                         }
                       />
-                    ) : (
-                      <></>
-                    )}
+                    ) : null}
                   </div>
                 </td>
                 <td className="py-2 px-4 flex">

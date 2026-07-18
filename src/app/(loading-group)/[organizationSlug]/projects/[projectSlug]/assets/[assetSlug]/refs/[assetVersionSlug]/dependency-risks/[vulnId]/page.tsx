@@ -86,7 +86,6 @@ import type { ViewDependencyTreeNode } from "../../../../../../../../../../../ut
 import { useTourSeen } from "@/hooks/useTourSeen";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import WarningWithDescription from "@/components/common/WarningWithDescription";
 import AdvisoriesCard from "@/components/risk-handling/AdvisoriesCard";
 
 const MarkdownEditor = dynamic(
@@ -1109,8 +1108,8 @@ const Index: FunctionComponent = () => {
                                 </form>
                               ) : isLastEventVexRule ? (
                                 <p className="text-sm text-muted-foreground">
-                                  This vuln was handled by a VEX rule. Remove
-                                  or adjust the VEX rule to reopen it.
+                                  This vuln was handled by a VEX rule. Remove or
+                                  adjust the VEX rule to reopen it.
                                 </p>
                               ) : (
                                 <form

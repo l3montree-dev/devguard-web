@@ -66,12 +66,23 @@ export function formatDateTime(
   );
 }
 
+const DATE_DEFAULTS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  // Date-only inputs like "2026-06-08" parse as UTC midnight. Formatting them
+  // in the viewer's timezone would render the previous day everywhere behind
+  // UTC, so pin the calendar day to UTC.
+  timeZone: "UTC",
+};
+
 /**
  * Format an ISO date string, `Date`, or epoch-millis value into a locale-aware
  * date-only string (no time, no timezone). Invalid input is returned as-is.
  *
  * @param value   - An ISO 8601 string, `Date`, or millisecond timestamp.
- * @param options - Optional `Intl.DateTimeFormatOptions` overrides.
+ * @param options - Optional `Intl.DateTimeFormatOptions` overrides, merged over
+ *                  the defaults.
  * @returns A formatted date string like "Jun 8, 2026".
  */
 export function formatDate(
@@ -84,14 +95,7 @@ export function formatDate(
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return String(value);
 
-  return date.toLocaleDateString(
-    undefined,
-    options ?? {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    },
-  );
+  return date.toLocaleDateString(undefined, { ...DATE_DEFAULTS, ...options });
 }
 
 /**

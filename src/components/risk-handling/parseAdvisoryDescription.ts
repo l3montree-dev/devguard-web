@@ -26,7 +26,7 @@ const MAX_LABEL_LENGTH = 48;
 /**
  * Splits an advisory description of the form
  *   "Category: text | Category2: text | ..."
- * into labelled sections. The remainder is renders
+ * into labelled sections. The remainder is rendered
  * as plain paragraphs.
  */
 export function parseAdvisoryDescription(
