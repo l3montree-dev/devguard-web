@@ -82,17 +82,6 @@ function getPathSuffix(
   return path;
 }
 
-function isHighlightedEdge(
-  parentId: string,
-  childId: string,
-  highlightPaths: string[][],
-) {
-  return highlightPaths.some((path) => {
-    const parentIndex = path.indexOf(parentId);
-    return parentIndex !== -1 && path[parentIndex + 1] === childId;
-  });
-}
-
 // Types for the context menu
 type MenuType = "edge" | "node" | null;
 
@@ -164,6 +153,17 @@ const DependencyGraph: FunctionComponent<{
 
   const pathsToHighlight = highlightPaths ?? EMPTY_HIGHLIGHT_PATHS;
   const highlightPath = pathsToHighlight[0];
+  const highlightAdjacency = useMemo(() => {
+    const adjacency = new Map<string, Set<string>>();
+    for (const path of pathsToHighlight) {
+      for (let i = 0; i < path.length - 1; i++) {
+        const children = adjacency.get(path[i]) ?? new Set<string>();
+        children.add(path[i + 1]);
+        adjacency.set(path[i], children);
+      }
+    }
+    return adjacency;
+  }, [pathsToHighlight]);
 
   // Pre-compute child counts for auto-expansion
   const childCountMapRef = useRef<Map<string, number>>(new Map());
@@ -299,11 +299,8 @@ const DependencyGraph: FunctionComponent<{
 
     for (const edge of initialEdges) {
       // Check if edge is in one of the highlighted paths
-      const isHighlightEdge = isHighlightedEdge(
-        edge.target,
-        edge.source,
-        pathsToHighlight,
-      );
+      const isHighlightEdge =
+        highlightAdjacency.get(edge.target)?.has(edge.source) ?? false;
       if (isHighlightEdge) {
         highlightPathEdges.add(edge.id);
       }
@@ -353,7 +350,7 @@ const DependencyGraph: FunctionComponent<{
       highlightPathEdges,
       falsePositiveEdges,
     };
-  }, [initialEdges, pathsToHighlight, vexRules]);
+  }, [initialEdges, highlightAdjacency, vexRules]);
 
   useEffect(() => {
     setNodes(initialNodes);
