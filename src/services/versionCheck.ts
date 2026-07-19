@@ -37,7 +37,7 @@ function baseTag(version: string): string {
  * Compare two semver tuples.
  * Returns negative if a < b, 0 if equal, positive if a > b.
  */
-function compareSemver(
+function compareSemverTuple(
   a: [number, number, number],
   b: [number, number, number],
 ): number {
@@ -45,6 +45,17 @@ function compareSemver(
     if (a[i] !== b[i]) return a[i] - b[i];
   }
   return 0;
+}
+
+/**
+ * Compare two semver strings like "1.2.3" (an optional leading "v" is allowed).
+ * Returns negative if a < b, 0 if equal, positive if a > b, NaN if either fails to parse.
+ */
+export function compareSemver(a: string, b: string): number {
+  const pa = parseSemver(a);
+  const pb = parseSemver(b);
+  if (!pa || !pb) return NaN;
+  return compareSemverTuple(pa, pb);
 }
 
 const GITHUB_RELEASES_API =
@@ -76,7 +87,7 @@ export async function checkForUpdate(
   // If we can't parse either version, be conservative and say no update
   const updateAvailable =
     currentParsed && latestParsed
-      ? compareSemver(currentParsed, latestParsed) < 0
+      ? compareSemverTuple(currentParsed, latestParsed) < 0
       : false;
 
   return {

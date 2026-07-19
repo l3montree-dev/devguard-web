@@ -91,6 +91,19 @@ export default function ErrPage(props: { error: Error }) {
               >
                 Go home
               </Link>
+              {statusCode === 500 && (
+                <Link
+                  href={config.issueTrackerUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className={classNames(
+                    buttonVariants({ variant: "secondary" }),
+                    "mt-4 ml-2 !text-secondary-foreground",
+                  )}
+                >
+                  Create an Issue
+                </Link>
+              )}
             </div>
           ) : (
             <Link
@@ -102,19 +115,6 @@ export default function ErrPage(props: { error: Error }) {
               )}
             >
               Login
-            </Link>
-          )}
-          {statusCode === 500 && (
-            <Link
-              href={config.issueTrackerUrl}
-              target="_blank"
-              rel="noreferrer noopener"
-              className={classNames(
-                buttonVariants({ variant: "secondary" }),
-                "mt-4 !text-secondary-foreground",
-              )}
-            >
-              Create an Issue
             </Link>
           )}
         </div>
