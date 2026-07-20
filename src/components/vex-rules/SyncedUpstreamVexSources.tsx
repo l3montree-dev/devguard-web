@@ -284,28 +284,19 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
                 </div>
               </TabsContent>
               <TabsContent value="csaf">
-                <div className="space-y-2">
+                <div className="flex gap-2">
                   <Input
                     placeholder="https://supplier.example.com/csaf/provider-metadata.json"
                     value={newCsafUrl}
                     onChange={(e) => setNewCsafUrl(e.target.value)}
                   />
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="pkg:npm/express@4.0.0 (Package URL - PURL)"
-                      value={csafPackageScope}
-                      onChange={(e) => setCsafPackageScope(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleAddCsafUrl()}
-                      className="flex-1"
-                    />
-                    <Button onClick={handleAddCsafUrl} disabled={isAdding}>
-                      {isAdding ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Plus className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <Button onClick={handleAddCsafUrl} disabled={isAdding}>
+                    {isAdding ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </TabsContent>
             </Tabs>
