@@ -28,7 +28,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
   const [newVexUrl, setNewVexUrl] = useState("");
   const [newCsafUrl, setNewCsafUrl] = useState("");
-  const [csafPackageScope, setCsafPackageScope] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [activeTab, setActiveTab] =
     useState<ExternalReference["type"]>("cyclonedxvex");
@@ -83,15 +82,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
     }
   };
 
-  const isPurlValid = (purl: string): boolean => {
-    // PURL format: pkg:<type>/<namespace?>/<name>@<version?>?<qualifiers?>#<subpath?>
-    // Type: lowercase alphanumeric with +, ., -
-    // Name/namespace: alphanumeric with ., _, -, %, ~, @, /
-    const purlRegex =
-      /^pkg:[a-z][a-z0-9+.-]*\/[a-zA-Z0-9._~%@/-]+[a-zA-Z0-9](?:[@?#].*)?$/;
-    return purlRegex.test(purl);
-  };
-
   const handleAddVexUrl = async () => {
     if (!newVexUrl.trim()) {
       toast.error("Please enter a URL");
@@ -129,18 +119,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
       return;
     }
 
-    if (!csafPackageScope.trim()) {
-      toast.error("Please enter a CSAF package scope (PURL)");
-      return;
-    }
-
-    if (!isPurlValid(csafPackageScope.trim())) {
-      toast.error(
-        "Invalid PURL format. Must start with 'pkg:' (e.g., pkg:npm/express@4.0.0)",
-      );
-      return;
-    }
-
     setIsAdding(true);
     try {
       const response = await browserApiClient(`${apiUrl}/`, {
@@ -149,7 +127,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
         body: JSON.stringify({
           url: newCsafUrl.trim(),
           type: "csaf",
-          csafPackageScope: csafPackageScope.trim(),
         }),
       });
 
@@ -159,7 +136,6 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
 
       toast.success("CSAF source added successfully");
       setNewCsafUrl("");
-      setCsafPackageScope("");
       mutate();
     } catch (error) {
       toast.error("Failed to add CSAF source");
