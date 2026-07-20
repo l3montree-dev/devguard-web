@@ -106,8 +106,7 @@ export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   }
   return vuln.directDependencyFixedVersion;
 }
-
-export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
+export function isQuickfixApplicable(vuln: QuickfixVuln): boolean {
   if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
     return false;
   }
@@ -122,11 +121,11 @@ export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
   const ecosystem = PackageURL.fromString(vulnerabilityPath).type;
   const hasResolver = ecosystem === "deb" || ecosystem === "npm";
 
-  if (!isDirectDep && !hasResolver) {
-    return false;
-  }
+  return isDirectDep || hasResolver;
+}
 
-  return getFixedVersionPurl(vuln) !== null;
+export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
+  return isQuickfixApplicable(vuln) && getFixedVersionPurl(vuln) !== null;
 }
 
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
@@ -135,26 +134,11 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
-  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+  if (!isQuickfixApplicable(vuln) || !vuln.vulnerabilityPath) {
     return null;
   }
 
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
-
-  // Only show quickfix for direct dependencies, or for ecosystems with a resolver (deb, npm)
-  const isDirectDep = vuln.vulnerabilityPath.length === 1;
-  const ecosystem = isValidPackagePurl(vulnerabilityPath)
-    ? PackageURL.fromString(vulnerabilityPath).type
-    : null;
-  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
-
-  if (!isDirectDep && !hasResolver) {
-    return null;
-  }
-
-  if (!isValidPackagePurl(vulnerabilityPath)) {
-    return null;
-  }
 
   return (
     <>
