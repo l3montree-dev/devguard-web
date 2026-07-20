@@ -4,6 +4,14 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.10.1] — 2026-07-20
+
+### Fixed
+
+- **Organization navigation menu** — the "Compliance Postures" menu item is no longer shown at the organization level for external entity providers, matching the existing restriction on the "Settings" item
+
+---
+
 ## [v1.10.0] — 2026-07-20
 
 ### Added
