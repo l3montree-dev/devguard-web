@@ -145,7 +145,7 @@ const OrgDependencySearch: FunctionComponent = () => {
             description={`The package ${searchParams?.get("search")} could not be found in any repository currently associated with your organization.`}
           />
         ) : (
-          <div className="overflow-hidden rounded-lg border shadow-sm">
+          <div className="overflow-hidden rounded-lg border ">
             <table className="w-full table-fixed overflow-x-auto text-sm">
               <thead className="border-b bg-card text-foreground">
                 {table.getHeaderGroups().map((headerGroup) => (

@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 export function advisorySource(id: string): string | null {
   if (/^WID-SEC/i.test(id)) return "CERT-Bund (Germany)";
   if (/^NCSC-\d{4}-/i.test(id)) return "NCSC (Netherlands)";

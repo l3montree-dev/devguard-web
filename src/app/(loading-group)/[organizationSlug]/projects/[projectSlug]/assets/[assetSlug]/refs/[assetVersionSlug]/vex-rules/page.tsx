@@ -309,7 +309,7 @@ const VexRulesPage: FunctionComponent = () => {
         </div>
       ) : (
         <div>
-          <div className="overflow-hidden rounded-lg border shadow-sm">
+          <div className="overflow-hidden rounded-lg border ">
             <div className="overflow-auto">
               <table className="w-full overflow-x-auto text-sm table-fixed">
                 <colgroup>
