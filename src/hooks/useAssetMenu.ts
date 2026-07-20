@@ -25,6 +25,7 @@ import {
   BookCheckIcon,
   ScanText,
   TextSelect,
+  ShieldEllipsis,
   ShieldCheck,
 } from "lucide-react";
 import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
@@ -96,7 +97,7 @@ export const useAssetMenu = () => {
     ? existingAssetVersionSlug
     : getAssetVersionSlug(activeAsset!, assetVersion);
 
-  let menu: Array<{
+  type MenuItem = {
     title: string;
     href: string;
     Icon: ForwardRefExoticComponent<
@@ -107,7 +108,10 @@ export const useAssetMenu = () => {
     >;
     isActive: boolean;
     testId?: string;
-  }> = [];
+    children?: Array<MenuItem>;
+  };
+
+  let menu: Array<MenuItem> = [];
 
   if ((activeAsset?.refs?.length ?? 0) > 0) {
     menu.unshift({
@@ -131,27 +135,30 @@ export const useAssetMenu = () => {
         pathname ===
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events` ||
         pathname ===
-          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs`,
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs` ||
+        pathname.includes("compliance-postures"),
       testId: "nav-asset-overview",
+      children: [
+        {
+          title: "Compliance Postures",
+          href:
+            "/" +
+            orgSlug +
+            "/projects/" +
+            projectSlug +
+            "/assets/" +
+            assetSlug +
+            "/refs/" +
+            assetVersionSlug +
+            "/compliance-postures",
+          Icon: ShieldCheck,
+          isActive: pathname.includes("compliance-postures"),
+          testId: "nav-asset-compliance-postures",
+        },
+      ],
     });
 
     menu = menu.concat([
-      {
-        title: "Dependency Risks",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/dependency-risks",
-        Icon: WrenchScrewdriverIcon,
-        isActive: pathname.includes("dependency-risks"),
-        testId: "nav-asset-dependency-risks",
-      },
       {
         title: "Code Risks",
         href:
@@ -165,11 +172,30 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/code-risks",
         Icon: CodeIcon,
-        isActive: pathname.includes("code-risks"),
+        isActive:
+          pathname.includes("code-risks") || pathname.includes("/advisory"),
         testId: "nav-asset-code-risks",
+        children: [
+          {
+            title: "Security Advisories",
+            href:
+              "/" +
+              orgSlug +
+              "/projects/" +
+              projectSlug +
+              "/assets/" +
+              assetSlug +
+              "/refs/" +
+              assetVersionSlug +
+              "/advisory",
+            Icon: ShieldEllipsis,
+            isActive: pathname.includes("/advisory"),
+            testId: "nav-asset-advisory",
+          },
+        ],
       },
       {
-        title: "License Risks",
+        title: "Dependency Risks",
         href:
           "/" +
           orgSlug +
@@ -179,57 +205,64 @@ export const useAssetMenu = () => {
           assetSlug +
           "/refs/" +
           assetVersionSlug +
-          "/license-risks",
-        Icon: ScanText,
-        isActive: pathname.includes("license-risks"),
-        testId: "nav-asset-license-risks",
-      },
-      {
-        title: "Compliance Postures",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/compliance-postures",
-        Icon: ShieldCheck,
-        isActive: pathname.includes("compliance-postures"),
-      },
-      {
-        title: "Dependency Insights",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/dependencies",
-        Icon: ShareIcon,
-        isActive: pathname.includes("dependencies"),
-        testId: "nav-asset-dependency-insights",
-      },
-      {
-        title: "VEX Rules",
-        href:
-          "/" +
-          orgSlug +
-          "/projects/" +
-          projectSlug +
-          "/assets/" +
-          assetSlug +
-          "/refs/" +
-          assetVersionSlug +
-          "/vex-rules",
-        Icon: BookCheckIcon,
-        isActive: pathname.includes("vex-rules"),
-        testId: "nav-asset-vex-rules",
+          "/dependency-risks",
+        Icon: WrenchScrewdriverIcon,
+        isActive:
+          pathname.includes("dependency-risks") ||
+          pathname.includes("license-risks") ||
+          pathname.includes("dependencies") ||
+          pathname.includes("vex-rules"),
+        testId: "nav-asset-dependency-risks",
+        children: [
+          {
+            title: "License Risks",
+            href:
+              "/" +
+              orgSlug +
+              "/projects/" +
+              projectSlug +
+              "/assets/" +
+              assetSlug +
+              "/refs/" +
+              assetVersionSlug +
+              "/license-risks",
+            Icon: ScanText,
+            isActive: pathname.includes("license-risks"),
+            testId: "nav-asset-license-risks",
+          },
+          {
+            title: "Dependency Insights",
+            href:
+              "/" +
+              orgSlug +
+              "/projects/" +
+              projectSlug +
+              "/assets/" +
+              assetSlug +
+              "/refs/" +
+              assetVersionSlug +
+              "/dependencies",
+            Icon: ShareIcon,
+            isActive: pathname.includes("dependencies"),
+            testId: "nav-asset-dependency-insights",
+          },
+          {
+            title: "VEX Rules",
+            href:
+              "/" +
+              orgSlug +
+              "/projects/" +
+              projectSlug +
+              "/assets/" +
+              assetSlug +
+              "/refs/" +
+              assetVersionSlug +
+              "/vex-rules",
+            Icon: BookCheckIcon,
+            isActive: pathname.includes("vex-rules"),
+            testId: "nav-asset-vex-rules",
+          },
+        ],
       },
       {
         title: "Artifacts",

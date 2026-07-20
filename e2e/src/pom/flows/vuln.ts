@@ -7,6 +7,7 @@ export class VulnFlow {
   async openFirstAffectedComponent() {
     await this.page
       .getByTestId("nav-asset-dependency-risks")
+      .locator("a")
       .click({ timeout: 20_000 });
     const packageRows = this.page.getByTestId("package-row");
     await expect(packageRows.first()).toBeVisible({ timeout: 180_000 });
@@ -57,6 +58,10 @@ export class VulnFlow {
 
   async verifyVEXRule() {
     await this.page
+      .getByTestId("nav-asset-dependency-risks")
+      .locator("button")
+      .click({ timeout: 20_000 });
+    await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });
     const firstHeaderRow = this.page.getByTestId("vex-header-row").first();
@@ -74,6 +79,7 @@ export class VulnFlow {
   async filterDependencyRisksTable() {
     await this.page
       .getByTestId("nav-asset-dependency-risks")
+      .locator("a")
       .click({ timeout: 5_000 });
     await this.page.getByTestId("filter-open-button").click();
     await this.page.getByTestId("filter-field-select").click();

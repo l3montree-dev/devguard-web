@@ -7,6 +7,7 @@ export class ShareFlow {
   async downloadSBOMFile() {
     await this.page
       .getByTestId("nav-asset-dependency-risks")
+      .locator("a")
       .click({ timeout: 5_000 });
     await this.page.getByTestId("share-sbom-button").click();
     await this.page
@@ -22,6 +23,7 @@ export class ShareFlow {
   async downloadVEXFile() {
     await this.page
       .getByTestId("nav-asset-dependency-risks")
+      .locator("a")
       .click({ timeout: 5_000 });
     await this.page.getByTestId("share-vex-button").click();
     await this.page

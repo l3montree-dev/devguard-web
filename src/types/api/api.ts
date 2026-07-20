@@ -1261,3 +1261,24 @@ export interface InstanceInfoDTO {
   runtime: InstanceRuntimeInfo;
   database: InstanceDatabaseInfo;
 }
+
+export interface SecurityAdvisory {
+  id: string;
+  title: string;
+  description: string;
+  severity: string;
+  vectorString: string;
+  assetID: string;
+  affectedPackages: AdvisoryAffectedPackage[] | null;
+  visibility: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdvisoryAffectedPackage {
+  id: string;
+  ecosystem: string;
+  packageName: string;
+  semverStart: string | null;
+  semverEnd: string | null;
+}
