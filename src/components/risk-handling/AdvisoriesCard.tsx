@@ -65,10 +65,10 @@ export default function AdvisoriesCard({
                   : "Advisory"}
               </CardTitle>
               <CardDescription className="mt-1">
-                From European Unions CSIRT Network members{" "}
+                From European Unions Computer Security Incident Response Team
+                (CSIRT) Network members{" "}
                 {advisories.length > 1 ? "advisories are" : "an advisory is"}{" "}
-                present. Please note that they are usually in member countries
-                official language.
+                present.
               </CardDescription>
             </div>
             <ChevronDown
