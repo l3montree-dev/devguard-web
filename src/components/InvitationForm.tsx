@@ -17,7 +17,7 @@ export const InvitationForm: FunctionComponent<OrgFormProps> = ({
   forceVertical = true,
 }) => (
   <Section
-    description="Enter the invitation link of the organization. This will be used to let you access your organization in the system."
+    description="Enter the invitation link of the organization."
     title="General Information"
     forceVertical={forceVertical}
   >
