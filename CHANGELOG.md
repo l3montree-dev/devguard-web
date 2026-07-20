@@ -4,6 +4,51 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.10.1] — 2026-07-20
+
+### Fixed
+
+- **Organization navigation menu** — the "Compliance Postures" menu item is no longer shown at the organization level for external entity providers, matching the existing restriction on the "Settings" item
+
+---
+
+## [v1.10.0] — 2026-07-20
+
+### Added
+
+- **Security advisories** — new advisory feature with a top-level overview page and per-advisory detail page; advisories support draft, published, and withdrawn states with a visibility badge and a withdrawn menu option; advisory dialog reworked with `react-hook-form` and CSAF links; breadcrumb added
+- **Compliance risks** — new compliance risks section wired to the real backend endpoint, with framework filtering, open/closed tabs, framework icons, and richer detail views; summary dashboard with controls-covered and last-attestation stat tiles, compliance risk distribution chart, and evidence download button; Grundschutz++ and SCF framework links added
+- **OSCAL components** — new OSCAL component pages and a Download OSCAL button
+- **SARIF download** — added SARIF download support
+- **GitHub issue resolve** — added support for resolving GitHub issues
+- **Security headers** — added security headers centrally via the Next.js server
+
+### Fixed
+
+- **CSAF export** — removed incorrect PURL logic from CSAF input
+- **VEX reopen logic** — reopen form now disabled when a vulnerability was already handled by a VEX rule
+- **Organization deletion** — fixed a redirect loop after deleting an organization
+- **Organization validation** — added validation and reworked related comments
+- **Dependency risks loading spinner** — fixed loading spinner behaviour
+- **Dashboard 404** — fixed a broken page
+- **Compliance state labels** — added missing `implemented` and `notApplicable` labels
+- **Dialog centering** — improved dialog centering
+- **ESLint config** — repaired broken ESLint config on Next 16
+- **README SBOM links** — updated public SBOM links
+
+### Changed
+
+- **Dynamic header** — added dropdown support
+- **CI** — added job retry in GitLab CI
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@Cryptoteep](https://github.com/Cryptoteep)** — fixed a redirect loop after deleting an organization
+
+---
+
 ## [v1.9.0] — 2026-07-14
 
 ### Added
