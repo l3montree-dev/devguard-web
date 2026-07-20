@@ -6,7 +6,7 @@ import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { SecurityAdvisory } from "@/types/api/api";
+import type { DetailedSecurityAdvisoryDTO } from "@/types/api/api";
 import Severity from "@/components/common/Severity";
 import Markdown from "@/components/common/Markdown";
 import { Button } from "@/components/ui/button";
@@ -37,11 +37,14 @@ import AdvisoryDialog, {
 } from "@/components/AdvisoryDialog";
 import AuthGuard from "@/components/AuthGuard";
 import { useConfig } from "@/context/ConfigContext";
+import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 
 const Index = () => {
   const router = useRouter();
   const params = useDecodedParams();
   const config = useConfig();
+  const deleteEvent = useDeleteEvent();
   const {
     organizationSlug,
     projectSlug,
@@ -129,7 +132,7 @@ const Index = () => {
     data: advisory,
     isLoading,
     error,
-  } = useSWR<SecurityAdvisory>(
+  } = useSWR<DetailedSecurityAdvisoryDTO>(
     organizationSlug &&
       projectSlug &&
       assetSlug &&
@@ -216,6 +219,11 @@ const Index = () => {
     variant: "secondary" as const,
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    await deleteEvent(eventId);
+    mutate(`${advisoryUrl}` + `/${advisoryId}/`);
+  };
+
   return (
     <Page
       Menu={assetMenu}
@@ -280,6 +288,16 @@ const Index = () => {
             <div className="rounded-lg">
               <h2 className="text-base font-semibold mb-3">Description</h2>
               <Markdown>{advisory.description}</Markdown>
+            </div>
+          )}
+          {advisory.events && advisory.events.length > 0 && (
+            <div className="mt-16">
+              <RiskAssessmentFeed
+                vulnerabilityName={advisory.title ?? advisory.id}
+                events={advisory.events}
+                page="security-advisory"
+                deleteEvent={handleDeleteEvent}
+              />
             </div>
           )}
           {advisory.visibility === "draft" && (

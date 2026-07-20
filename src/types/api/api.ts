@@ -287,7 +287,11 @@ interface BaseVulnEventDTO {
   createdAt: string;
   id: string;
   vulnId: string;
-  vulnType: "dependencyVuln" | "firstPartyVuln" | "compliancePosture";
+  vulnType:
+    | "dependencyVuln"
+    | "firstPartyVuln"
+    | "compliancePosture"
+    | "securityAdvisory";
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
@@ -400,6 +404,14 @@ export interface RemovedComplianceComponentEventDTO extends BaseVulnEventDTO {
   };
 }
 
+export interface PublishedEventDTO extends BaseVulnEventDTO {
+  type: "published";
+}
+
+export interface WithdrawnEventDTO extends BaseVulnEventDTO {
+  type: "withdrawn";
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -416,7 +428,9 @@ export type VulnEventDTO =
   | ImplementedEventDTO
   | NotApplicableEventDTO
   | AttachedComplianceComponentEventDTO
-  | RemovedComplianceComponentEventDTO;
+  | RemovedComplianceComponentEventDTO
+  | PublishedEventDTO
+  | WithdrawnEventDTO;
 
 export interface CWE {
   cwe: string;
@@ -1274,4 +1288,8 @@ export interface AdvisoryAffectedPackage {
   packageName: string;
   semverStart: string | null;
   semverEnd: string | null;
+}
+
+export interface DetailedSecurityAdvisoryDTO extends SecurityAdvisory {
+  events: VulnEventDTO[];
 }
