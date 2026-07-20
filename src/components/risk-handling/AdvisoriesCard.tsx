@@ -15,24 +15,25 @@
 
 import Markdown from "@/components/common/Markdown";
 import { markdownComponents } from "@/components/common/markdownComponents";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { Advisory } from "@/types/api/api";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { useState } from "react";
-import { advisorySourceUrl } from "./advisorySourceUrl";
+import { advisorySource, advisorySourceUrl } from "./advisorySourceUrl";
 import { parseAdvisoryDescription } from "./parseAdvisoryDescription";
-
-const LABEL_CLASS =
-  "text-xs font-semibold uppercase tracking-wider text-muted-foreground";
 
 interface Props {
   advisories: Advisory[];
   variant?: "collapsible" | "static";
 }
 
-// component to display available advisories for a given vulnerability
-// when viewed on the details page. Its an expandable box with a pulsating dot
-// and for each advisory it displays the title and the labeled description.
 export default function AdvisoriesCard({
   advisories,
   variant = "collapsible",
@@ -44,26 +45,32 @@ export default function AdvisoriesCard({
   if (!advisories || advisories.length === 0) return null;
 
   return (
-    <Card className="mb-4 bg-transparent">
+    <Card className="mb-4">
       <CardHeader className="p-5">
         {isStatic ? (
-          <CardTitle className={LABEL_CLASS}>Description</CardTitle>
+          <CardTitle className="">Description</CardTitle>
         ) : (
           <button
             type="button"
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
-            className="flex w-full cursor-pointer items-center gap-3 text-left"
+            className="flex w-full cursor-pointer items-start gap-3 text-left"
           >
-            <span className="relative flex h-2.5 w-2.5 shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
-            </span>
-            <CardTitle className={LABEL_CLASS}>
-              {advisories.length > 1
-                ? `Advisories (${advisories.length})`
-                : "Advisory"}
-            </CardTitle>
+            <InformationCircleIcon className="h-5 w-5 shrink-0 text-muted-foreground mt-1" />
+            <div>
+              <CardTitle className="text-base">
+                Official EU-CSIRT{" "}
+                {advisories.length > 1
+                  ? `Advisories (${advisories.length})`
+                  : "Advisory"}
+              </CardTitle>
+              <CardDescription className="mt-1">
+                From European Unions CSIRT Network members{" "}
+                {advisories.length > 1 ? "advisories are" : "an advisory is"}{" "}
+                present. Please note that they are usually in member countries
+                official language.
+              </CardDescription>
+            </div>
             <ChevronDown
               className={`ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
                 expanded ? "rotate-180" : ""
@@ -73,42 +80,47 @@ export default function AdvisoriesCard({
         )}
       </CardHeader>
       {open && (
-        <CardContent className="space-y-8 px-5 pb-5">
+        <CardContent className="space-y-8 border-t pt-6">
           {advisories.map((advisory, index) => {
             const sections = parseAdvisoryDescription(advisory.description);
             const sourceUrl = advisorySourceUrl(advisory.cve);
+            const source = advisorySource(advisory.cve);
             return (
               <div key={advisory.cve || index}>
                 {!isStatic && advisory.cve && (
-                  <div className="mb-5 ml-4 flex items-center gap-2">
-                    <p className="font-mono font-semibold text-foreground">
-                      {advisory.cve}
-                    </p>
-                    {sourceUrl && (
+                  <div className="mb-5 flex items-center gap-2">
+                    {sourceUrl ? (
                       <a
                         href={sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`Open ${advisory.cve} at the issuing authority`}
-                        className="shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+                        className="inline-flex items-center gap-1.5 font-mono font-semibold text-foreground transition-colors hover:text-muted-foreground"
                       >
-                        <ExternalLink className="h-4 w-4" />
+                        {advisory.cve}
+                        <ExternalLink className="h-4 w-4 shrink-0" />
                       </a>
+                    ) : (
+                      <p className="font-mono font-semibold text-foreground">
+                        {advisory.cve}
+                      </p>
+                    )}
+                    {source && (
+                      <span className="text-sm text-muted-foreground">
+                        Source: {source}
+                      </span>
                     )}
                   </div>
                 )}
                 <dl className="space-y-3">
                   {sections.map((section, i) => (
-                    <div
-                      key={i}
-                      className="border-l-4 border-[hsl(var(--grid-line-color))] pl-6"
-                    >
+                    <div key={i}>
                       {section.label && (
-                        <dt className={`${LABEL_CLASS} mb-1`}>
+                        <dt className="mb-1 text-sm font-bold">
                           {section.label}
                         </dt>
                       )}
-                      <dd className="ml-4 text-sm leading-relaxed text-foreground">
+                      <dd className="text-sm leading-relaxed text-foreground">
                         <Markdown components={markdownComponents}>
                           {section.content}
                         </Markdown>

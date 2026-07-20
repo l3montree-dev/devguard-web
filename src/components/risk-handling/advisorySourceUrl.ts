@@ -1,3 +1,9 @@
+export function advisorySource(id: string): string | null {
+  if (/^WID-SEC/i.test(id)) return "CERT-Bund (Germany)";
+  if (/^NCSC-\d{4}-/i.test(id)) return "NCSC (Netherlands)";
+  return null;
+}
+
 export function advisorySourceUrl(id: string): string | null {
   if (/^WID-SEC/i.test(id)) {
     // The portal expects the ID without the internal single-letter segment,

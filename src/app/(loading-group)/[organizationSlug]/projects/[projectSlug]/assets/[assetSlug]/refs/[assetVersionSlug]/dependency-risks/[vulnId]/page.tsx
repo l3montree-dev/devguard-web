@@ -1246,7 +1246,8 @@ const Index: FunctionComponent = () => {
                           <div>
                             <Callout intent="danger">
                               <p className="font-medium mx-2">
-                                This vulnerability is actively being exploited!
+                                This vulnerability is known to be actively
+                                exploited!
                               </p>
                               <div className="mt-1 mx-2 space-y-0.5">
                                 {vuln.cve?.euvdExploitAdd && (

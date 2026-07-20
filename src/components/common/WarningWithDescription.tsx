@@ -9,7 +9,7 @@ const WarningWithDescription: FunctionComponent<Props> = ({ description }) => {
   return (
     <Tooltip>
       <TooltipTrigger aria-label="Warning">
-        <TriangleAlert className="inline-block h-6 w-6 text-destructive" />
+        <TriangleAlert className="inline-block h-5 w-5 text-destructive" />
       </TooltipTrigger>
       <TooltipContent>{description}</TooltipContent>
     </Tooltip>

@@ -191,6 +191,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   const displayPackageQualifiers = formatPurlQualifiers(
     row.original.packageName,
   );
+  const isActivelyExploited = row.original.vulns.some(
+    (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
+  );
 
   const toggleCve = (cveID: string) => {
     setExpandedCves((prev) => {
@@ -242,6 +245,20 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 </TooltipContent>
               </Tooltip>
             )}
+            {isActivelyExploited ? (
+              <WarningWithDescription
+                description={
+                  <>
+                    <span className="font-bold">
+                      A vulnerability in this package is actively exploited!
+                    </span>
+                    <br />
+                    Present in official KEV catalogue. See the details page for
+                    more information.
+                  </>
+                }
+              />
+            ) : null}
           </div>
         </td>
         <td className="py-3 px-4 flex">
@@ -370,10 +387,12 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         description={
                           <>
                             <span className="font-bold">
-                              This vulnerability is actively being exploited!
+                              This vulnerability is known to be actively
+                              exploited!
                             </span>
                             <br />
-                            See the details page for more information
+                            Present in official KEV catalogue. See the details
+                            page for more information.
                           </>
                         }
                       />
