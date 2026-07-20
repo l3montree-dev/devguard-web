@@ -53,23 +53,28 @@ export const useOrganizationMenu = () => {
     testId: "nav-org-groups",
   });
 
-  menu.push({
-    title: "Compliance Postures",
-    href: "/" + decodedOrgSlug + "/compliance-postures",
-    Icon: ShieldCheck,
-    isActive: decodedPathName.startsWith(
-      "/" + decodedOrgSlug + "/compliance-postures",
-    ),
-  });
-
   if (isAdmin(currentUserRole) && !org.externalEntityProviderId) {
-    menu.push({
-      title: "Settings",
-      href: "/" + decodedOrgSlug + "/settings",
-      Icon: CogIcon,
-      isActive: decodedPathName.startsWith("/" + decodedOrgSlug + "/settings"),
-      testId: "nav-org-settings",
-    });
+    menu.push(
+      ...[
+        {
+          title: "Compliance Postures",
+          href: "/" + decodedOrgSlug + "/compliance-postures",
+          Icon: ShieldCheck,
+          isActive: decodedPathName.startsWith(
+            "/" + decodedOrgSlug + "/compliance-postures",
+          ),
+        },
+        {
+          title: "Settings",
+          href: "/" + decodedOrgSlug + "/settings",
+          Icon: CogIcon,
+          isActive: decodedPathName.startsWith(
+            "/" + decodedOrgSlug + "/settings",
+          ),
+          testId: "nav-org-settings",
+        },
+      ],
+    );
   }
   return menu;
 };
