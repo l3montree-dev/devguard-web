@@ -9,8 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { SecurityAdvisory } from "@/types/api/api";
 import Severity from "@/components/common/Severity";
 import Markdown from "@/components/common/Markdown";
-import FormatDate from "@/components/risk-assessment/FormatDate";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   AlertDialog,
@@ -179,7 +178,7 @@ const Index = () => {
       title: "Are you sure you want to delete this advisory?",
       description:
         "This action cannot be undone. All data associated with this advisory will be deleted.",
-      confirmClassName: buttonVariants({ variant: "default" }),
+      variant: "destructive",
       onConfirm: handleDeleteAdvisory,
     },
     publish: {
@@ -187,7 +186,7 @@ const Index = () => {
       title: "Are you sure you want to publish this advisory?",
       description:
         "NOTE: This feature is still work in progress. This publishment will only add the Advisory to the CSAF report. This action cannot be undone. All data associated with this advisory will be published.",
-      confirmClassName: buttonVariants({ variant: "default" }),
+      variant: "default",
       onConfirm: handlePublishAdvisory,
     },
     withdraw: {
@@ -197,7 +196,7 @@ const Index = () => {
       title: "Are you sure you want to withdraw this advisory?",
       description:
         "This action cannot be undone. The advisory stays public but is marked as withdrawn and can no longer be changed.",
-      confirmClassName: buttonVariants({ variant: "destructive" }),
+      variant: "destructive",
       onConfirm: handleWithdrawAdvisory,
     },
   } as const;
@@ -418,7 +417,7 @@ const Index = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className={activeConfirm?.confirmClassName}
+              variant={activeConfirm?.variant}
               onClick={() => activeConfirm?.onConfirm()}
             >
               <span>Confirm</span>
