@@ -41,6 +41,7 @@ import AdvisoryDialog, {
 import AuthGuard from "@/components/AuthGuard";
 import { useConfig } from "@/context/ConfigContext";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import { withVPrefix } from "@/services/versionCheck";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSession } from "@/context/SessionContext";
@@ -358,10 +359,12 @@ const Index = () => {
                     <tr key={pkg.id} className="border-b last:border-0">
                       <td className="p-3 font-medium">{pkg.packageName}</td>
                       <td className="p-3 text-muted-foreground">
-                        {pkg.semverStart ? `< v${pkg.semverStart}` : "—"}
+                        {pkg.semverStart
+                          ? `< ${withVPrefix(pkg.semverStart)}`
+                          : "—"}
                       </td>
                       <td className="p-3 text-muted-foreground">
-                        {pkg.semverEnd ? `v${pkg.semverEnd}` : "—"}
+                        {pkg.semverEnd ? withVPrefix(pkg.semverEnd) : "—"}
                       </td>
                     </tr>
                   ))}
