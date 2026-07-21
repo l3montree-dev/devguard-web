@@ -114,6 +114,8 @@ export function EventTypeIcon({
       return <Eye className="h-4 w-4" />;
     case "withdrawn":
       return <ArrowDownToDot className="h-4 w-4" />;
+    case "created":
+      return <Sparkles className="h-4 w-4" />;
   }
 }
 

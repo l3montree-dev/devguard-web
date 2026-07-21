@@ -412,6 +412,10 @@ export interface WithdrawnEventDTO extends BaseVulnEventDTO {
   type: "withdrawn";
 }
 
+export interface CreatedEventDTO extends BaseVulnEventDTO {
+  type: "created";
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -430,7 +434,8 @@ export type VulnEventDTO =
   | AttachedComplianceComponentEventDTO
   | RemovedComplianceComponentEventDTO
   | PublishedEventDTO
-  | WithdrawnEventDTO;
+  | WithdrawnEventDTO
+  | CreatedEventDTO;
 
 export interface CWE {
   cwe: string;
