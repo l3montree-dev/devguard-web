@@ -10,8 +10,8 @@ export async function GET() {
       },
       next: { revalidate: 900 },
     });
-
     if (!res.ok) {
+      console.error(res);
       return NextResponse.json({ notice: null }, { status: 200 });
     }
 
@@ -24,7 +24,8 @@ export async function GET() {
         description: issue.body,
       },
     });
-  } catch {
+  } catch (error: unknown) {
+    console.error(error);
     return NextResponse.json({ notice: null }, { status: 200 });
   }
 }

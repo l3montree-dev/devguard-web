@@ -280,27 +280,6 @@ const OrganizationHomePage: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const STORAGE_KEY = "global-notice-updatedAt";
-
-    fetch(`/${decodeURIComponent(activeOrg.slug)}/notice`)
-      .then((res) => res.json())
-      .then(({ notice }) => {
-        if (!notice) return;
-        if (localStorage.getItem(STORAGE_KEY) === notice.updatedAt) return;
-
-        toast(notice.description, {
-          icon: <Megaphone className="h-4 w-4" />,
-          id: "global-notice",
-          duration: Infinity,
-          closeButton: true,
-          onDismiss: () => {
-            localStorage.setItem(STORAGE_KEY, notice.updatedAt);
-          },
-        });
-      });
-  });
-
   return (
     <>
       <WelcomeModal
