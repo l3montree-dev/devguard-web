@@ -778,9 +778,9 @@ const Index: FunctionComponent = () => {
                 ))}
               </div>
               <div className="mt-8">
-                {vuln?.advisories && (
+                {vuln?.related?.advisory && (
                   <AdvisoriesCard
-                    advisories={vuln?.advisories}
+                    advisories={vuln?.related?.advisory}
                     variant="collapsible"
                   />
                 )}

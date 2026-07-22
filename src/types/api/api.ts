@@ -499,9 +499,15 @@ export interface Advisory {
   description: string;
 }
 
+interface related {
+  // related exposes all related cves under their respective relationship type
+  // if you want to access them add them here (e.g. alias: CVE[];); they are currently omitted to avoid clutter
+  advisory?: Advisory[];
+}
+
 export interface DetailedDependencyVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
-  advisories?: Advisory[];
+  related?: related;
 }
 
 export interface DependencyVulnHints {
