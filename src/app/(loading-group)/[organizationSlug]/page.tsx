@@ -61,7 +61,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
-import { Loader2 } from "lucide-react";
+import { Loader2, Megaphone } from "lucide-react";
 import useSWR from "swr";
 import EmptyParty from "../../../components/common/EmptyParty";
 import ListRenderer from "../../../components/common/ListRenderer";
@@ -279,6 +279,27 @@ const OrganizationHomePage: FunctionComponent = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const STORAGE_KEY = "global-notice-updatedAt";
+
+    fetch(`/${decodeURIComponent(activeOrg.slug)}/notice`)
+      .then((res) => res.json())
+      .then(({ notice }) => {
+        if (!notice) return;
+        if (localStorage.getItem(STORAGE_KEY) === notice.updatedAt) return;
+
+        toast(notice.description, {
+          icon: <Megaphone className="h-4 w-4" />,
+          id: "global-notice",
+          duration: Infinity,
+          closeButton: true,
+          onDismiss: () => {
+            localStorage.setItem(STORAGE_KEY, notice.updatedAt);
+          },
+        });
+      });
+  });
 
   return (
     <>
