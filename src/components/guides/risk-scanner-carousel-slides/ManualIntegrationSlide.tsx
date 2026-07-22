@@ -179,7 +179,7 @@ const ManualIntegrationSlide: FunctionComponent<
           Manual Integration
         </DialogTitle>
         <DialogDescription>
-          Upload an SARIF or SBOM file by using the dropzone below.
+          Upload an SBOM or SARIF file by using the dropzone below.
         </DialogDescription>
       </DialogHeader>
       <div className="mt-4 px-1">
@@ -190,11 +190,11 @@ const ManualIntegrationSlide: FunctionComponent<
         >
           <div className="flex">
             <TabsList>
-              <TabsTrigger data-testid="sarif-tab" value="sarif">
-                SARIF
-              </TabsTrigger>
               <TabsTrigger data-testid="sbom-tab" value="sbom">
                 SBOM
+              </TabsTrigger>
+              <TabsTrigger data-testid="sarif-tab" value="sarif">
+                SARIF
               </TabsTrigger>
               <TabsTrigger data-testid="vex-tab" value="vex">
                 VEX
