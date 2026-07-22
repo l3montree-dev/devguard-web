@@ -31,7 +31,10 @@ export function EssentialProjectConfigContent({
   assetSlug,
   repositoryProvider,
 }: ContentProps) {
-  const { pat, onCreatePat } = usePersonalAccessToken();
+  const { pat, onCreatePat } = usePersonalAccessToken(
+    undefined,
+    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/pats/`,
+  );
 
   return (
     <Card>
@@ -54,9 +57,9 @@ export function EssentialProjectConfigContent({
         </div>
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-semibold">Personal Access Token</p>
+            <p className="text-sm font-semibold">Repository Access Token</p>
             <Link
-              href="/user-settings#pat"
+              href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings#access-tokens`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-foreground underline"
@@ -70,13 +73,13 @@ export function EssentialProjectConfigContent({
             CI/CD variables.
           </p>
           <InputWithButton
-            label="Personal Access token"
+            label="Repository Access token"
             nameKey="devguard-secret-token"
             copyable={true}
             copyToastDescription="The DevGuard token has been copied to your clipboard."
             mutable={true}
             variant="onCard"
-            value={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+            value={pat?.privKey ?? "<REPOSITORY ACCESS TOKEN>"}
             update={{
               update: () =>
                 onCreatePat({
@@ -85,9 +88,9 @@ export function EssentialProjectConfigContent({
                   expiryDateUnix:
                     Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
                 }),
-              updateConfirmTitle: "Create new personal access token",
+              updateConfirmTitle: "Create new repository access token",
               updateConfirmDescription:
-                "Are you sure you want to create a new personal access token? Make sure to copy it, as you won't be able to see it again.",
+                "Are you sure you want to create a new repository access token? Make sure to copy it, as you won't be able to see it again.",
             }}
           />
         </div>

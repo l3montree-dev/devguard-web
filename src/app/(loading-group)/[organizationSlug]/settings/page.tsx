@@ -50,7 +50,7 @@ import type {
 } from "@/types/api/api";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
 import { useConfig } from "../../../../context/ConfigContext";
@@ -62,8 +62,19 @@ import Alert from "../../../../components/common/Alert";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
 import InvitedMembersTable from "@/components/InvitedMembersTable";
+import AccessTokenManagement from "@/components/AccessTokenManagement";
+import useDecodedParams from "@/hooks/useDecodedParams";
 
 const Home = () => {
+  let { organizationSlug } = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  };
+
+  const url = "/organizations/" + organizationSlug + "/pats/";
+
   const orgCtx = useOrganization();
   const activeOrg = orgCtx?.organization as OrganizationDetailsDTO;
   const updateOrgCtx = useUpdateOrganization();
@@ -461,7 +472,7 @@ const Home = () => {
                 Integrate with GitLab
               </div>
             }
-            Description="DevGuard uses a personal, group or project access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Description="DevGuard uses a personal, organization, group or repository access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
             Button={
               <GitLabIntegrationDialog
                 onNewIntegration={handleNewGitLabIntegration}
@@ -613,6 +624,14 @@ const Home = () => {
             </div>
           </Card>
         </Section>
+        <AccessTokenManagement
+          url={url}
+          section={{
+            title: "Generate your Organization Access Tokens",
+            description:
+              "Manage your organization access tokens that scanners and other integrations use to authenticate with DevGuard.",
+          }}
+        />
       </div>
       <hr />
       <FormProvider {...form}>

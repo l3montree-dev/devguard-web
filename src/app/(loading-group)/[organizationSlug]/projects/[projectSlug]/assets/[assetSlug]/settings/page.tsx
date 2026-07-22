@@ -1,47 +1,47 @@
 "use client";
+import AccessTokenManagement from "@/components/AccessTokenManagement";
 import Page from "@/components/Page";
 import AssetForm, { type AssetFormValues } from "@/components/asset/AssetForm";
 import AssetTitle from "@/components/common/AssetTitle";
-import { AsyncButton, Button } from "@/components/ui/button";
+import Section from "@/components/common/Section";
+import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useAutoTour } from "@/hooks/useAutoTour";
 import { convertRepos } from "@/hooks/useRepositorySearch";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import { isNumber } from "@/utils/common";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
 import type { FunctionComponent } from "react";
+import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import Alert from "../../../../../../../../components/common/Alert";
 import DangerZone from "../../../../../../../../components/common/DangerZone";
 import ListItem from "../../../../../../../../components/common/ListItem";
-import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
-import { useConfig } from "../../../../../../../../context/ConfigContext";
-import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
-import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { UserRole } from "../../../../../../../../types/api/api";
-import type { AssetDTO } from "../../../../../../../../types/api/api";
-import {
-  generateNewSecret,
-  getParentRepositoryIdAndName,
-} from "../../../../../../../../utils/view";
-import { Switch } from "../../../../../../../../components/ui/switch";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "../../../../../../../../components/ui/collapsible";
-import DateString from "../../../../../../../../components/common/DateString";
-import Section from "@/components/common/Section";
-import { Card } from "@/components/ui/card";
-import Link from "next/link";
-import { useAutoTour } from "@/hooks/useAutoTour";
-import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import { Switch } from "../../../../../../../../components/ui/switch";
+import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
+import { useConfig } from "../../../../../../../../context/ConfigContext";
+import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
+import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
+import type { AssetDTO } from "../../../../../../../../types/api/api";
+import { UserRole } from "../../../../../../../../types/api/api";
+import {
+  generateNewSecret,
+  getParentRepositoryIdAndName,
+} from "../../../../../../../../utils/view";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -80,6 +80,15 @@ const Index: FunctionComponent = () => {
       "/secrets",
     fetcher,
   );
+
+  const url =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/assets/" +
+    assetSlug +
+    "/pats/";
 
   const { data: repoResp } = useSWR<any[]>(
     "/organizations/" + organizationSlug + "/integrations/repositories",
@@ -353,6 +362,14 @@ const Index: FunctionComponent = () => {
         </FormProvider>
       </div>
       <hr />
+      <AccessTokenManagement
+        url={url}
+        section={{
+          title: "Generate your Repository Access Tokens",
+          description:
+            "Manage your repository access tokens that scanners and other integrations use to authenticate with DevGuard.",
+        }}
+      />
       <div>
         <Section
           data-tour="repo-settings-webhook"
