@@ -15,6 +15,7 @@
 
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import type { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
 
 import { browserApiClient } from "@/services/devGuardApi";
@@ -22,16 +23,15 @@ import { Form } from "./ui/form";
 
 import { OrgForm } from "./OrgForm";
 import { Button } from "./ui/button";
+import AcceptInvitationDialog from "./AcceptInvitationDialog";
 
 import { toast } from "@/lib/toast";
-import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useUpdateSession } from "@/context/SessionContext";
 
-interface Props {}
-
-export default function OrgRegisterForm(props: Props) {
+export default function OrgRegisterForm() {
   const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
+  const [acceptInvitationOpen, setAcceptInvitationOpen] = useState(false);
 
   const router = useRouter();
   const handleOrgCreation = async (data: OrganizationDTO) => {
@@ -77,7 +77,14 @@ export default function OrgRegisterForm(props: Props) {
       >
         <OrgForm />
 
-        <div className="-mt-4 flex items-center justify-end gap-x-6">
+        <div className="mt-6 flex items-center justify-end gap-x-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setAcceptInvitationOpen(true)}
+          >
+            Join Organization
+          </Button>
           <Button
             disabled={form.formState.isSubmitting}
             isSubmitting={form.formState.isSubmitting}
@@ -85,8 +92,12 @@ export default function OrgRegisterForm(props: Props) {
           >
             Create Organization
           </Button>
-        </div>
+        </div >
       </form>
+      <AcceptInvitationDialog
+        isOpen={acceptInvitationOpen}
+        onOpenChange={setAcceptInvitationOpen}
+      />
     </Form>
   );
 }
