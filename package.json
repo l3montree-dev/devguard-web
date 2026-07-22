@@ -10,6 +10,10 @@
         "test": "jest",
         "postinstall": "patch-package"
     },
+    "engines": {
+        "node": ">=v26.5.0",
+        "npm": ">=11.17.0"
+    },
     "dependencies": {
         "@codemirror/lang-json": "^6.0.2",
         "@codemirror/lang-yaml": "^6.1.3",
