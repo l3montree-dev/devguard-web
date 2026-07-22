@@ -32,10 +32,9 @@ export function EssentialProjectConfigContent({
   repositoryProvider,
 }: ContentProps) {
   const { pat, onCreatePat } = usePersonalAccessToken(
-  undefined,
-  `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/pats/`,
-);
-
+    undefined,
+    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/pats/`,
+  );
 
   return (
     <Card>
@@ -60,7 +59,7 @@ export function EssentialProjectConfigContent({
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold">Repository Access Token</p>
             <Link
-              href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings#pat`}
+              href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings#access-tokens`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-foreground underline"

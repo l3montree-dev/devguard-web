@@ -23,7 +23,7 @@ const AccessTokenSection = ({ description }: { description: string }) => {
     `/organizations/${org.slug}/projects/${project.slug}/assets/${asset.slug}/pats/`,
   );
 
-  const manageTokensHref = `/${org.slug}/projects/${project.slug}/assets/${asset.slug}/settings#pat`;
+  const manageTokensHref = `/${org.slug}/projects/${project.slug}/assets/${asset.slug}/settings#access-tokens`;
 
   return (
     <Section

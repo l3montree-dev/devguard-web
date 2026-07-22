@@ -154,7 +154,11 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
 
   return (
     <>
-      <Section id="pat" title={section.title} description={section.description}>
+      <Section
+        id="access-tokens"
+        title={section.title}
+        description={section.description}
+      >
         <Card className="pt-6">
           <form onSubmit={handleSubmit(handleCreatePat)}>
             <CardContent>

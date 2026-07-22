@@ -244,7 +244,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
                 Integrate with GitLab/ openCode
               </div>
             }
-            Description="DevGuard uses a personal, organization, group or repository access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
+            Description="DevGuard uses a personal, group or repository access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
             Button={
               <Link
                 className={cn(

@@ -66,19 +66,14 @@ import AccessTokenManagement from "@/components/AccessTokenManagement";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
 const Home = () => {
-  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useDecodedParams() as {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
+  let { organizationSlug } = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  };
 
-  const searchParams = useSearchParams();
-
-  const uri = "/organizations/" + organizationSlug + "/";
-
-  const url = uri + "pats/";
+  const url = "/organizations/" + organizationSlug + "/pats/";
 
   const orgCtx = useOrganization();
   const activeOrg = orgCtx?.organization as OrganizationDetailsDTO;
@@ -627,11 +622,11 @@ const Home = () => {
           </Card>
         </Section>
         <AccessTokenManagement
-          url={`${url}`}
+          url={url}
           section={{
             title: "Generate your Organization Access Tokens",
             description:
-              "Manage your organization access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+              "Manage your organization access tokens that scanners and other integrations use to authenticate with DevGuard.",
           }}
         />
       </div>

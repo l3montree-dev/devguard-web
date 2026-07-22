@@ -40,20 +40,19 @@ const Index: FunctionComponent = () => {
   const config = useConfig();
   const router = useRouter();
 
-  let { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useDecodedParams() as {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
+  let { organizationSlug, projectSlug } = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  };
 
-  const searchParams = useSearchParams();
-
-  const uri = "/organizations/" + organizationSlug + "/projects/" + projectSlug;
-  ("/");
-
-  const url = uri + "/pats/";
+  const url =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/pats/";
 
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     if (!project) {
@@ -353,7 +352,7 @@ These identifiers are managed by the external system and are treated as immutabl
         )}
         <hr />
         <AccessTokenManagement
-          url={`${url}`}
+          url={url}
           section={{
             title: "Generate your Group Access Tokens",
             description:
