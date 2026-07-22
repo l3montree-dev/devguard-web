@@ -9,15 +9,12 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
-    sbomnix.url = "github:tiiuae/sbomnix";
-    sbomnix.inputs.nixpkgs.follows = "nixpkgs"; # share the same nixpkgs pin
   };
 
-  outputs = { self, nixpkgs, flake-utils, sbomnix }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        sbomnixPkgs = sbomnix.packages.${system};
         npmPackages = (import ./nix/npm-packages.nix { inherit pkgs; });
         pkgsLinuxAmd64 = nixpkgs.legacyPackages.x86_64-linux;
         pkgsLinuxArm64 = nixpkgs.legacyPackages.aarch64-linux;
