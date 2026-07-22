@@ -1,6 +1,9 @@
 import CopyCode from "@/components/common/CopyCode";
 import { DocDrawer } from "@/components/common/DocDrawer";
-import type { DetailedDependencyVulnDTO } from "@/types/api/api";
+import type {
+  DependencyVuln,
+  DetailedDependencyVulnDTO,
+} from "@/types/api/api";
 import {
   beautifyPurl,
   isValidPackagePurl,
@@ -87,7 +90,12 @@ function renderQuickFixText(
   }
 }
 
-function getFixedVersionPurl(vuln: DetailedDependencyVulnDTO): string | null {
+type QuickfixVuln = Pick<
+  DependencyVuln,
+  "directDependencyFixedVersion" | "componentFixedVersion" | "vulnerabilityPath"
+>;
+
+export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   if (!vuln.directDependencyFixedVersion && vuln.componentFixedVersion) {
     if (vuln.vulnerabilityPath && vuln.vulnerabilityPath.length === 1) {
       const purl = PackageURL.fromString(vuln.vulnerabilityPath[0]); // Check if it's a valid purl
@@ -98,6 +106,27 @@ function getFixedVersionPurl(vuln: DetailedDependencyVulnDTO): string | null {
   }
   return vuln.directDependencyFixedVersion;
 }
+export function isQuickfixApplicable(vuln: QuickfixVuln): boolean {
+  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+    return false;
+  }
+
+  const vulnerabilityPath = vuln.vulnerabilityPath[0];
+
+  if (!isValidPackagePurl(vulnerabilityPath)) {
+    return false;
+  }
+
+  const isDirectDep = vuln.vulnerabilityPath.length === 1;
+  const ecosystem = PackageURL.fromString(vulnerabilityPath).type;
+  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
+
+  return isDirectDep || hasResolver;
+}
+
+export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
+  return isQuickfixApplicable(vuln) && getFixedVersionPurl(vuln) !== null;
+}
 
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
@@ -105,26 +134,11 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
 
-  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
+  if (!isQuickfixApplicable(vuln) || !vuln.vulnerabilityPath) {
     return null;
   }
 
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
-
-  // Only show quickfix for direct dependencies, or for ecosystems with a resolver (deb, npm)
-  const isDirectDep = vuln.vulnerabilityPath.length === 1;
-  const ecosystem = isValidPackagePurl(vulnerabilityPath)
-    ? PackageURL.fromString(vulnerabilityPath).type
-    : null;
-  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
-
-  if (!isDirectDep && !hasResolver) {
-    return null;
-  }
-
-  if (!isValidPackagePurl(vulnerabilityPath)) {
-    return null;
-  }
 
   return (
     <>
