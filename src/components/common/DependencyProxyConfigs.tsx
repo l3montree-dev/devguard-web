@@ -293,8 +293,8 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
           <DocDrawer
             triggerLabel="Learn how the Dependency Proxy works"
             drawerTitle="Dependency Proxy"
-            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/how-to-guides/security/dependency-proxy.mdx"
-            docsUrl="https://docs.devguard.org/how-to-guides/security/dependency-proxy/"
+            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/how-to-guides/dependency-proxy/index.mdx"
+            docsUrl="https://docs.devguard.org/how-to-guides/dependency-proxy/"
           />
         </div>
         <Section
