@@ -27,7 +27,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import ColoredBadge from "@/components/common/ColoredBadge";
-import PatSection from "@/components/PatSection";
+import AccessTokenSection from "@/components/AccessTokenSection";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
@@ -214,7 +214,7 @@ const Index = () => {
                       ></CopyCodeFragment>
                     </div>
                     <div className="mt-10">
-                      <PatSection description="Repository access token to create attestations" />
+                      <AccessTokenSection description="Repository access token" />
                     </div>
                   </div>
                 </CardContent>

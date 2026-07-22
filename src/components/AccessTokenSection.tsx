@@ -11,7 +11,7 @@ import CopyCode from "./common/CopyCode";
 import Section from "./common/Section";
 import { Button } from "./ui/button";
 
-const PatSection = ({ description }: { description: string }) => {
+const AccessTokenSection = ({ description }: { description: string }) => {
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
 
   const org = useActiveOrg();
@@ -87,4 +87,4 @@ const PatSection = ({ description }: { description: string }) => {
   );
 };
 
-export default PatSection;
+export default AccessTokenSection;
