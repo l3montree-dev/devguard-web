@@ -65,7 +65,7 @@ const emptyPackage = (): PackageRow => ({
   versionEnd: "",
 });
 
-const SEMVER_RE = /^v?\d+\.\d+\.\d+$/;
+const Version_RE = /^v?\d+\.\d+\.\d+$/;
 
 const defaultValues = (initialValues?: AdvisoryFormData): AdvisoryFormData => ({
   title: initialValues?.title ?? "",
@@ -150,8 +150,8 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
         severity: vectorStringToSeverity(data.vectorString) ?? "",
         affectedPackages: data.affectedPackages.map((pkg) => ({
           ...pkg,
-          semverStart: pkg.versionStart || null,
-          semverEnd: pkg.versionEnd || null,
+          versionStart: pkg.versionStart || null,
+          versionEnd: pkg.versionEnd || null,
         })),
         state: "draft",
       });
@@ -353,17 +353,17 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                     />
                     <FormField
                       control={form.control}
-                      name={`affectedPackages.${index}.semverStart`}
+                      name={`affectedPackages.${index}.versionStart`}
                       rules={{
-                        required: "Semver Start is required",
+                        required: "Version Start is required",
                         pattern: {
-                          value: SEMVER_RE,
+                          value: Version_RE,
                           message: "Format: 1.2.3",
                         },
                       }}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Semver Start</FormLabel>
+                          <FormLabel>Version Start</FormLabel>
                           <FormControl>
                             <Input
                               placeholder="0.0.0"
@@ -377,34 +377,34 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                     />
                     <FormField
                       control={form.control}
-                      name={`affectedPackages.${index}.semverEnd`}
+                      name={`affectedPackages.${index}.versionEnd`}
                       rules={{
-                        required: "Semver End is required",
+                        required: "Version End is required",
                         pattern: {
-                          value: SEMVER_RE,
+                          value: Version_RE,
                           message: "Format: 1.2.3",
                         },
                         validate: (value) => {
                           const start = form.getValues(
-                            `affectedPackages.${index}.semverStart`,
+                            `affectedPackages.${index}.versionStart`,
                           );
                           if (
                             !value ||
                             !start ||
-                            !SEMVER_RE.test(value) ||
-                            !SEMVER_RE.test(start)
+                            !Version_RE.test(value) ||
+                            !Version_RE.test(start)
                           ) {
                             return true;
                           }
                           return (
                             compareSemver(value, start) > 0 ||
-                            "Must be greater than Semver Start"
+                            "Must be greater than Version Start"
                           );
                         },
                       }}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Semver End</FormLabel>
+                          <FormLabel>Version End</FormLabel>
                           <FormControl>
                             <Input placeholder="1.0.0" {...(field as any)} />
                           </FormControl>
