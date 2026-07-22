@@ -236,9 +236,9 @@ const Index = () => {
   } as const;
 
   const visibilityBadge = visibilityConfig[
-    advisory.visibility as keyof typeof visibilityConfig
+    advisory.state as keyof typeof visibilityConfig
   ] ?? {
-    label: advisory.visibility,
+    label: advisory.state,
     variant: "secondary" as const,
   };
 
@@ -328,7 +328,7 @@ const Index = () => {
             <Badge className="h-full" variant={visibilityBadge.variant}>
               {visibilityBadge.label}
             </Badge>
-            {advisory.visibility !== "draft" && (
+            {advisory.state !== "draft" && (
               <a
                 href={csafUrl}
                 target="_blank"
@@ -359,12 +359,12 @@ const Index = () => {
                     <tr key={pkg.id} className="border-b last:border-0">
                       <td className="p-3 font-medium">{pkg.packageName}</td>
                       <td className="p-3 text-muted-foreground">
-                        {pkg.semverStart
-                          ? `< ${withVPrefix(pkg.semverStart)}`
+                        {pkg.versionStart
+                          ? `< ${withVPrefix(pkg.versionStart)}`
                           : "—"}
                       </td>
                       <td className="p-3 text-muted-foreground">
-                        {pkg.semverEnd ? withVPrefix(pkg.semverEnd) : "—"}
+                        {pkg.versionEnd ? withVPrefix(pkg.versionEnd) : "—"}
                       </td>
                     </tr>
                   ))}
@@ -405,7 +405,7 @@ const Index = () => {
                   </div>
                   <div className="flex flex-row justify-end gap-1">
                     <div className="flex flex-row items-start gap-2 pt-2">
-                      {advisory.visibility === "draft" && (
+                      {advisory.state === "draft" && (
                         <>
                           <Button
                             onClick={() => setConfirm("delete")}
@@ -427,7 +427,7 @@ const Index = () => {
                           </Button>
                         </>
                       )}
-                      {advisory.visibility === "public" && (
+                      {advisory.state === "public" && (
                         <Button
                           onClick={() => setConfirm("withdraw")}
                           variant="destructive"
@@ -533,7 +533,7 @@ const Index = () => {
             affectedPackages: (advisory.affectedPackages ?? []).map(
               ({ id, ...rest }) => rest,
             ),
-            visibility: advisory.visibility,
+            state: advisory.state,
           }}
           onSubmit={handleChangeAdvisory}
         />

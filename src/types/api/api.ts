@@ -1282,7 +1282,7 @@ export interface SecurityAdvisory {
   vectorString: string;
   assetID: string;
   affectedPackages: AdvisoryAffectedPackage[] | null;
-  visibility: string;
+  state: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -1291,8 +1291,8 @@ export interface AdvisoryAffectedPackage {
   id: string;
   ecosystem: string;
   packageName: string;
-  semverStart: string | null;
-  semverEnd: string | null;
+  versionStart: string | null;
+  versionEnd: string | null;
 }
 
 export interface DetailedSecurityAdvisoryDTO extends SecurityAdvisory {

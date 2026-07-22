@@ -46,7 +46,7 @@ export interface AdvisoryFormData {
   severity: string;
   vectorString: string;
   affectedPackages: Omit<AdvisoryAffectedPackage, "id">[];
-  visibility: string;
+  state: string;
 }
 
 interface AdvisoryDialogProps {
@@ -61,8 +61,8 @@ type PackageRow = Omit<AdvisoryAffectedPackage, "id">;
 const emptyPackage = (): PackageRow => ({
   ecosystem: "",
   packageName: "",
-  semverStart: "",
-  semverEnd: "",
+  versionStart: "",
+  versionEnd: "",
 });
 
 const SEMVER_RE = /^v?\d+\.\d+\.\d+$/;
@@ -76,7 +76,7 @@ const defaultValues = (initialValues?: AdvisoryFormData): AdvisoryFormData => ({
     initialValues?.affectedPackages && initialValues.affectedPackages.length > 0
       ? initialValues.affectedPackages
       : [emptyPackage()],
-  visibility: initialValues?.visibility ?? "draft",
+  state: initialValues?.state ?? "draft",
 });
 
 const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
@@ -150,10 +150,10 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
         severity: vectorStringToSeverity(data.vectorString) ?? "",
         affectedPackages: data.affectedPackages.map((pkg) => ({
           ...pkg,
-          semverStart: pkg.semverStart || null,
-          semverEnd: pkg.semverEnd || null,
+          semverStart: pkg.versionStart || null,
+          semverEnd: pkg.versionEnd || null,
         })),
-        visibility: "draft",
+        state: "draft",
       });
       handleClose(false);
     } finally {
