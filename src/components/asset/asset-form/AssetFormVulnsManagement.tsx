@@ -40,6 +40,7 @@ import { ClipboardDocumentIcon } from "@heroicons/react/20/solid";
 import { toast } from "@/lib/toast";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -372,6 +373,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
                         </FormItem>
                       )}
                     />
+                    <Badge variant="secondary">OR</Badge>
                     <FormField
                       name="riskAutomaticTicketThreshold"
                       control={form.control}
@@ -612,12 +614,14 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   // Clear selected artifact whenever the selected version changes
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedArtifact("");
   }, [selectedVersionSlug]);
 
   // Auto-select first artifact when artifacts load, but only if there is no valid selection
   React.useEffect(() => {
     if (!artifacts || artifacts.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedArtifact("");
       return;
     }
