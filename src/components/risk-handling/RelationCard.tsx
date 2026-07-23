@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { Advisory } from "@/types/api/api";
+import type { CVE } from "@/types/api/api";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { useState } from "react";
@@ -30,19 +30,19 @@ import { advisorySource, advisorySourceUrl } from "./advisorySourceUrl";
 import { parseAdvisoryDescription } from "./parseAdvisoryDescription";
 
 interface Props {
-  advisories: Advisory[];
+  related: CVE[];
   variant?: "collapsible" | "static";
 }
 
-export default function AdvisoriesCard({
-  advisories,
+export default function RelationCard({
+  related,
   variant = "collapsible",
 }: Props) {
   const isStatic = variant === "static";
   const [expanded, setExpanded] = useState(false);
   const open = isStatic || expanded;
 
-  if (!advisories || advisories.length === 0) return null;
+  if (!related || related.length === 0) return null;
 
   return (
     <Card className="mb-4">
@@ -60,14 +60,14 @@ export default function AdvisoriesCard({
             <div>
               <CardTitle className="text-base">
                 Official EU-CSIRT{" "}
-                {advisories.length > 1
-                  ? `Advisories (${advisories.length})`
+                {related.length > 1
+                  ? `Advisories (${related.length})`
                   : "Advisory"}
               </CardTitle>
               <CardDescription className="mt-1">
                 From European Unions Computer Security Incident Response Team
                 (CSIRT) Network members{" "}
-                {advisories.length > 1 ? "advisories are" : "an advisory is"}{" "}
+                {related.length > 1 ? "advisories are" : "an advisory is"}{" "}
                 present.
               </CardDescription>
             </div>
@@ -81,7 +81,7 @@ export default function AdvisoriesCard({
       </CardHeader>
       {open && (
         <CardContent className="space-y-8 border-t pt-6">
-          {advisories.map((advisory, index) => {
+          {related.map((advisory, index) => {
             const sections = parseAdvisoryDescription(advisory.description);
             const sourceUrl = advisorySourceUrl(advisory.cve);
             const source = advisorySource(advisory.cve);
@@ -121,9 +121,7 @@ export default function AdvisoriesCard({
                         </dt>
                       )}
                       <dd className="text-sm leading-relaxed text-foreground">
-                        <Markdown components={markdownComponents}>
-                          {section.content}
-                        </Markdown>
+                        <Markdown>{section.content}</Markdown>
                       </dd>
                     </div>
                   ))}

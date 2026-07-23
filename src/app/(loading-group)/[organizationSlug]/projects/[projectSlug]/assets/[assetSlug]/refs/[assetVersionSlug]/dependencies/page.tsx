@@ -656,7 +656,7 @@ const Index: FunctionComponent = () => {
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           )}
         </div>
-        <div className="overflow-hidden rounded-lg border ">
+        <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead
               data-tour="dependencies-table"

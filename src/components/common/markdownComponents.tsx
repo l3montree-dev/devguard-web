@@ -18,7 +18,9 @@ import type { Components } from "react-markdown";
 // Shared prose styling for markdown rendered inside cards. Pass to the
 // <Markdown> wrapper in @/components/common/Markdown so remark-gfm stays
 // enabled -- the table components below only render with it.
-export const markdownComponents: Components = {
+export const markdownComponents: (linkBaseURL?: string) => Components = (
+  linkBaseURL,
+) => ({
   h1: ({ children }) => (
     <h1 className="mb-3 mt-6 text-xl font-semibold">{children}</h1>
   ),
@@ -51,9 +53,14 @@ export const markdownComponents: Components = {
   hr: () => (
     <hr className="my-4 border-t border-[hsl(var(--grid-line-color))]" />
   ),
-  a: ({ children, href }) => (
+  a: ({ node: _, children, ...props }) => (
     <a
-      href={href}
+      {...props}
+      href={
+        props.href?.startsWith("http")
+          ? props.href
+          : `${linkBaseURL || ""}${props.href}`
+      }
       target="_blank"
       rel="noopener noreferrer"
       className="text-link hover:underline dark:text-blue-400"
@@ -96,4 +103,4 @@ export const markdownComponents: Components = {
       {children}
     </td>
   ),
-};
+});

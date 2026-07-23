@@ -515,7 +515,7 @@ const Index: FunctionComponent = () => {
         </div>
       ) : (
         <div>
-          <div className="rounded-lg overflow-hidden border ">
+          <div className="rounded-lg overflow-hidden border shadow-sm">
             <div>
               <table className="w-full text-left text-sm table-fixed">
                 <colgroup>

@@ -494,15 +494,10 @@ export interface VulnWithCVE extends DependencyVuln {
     | null;
 }
 
-export interface Advisory {
-  cve: string;
-  description: string;
-}
-
 interface related {
   // related exposes all related cves under their respective relationship type
   // if you want to access them add them here (e.g. alias: CVE[];); they are currently omitted to avoid clutter
-  advisory?: Advisory[];
+  advisory?: CVE[];
 }
 
 export interface DetailedDependencyVulnDTO extends VulnWithCVE {

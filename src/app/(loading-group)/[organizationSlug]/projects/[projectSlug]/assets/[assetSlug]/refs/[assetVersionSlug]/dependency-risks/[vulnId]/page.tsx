@@ -10,6 +10,7 @@ import VulnState from "@/components/common/VulnState";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import RelationCard from "@/components/risk-handling/RelationCard";
 import { Badge } from "@/components/ui/badge";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,9 +36,10 @@ import { useCreateVexRule } from "@/hooks/useCreateVexRule";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { usePageTour } from "@/hooks/usePageTour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import { formatDate } from "@/utils/format";
 import type {
   AssetDTO,
   DependencyVulnHints,
@@ -46,6 +48,7 @@ import type {
   VulnEventDTO,
 } from "@/types/api/api";
 import { RequirementsLevel } from "@/types/api/api";
+import { formatDate } from "@/utils/format";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
   InformationCircleIcon,
@@ -58,11 +61,10 @@ import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
-import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
@@ -83,10 +85,7 @@ import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import { useTourSeen } from "@/hooks/useTourSeen";
-import { DocDrawer } from "@/components/common/DocDrawer";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import AdvisoriesCard from "@/components/risk-handling/AdvisoriesCard";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -779,8 +778,8 @@ const Index: FunctionComponent = () => {
               </div>
               <div className="mt-8">
                 {vuln?.related?.advisory && (
-                  <AdvisoriesCard
-                    advisories={vuln?.related?.advisory}
+                  <RelationCard
+                    related={vuln?.related?.advisory}
                     variant="collapsible"
                   />
                 )}

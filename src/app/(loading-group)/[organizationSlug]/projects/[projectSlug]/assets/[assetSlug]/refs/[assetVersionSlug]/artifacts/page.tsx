@@ -386,7 +386,7 @@ const Artifacts = () => {
                   description="There are currently no artifacts associated with this ref (branch or tag)."
                 />
               ) : (
-                <div className="overflow-hidden rounded-lg border ">
+                <div className="overflow-hidden rounded-lg border shadow-sm">
                   <div className="overflow-auto">
                     <table className="w-full overflow-x-auto text-sm">
                       <thead className="border-b bg-card text-foreground">

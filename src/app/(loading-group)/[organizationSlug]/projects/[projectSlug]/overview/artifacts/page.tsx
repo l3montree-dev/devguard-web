@@ -171,7 +171,7 @@ const Index: FunctionComponent = () => {
             </TabsList>
           </div>
         </Tabs>
-        <div className="overflow-hidden rounded-lg border ">
+        <div className="overflow-hidden rounded-lg border shadow-sm">
           <table className="w-full table-fixed overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">
               {table.getHeaderGroups().map((headerGroup) => (

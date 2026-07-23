@@ -335,16 +335,16 @@ const Index: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex gap-2">
-        <DelayedDownloadButton
-          href={pathname + "/../sarif.json"}
-          label={"Download Sarif"}
-          downloadFileName={assetSlug + "_sarif.json"}
-        />
-        <AuthGuard require="admin">
-          <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Risks
-          </Button>
-        </AuthGuard>
+          <DelayedDownloadButton
+            href={pathname + "/../sarif.json"}
+            label={"Download Sarif"}
+            downloadFileName={assetSlug + "_sarif.json"}
+          />
+          <AuthGuard require="admin">
+            <Button onClick={() => setIsOpen(true)} variant="default">
+              Identify Risks
+            </Button>
+          </AuthGuard>
         </div>
       </div>
       <Section
@@ -412,7 +412,7 @@ const Index: FunctionComponent = () => {
       ) : (
         <div>
           <div>
-            <div className="overflow-hidden rounded-lg border ">
+            <div className="overflow-hidden rounded-lg border shadow-sm">
               <div className="overflow-auto">
                 <table className="w-full overflow-x-auto text-sm">
                   <thead className="border-b bg-card text-foreground">
