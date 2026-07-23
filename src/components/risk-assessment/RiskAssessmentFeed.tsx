@@ -262,7 +262,13 @@ const RiskFeedItem = ({
                   <AvatarImage src={user?.avatarUrl} alt={event.userId} />
                 )}
                 <AvatarFallback className="bg-secondary">
-                  {user.realName.charAt(0)}
+                  {user.realName
+                    .trim()
+                    .split(/\s+/)
+                    .map((name) => name[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             )}
