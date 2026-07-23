@@ -10,6 +10,7 @@ import VulnState from "@/components/common/VulnState";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import RelationCard from "@/components/risk-handling/RelationCard";
 import { Badge } from "@/components/ui/badge";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -35,7 +36,9 @@ import { useCreateVexRule } from "@/hooks/useCreateVexRule";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { usePageTour } from "@/hooks/usePageTour";
+import { useTourSeen } from "@/hooks/useTourSeen";
 import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import type {
   AssetDTO,
@@ -45,6 +48,7 @@ import type {
   VulnEventDTO,
 } from "@/types/api/api";
 import { RequirementsLevel } from "@/types/api/api";
+import { formatDate } from "@/utils/format";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import {
   InformationCircleIcon,
@@ -57,11 +61,10 @@ import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import type { FunctionComponent, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Label, Pie, PieChart } from "recharts";
-import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
@@ -82,8 +85,6 @@ import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import { useTourSeen } from "@/hooks/useTourSeen";
-import { DocDrawer } from "@/components/common/DocDrawer";
 import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
 
 const MarkdownEditor = dynamic(
@@ -710,7 +711,7 @@ const Index: FunctionComponent = () => {
                   <Skeleton className="w-20 h-6 rounded-full" />
                 )}
               </div>
-              <div className="mt-4 cve-description overflow-x-auto text-muted-foreground">
+              <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <>
                     <Markdown>
@@ -774,6 +775,14 @@ const Index: FunctionComponent = () => {
                     artifactName={a.artifactName}
                   />
                 ))}
+              </div>
+              <div className="mt-8">
+                {vuln?.related?.advisory && (
+                  <RelationCard
+                    related={vuln?.related?.advisory}
+                    variant="collapsible"
+                  />
+                )}
               </div>
               <div data-tour="path">
                 {!graphLoading && (
@@ -1098,8 +1107,8 @@ const Index: FunctionComponent = () => {
                                 </form>
                               ) : isLastEventVexRule ? (
                                 <p className="text-sm text-muted-foreground">
-                                  This vuln was handled by a VEX rule. Remove
-                                  or adjust the VEX rule to reopen it.
+                                  This vuln was handled by a VEX rule. Remove or
+                                  adjust the VEX rule to reopen it.
                                 </p>
                               ) : (
                                 <form
@@ -1229,6 +1238,50 @@ const Index: FunctionComponent = () => {
                       </PieChart>
                     </ChartContainer>
                   </div>
+                  {vuln.cve?.euvdExploitAdd || vuln.cve?.cisaExploitAdd ? (
+                    <div className="p-5">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <Callout intent="danger">
+                              <p className="font-medium mx-2">
+                                This vulnerability is known to be actively
+                                exploited!
+                              </p>
+                              <div className="mt-1 mx-2 space-y-0.5">
+                                {vuln.cve?.euvdExploitAdd && (
+                                  <div className="flex justify-between gap-4">
+                                    <span>EUVD:</span>
+                                    <span>
+                                      {formatDate(vuln.cve.euvdExploitAdd)}
+                                    </span>
+                                  </div>
+                                )}
+                                {vuln.cve?.cisaExploitAdd && (
+                                  <div className="flex justify-between gap-4">
+                                    <span>CISA:</span>
+                                    <span>
+                                      {formatDate(vuln.cve.cisaExploitAdd)}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </Callout>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-screen-sm font-normal">
+                          <p>
+                            A KEV catalog flags this vulnerability as one that
+                            has already been actively exploited by attackers.
+                            Below you can see the KEV source and the date the
+                            information was added.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
                   <div className="p-5">
                     <Collapsible>
                       <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-sm font-semibold">

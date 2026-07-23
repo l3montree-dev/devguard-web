@@ -448,6 +448,7 @@ export interface CVE {
   cisaActionDue?: string;
   cisaRequiredAction?: string;
   cisaVulnerabilityName?: string;
+  euvdExploitAdd?: string;
 
   vector?: string;
 }
@@ -493,8 +494,15 @@ export interface VulnWithCVE extends DependencyVuln {
     | null;
 }
 
+interface related {
+  // related exposes all related cves under their respective relationship type
+  // if you want to access them add them here (e.g. alias: CVE[];); they are currently omitted to avoid clutter
+  advisory?: CVE[];
+}
+
 export interface DetailedDependencyVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
+  related?: related;
 }
 
 export interface DependencyVulnHints {
