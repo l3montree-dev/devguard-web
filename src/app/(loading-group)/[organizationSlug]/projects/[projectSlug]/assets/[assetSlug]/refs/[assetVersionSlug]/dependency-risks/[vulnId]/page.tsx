@@ -25,13 +25,11 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
-import VexRuleListItem from "@/components/vex-rules/VexRuleListItem";
 import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { useCreateVexRule } from "@/hooks/useCreateVexRule";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { usePageTour } from "@/hooks/usePageTour";
@@ -350,14 +348,6 @@ const Index: FunctionComponent = () => {
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
 
-  // Fetch VEX rules for the current vulnerability to show FP edges in the graph
-  const { data: vexRulesData, mutate: mutateVexRules } = useSWR<VexRule[]>(
-    vuln
-      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/vex-rules/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
-      : null,
-    fetcher,
-  );
-
   const isLastEventVexRule = useMemo(() => {
     if (!vuln || !vuln.events || vuln.events.length === 0) {
       return false;
@@ -373,19 +363,6 @@ const Index: FunctionComponent = () => {
     }
     return false;
   }, [vuln]);
-
-  // Handler to create false-positive rules from the dependency graph context menu
-  const createFalsePositive = useCreateVexRule({
-    activeOrgSlug: activeOrg.slug,
-    projectSlug: project.slug,
-    assetSlug: asset.slug,
-    assetVersionSlug: assetVersion?.slug ?? "",
-    cveId: vuln?.cveID ?? null,
-    mutate: async () => {
-      mutate?.();
-      mutateVexRules?.();
-    },
-  });
 
   const { data: graphResponse, isLoading: graphLoading } = useSWR<
     Array<Array<string>>
@@ -489,46 +466,7 @@ const Index: FunctionComponent = () => {
       return false;
     }
 
-    // If the user selects a path suffix, we should create a False Positive Rule via the dedicated endpoint
-    // instead of sending the pathPattern in the vulnerability event (the vuln model no longer accepts pathPattern).
-    if (
-      data.status === "falsePositive" &&
-      data.pathPattern &&
-      data.pathPattern.length > 0
-    ) {
-      const resp = await browserApiClient(
-        "/organizations/" +
-          activeOrg.slug +
-          "/projects/" +
-          project.slug +
-          "/assets/" +
-          asset.slug +
-          "/refs/" +
-          assetVersion?.slug +
-          "/vex-rules",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            cveId: vuln?.cveID,
-            justification: data.justification ?? "",
-            mechanicalJustification: data.mechanicalJustification ?? "",
-            pathPattern: data.pathPattern,
-          }),
-        },
-      );
-
-      if (!resp.ok) {
-        toast("Failed to create false positive rule", {
-          description: "Please try again later.",
-        });
-        return false;
-      }
-
-      // Refresh the vuln details to reflect the applied rule
-      await mutate();
-      setJustification("");
-      return true;
-    }
+    // instead of sending the pathPattern in the vulnerability event (the vuln
 
     const optimisticState =
       data.status === "falsePositive"
@@ -833,8 +771,6 @@ const Index: FunctionComponent = () => {
                                 "ROOT",
                                 ...vuln.vulnerabilityPath,
                               ]}
-                              onVexSelect={createFalsePositive}
-                              vexRules={vexRulesData}
                               onReady={handleGraphReady}
                             />
                           )}
@@ -864,110 +800,8 @@ const Index: FunctionComponent = () => {
                           ) : (
                             ""
                           )}
-                          <>
-                            You are trying to answer the question:{" "}
-                            <b>
-                              How does the vulnerability get inherited by my
-                              project?
-                            </b>{" "}
-                            This will create{" "}
-                          </>
-                          <Link
-                            href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
-                            className=""
-                          >
-                            VEX rules
-                          </Link>
-                          .
                         </Callout>
                       )}
-                    </div>
-                    {/* VEX Rules applied to this vulnerability */}
-                    <div className="mt-6">
-                      <span className="font-semibold block mb-2">
-                        VEX Rules
-                      </span>
-                      <span className="font-semibold block mb-2 flex items-center gap-1">
-                        Recommendation
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <CircleHelp className="w-4 h-4 text-muted-foreground" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <div className="relative font-normal">
-                              This recommendation is derived from patterns and
-                              best practices observed across teams in your
-                              DevGuard community.
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
-                      </span>
-                      {recommendedVexRule?.cveId && (
-                        <>
-                          {vexRulesData &&
-                            vexRulesData.some((obj) =>
-                              pathEqual(
-                                obj.pathPattern,
-                                recommendedVexRule.pathPattern,
-                              ),
-                            ) && (
-                              <div className="my-2 flex gap-2 items-center text-muted-foreground border rounded-lg p-5">
-                                <div className=" cve-description overflow-x-auto ">
-                                  One of your applied VEX Rules already aligns
-                                  with the community-driven recommendation.
-                                </div>
-                                <BookOpenCheck />
-                              </div>
-                            )}
-                          {vexRulesData &&
-                            !vexRulesData.some((obj) =>
-                              pathEqual(
-                                obj.pathPattern,
-                                recommendedVexRule.pathPattern,
-                              ),
-                            ) && (
-                              <div className="flex flex-col gap-2 my-2">
-                                <VexRuleListItem
-                                  rule={recommendedVexRule}
-                                  onClick={() => {
-                                    setSelectedVexRule(recommendedVexRule);
-                                    setAcceptVexRuleRecommendationDialogOpen(
-                                      true,
-                                    );
-                                  }}
-                                />
-                              </div>
-                            )}
-                        </>
-                      )}
-                      {!recommendedVexRule?.cveId && (
-                        <div className="my-2 cve-description overflow-x-auto text-muted-foreground">
-                          There is currently no VEX Rule recommended.
-                        </div>
-                      )}
-                      <span className="font-semibold block mb-2">
-                        Applied Rules ({vexRulesData?.length || 0})
-                      </span>
-                      {vexRulesData && vexRulesData.length > 0 && (
-                        <div className="flex flex-col gap-2">
-                          {vexRulesData.map((rule) => (
-                            <VexRuleListItem
-                              key={rule.id}
-                              rule={rule}
-                              onClick={() => {
-                                setSelectedVexRule(rule);
-                                setVexRuleDialogOpen(true);
-                              }}
-                            />
-                          ))}
-                        </div>
-                      )}
-                      {!vexRulesData ||
-                        (vexRulesData.length < 1 && (
-                          <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
-                            There have been no VEX Rules applied so far.
-                          </div>
-                        ))}
                     </div>
                   </div>
                 )}
@@ -1098,8 +932,8 @@ const Index: FunctionComponent = () => {
                                 </form>
                               ) : isLastEventVexRule ? (
                                 <p className="text-sm text-muted-foreground">
-                                  This vuln was handled by a VEX rule. Remove
-                                  or adjust the VEX rule to reopen it.
+                                  This vuln was handled by a VEX rule. Remove or
+                                  adjust the VEX rule to reopen it.
                                 </p>
                               ) : (
                                 <form
@@ -1547,7 +1381,6 @@ const Index: FunctionComponent = () => {
         assetVersionSlug={assetVersionSlug}
         urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
         onAccepted={() => {
-          mutateVexRules();
           mutate();
         }}
       />
@@ -1555,17 +1388,8 @@ const Index: FunctionComponent = () => {
         vexRule={selectedVexRule}
         isOpen={vexRuleDialogOpen}
         onOpenChange={setVexRuleDialogOpen}
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        assetSlug={assetSlug}
-        assetVersionSlug={assetVersionSlug}
         urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
         onDeleted={() => {
-          mutateVexRules();
-          mutate();
-        }}
-        onReapplied={() => {
-          mutateVexRules();
           mutate();
         }}
       />
