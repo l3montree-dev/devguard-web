@@ -16,11 +16,11 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import SyncedUpstreamVexSources from "@/components/vex-rules/SyncedUpstreamVexSources";
 import VexHasEffectBadge from "@/components/vex-rules/VexHasEffectBadge";
-import VexPathPattern from "@/components/vex-rules/VexPathPattern";
 import VexRuleActionsCell from "@/components/vex-rules/VexRuleActionsCell";
 import VexRuleResult from "@/components/vex-rules/VexRuleResult";
 import VexRulesRow from "@/components/vex-rules/VexRulesRow";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
+import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import { useArtifacts } from "@/context/AssetVersionContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -49,33 +49,16 @@ import useSWR from "swr";
 const columnHelper = createColumnHelper<VexRule>();
 
 const baseColumnsDef: ColumnDef<VexRule, any>[] = [
-  columnHelper.accessor("cveId", {
-    header: "CVE ID",
+  columnHelper.accessor("title", {
+    header: "Title",
     cell: (info) => {
-      const cveId = info.getValue();
-      const params = info.table.options.meta as {
-        organizationSlug: string;
-        projectSlug: string;
-        assetSlug: string;
-        assetVersionSlug: string;
-      };
-
+      const title = info.getValue();
       return (
-        <Link
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${params.assetVersionSlug}/dependency-risks?search=${encodeURIComponent(cveId)}&state=closed`}
-          className=""
-        >
-          {cveId}
-        </Link>
+        <span className="text-sm text-foreground truncate max-w-[300px]">
+          {title}
+        </span>
       );
     },
-  }),
-  columnHelper.accessor("pathPattern", {
-    header: "Path Pattern",
-    cell: (info) => <VexPathPattern pathPattern={info.getValue()} />,
   }),
   columnHelper.accessor("eventType", {
     header: "Rule Result",
@@ -95,6 +78,7 @@ const baseColumnsDef: ColumnDef<VexRule, any>[] = [
 const VexRulesPage: FunctionComponent = () => {
   const [showVexModal, setShowVexModal] = useState(false);
   const [uploadVexModal, setUploadVexModal] = useState(false);
+  const [addVexRuleModal, setAddVexRuleModal] = useState(false);
   const params = useDecodedParams();
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -134,7 +118,6 @@ const VexRulesPage: FunctionComponent = () => {
     mutate,
   } = useSWR<Paged<VexRule>>(url, fetcher);
   const vexRules = vexRulesResponse?.data;
-
   // Create actions column with access to params and mutate
   const actionsColumn: ColumnDef<VexRule, any> = useMemo(
     () =>
@@ -253,12 +236,21 @@ const VexRulesPage: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <AuthGuard require="member">
-          <Button
-            data-testid="upload-vex-button"
-            onClick={() => setUploadVexModal(true)}
-          >
-            Upload a VEX-File or add a VEX-URL
-          </Button>
+          <div className="flex flex-row gap-2">
+            <Button
+              data-testid="upload-vex-button"
+              onClick={() => setUploadVexModal(true)}
+            >
+              Upload a VEX-File or add a VEX-URL
+            </Button>
+            <Button
+              data-testid="create-vex-rules-button"
+              variant="secondary"
+              onClick={() => setAddVexRuleModal(true)}
+            >
+              Add VEX rule
+            </Button>
+          </div>
         </AuthGuard>
       </div>
       <Section
@@ -311,13 +303,12 @@ const VexRulesPage: FunctionComponent = () => {
         <div>
           <div className="overflow-hidden rounded-lg border shadow-sm">
             <div className="overflow-auto">
-              <table className="w-full overflow-x-auto text-sm table-fixed">
+              <table className="w-full overflow-x-auto text-sm ">
                 <colgroup>
                   <col className="w-[100px]" />
                   <col className="w-[170px]" />
-                  <col className="w-[70px]" />
                   <col className="w-[100px]" />
-                  <col className="w-[30px]" />
+                  <col className="w-[100px]" />
                 </colgroup>
                 <thead className="border-b bg-card text-foreground">
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -387,10 +378,6 @@ const VexRulesPage: FunctionComponent = () => {
                           vexRulesInGroup={rulesInGroup}
                           deleteUrlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
                           onDeleted={() => mutate()}
-                          organizationSlug={organizationSlug}
-                          projectSlug={projectSlug}
-                          assetSlug={assetSlug}
-                          assetVersionSlug={assetVersionSlug}
                         />
                       );
                     })}
@@ -404,6 +391,13 @@ const VexRulesPage: FunctionComponent = () => {
         open={uploadVexModal}
         onOpenChange={setUploadVexModal}
         onUpload={handleVexUpload}
+      />
+      <AddVexRuleDialog
+        open={addVexRuleModal}
+        onOpenChange={setAddVexRuleModal}
+        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        assetVersionId={assetVersion?.id ?? ""}
+        onCreated={() => mutate()}
       />
       <VexDownloadModal
         artifacts={artifacts}
