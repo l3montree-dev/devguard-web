@@ -265,6 +265,23 @@ export const useAssetMenu = () => {
         ],
       },
       {
+        title: "Compliance Postures",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/compliance-postures",
+        Icon: ShieldCheck,
+        isActive: pathname.startsWith(
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance-postures`,
+        ),
+      },
+      {
         title: "Artifacts",
         href:
           "/" +

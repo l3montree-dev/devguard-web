@@ -15,7 +15,7 @@ import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
 import { generateDockerSnippet } from "../../../integrationSnippets";
 import CopyCode from "../../common/CopyCode";
 import Section from "../../common/Section";
-import PatSection from "../../PatSection";
+import AccessTokenSection from "../../AccessTokenSection";
 import {
   Card,
   CardContent,
@@ -76,7 +76,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
             />
           </>
         </Section>
-        <PatSection description="Local DevGuard CLI" {...pat} />
+        <AccessTokenSection description="Local DevGuard CLI" />
         <Tabs
           value={tab}
           onValueChange={(v) => setTab(v as "sca" | "sast")}
