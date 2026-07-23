@@ -62,60 +62,16 @@ const AffectedComponentDetails: FunctionComponent<{
 
   return (
     <div>
-      {vuln.cve?.relationships && vuln.cve.relationships.length > 0 && (
-        <div className="p-5">
-          <h3 className="mb-2 text-sm font-semibold">
-            Vulnerability Details{" "}
-            <Image
-              src={
-                theme === "light" ? "/logos/osv-black.png" : "/logos/osv.png"
-              }
-              alt="OSV Logo"
-              width={40}
-              height={40}
-              className="inline-block ml-2 mb-1"
-            />
-          </h3>
-          <div className="flex flex-col gap-2">
-            <div className="rounded-lg border bg-card p-4">
-              {vuln.cve?.relationships && (
-                <table className="w-full table-auto border-collapse">
-                  <tbody>
-                    {vuln.cve?.relationships?.map((rel) => (
-                      <tr
-                        className="text-sm"
-                        key={rel.relationshipType + rel.targetCve}
-                      >
-                        <td className="capitalize font-semibold">
-                          {rel.relationshipType}
-                        </td>
-                        <td>{rel.targetCve}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-            <Link
-              target="_blank"
-              className="text-xs"
-              href={"https://osv.dev/vulnerability/" + vuln.cveID}
-            >
-              See vulnerability on osv.dev
-            </Link>
-          </div>
-        </div>
-      )}
       <div className="p-5">
-        <h3 className="mb-2 text-sm font-semibold">Affected component</h3>
+        <h3 className="mb-2 text-xs font-semibold">Affected component</h3>
         <div className="flex flex-col gap-4">
           <Collapsible>
-            <div className="rounded-lg border bg-card p-4">
+            <div className="rounded-lg border bg-card p-3">
               <CollapsibleTrigger className="flex cursor-pointer w-full flex-row items-center justify-between text-sm font-semibold">
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}
-                    <span className="flex-1 text-left">
+                    <span className="flex-1 text-left mt-0.75 text-xs">
                       {beautifyPurl(purl)}
                     </span>
                   </span>
@@ -207,6 +163,42 @@ const AffectedComponentDetails: FunctionComponent<{
           />
         </div>
       </div>
+      {vuln.cve?.relationships && vuln.cve.relationships.length > 0 && (
+        <div className="p-5">
+          <h3 className="mb-2 text-xs font-semibold">
+            Vulnerability Details{" "}
+            <Image
+              src={
+                theme === "light" ? "/logos/osv-black.png" : "/logos/osv.png"
+              }
+              alt="OSV Logo"
+              width={30}
+              height={30}
+              className="inline-block ml-2 mb-1"
+            />
+          </h3>
+
+          <div className="rounded-lg border bg-card p-3">
+            {vuln.cve?.relationships && (
+              <table className="w-full table-auto border-collapse">
+                <tbody>
+                  {vuln.cve?.relationships?.map((rel) => (
+                    <tr
+                      className="text-sm"
+                      key={rel.relationshipType + rel.targetCve}
+                    >
+                      <td className="capitalize font-semibold">
+                        {rel.relationshipType}
+                      </td>
+                      <td>{rel.targetCve}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
