@@ -1,6 +1,7 @@
 import type { VexRule } from "@/types/api/api";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { FunctionComponent } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,71 +12,35 @@ import {
 } from "@/components/ui/dialog";
 import VexRuleResult from "./VexRuleResult";
 import VexHasEffectBadge from "./VexHasEffectBadge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Loader2, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "@/lib/toast";
-import { Badge } from "@/components/ui/badge";
-import Section from "@/components/common/Section";
-import DependencyGraph from "../DependencyGraph";
-import { convertPathsToTree } from "../../utils/dependencyGraphHelpers";
-import ListItem from "../common/ListItem";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { truncateMiddle } from "../../utils/common";
 
 interface VexRuleDetailsDialogProps {
   vexRule: VexRule | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  organizationSlug?: string;
-  projectSlug?: string;
-  assetSlug?: string;
-  assetVersionSlug?: string;
   urlBase?: string;
   onDeleted?: () => void;
-  onReapplied?: () => void;
 }
 
 const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   vexRule,
   isOpen,
   onOpenChange,
-  organizationSlug,
-  projectSlug,
-  assetSlug,
-  assetVersionSlug,
-  urlBase: deleteUrlBase,
+  urlBase,
   onDeleted,
-  onReapplied,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isReapplying, setIsReapplying] = useState(false);
-
-  const graph = useMemo(() => {
-    if (!vexRule?.pathPattern)
-      return {
-        id: "(*)",
-        name: "(*)",
-        children: [],
-        risk: 0,
-        parents: [],
-        nodeType: "component" as const,
-      };
-
-    const g = convertPathsToTree([vexRule.pathPattern], [], false);
-
-    return g;
-  }, [vexRule?.pathPattern]);
 
   if (!vexRule) return null;
 
   const handleDelete = async () => {
-    if (!deleteUrlBase) return;
+    if (!urlBase) return;
 
     setIsDeleting(true);
     try {
-      await browserApiClient(`${deleteUrlBase}/${vexRule.id}`, {
+      await browserApiClient(`${urlBase}/${vexRule.id}`, {
         method: "DELETE",
       });
       toast.success("VEX rule deleted successfully");
@@ -88,179 +53,74 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
     }
   };
 
-  const handleReapply = async () => {
-    if (!deleteUrlBase) return;
-
-    setIsReapplying(true);
-
-    const resp = await browserApiClient(
-      `${deleteUrlBase}/${vexRule.id}/reapply`,
-      {
-        method: "POST",
-      },
-    );
-    if (!resp.ok) {
-      toast.error("Failed to reapply VEX rule");
-    } else {
-      toast.success("VEX rule reapplied successfully");
-      onReapplied?.();
-    }
-    setIsReapplying(false);
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>VEX Rule Details</DialogTitle>
           <DialogDescription>
-            View and manage the details of this VEX rule
+            View the details of this VEX rule
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6">
-          {/* Path Pattern */}
-          <Section
-            className="mb-0"
-            title="Path Pattern"
-            description={
-              <p>
-                The dependency path where this rule applies. The wildcard * will
-                match any component (Zero or more).{" "}
-                <Link href="https://devguard.org/explanations/vulnerability-management/mitigation-strategies#vex-rules-automating-mitigation-at-scale">
-                  Check out the documentation for path patterns
-                </Link>
-              </p>
-            }
-            forceVertical
-          >
-            <div className={"h-72 w-full rounded-lg border bg-muted"}>
-              <DependencyGraph
-                variant="compact"
-                width={100}
-                height={200}
-                vulns={[]}
-                graph={graph}
-              />
+        <div className="flex flex-col gap-4 text-sm">
+          <div>
+            <span className="text-muted-foreground">Title</span>
+            <div className="mt-1 bg-card/50 p-2 rounded-md border whitespace-pre-wrap break-words text-xs font-mono">
+              {vexRule.title}
             </div>
-          </Section>
+          </div>
 
-          {/* Justification */}
+          <div>
+            <span className="text-muted-foreground">CEL expression</span>
+            <div className="mt-1 bg-card/50 p-2 rounded-md border whitespace-pre-wrap break-words text-xs font-mono">
+              {vexRule.celExpression}
+            </div>
+          </div>
+
           {vexRule.justification && (
-            <Section
-              className="mb-0"
-              title="Justification"
-              description="The reason why this vulnerability is not applicable or can be accepted. This is usually provided by the vulnerability management team or the rule source."
-              forceVertical
-            >
-              <div className="bg-card/50 p-3 rounded-md text-sm border whitespace-pre-wrap break-words">
+            <div>
+              <span className="text-muted-foreground">Justification</span>
+              <div className="mt-1 bg-card/50 p-2 rounded-md border whitespace-pre-wrap break-words text-xs">
                 {vexRule.justification}
               </div>
-            </Section>
-          )}
-          {/* CVE ID */}
-          <ListItem
-            Title="CVE ID"
-            Description="The Common Vulnerabilities and Exposures identifier"
-            Button={
-              organizationSlug &&
-              projectSlug &&
-              assetSlug &&
-              assetVersionSlug ? (
-                <Link
-                  href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/dependency-risks?search=${encodeURIComponent(vexRule.cveId)}&state=closed`}
-                  className="whitespace-nowrap text-primary text-sm hover:underline"
-                >
-                  {vexRule.cveId}
-                </Link>
-              ) : null
-            }
-          />
-          {/* Mechanical Justification */}
-          {vexRule.mechanicalJustification && (
-            <Section
-              title="Mechanical Justification"
-              description="Additional technical justification provided by the rule source"
-              forceVertical
-            >
-              <div className="bg-card/50 p-3 rounded-md border whitespace-pre-wrap break-words">
-                {vexRule.mechanicalJustification}
-              </div>
-            </Section>
+            </div>
           )}
 
-          {/* VEX Source */}
-          {vexRule.vexSource && (
-            <ListItem
-              Title="VEX Source"
-              Description="The source or document that defines this VEX rule"
-              Button={
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="outline">
-                      {truncateMiddle(vexRule.vexSource, 20)}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent className="whitespace-normal">
-                    {vexRule.vexSource}
-                  </TooltipContent>
-                </Tooltip>
-              }
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">Rule Result</span>
+            <VexRuleResult
+              eventType={vexRule.eventType}
+              mechanicalJustification={vexRule.mechanicalJustification}
             />
-          )}
+          </div>
 
-          {/* Rule Result */}
-          <ListItem
-            Title="Rule Result"
-            Description="The outcome of this rule when applied to vulnerabilities"
-            Button={
-              <VexRuleResult
-                eventType={vexRule.eventType}
-                mechanicalJustification={vexRule.mechanicalJustification}
-              />
-            }
-          ></ListItem>
-
-          {/* Has Effect */}
-          <ListItem
-            Title="Has Effect"
-            Description="Number of dependency vulnerabilities affected by this rule"
-            Button={
-              <VexHasEffectBadge
-                effectCount={vexRule.appliesToAmountOfDependencyVulns}
-              />
-            }
-          ></ListItem>
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">Has Effect</span>
+            <VexHasEffectBadge
+              effectCount={vexRule.appliesToAmountOfDependencyVulns}
+            />
+          </div>
         </div>
 
-        <DialogFooter className="mt-10">
+        <DialogFooter className="mt-6">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          {deleteUrlBase && (
-            <>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="gap-2"
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-                Delete Rule
-              </Button>
-              <Button
-                onClick={handleReapply}
-                disabled={isReapplying}
-                className="gap-2"
-              >
-                {isReapplying && <Loader2 className="h-4 w-4 animate-spin" />}
-                Reapply
-              </Button>
-            </>
+          {urlBase && (
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="gap-2"
+            >
+              {isDeleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Delete Rule
+            </Button>
           )}
         </DialogFooter>
       </DialogContent>

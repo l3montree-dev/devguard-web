@@ -25,10 +25,6 @@ interface VexRulesRowProps {
   vexRulesInGroup: VexRule[];
   deleteUrlBase: string;
   onDeleted: () => void;
-  organizationSlug?: string;
-  projectSlug?: string;
-  assetSlug?: string;
-  assetVersionSlug?: string;
 }
 
 const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
@@ -37,10 +33,6 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
   vexRulesInGroup,
   deleteUrlBase,
   onDeleted,
-  organizationSlug,
-  projectSlug,
-  assetSlug,
-  assetVersionSlug,
 }) => {
   const [isGroupOpen, setIsGroupOpen] = useState(false);
   const [isDeletingGroup, setIsDeletingGroup] = useState(false);
@@ -193,7 +185,7 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
                 } as typeof originalContext;
 
                 return (
-                  <td className="p-4" key={cell.id + "-" + vexRule.id}>
+                  <td className="p-2" key={cell.id + "-" + vexRule.id}>
                     {isFirstCell ? (
                       <div className="pl-6">
                         {flexRender(cell.column.columnDef.cell, cellContext)}
@@ -212,10 +204,6 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
         vexRule={selectedRule}
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        assetSlug={assetSlug}
-        assetVersionSlug={assetVersionSlug}
         urlBase={deleteUrlBase}
         onDeleted={onDeleted}
       />

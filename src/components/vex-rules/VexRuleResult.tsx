@@ -30,7 +30,7 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
           "bg-info-muted text-info ring-info-muted",
         )}
       >
-        Accepted (Comment only)
+        Accepted
       </span>
     );
   }

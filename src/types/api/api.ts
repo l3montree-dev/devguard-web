@@ -1028,6 +1028,8 @@ export type VexRule = {
   // Primary key
   id: string;
 
+  title: string;
+
   // Composite key components
   assetId: string;
   cveId: string;
@@ -1037,7 +1039,7 @@ export type VexRule = {
   justification: string;
   mechanicalJustification: string;
   eventType: string;
-  pathPattern: string[];
+  celExpression: string;
   createdById: string;
   createdAt: string;
   updatedAt: string;
