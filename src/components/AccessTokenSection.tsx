@@ -2,33 +2,34 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { SeeOncePatWithPrivKey } from "../types/api/api";
+import { useActiveAsset } from "../hooks/useActiveAsset";
+import { useActiveOrg } from "../hooks/useActiveOrg";
+import { useActiveProject } from "../hooks/useActiveProject";
+import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
 import { DatePicker } from "./DatePicker";
 import CopyCode from "./common/CopyCode";
 import Section from "./common/Section";
 import { Button } from "./ui/button";
 
-const PatSection = ({
-  description,
-  pat,
-  onCreatePat,
-}: {
-  description: string;
-  pat?: SeeOncePatWithPrivKey;
-  onCreatePat: (data: {
-    description: string;
-    scopes: string;
-    expiryDateUnix: number;
-    symmetric?: boolean;
-  }) => void;
-}) => {
+const AccessTokenSection = ({ description }: { description: string }) => {
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
+
+  const org = useActiveOrg();
+  const project = useActiveProject();
+  const asset = useActiveAsset();
+
+  const { pat, onCreatePat } = usePersonalAccessToken(
+    undefined,
+    `/organizations/${org.slug}/projects/${project.slug}/assets/${asset.slug}/pats/`,
+  );
+
+  const manageTokensHref = `/${org.slug}/projects/${project.slug}/assets/${asset.slug}/settings#access-tokens`;
 
   return (
     <Section
       className="mb-0 mt-0 pb-0 pt-0"
-      description="To use the Devguard-Scanner, you need to create a Personal Access Token. You can create such a token by clicking the button below."
-      title="Create a Personal Access Token"
+      description="To use the Devguard-Scanner, you need to create an Repository Access Token. You can create such a token by clicking the button below."
+      title="Create an Repository Access Token"
       forceVertical
     >
       {pat ? (
@@ -42,7 +43,7 @@ const PatSection = ({
               again!
             </span>
             <Link
-              href="/user-settings#pat"
+              href={manageTokensHref}
               target="_blank"
               className="mt-4 items-end justify-end flex text-sm"
             >
@@ -70,10 +71,10 @@ const PatSection = ({
                 })
               }
             >
-              Create Personal Access Token
+              Create Repository Access Token
             </Button>
             <Link
-              href="/user-settings#pat"
+              href={manageTokensHref}
               target="_blank"
               className="flex items-end justify-end align-super text-sm"
             >
@@ -86,4 +87,4 @@ const PatSection = ({
   );
 };
 
-export default PatSection;
+export default AccessTokenSection;

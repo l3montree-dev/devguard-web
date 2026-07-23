@@ -14,6 +14,7 @@ import { uniqBy, isEqual } from "lodash";
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
   existingPats?: Array<PersonalAccessTokenDTO>,
+  baseUrl: string = "/pats/",
 ) {
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
     Array<
@@ -53,7 +54,7 @@ export default function usePersonalAccessToken(
   }, []);
 
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
-    await browserApiClient(`/pats/${pat.id}/`, {
+    await browserApiClient(`${baseUrl}${pat.id}/`, {
       method: "DELETE",
     });
     setPersonalAccessTokens((prev) => prev.filter((p) => p.id !== pat.id));
@@ -87,7 +88,7 @@ export default function usePersonalAccessToken(
     expiryDateUnix: number;
     symmetric?: boolean;
   }): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken> {
-    const pat = await createPat(data);
+    const pat = await createPat(data, baseUrl);
 
     setPersonalAccessTokens((prev) => [...prev, pat]);
     sessionStorage.setItem("pat", JSON.stringify(pat));

@@ -14,7 +14,7 @@
 import type { FunctionComponent } from "react";
 import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
 import CopyCode from "../../common/CopyCode";
-import PatSection from "../../PatSection";
+import AccessTokenSection from "../../AccessTokenSection";
 import { Button } from "../../ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
@@ -114,10 +114,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
       </Tabs>
 
       <div className="mt-10">
-        <PatSection
-          {...pat}
-          description="Risk Identification using CLI Setup"
-        />
+        <AccessTokenSection description="Risk Identification using CLI Setup" />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
         <Button id="automated-integration-continue" onClick={onClose}>

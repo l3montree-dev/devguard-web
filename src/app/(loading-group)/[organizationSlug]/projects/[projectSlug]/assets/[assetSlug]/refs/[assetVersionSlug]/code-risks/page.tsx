@@ -335,16 +335,16 @@ const Index: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex gap-2">
-        <DelayedDownloadButton
-          href={pathname + "/../sarif.json"}
-          label={"Download Sarif"}
-          downloadFileName={assetSlug + "_sarif.json"}
-        />
-        <AuthGuard require="admin">
-          <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Risks
-          </Button>
-        </AuthGuard>
+          <DelayedDownloadButton
+            href={pathname + "/../sarif.json"}
+            label={"Download Sarif"}
+            downloadFileName={assetSlug + "_sarif.json"}
+          />
+          <AuthGuard require="admin">
+            <Button onClick={() => setIsOpen(true)} variant="default">
+              Identify Risks
+            </Button>
+          </AuthGuard>
         </div>
       </div>
       <Section
