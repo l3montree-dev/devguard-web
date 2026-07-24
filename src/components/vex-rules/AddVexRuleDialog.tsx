@@ -31,7 +31,6 @@ interface AddVexRuleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   baseUrl: string;
-  assetVersionId: string;
   onCreated: () => void;
 }
 
@@ -39,7 +38,6 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   open,
   onOpenChange,
   baseUrl,
-  assetVersionId,
   onCreated,
 }) => {
   const [title, setTitle] = useState("");
@@ -114,7 +112,6 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
         >
           <VexRuleForm
             baseUrl={baseUrl}
-            assetVersionId={assetVersionId}
             title={title}
             onTitleChange={setTitle}
             celExpression={celExpression}

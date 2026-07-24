@@ -19,8 +19,6 @@ import {
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { BranchTagSelector } from "../BranchTagSelector";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useDropzone } from "react-dropzone";
 import { LinkIcon } from "@heroicons/react/24/outline";
 import {
@@ -53,12 +51,7 @@ import Fade from "embla-carousel-fade";
 interface VexUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpload: (params: {
-    file: File;
-    branchOrTagName: string;
-    branchOrTagSlug: string;
-    isTag: boolean;
-  }) => Promise<void>;
+  onUpload: (params: { file: File }) => Promise<void>;
 }
 
 const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
@@ -66,7 +59,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   onOpenChange,
   onUpload,
 }) => {
-  const { branches, tags } = useAssetBranchesAndTags();
   const params = useDecodedParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
 
@@ -90,7 +82,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     setCarouselApi(emblaApi);
   }, []);
 
-  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
+  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
 
   const {
     data: allRefs,
@@ -102,21 +94,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     allRefs?.filter(
       (ref) => ref.type === "cyclonedxvex" || ref.type === "csaf",
     ) || [];
-
-  // Initialize branch/tag from URL or default to main
-  useEffect(() => {
-    if (branches.length > 0) {
-      const defaultBranch = branches[0];
-      setBranchOrTagName(defaultBranch.name);
-      setBranchOrTagSlug(defaultBranch.slug);
-      setIsTag(false);
-    } else if (tags.length > 0) {
-      const defaultTag = tags[0];
-      setBranchOrTagName(defaultTag.name);
-      setBranchOrTagSlug(defaultTag.slug);
-      setIsTag(true);
-    }
-  }, [branches, tags, open]);
 
   const vexDropzone = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -143,9 +120,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     try {
       await onUpload({
         file: vexFile,
-        branchOrTagName,
-        branchOrTagSlug,
-        isTag,
       });
       // Reset form
       setVexFile(null);
@@ -219,7 +193,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   };
 
   const handleTriggerSync = async (source: ExternalReference) => {
-    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references/sync/`;
+    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references/sync/`;
 
     try {
       const response = await browserApiClient(syncUrl, {
@@ -335,19 +309,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                 </DialogHeader>
 
                 <div className="space-y-4 mt-6">
-                  <div>
-                    <Label className="mb-2 block">Branch/Tag</Label>
-                    <BranchTagSelector
-                      branches={branches}
-                      tags={tags}
-                      disableNavigateToRefInsteadCall={(v) => {
-                        setBranchOrTagName(v.name);
-                        setBranchOrTagSlug(v.slug);
-                        setIsTag(v.type === "tag");
-                      }}
-                    />
-                  </div>
-
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-md">VEX File</CardTitle>

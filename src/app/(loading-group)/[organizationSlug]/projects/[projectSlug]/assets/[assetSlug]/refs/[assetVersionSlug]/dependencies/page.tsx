@@ -771,12 +771,10 @@ const Index: FunctionComponent = () => {
         assetVersionName={assetVersion?.name}
       />
       <VexDownloadModal
-        artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
         pathname={pathname || ""}
         assetName={asset?.name}
-        assetVersionName={assetVersion?.name}
       />
     </Page>
   );
