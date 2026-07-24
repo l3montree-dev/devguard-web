@@ -99,21 +99,23 @@ const VexRulesRow: FunctionComponent<VexRulesRowProps> = ({
                   ) : (
                     <ChevronRightIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   )}
-                  <span className="font-medium">
-                    Source:{" "}
-                    <Tooltip>
-                      <TooltipTrigger>
-                        {truncateMiddle(vexSource, 20)}
-                      </TooltipTrigger>
-                      <TooltipContent className="whitespace-normal">
-                        {vexSource}
-                      </TooltipContent>
-                    </Tooltip>
-                  </span>
-                  <Badge variant="outline" className="w-fit">
-                    {vexRulesInGroup.length}{" "}
-                    {vexRulesInGroup.length === 1 ? "rule" : "rules"}
-                  </Badge>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-medium">
+                      Source:{" "}
+                      <Tooltip>
+                        <TooltipTrigger>
+                          {truncateMiddle(vexSource, 20)}
+                        </TooltipTrigger>
+                        <TooltipContent className="whitespace-normal">
+                          {vexSource}
+                        </TooltipContent>
+                      </Tooltip>
+                    </span>
+                    <Badge variant="outline" className="w-fit">
+                      {vexRulesInGroup.length}{" "}
+                      {vexRulesInGroup.length === 1 ? "rule" : "rules"}
+                    </Badge>
+                  </div>
                 </div>
               ) : isLastCell ? (
                 <DropdownMenu>
