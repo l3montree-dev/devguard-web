@@ -4,6 +4,38 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.11.0] — 2026-07-24
+
+### Added
+
+- **Notification banner** — added a global banner to highlight important updates, contributor calls, or ongoing issues
+- **CSIRT advisory display** — advisories are now shown in an expandable box below vulnerability badges, with the advisory description parsed into markdown segments and linked to the source document
+- **KEV information on vulnerabilities** — Known Exploited Vulnerabilities callouts added to the vulnerability detail page and risk handling row, with a tooltip explaining the KEV data
+- **Quick fix symbols** — quick fix indicators added to the dependency risk table
+- **Personal access tokens** — reworked into four dedicated PAT sections, with tokens and the create flow renamed for clarity
+- **Org join flow** — joining an organization added to the create-organization flow; accept-invitation flow reworked into a dialog
+
+### Fixed
+
+- **Reporting range** — fixed an issue with the reporting date range
+- **SBOM/SARIF manual upload** — fixed the switch between SBOM and SARIF for manual uploads
+- **Dependency Proxy docs** — fixed broken documentation URLs
+- **Dependency vulnerability API type** — adjusted to support the `related` field
+- **Compliance postures in asset menu** — added missing menu entry for compliance postures in asset menu
+
+### Changed
+
+- **Dependencies** — updated Next.js, Node (26.5.0), and other npm packages; removed `sbomnix`
+- **Access token components** — renamed and consolidated (`RelationCard`, markdown components)
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@eliashaeussler](https://github.com/eliashaeussler)** — fixed broken Dependency Proxy documentation URLs
+
+---
+
 ## [v1.10.1] — 2026-07-20
 
 ### Fixed
