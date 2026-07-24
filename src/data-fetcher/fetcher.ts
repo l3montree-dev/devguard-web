@@ -22,5 +22,9 @@ export const fetcher = <T = any>(
       );
     }
 
+    if (res.status === 204) {
+      return null as T;
+    }
+
     return res.json();
   });
