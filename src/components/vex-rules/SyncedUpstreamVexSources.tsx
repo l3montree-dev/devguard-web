@@ -30,7 +30,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   const [newCsafUrl, setNewCsafUrl] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [activeTab, setActiveTab] =
-    useState<ExternalReference["type"]>("cyclonedxvex");
+    useState<ExternalReference["type"]>("cyclonedx");
 
   const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
 
@@ -41,11 +41,10 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
     isLoading,
   } = useSWR<ExternalReference[]>(apiUrl, fetcher);
 
-  // Filter only VEX type references (cyclonedxvex and csaf)
+  // Filter only VEX type references (cyclonedx and csaf)
   const vexSources =
-    allRefs?.filter(
-      (ref) => ref.type === "cyclonedxvex" || ref.type === "csaf",
-    ) || [];
+    allRefs?.filter((ref) => ref.type === "cyclonedx" || ref.type === "csaf") ||
+    [];
 
   const handleTriggerSync = async (source: ExternalReference) => {
     const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references/sync/`;
@@ -238,10 +237,10 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
               }
             >
               <TabsList>
-                <TabsTrigger value="cyclonedxvex">VEX</TabsTrigger>
+                <TabsTrigger value="cyclonedx">VEX</TabsTrigger>
                 <TabsTrigger value="csaf">CSAF</TabsTrigger>
               </TabsList>
-              <TabsContent value="cyclonedxvex">
+              <TabsContent value="cyclonedx">
                 <div className="flex gap-2">
                   <Input
                     placeholder="https://supplier.example.com/vex.json"
