@@ -14,10 +14,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use client";
 import Head from "next/head";
-import React, { type PropsWithChildren, useState } from "react";
+import React, { type PropsWithChildren, useEffect, useState } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
 import { Toaster } from "./ui/sonner";
+import { toast } from "@/lib/toast";
+import Markdown from "./common/Markdown";
+import { Megaphone } from "lucide-react";
 
 type PageProps = {
   title: string;
@@ -40,6 +43,26 @@ type PageProps = {
 
 // Add that the navigation is a prop
 const Page = (props: PropsWithChildren<PageProps>) => {
+  useEffect(() => {
+    const STORAGE_KEY = "global-notice-updatedAt";
+
+    fetch(`/notice`)
+      .then((res) => res.json())
+      .then(({ notice }) => {
+        if (!notice) return;
+        if (localStorage.getItem(STORAGE_KEY) === notice.updatedAt) return;
+
+        toast(<Markdown>{notice.description}</Markdown>, {
+          icon: <Megaphone className="h-4 w-4" />,
+          id: "global-notice",
+          duration: Infinity,
+          closeButton: true,
+          onDismiss: () => {
+            localStorage.setItem(STORAGE_KEY, notice.updatedAt);
+          },
+        });
+      });
+  }, []);
   return (
     <>
       <Head>
