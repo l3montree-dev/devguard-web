@@ -236,7 +236,7 @@ const DetailedRiskAssessment: FunctionComponent<
   return (
     <div className="p-5">
       <Collapsible>
-        <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-sm font-semibold">
+        <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-xs font-semibold">
           Show detailed risk assessment
           <CaretDownIcon />
         </CollapsibleTrigger>

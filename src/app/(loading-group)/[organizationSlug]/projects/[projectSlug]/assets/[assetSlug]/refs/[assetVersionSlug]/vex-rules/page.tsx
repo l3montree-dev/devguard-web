@@ -238,14 +238,14 @@ const VexRulesPage: FunctionComponent = () => {
         <AuthGuard require="member">
           <div className="flex flex-row gap-2">
             <Button
+              variant="secondary"
               data-testid="upload-vex-button"
               onClick={() => setUploadVexModal(true)}
             >
-              Upload a VEX-File or add a VEX-URL
+              Add a VEX-File or VEX-URL
             </Button>
             <Button
               data-testid="create-vex-rules-button"
-              variant="secondary"
               onClick={() => setAddVexRuleModal(true)}
             >
               Add VEX rule
@@ -260,22 +260,13 @@ const VexRulesPage: FunctionComponent = () => {
         title="Manage VEX Rules"
         className="mb-4 mt-4"
       >
-        <div className="flex justify-end">
+        <div className="-mt-4">
           <DocDrawer
             triggerLabel="Learn about CSAF/VEX"
             drawerTitle="CSAF/VEX Explained"
             mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/compliance/csaf-vex-explained.mdx"
             docsUrl="https://docs.devguard.org/explanations/compliance/csaf-vex-explained/"
           />
-        </div>
-        <div>
-          <Callout intent={"neutral"} showIcon>
-            <span className="text-sm flex items-center">
-              Note: VEX rules are created by handling a dependency risk using
-              the given graph based assessment option on a dependency risks
-              details page.
-            </span>
-          </Callout>
         </div>
         <SyncedUpstreamVexSources />
         <div className="relative flex flex-row gap-2">

@@ -4,23 +4,25 @@ import Page from "@/components/Page";
 import RiskSeverityRadialChart from "@/components/RiskSeverityRadialChart";
 import AssetTitle from "@/components/common/AssetTitle";
 
-import AuthGuard from "@/components/AuthGuard";
 import MitigateDialog from "@/components/MitigateDialog";
 import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import DetailedRiskAssessment from "@/components/risk-assessment/DetailedRiskAssessment";
+import ManagementDecisions from "@/components/risk-assessment/ManagementDecisions";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import VulnAssessmentComposer from "@/components/risk-assessment/VulnAssessmentComposer";
+import PathToComponent from "@/components/risk-handling/PathToComponent";
 import RelationCard from "@/components/risk-handling/RelationCard";
 import { Badge } from "@/components/ui/badge";
-import { AsyncButton, Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
+import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
@@ -34,32 +36,21 @@ import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import type {
-  DependencyVulnHints,
   DetailedDependencyVulnDTO,
   VexRule,
   VulnEventDTO,
 } from "@/types/api/api";
 import { formatDate } from "@/utils/format";
+import { beautifyPurl } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
-import {
-  ShareIcon,
-  SpeakerXMarkIcon,
-  StopIcon,
-} from "@heroicons/react/24/outline";
-import { BookOpenCheck, Bug, CheckCircleIcon, CircleHelp } from "lucide-react";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
-import AcceptRiskDialog from "../../../../../../../../../../../components/AcceptRiskDialog";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
-import CommentDialog from "../../../../../../../../../../../components/CommentDialog";
-import DependencyGraph from "../../../../../../../../../../../components/DependencyGraph";
-import FalsePositiveDialog from "../../../../../../../../../../../components/FalsePositiveDialog";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
 import Quickfix from "../../../../../../../../../../../components/Quickfix";
 import Callout from "../../../../../../../../../../../components/common/Callout";
@@ -72,15 +63,6 @@ import VexRuleDetailsDialog from "../../../../../../../../../../../components/ve
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-import type { ViewDependencyTreeNode } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-import { convertPathsToTree } from "../../../../../../../../../../../utils/dependencyGraphHelpers";
-
-const MarkdownEditor = dynamic(
-  () => import("@/components/common/MarkdownEditor"),
-  {
-    ssr: false,
-  },
-);
 
 const Index: FunctionComponent = () => {
   const { session } = useSession();
@@ -96,14 +78,11 @@ const Index: FunctionComponent = () => {
   const deleteEvent = useDeleteEvent();
   const currentUser = useCurrentUser();
 
-  const [justification, setJustification] = useState<string | undefined>(
-    undefined,
-  );
-
-  const [falsePositiveDialogOpen, setFalsePositiveDialogOpen] = useState(false);
-  const [commentDialogOpen, setCommentDialogOpen] = useState(false);
-  const [acceptRiskDialogOpen, setAcceptRiskDialogOpen] = useState(false);
+  const [addVexRuleDialogOpen, setAddVexRuleDialogOpen] = useState(false);
   const [mitigateDialogOpen, setMitigateDialogOpen] = useState(false);
+  const [vexRulePrefill, setVexRulePrefill] = useState<
+    { title: string; celExpression: string } | undefined
+  >(undefined);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [selectedVexRule, setSelectedVexRule] = useState<VexRule | null>(null);
   const [vexRuleDialogOpen, setVexRuleDialogOpen] = useState(false);
@@ -138,6 +117,8 @@ const Index: FunctionComponent = () => {
     mutate,
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
+
+  console.log(vuln);
 
   const isLastEventVexRule = useMemo(() => {
     if (!vuln || !vuln.events || vuln.events.length === 0) {
@@ -198,42 +179,14 @@ const Index: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [graphLoading, shouldStartTour]);
 
-  const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
-    if (!vuln || vuln.vulnerabilityPath.length === 0) {
-      return null;
+  // The path is rendered as static boxes (no React Flow), so there is no graph
+  // onReady callback — start the tour directly once the path view is ready.
+  useEffect(() => {
+    if (!graphLoading && (vuln?.vulnerabilityPath.length || 0) > 0) {
+      handleGraphReady();
     }
-
-    return convertPathsToTree([vuln.vulnerabilityPath], [vuln]);
-  }, [vuln]);
-
-  // Generate path pattern options for the user to select
-  // Each option is a suffix of the vulnerability path with a count of matching paths
-  const pathPatternOptions = useMemo(() => {
-    // group the graphResponse by suffixes
-    if (!graphResponse) return [];
-    const suffixMap: { [key: string]: number } = {};
-    graphResponse.forEach((path) => {
-      for (let i = 1; i <= path.length; i++) {
-        const suffix = path.slice(-i);
-        const key = suffix.join(" > ");
-        if (suffixMap[key]) {
-          suffixMap[key] += 1;
-        } else {
-          suffixMap[key] = 1;
-        }
-      }
-    });
-    // create an array of suffixes
-    // make sure to sort it
-
-    const sortedSuffixes = Object.entries(suffixMap).sort(([x, a], [y, b]) => {
-      return b - a;
-    });
-
-    return sortedSuffixes;
-  }, [graphResponse]);
-
-  const { data: hints } = useSWR<DependencyVulnHints>(uri + "/hints", fetcher);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graphLoading, vuln, shouldStartTour]);
 
   const handleDeleteEvent = async (eventId: string) => {
     await deleteEvent(eventId);
@@ -256,8 +209,6 @@ const Index: FunctionComponent = () => {
       });
       return false;
     }
-
-    // instead of sending the pathPattern in the vulnerability event (the vuln
 
     const optimisticState =
       data.status === "falsePositive"
@@ -342,7 +293,6 @@ const Index: FunctionComponent = () => {
           });
           throw new Error("Failed to update vulnerability");
         }
-        setJustification("");
         return {
           ...prev,
           ...json,
@@ -383,13 +333,6 @@ const Index: FunctionComponent = () => {
     () =>
       getIntegrationNameFromRepositoryIdOrExternalProviderId(asset, project),
     [asset, project],
-  );
-
-  const { data: recommendedVexRule } = useSWR<VexRule>(
-    vuln
-      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/crowdsourced-vexing/recommendation/?dependencyVulnId=${encodeURIComponent(vuln.id)}`
-      : null,
-    fetcher,
   );
 
   // Show error state
@@ -460,13 +403,6 @@ const Index: FunctionComponent = () => {
                     </Badge>
                   </Link>
                 )}
-
-                {vuln ? (
-                  <Severity risk={vuln.rawRiskAssessment} />
-                ) : (
-                  <Skeleton className="w-10 h-4" />
-                )}
-                {}
                 {vuln?.artifacts.map((a) => (
                   <ArtifactBadge
                     key={a.artifactName + vuln.id}
@@ -488,7 +424,7 @@ const Index: FunctionComponent = () => {
                         onClick={() =>
                           setDescriptionExpanded(!descriptionExpanded)
                         }
-                        className="text-sm text-primary hover:opacity-80 my-2 cursor-pointer"
+                        className="text-sm text-link hover:opacity-80 my-2 cursor-pointer"
                       >
                         {descriptionExpanded ? "Show less" : "Read more"}
                       </button>
@@ -509,64 +445,26 @@ const Index: FunctionComponent = () => {
               <div data-tour="path">
                 {!graphLoading && (
                   <div className="mt-10">
-                    {graphData && vuln && (
-                      <>
-                        <div className="flex flex-row items-center justify-between mb-2">
-                          <span className="font-semibold block">
-                            Path to component
-                          </span>
-                          {(vuln?.vulnerabilityPath.length || 0) > 0 &&
-                            (graphResponse?.length || 0) > 0 && (
-                              <Tooltip>
-                                <TooltipTrigger className="text-xs flex items-center">
-                                  <ShareIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                                  Vulnerability is reachable through{" "}
-                                  {graphResponse?.length}{" "}
-                                  {graphResponse?.length === 1
-                                    ? "path"
-                                    : "paths"}
-                                </TooltipTrigger>
-                                <TooltipContent className="max-w-screen-sm font-normal">
-                                  <p>
-                                    This vulnerability exists in{" "}
-                                    {graphResponse?.length} other dependency{" "}
-                                    {graphResponse?.length === 1
-                                      ? "path"
-                                      : "paths"}{" "}
-                                    within this asset. When marking as false
-                                    positive, you can apply a rule to
-                                    automatically mark all paths with matching
-                                    suffixes.
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                        </div>
-                        <div
-                          style={{ height: 400 }}
-                          className={"w-full rounded-lg border bg-muted"}
-                        >
-                          {graphData && vuln && (
-                            <DependencyGraph
-                              variant="compact"
-                              width={100}
-                              height={400}
-                              enableContextMenu={
-                                vuln.vulnerabilityPath.length !== 0 &&
-                                vuln.state === "open" &&
-                                isMember(role)
-                              }
-                              graph={graphData}
-                              vulns={[vuln]}
-                              highlightPath={[
-                                "ROOT",
-                                ...vuln.vulnerabilityPath,
-                              ]}
-                              onReady={handleGraphReady}
-                            />
-                          )}
-                        </div>
-                      </>
+                    {vuln && vuln.vulnerabilityPath.length > 0 && (
+                      <PathToComponent
+                        rootName={asset.name}
+                        path={vuln.vulnerabilityPath}
+                        pathCount={graphResponse?.length}
+                        actionable={vuln.state === "open" && isMember(role)}
+                        onCallClick={(edgeIndex) => {
+                          const suffix =
+                            vuln.vulnerabilityPath.slice(edgeIndex);
+                          setVexRulePrefill({
+                            title: `${vuln.cveID ?? "Vulnerability"} not exploitable via ${beautifyPurl(
+                              suffix[0] ?? vuln.componentPurl,
+                            )}`,
+                            celExpression: `matchesPattern(vuln, ${JSON.stringify(
+                              ["*", ...suffix],
+                            )})`,
+                          });
+                          setAddVexRuleDialogOpen(true);
+                        }}
+                      />
                     )}
                     {(vuln?.vulnerabilityPath.length || 0) === 0 && (
                       <div className="mt-4">
@@ -599,171 +497,74 @@ const Index: FunctionComponent = () => {
                   {vuln && <Quickfix vuln={vuln} />}
                   {(isMember(role) || vuln.ticketUrl) && (
                     <div data-tour="vuln-management">
-                      <Card>
-                        <CardContent className="mt-4">
-                          <AuthGuard require="member">
-                            <>
-                              {vuln.state === "open" ? (
-                                <form
-                                  className="flex flex-col gap-4"
-                                  onSubmit={(e) => e.preventDefault()}
-                                >
-                                  <div className="flex flex-row justify-end gap-1">
-                                    <div className="flex flex-row items-start gap-2 pt-2">
-                                      {vuln.ticketId === null &&
-                                        (integrationName === undefined ? (
-                                          <Tooltip>
-                                            <TooltipTrigger asChild>
-                                              <span>
-                                                <Button
-                                                  variant={"ghost"}
-                                                  disabled
-                                                  className=""
-                                                >
-                                                  <span className="ml-1 text-muted-foreground">
-                                                    Create Ticket
-                                                  </span>
-                                                </Button>
-                                              </span>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                              No repository is linked. To create
-                                              a ticket, please integrate your
-                                              issue tracker in the {` `}
-                                              <Link
-                                                href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                                className="underline"
-                                              >
-                                                settings
-                                              </Link>
-                                            </TooltipContent>
-                                          </Tooltip>
-                                        ) : (
-                                          <Button
-                                            variant={"secondary"}
-                                            onClick={() =>
-                                              setMitigateDialogOpen(true)
-                                            }
-                                          >
-                                            {integrationName === "gitlab" && (
-                                              <GitProviderIcon
-                                                externalEntityProviderIdOrRepositoryId={
-                                                  asset.externalEntityProviderId ??
-                                                  "gitlab"
-                                                }
-                                              />
-                                            )}
-                                            {integrationName === "github" && (
-                                              <Image
-                                                alt="GitHub Logo"
-                                                width={15}
-                                                height={15}
-                                                className="dark:invert"
-                                                src={"/assets/github.svg"}
-                                              />
-                                            )}
-                                            {integrationName === "jira" && (
-                                              <Image
-                                                alt="Jira Logo"
-                                                width={15}
-                                                height={15}
-                                                src={
-                                                  "/assets/jira-svgrepo-com.svg"
-                                                }
-                                              />
-                                            )}
-                                            <span className="ml-1">
-                                              Create Ticket{" "}
-                                            </span>
-                                          </Button>
-                                        ))}
-
-                                      <Button
-                                        data-testid="mark-false-positive"
-                                        onClick={() =>
-                                          setFalsePositiveDialogOpen(true)
-                                        }
-                                        variant={"secondary"}
-                                      >
-                                        Mark as False Positive
-                                      </Button>
-                                      <Button
-                                        data-testid="mark-accepted-risk"
-                                        onClick={() =>
-                                          setAcceptRiskDialogOpen(true)
-                                        }
-                                        variant={"secondary"}
-                                      >
-                                        Accept risk
-                                      </Button>
-                                      <Button
-                                        data-testid="add-comment"
-                                        onClick={() =>
-                                          setCommentDialogOpen(true)
-                                        }
-                                        variant={"default"}
-                                      >
-                                        Comment
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </form>
-                              ) : isLastEventVexRule ? (
-                                <p className="text-sm text-muted-foreground">
-                                  This vuln was handled by a VEX rule. Remove or
-                                  adjust the VEX rule to reopen it.
-                                </p>
-                              ) : (
-                                <form
-                                  className="flex flex-col gap-4"
-                                  onSubmit={(e) => {
-                                    e.preventDefault();
-                                  }}
-                                >
-                                  <div>
-                                    <label className="mb-2 block text-sm font-semibold">
-                                      Comment
-                                    </label>
-                                    <MarkdownEditor
-                                      value={justification ?? ""}
-                                      setValue={setJustification}
-                                      placeholder="Add your comment here..."
-                                    />
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">
-                                    You can reopen this vuln, if you plan to
-                                    mitigate the risk now, or accepted this vuln
-                                    by accident.
-                                  </p>
-                                  <div className="flex flex-row justify-end">
-                                    <AsyncButton
-                                      onClick={() =>
-                                        handleSubmit({
-                                          status: "reopened",
-                                          justification,
-                                        })
-                                      }
-                                      variant={"secondary"}
-                                      type="submit"
-                                    >
-                                      Reopen
-                                    </AsyncButton>
-                                  </div>
-                                </form>
-                              )}
-                            </>
-                          </AuthGuard>
-
-                          {vuln.ticketUrl && (
-                            <small className="mt-2 block w-full text-right text-muted-foreground">
-                              Comment will be synced with{" "}
-                              <Link href={vuln.ticketUrl} target="_blank">
-                                {vuln.ticketUrl}
-                              </Link>
-                            </small>
-                          )}
-                        </CardContent>
-                      </Card>
+                      <VulnAssessmentComposer
+                        state={vuln.state ?? "open"}
+                        isHandledByVexRule={isLastEventVexRule}
+                        ticketUrl={vuln.ticketUrl}
+                        onCreateVexRule={() => {
+                          setVexRulePrefill(undefined);
+                          setAddVexRuleDialogOpen(true);
+                        }}
+                        onSubmit={handleSubmit}
+                        secondaryActions={
+                          vuln.ticketId === null ? (
+                            integrationName === undefined ? (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>
+                                    <Button variant={"ghost"} disabled>
+                                      <span className="ml-1 text-muted-foreground">
+                                        Create Ticket
+                                      </span>
+                                    </Button>
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  No repository is linked. To create a ticket,
+                                  please integrate your issue tracker in the{" "}
+                                  <Link
+                                    href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                    className="underline"
+                                  >
+                                    settings
+                                  </Link>
+                                </TooltipContent>
+                              </Tooltip>
+                            ) : (
+                              <Button
+                                variant={"secondary"}
+                                onClick={() => setMitigateDialogOpen(true)}
+                              >
+                                {integrationName === "gitlab" && (
+                                  <GitProviderIcon
+                                    externalEntityProviderIdOrRepositoryId={
+                                      asset.externalEntityProviderId ?? "gitlab"
+                                    }
+                                  />
+                                )}
+                                {integrationName === "github" && (
+                                  <Image
+                                    alt="GitHub Logo"
+                                    width={15}
+                                    height={15}
+                                    className="dark:invert"
+                                    src={"/assets/github.svg"}
+                                  />
+                                )}
+                                {integrationName === "jira" && (
+                                  <Image
+                                    alt="Jira Logo"
+                                    width={15}
+                                    height={15}
+                                    src={"/assets/jira-svgrepo-com.svg"}
+                                  />
+                                )}
+                                <span className="ml-1">Create Ticket</span>
+                              </Button>
+                            )
+                          ) : null
+                        }
+                      />
                     </div>
                   )}
                 </div>
@@ -834,70 +635,7 @@ const Index: FunctionComponent = () => {
                 <div data-tour="affected-component">
                   <AffectedComponentDetails vuln={vuln} />
                 </div>
-
-                <div className="p-5">
-                  <h3 className="mb-2 text-sm font-semibold">
-                    Management decisions across the organization
-                  </h3>
-                  {hints ? (
-                    <div className="flex flex-row justify-between mt-4">
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge variant={"secondary"}>
-                            <Bug className="-ml-1 mr-1 inline-block h-4 w-4" />
-                            {hints.amountOpen}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-screen-sm font-normal">
-                          This vulnerability is still open in {hints.amountOpen}{" "}
-                          projects, artifacts and assets.
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge variant={"secondary"}>
-                            <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                            {hints.amountFixed}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-screen-sm font-normal">
-                          This vulnerability has been fixed in{" "}
-                          {hints.amountFixed} projects, artifacts and assets.
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge variant={"secondary"}>
-                            <SpeakerXMarkIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                            {hints.amountAccepted}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-screen-sm font-normal">
-                          This vulnerability has been accepted in{" "}
-                          {hints.amountAccepted} projects, artifacts and assets.
-                        </TooltipContent>
-                      </Tooltip>
-
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge variant={"secondary"}>
-                            <StopIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
-                            {hints.amountFalsePositive}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-screen-sm font-normal">
-                          This vulnerability has been marked as false positive
-                          in {hints.amountFalsePositive} projects, artifacts and
-                          assets.
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  ) : (
-                    <Skeleton className="w-full h-20" />
-                  )}
-                </div>
+                <ManagementDecisions uri={uri} />
               </div>
             ) : (
               <div className="border-l flex-col pl-4 flex gap-8">
@@ -912,16 +650,6 @@ const Index: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      <CommentDialog
-        open={commentDialogOpen}
-        onOpenChange={setCommentDialogOpen}
-        onSubmit={async (justification) => {
-          return handleSubmit({
-            status: "comment",
-            justification,
-          });
-        }}
-      />
       <MitigateDialog
         open={mitigateDialogOpen}
         onOpenChange={setMitigateDialogOpen}
@@ -934,34 +662,24 @@ const Index: FunctionComponent = () => {
         integrationType={integrationName ?? undefined}
         gitlabIntegration={asset.externalEntityProviderId ?? "gitlab"}
       />
-
-      <AcceptRiskDialog
-        open={acceptRiskDialogOpen}
-        onOpenChange={setAcceptRiskDialogOpen}
-        onSubmit={async (justification) => {
-          return handleSubmit({
-            status: "accepted",
-            justification,
-          });
-        }}
-      />
-
-      <FalsePositiveDialog
-        open={falsePositiveDialogOpen}
-        onOpenChange={setFalsePositiveDialogOpen}
-        onSubmit={async (data) => {
-          return handleSubmit({
-            status: "falsePositive",
-            justification: data.justification,
-            mechanicalJustification: data.mechanicalJustification,
-            pathPattern: data.pathPattern,
-          });
-        }}
-        pathPatternOptions={
-          vuln?.vulnerabilityPath.length === 0 ? [] : pathPatternOptions
+      <AddVexRuleDialog
+        open={addVexRuleDialogOpen}
+        onOpenChange={setAddVexRuleDialogOpen}
+        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        assetVersionId={assetVersion?.id ?? ""}
+        onCreated={() => mutate()}
+        initialTitle={vexRulePrefill?.title}
+        initialCelExpression={vexRulePrefill?.celExpression}
+        currentVuln={
+          vuln
+            ? {
+                cveID: vuln.cveID,
+                componentPurl: vuln.componentPurl,
+                vulnerabilityPath: vuln.vulnerabilityPath,
+                rootName: asset.name,
+              }
+            : undefined
         }
-        vulnState={vuln?.state ?? ""}
-        vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/vex-rules`}
       />
       <AcceptVexRuleRecommendationDialog
         vexRule={selectedVexRule}

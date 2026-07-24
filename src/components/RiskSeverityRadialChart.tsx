@@ -39,34 +39,40 @@ interface RiskSeverityRadialChartProps {
 const RiskSeverityRadialChart: FunctionComponent<
   RiskSeverityRadialChartProps
 > = ({ risk, cvss, className }) => {
-  // Two concentric rings: the general CVSS base score (muted) and the
-  // contextual risk assessment (coloured by its severity bucket). Both scores
-  // share the 0-10 angle axis below, so each ring's arc reflects its value.
+  // Two concentric rings sharing the 0-10 angle axis, each coloured by its own
+  // severity bucket. `fill` and `stroke` are full-strength severity colours;
+  // the bar itself is rendered translucent via `fillOpacity` on the RadialBar,
+  // while the border and the inline label stay at full strength.
+  const cvssColor = severityToColor(riskToSeverity(cvss));
+  const riskColor = severityToColor(riskToSeverity(risk));
+
   const chartData = [
     {
       metric: "cvss",
       label: "CVSS",
       score: cvss,
-      fill: "hsl(var(--muted-foreground))",
+      fill: cvssColor,
+      stroke: cvssColor,
     },
     {
       metric: "risk",
       label: "Risk",
       score: risk,
-      fill: severityToColor(riskToSeverity(risk)),
+      fill: riskColor,
+      stroke: riskColor,
     },
   ];
 
   return (
     <ChartContainer
       config={chartConfig}
-      className={cn("mx-auto aspect-square max-w-[200px]", className)}
+      className={cn("mx-auto aspect-square max-w-[240px]", className)}
     >
       <RadialBarChart
         data={chartData}
         startAngle={90}
         endAngle={-270}
-        innerRadius="68%"
+        innerRadius="65%"
         outerRadius="100%"
       >
         {/* Map the 0-10 scores onto the arc length shared by both rings. */}
@@ -101,12 +107,19 @@ const RiskSeverityRadialChart: FunctionComponent<
             />
           }
         />
-        <RadialBar dataKey="score" background cornerRadius={2}>
+        <RadialBar
+          dataKey="score"
+          background={{ stroke: "none" }}
+          cornerRadius={3}
+          fillOpacity={0.5}
+          strokeWidth={0}
+        >
           <LabelList
             position="insideStart"
             dataKey="label"
-            className="fill-foreground mix-blend-luminosity"
-            fontSize={10}
+            className="font-semibold"
+            stroke="none"
+            fontSize={13}
           />
         </RadialBar>
         <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>

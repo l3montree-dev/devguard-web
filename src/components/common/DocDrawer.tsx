@@ -76,7 +76,7 @@ export function DocDrawer({
       <DrawerTrigger asChild>
         <button
           data-umami-event="Documentation Drawer"
-          className="text-xs cursor-pointer text-link"
+          className="text-xs cursor-pointer text-link text-left"
           type="button"
         >
           {triggerLabel}

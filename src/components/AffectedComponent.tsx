@@ -149,56 +149,47 @@ const AffectedComponentDetails: FunctionComponent<{
                         </Link>
                       ))}
                   </div>
+                  {vuln.cve?.relationships &&
+                    vuln.cve.relationships.length > 0 && (
+                      <div className="mt-3 flex flex-col text-xs">
+                        <span className="text-muted-foreground">
+                          Relationships:
+                        </span>
+                        <ul className="mt-1 list-none space-y-0.5">
+                          {vuln.cve.relationships.map((rel) => (
+                            <li
+                              key={rel.relationshipType + rel.targetCve}
+                              className="flex flex-row gap-2"
+                            >
+                              <Link
+                                href={`https://osv.dev/vulnerability/${rel.targetCve}`}
+                                target="_blank"
+                                className="!text-xs"
+                              >
+                                {rel.targetCve}
+                              </Link>
+                              <span className="capitalize text-muted-foreground">
+                                ({rel.relationshipType})
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  <div className="mt-4 border-t pt-4">
+                    <DocDrawer
+                      triggerLabel="See how DevGuard matches vulnerabilities"
+                      drawerTitle="Vulnerability Matching"
+                      mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/vulnerability-management/vulnerability-matching.mdx"
+                      docsUrl="https://docs.devguard.org/explanations/vulnerability-management/vulnerability-matching/"
+                    />
+                  </div>
                 </CollapsibleContent>
               </div>
             </div>
           </Collapsible>
         </div>
-        <div className="mt-1">
-          <DocDrawer
-            triggerLabel="See how DevGuard matches vulnerabilities"
-            drawerTitle="Vulnerability Matching"
-            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/vulnerability-management/vulnerability-matching.mdx"
-            docsUrl="https://docs.devguard.org/explanations/vulnerability-management/vulnerability-matching/"
-          />
-        </div>
       </div>
-      {vuln.cve?.relationships && vuln.cve.relationships.length > 0 && (
-        <div className="p-5">
-          <h3 className="mb-2 text-xs font-semibold">
-            Vulnerability Details{" "}
-            <Image
-              src={
-                theme === "light" ? "/logos/osv-black.png" : "/logos/osv.png"
-              }
-              alt="OSV Logo"
-              width={30}
-              height={30}
-              className="inline-block ml-2 mb-1"
-            />
-          </h3>
-
-          <div className="rounded-lg border bg-card p-3">
-            {vuln.cve?.relationships && (
-              <table className="w-full table-auto border-collapse">
-                <tbody>
-                  {vuln.cve?.relationships?.map((rel) => (
-                    <tr
-                      className="text-sm"
-                      key={rel.relationshipType + rel.targetCve}
-                    >
-                      <td className="capitalize font-semibold">
-                        {rel.relationshipType}
-                      </td>
-                      <td>{rel.targetCve}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import VexRuleForm from "./VexRuleForm";
+import VexRuleForm, { type VexRuleVulnContext } from "./VexRuleForm";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "@/lib/toast";
 import {
@@ -33,6 +33,11 @@ interface AddVexRuleDialogProps {
   baseUrl: string;
   assetVersionId: string;
   onCreated: () => void;
+  // Prefill the form (e.g. when opened from a specific dependency path).
+  initialTitle?: string;
+  initialCelExpression?: string;
+  // When set, the form previews the rule's effect on this specific vulnerability.
+  currentVuln?: VexRuleVulnContext;
 }
 
 const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
@@ -41,6 +46,9 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   baseUrl,
   assetVersionId,
   onCreated,
+  initialTitle,
+  initialCelExpression,
+  currentVuln,
 }) => {
   const [title, setTitle] = useState("");
   const [celExpression, setCelExpression] = useState("");
@@ -48,6 +56,17 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   const [selectedOption, setSelectedOption] = useState<string>(
     Object.keys(vexOptionMessages)[2],
   );
+
+  // Seed the form from the prefill each time the dialog transitions to open.
+  // Adjusting state during render (React's recommended alternative to an effect).
+  const [wasOpen, setWasOpen] = useState(false);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) {
+      setTitle(initialTitle ?? "");
+      setCelExpression(initialCelExpression ?? "");
+    }
+  }
 
   const canSubmit =
     celExpression.trim() !== "" &&
@@ -121,6 +140,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
             onCelExpressionChange={setCelExpression}
             justification={justification}
             onJustificationChange={setJustification}
+            currentVuln={currentVuln}
           />
           <DialogFooter>
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
