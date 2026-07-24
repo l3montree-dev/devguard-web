@@ -31,15 +31,25 @@ const labelMap: Record<string, string> = {
   uncontrollable_by_attacker: "Uncontrollable by Attacker",
 };
 
+const isStructuralGraphNode = (node: string) =>
+  node === "ROOT" || node.startsWith("artifact:");
+
 // Builds the path pattern array for a VEX rule from a user selection.
 // Node selections use ["*", node, "*"] to match regardless of position.
 // Edge selections use ["*", ...suffix] to match the specific dependency chain.
 export function buildVexPathPattern(selection: VexSelection): string[] | null {
   if (!selection.path || selection.path.length === 0) return null;
   if (selection.type === "node") {
-    return ["*", selection.path[0], "*"];
+    const selectedNode = selection.path[0];
+    return isStructuralGraphNode(selectedNode)
+      ? null
+      : ["*", selectedNode, "*"];
   }
-  return ["*", ...selection.path];
+
+  const componentPath = selection.path.filter(
+    (node) => !isStructuralGraphNode(node),
+  );
+  return componentPath.length === 0 ? null : ["*", ...componentPath];
 }
 
 // Returns an async handler that accepts the VEX selection and creates a false positive rule

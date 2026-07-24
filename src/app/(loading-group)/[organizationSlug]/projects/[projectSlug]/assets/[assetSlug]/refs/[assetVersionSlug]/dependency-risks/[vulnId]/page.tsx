@@ -431,13 +431,32 @@ const Index: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [graphLoading, shouldStartTour]);
 
-  const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
+  const graphPaths = useMemo(() => {
     if (!vuln || vuln.vulnerabilityPath.length === 0) {
+      return [];
+    }
+
+    const artifactNames = Array.from(
+      new Set(vuln.artifacts.map((artifact) => artifact.artifactName)),
+    ).sort((a, b) => a.localeCompare(b));
+
+    if (artifactNames.length === 0) {
+      return [["ROOT", ...vuln.vulnerabilityPath]];
+    }
+
+    return artifactNames.map((artifactName) => [
+      `artifact:${artifactName}`,
+      ...vuln.vulnerabilityPath,
+    ]);
+  }, [vuln]);
+
+  const graphData = useMemo<ViewDependencyTreeNode | null>(() => {
+    if (!vuln || graphPaths.length === 0) {
       return null;
     }
 
-    return convertPathsToTree([vuln.vulnerabilityPath], [vuln]);
-  }, [vuln]);
+    return convertPathsToTree(graphPaths, [vuln]);
+  }, [graphPaths, vuln]);
 
   // Generate path pattern options for the user to select
   // Each option is a suffix of the vulnerability path with a count of matching paths
@@ -838,10 +857,7 @@ const Index: FunctionComponent = () => {
                               }
                               graph={graphData}
                               vulns={[vuln]}
-                              highlightPath={[
-                                "ROOT",
-                                ...vuln.vulnerabilityPath,
-                              ]}
+                              highlightPaths={graphPaths}
                               onVexSelect={createFalsePositive}
                               vexRules={vexRulesData}
                               onReady={handleGraphReady}

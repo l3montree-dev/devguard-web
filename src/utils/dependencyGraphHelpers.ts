@@ -271,19 +271,30 @@ export const getLayoutedElements = (
   // Pre-populate child counts for all nodes
   populateChildCounts(tree, childCountMap);
 
-  addRecursive(
-    dagreGraph,
-    tree,
-    nodeWidth,
-    nodeHeight,
-    infoSourceMap,
-    expandedNodes,
-    childCountMap,
-    childrenLimitMap,
-    riskMap,
-    new Set(),
-    nameMap,
-  );
+  const hasArtifactRoots =
+    tree.nodeType === "root" &&
+    tree.children.length > 0 &&
+    tree.children.every((child) => child.nodeType === "artifact");
+  const rootsToRender = hasArtifactRoots ? tree.children : [tree];
+  const visited = new Set<string>();
+
+  [...rootsToRender]
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach((root) => {
+      addRecursive(
+        dagreGraph,
+        root,
+        nodeWidth,
+        nodeHeight,
+        infoSourceMap,
+        expandedNodes,
+        childCountMap,
+        childrenLimitMap,
+        riskMap,
+        visited,
+        nameMap,
+      );
+    });
 
   dagre.layout(dagreGraph, { width: 10, height: 10 });
 

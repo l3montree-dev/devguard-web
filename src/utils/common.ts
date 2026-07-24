@@ -170,6 +170,9 @@ export const beautifyPurl = (purl: string): string => {
   if (!purl) {
     return "";
   }
+  if (purl.startsWith("artifact:")) {
+    return purl.slice("artifact:".length) || "Default";
+  }
   try {
     const p = PackageURL.fromString(purl);
     return p.namespace ? `${p.namespace}/${p.name}` : p.name;
