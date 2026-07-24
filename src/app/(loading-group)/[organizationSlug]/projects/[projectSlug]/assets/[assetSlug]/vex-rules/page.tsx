@@ -1,9 +1,7 @@
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
-import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
-import Callout from "@/components/common/Callout";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import EmptyParty from "@/components/common/EmptyParty";
 import Err from "@/components/common/Err";
@@ -21,13 +19,8 @@ import VexRuleResult from "@/components/vex-rules/VexRuleResult";
 import VexRulesRow from "@/components/vex-rules/VexRulesRow";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
-import { useArtifacts } from "@/context/AssetVersionContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
-} from "@/hooks/useActiveAssetVersion";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
@@ -41,7 +34,6 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import { groupBy } from "lodash";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type FunctionComponent, useMemo, useState } from "react";
 import useSWR from "swr";
@@ -83,15 +75,11 @@ const VexRulesPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const asset = useActiveAsset();
-  const assetVersion = useActiveAssetVersion();
-  const artifacts = useArtifacts();
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    params as {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
+  const { organizationSlug, projectSlug, assetSlug } = params as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  };
 
   const query = useMemo(() => {
     return buildFilterSearchParams(searchParams);
@@ -105,8 +93,6 @@ const VexRulesPage: FunctionComponent = () => {
     projectSlug +
     "/assets/" +
     assetSlug +
-    "/refs/" +
-    assetVersionSlug +
     "/vex-rules/?" +
     query.toString();
 
@@ -126,7 +112,7 @@ const VexRulesPage: FunctionComponent = () => {
         header: "",
         cell: (info) => {
           const rule = info.row.original;
-          const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/${rule.id}`;
+          const deleteUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules/${rule.id}`;
 
           return (
             <VexRuleActionsCell
@@ -137,7 +123,7 @@ const VexRulesPage: FunctionComponent = () => {
           );
         },
       }),
-    [mutate, organizationSlug, projectSlug, assetSlug, assetVersionSlug],
+    [mutate, organizationSlug, projectSlug, assetSlug],
   );
 
   const columnsDef = useMemo(
@@ -155,7 +141,6 @@ const VexRulesPage: FunctionComponent = () => {
         organizationSlug,
         projectSlug,
         assetSlug,
-        assetVersionSlug,
       },
     },
   );
@@ -172,13 +157,7 @@ const VexRulesPage: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
   const assetMenu = useAssetMenu();
-  const { branches, tags } = useAssetBranchesAndTags();
-  const handleVexUpload = async (params: {
-    file: File;
-    branchOrTagName: string;
-    branchOrTagSlug: string;
-    isTag: boolean;
-  }) => {
+  const handleVexUpload = async (params: { file: File }) => {
     // Read file content as text (VEX is JSON)
     const fileContent = await params.file.text();
 
@@ -186,10 +165,6 @@ const VexRulesPage: FunctionComponent = () => {
       method: "POST",
       body: fileContent,
       headers: {
-        "X-Tag": params.isTag ? "1" : "0",
-        "X-Asset-Ref": params.branchOrTagName,
-        "X-Asset-Default-Branch": "",
-        "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
         "X-Origin": "vex-upload",
       },
     });
@@ -233,8 +208,7 @@ const VexRulesPage: FunctionComponent = () => {
 
   return (
     <Page Menu={assetMenu} title={"Manage VEX Rules"} Title={<AssetTitle />}>
-      <div className="flex flex-row items-center justify-between">
-        <BranchTagSelector branches={branches} tags={tags} />
+      <div className="flex justify-end">
         <AuthGuard require="member">
           <div className="flex flex-row gap-2">
             <Button
@@ -254,7 +228,7 @@ const VexRulesPage: FunctionComponent = () => {
         </AuthGuard>
       </div>
       <Section
-        description="Manage VEX (Vulnerability Exploitability eXchange) rules for this repository ref (branches/ tags). VEX rules define how vulnerabilities should be handled based on their context."
+        description="Manage VEX (Vulnerability Exploitability eXchange) rules for this asset. VEX rules define how vulnerabilities should be handled based on their context."
         primaryHeadline
         forceVertical
         title="Manage VEX Rules"
@@ -367,7 +341,7 @@ const VexRulesPage: FunctionComponent = () => {
                           row={rowForGroup}
                           index={groupIndex}
                           vexRulesInGroup={rulesInGroup}
-                          deleteUrlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+                          deleteUrlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
                           onDeleted={() => mutate()}
                         />
                       );
@@ -386,17 +360,14 @@ const VexRulesPage: FunctionComponent = () => {
       <AddVexRuleDialog
         open={addVexRuleModal}
         onOpenChange={setAddVexRuleModal}
-        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
-        assetVersionId={assetVersion?.id ?? ""}
+        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
         onCreated={() => mutate()}
       />
       <VexDownloadModal
-        artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
         pathname={pathname || ""}
         assetName={asset?.name}
-        assetVersionName={assetVersion?.name}
       />
     </Page>
   );

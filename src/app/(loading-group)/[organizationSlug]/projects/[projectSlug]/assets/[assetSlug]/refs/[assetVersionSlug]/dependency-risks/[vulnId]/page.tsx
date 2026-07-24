@@ -689,7 +689,7 @@ const Index: FunctionComponent = () => {
         projectSlug={projectSlug}
         assetSlug={assetSlug}
         assetVersionSlug={assetVersionSlug}
-        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
         onAccepted={() => {
           mutate();
         }}
@@ -698,7 +698,7 @@ const Index: FunctionComponent = () => {
         vexRule={selectedVexRule}
         isOpen={vexRuleDialogOpen}
         onOpenChange={setVexRuleDialogOpen}
-        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
+        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
         onDeleted={() => {
           mutate();
         }}

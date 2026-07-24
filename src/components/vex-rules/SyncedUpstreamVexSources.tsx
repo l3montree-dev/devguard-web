@@ -32,7 +32,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
   const [activeTab, setActiveTab] =
     useState<ExternalReference["type"]>("cyclonedxvex");
 
-  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references`;
+  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
 
   const {
     data: allRefs,
@@ -48,7 +48,7 @@ const SyncedUpstreamVexSources: FunctionComponent = () => {
     ) || [];
 
   const handleTriggerSync = async (source: ExternalReference) => {
-    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/external-references/sync/`;
+    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references/sync/`;
 
     try {
       const response = await browserApiClient(syncUrl, {

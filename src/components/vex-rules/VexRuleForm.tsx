@@ -165,7 +165,6 @@ const PathConnector: FunctionComponent<{
 
 interface VexRuleFormProps {
   baseUrl: string;
-  assetVersionId: string;
   title: string;
   onTitleChange: (title: string) => void;
   celExpression: string;
@@ -178,7 +177,6 @@ interface VexRuleFormProps {
 
 const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
   baseUrl,
-  assetVersionId,
   title,
   onTitleChange,
   celExpression,
@@ -244,7 +242,6 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            id: assetVersionId,
             celExpression: [expression],
           }),
         });
@@ -266,7 +263,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [celExpression, hasSyntaxError, baseUrl, assetVersionId]);
+  }, [celExpression, hasSyntaxError, baseUrl]);
 
   return (
     <div className="flex flex-col gap-4">

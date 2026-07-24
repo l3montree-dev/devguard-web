@@ -31,7 +31,6 @@ interface AddVexRuleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   baseUrl: string;
-  assetVersionId: string;
   onCreated: () => void;
   // Prefill the form (e.g. when opened from a specific dependency path).
   initialTitle?: string;
@@ -44,7 +43,6 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   open,
   onOpenChange,
   baseUrl,
-  assetVersionId,
   onCreated,
   initialTitle,
   initialCelExpression,
@@ -133,7 +131,6 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
         >
           <VexRuleForm
             baseUrl={baseUrl}
-            assetVersionId={assetVersionId}
             title={title}
             onTitleChange={setTitle}
             celExpression={celExpression}
