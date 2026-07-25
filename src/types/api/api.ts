@@ -297,6 +297,8 @@ interface BaseVulnEventDTO {
   uri: string | null;
   createdByVexRule: boolean;
   userAgent: string;
+  vexRuleId?: string | null;
+  vexRule?: VexRule | null;
 }
 
 export interface ExternalReferenceErrorDTO {
@@ -1048,6 +1050,7 @@ export type VexRule = {
   mechanicalJustification: string;
   eventType: string;
   celExpression: string;
+  pathPattern: string[] | null;
   createdById: string;
   createdAt: string;
   updatedAt: string;

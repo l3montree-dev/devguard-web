@@ -35,6 +35,7 @@ module.exports = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          muted: "hsl(var(--primary) / 0.2)",
         },
         link: "hsl(var(--link))",
         header: {
@@ -50,6 +51,7 @@ module.exports = {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          muted: "hsl(var(--secondary-foreground) / 0.15)",
         },
         success: {
           DEFAULT: "hsl(var(--success))",

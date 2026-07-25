@@ -3,9 +3,7 @@
 import Page from "@/components/Page";
 import RiskSeverityRadialChart from "@/components/RiskSeverityRadialChart";
 import AssetTitle from "@/components/common/AssetTitle";
-
 import MitigateDialog from "@/components/MitigateDialog";
-import Severity from "@/components/common/Severity";
 import VulnState from "@/components/common/VulnState";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import DetailedRiskAssessment from "@/components/risk-assessment/DetailedRiskAssessment";
@@ -23,6 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
+import VexRuleCard from "@/components/vex-rules/VexRuleCard";
 import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
@@ -43,6 +42,7 @@ import type {
 import { formatDate } from "@/utils/format";
 import { beautifyPurl } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
+import { Lock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -135,6 +135,27 @@ const Index: FunctionComponent = () => {
     }
     return false;
   }, [vuln]);
+
+  // The VEX rule currently holding this vuln, if the last decisive event was
+  // created by one (and the backend attached the rule object to that event).
+  const lockingVexRule = useMemo(() => {
+    if (!vuln?.events?.length) return null;
+    for (let i = vuln.events.length - 1; i >= 0; i--) {
+      const ev = vuln.events[i];
+      if (ev.type === "rawRiskAssessmentUpdated") continue;
+      return ev.createdByVexRule ? (ev.vexRule ?? null) : null;
+    }
+    return null;
+  }, [vuln]);
+
+  // Locked = handled (accepted / false positive) and owned by a VEX rule.
+  const isVexLocked =
+    isLastEventVexRule &&
+    (vuln?.state === "accepted" || vuln?.state === "falsePositive");
+  //
+  const lockedOverlay = isVexLocked
+    ? " pointer-events-none select-none blur-[1px] opacity-50 transition"
+    : "";
 
   const { data: graphResponse, isLoading: graphLoading } = useSWR<
     Array<Array<string>>
@@ -348,14 +369,6 @@ const Index: FunctionComponent = () => {
     );
   }
 
-  function pathEqual<T>(a: T[], b: T[]) {
-    if (a.length === 0 || b.length === 0 || a.length !== b.length) {
-      return false;
-    }
-
-    return a.every((val, i) => val === b[i]);
-  }
-
   return (
     <Page
       Menu={assetMenu}
@@ -371,7 +384,19 @@ const Index: FunctionComponent = () => {
                   {vuln ? vuln.cveID : <Skeleton className="w-90 h-10" />}
                 </h1>
                 {vuln ? (
-                  <VulnState state={vuln?.state ?? "open"} />
+                  <>
+                    <VulnState state={vuln?.state ?? "open"} />
+                    {isVexLocked && (
+                      <Badge
+                        variant="default"
+                        className="gap-1 py-1"
+                        title="A VEX rule is handling this vulnerability. Delete the rule to reopen it."
+                      >
+                        <Lock className="h-4 w-4" />
+                        Locked by VEX rule
+                      </Badge>
+                    )}
+                  </>
                 ) : (
                   <Skeleton className="w-20 h-6 rounded-full" />
                 )}
@@ -434,148 +459,159 @@ const Index: FunctionComponent = () => {
                   <Skeleton className="w-full h-20" />
                 )}
               </div>
-              <div className="mt-8">
-                {vuln?.related?.advisory && (
-                  <RelationCard
-                    related={vuln?.related?.advisory}
-                    variant="collapsible"
+              {isVexLocked && lockingVexRule && (
+                <div className="mt-6">
+                  <VexRuleCard
+                    vexRule={lockingVexRule}
+                    vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/vex-rules`}
                   />
-                )}
-              </div>
-              <div data-tour="path">
-                {!graphLoading && (
-                  <div className="mt-10">
-                    {vuln && vuln.vulnerabilityPath.length > 0 && (
-                      <PathToComponent
-                        rootName={asset.name}
-                        path={vuln.vulnerabilityPath}
-                        pathCount={graphResponse?.length}
-                        actionable={vuln.state === "open" && isMember(role)}
-                        onCallClick={(edgeIndex) => {
-                          const suffix =
-                            vuln.vulnerabilityPath.slice(edgeIndex);
-                          setVexRulePrefill({
-                            title: `${vuln.cveID ?? "Vulnerability"} not exploitable via ${beautifyPurl(
-                              suffix[0] ?? vuln.componentPurl,
-                            )}`,
-                            celExpression: `matchesPattern(vuln, ${JSON.stringify(
-                              ["*", ...suffix],
-                            )})`,
-                          });
-                          setAddVexRuleDialogOpen(true);
-                        }}
-                      />
-                    )}
-                    {(vuln?.vulnerabilityPath.length || 0) === 0 && (
-                      <div className="mt-4">
-                        <Callout intent="warning" showIcon>
-                          There are more than 12 different paths which lead to
-                          this vulnerability in your dependency tree. Therefore
-                          the graph is not displayed by default to avoid
-                          performance issues.
-                          {isMember(role)
-                            ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
-                            : ""}
-                        </Callout>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {vuln ? (
-                <div className="mt-10">
-                  <RiskAssessmentFeed
-                    vulnerabilityName={vuln.cveID ?? ""}
-                    events={vuln.events}
-                    deleteEvent={handleDeleteEvent}
-                    page="dependency-risks"
-                    directDependencyFixedVersion={
-                      vuln.directDependencyFixedVersion
-                    }
-                  />
-                  {vuln && <Quickfix vuln={vuln} />}
-                  {(isMember(role) || vuln.ticketUrl) && (
-                    <div data-tour="vuln-management">
-                      <VulnAssessmentComposer
-                        state={vuln.state ?? "open"}
-                        isHandledByVexRule={isLastEventVexRule}
-                        ticketUrl={vuln.ticketUrl}
-                        onCreateVexRule={() => {
-                          setVexRulePrefill(undefined);
-                          setAddVexRuleDialogOpen(true);
-                        }}
-                        onSubmit={handleSubmit}
-                        secondaryActions={
-                          vuln.ticketId === null ? (
-                            integrationName === undefined ? (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span>
-                                    <Button variant={"ghost"} disabled>
-                                      <span className="ml-1 text-muted-foreground">
-                                        Create Ticket
-                                      </span>
-                                    </Button>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  No repository is linked. To create a ticket,
-                                  please integrate your issue tracker in the{" "}
-                                  <Link
-                                    href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                    className="underline"
-                                  >
-                                    settings
-                                  </Link>
-                                </TooltipContent>
-                              </Tooltip>
-                            ) : (
-                              <Button
-                                variant={"secondary"}
-                                onClick={() => setMitigateDialogOpen(true)}
-                              >
-                                {integrationName === "gitlab" && (
-                                  <GitProviderIcon
-                                    externalEntityProviderIdOrRepositoryId={
-                                      asset.externalEntityProviderId ?? "gitlab"
-                                    }
-                                  />
-                                )}
-                                {integrationName === "github" && (
-                                  <Image
-                                    alt="GitHub Logo"
-                                    width={15}
-                                    height={15}
-                                    className="dark:invert"
-                                    src={"/assets/github.svg"}
-                                  />
-                                )}
-                                {integrationName === "jira" && (
-                                  <Image
-                                    alt="Jira Logo"
-                                    width={15}
-                                    height={15}
-                                    src={"/assets/jira-svgrepo-com.svg"}
-                                  />
-                                )}
-                                <span className="ml-1">Create Ticket</span>
-                              </Button>
-                            )
-                          ) : null
-                        }
-                      />
+                </div>
+              )}
+              <div className={lockedOverlay}>
+                <div className="mt-8">
+                  {vuln?.related?.advisory && (
+                    <RelationCard
+                      related={vuln?.related?.advisory}
+                      variant="collapsible"
+                    />
+                  )}
+                </div>
+                <div data-tour="path">
+                  {!graphLoading && (
+                    <div className="mt-10">
+                      {vuln && vuln.vulnerabilityPath.length > 0 && (
+                        <PathToComponent
+                          rootName={asset.name}
+                          path={vuln.vulnerabilityPath}
+                          pathCount={graphResponse?.length}
+                          actionable={vuln.state === "open" && isMember(role)}
+                          onCallClick={(edgeIndex) => {
+                            const suffix =
+                              vuln.vulnerabilityPath.slice(edgeIndex);
+                            setVexRulePrefill({
+                              title: `${vuln.cveID ?? "Vulnerability"} not exploitable via ${beautifyPurl(
+                                suffix[0] ?? vuln.componentPurl,
+                              )}`,
+                              celExpression: `matchesPattern(vuln, ${JSON.stringify(
+                                ["*", ...suffix],
+                              )})`,
+                            });
+                            setAddVexRuleDialogOpen(true);
+                          }}
+                        />
+                      )}
+                      {(vuln?.vulnerabilityPath.length || 0) === 0 && (
+                        <div className="mt-4">
+                          <Callout intent="warning" showIcon>
+                            There are more than 12 different paths which lead to
+                            this vulnerability in your dependency tree.
+                            Therefore the graph is not displayed by default to
+                            avoid performance issues.
+                            {isMember(role)
+                              ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
+                              : ""}
+                          </Callout>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              ) : (
-                <>
-                  <RiskAssessmentFeedSkeleton />
-                  <div>
-                    <EditorSkeleton />
+
+                {vuln ? (
+                  <div className="mt-10">
+                    <RiskAssessmentFeed
+                      vulnerabilityName={vuln.cveID ?? ""}
+                      events={vuln.events}
+                      deleteEvent={handleDeleteEvent}
+                      page="dependency-risks"
+                      directDependencyFixedVersion={
+                        vuln.directDependencyFixedVersion
+                      }
+                    />
+                    {vuln && <Quickfix vuln={vuln} />}
+                    {(isMember(role) || vuln.ticketUrl) && (
+                      <div data-tour="vuln-management">
+                        <VulnAssessmentComposer
+                          state={vuln.state ?? "open"}
+                          isHandledByVexRule={isLastEventVexRule}
+                          ticketUrl={vuln.ticketUrl}
+                          onCreateVexRule={() => {
+                            setVexRulePrefill(undefined);
+                            setAddVexRuleDialogOpen(true);
+                          }}
+                          onSubmit={handleSubmit}
+                          secondaryActions={
+                            vuln.ticketId === null ? (
+                              integrationName === undefined ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span>
+                                      <Button variant={"ghost"} disabled>
+                                        <span className="ml-1 text-muted-foreground">
+                                          Create Ticket
+                                        </span>
+                                      </Button>
+                                    </span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    No repository is linked. To create a ticket,
+                                    please integrate your issue tracker in the{" "}
+                                    <Link
+                                      href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                      className="underline"
+                                    >
+                                      settings
+                                    </Link>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                <Button
+                                  variant={"secondary"}
+                                  onClick={() => setMitigateDialogOpen(true)}
+                                >
+                                  {integrationName === "gitlab" && (
+                                    <GitProviderIcon
+                                      externalEntityProviderIdOrRepositoryId={
+                                        asset.externalEntityProviderId ??
+                                        "gitlab"
+                                      }
+                                    />
+                                  )}
+                                  {integrationName === "github" && (
+                                    <Image
+                                      alt="GitHub Logo"
+                                      width={15}
+                                      height={15}
+                                      className="dark:invert"
+                                      src={"/assets/github.svg"}
+                                    />
+                                  )}
+                                  {integrationName === "jira" && (
+                                    <Image
+                                      alt="Jira Logo"
+                                      width={15}
+                                      height={15}
+                                      src={"/assets/jira-svgrepo-com.svg"}
+                                    />
+                                  )}
+                                  <span className="ml-1">Create Ticket</span>
+                                </Button>
+                              )
+                            ) : null
+                          }
+                        />
+                      </div>
+                    )}
                   </div>
-                </>
-              )}
+                ) : (
+                  <>
+                    <RiskAssessmentFeedSkeleton />
+                    <div>
+                      <EditorSkeleton />
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             {vuln ? (
               <div className="border-l">
@@ -665,8 +701,7 @@ const Index: FunctionComponent = () => {
       <AddVexRuleDialog
         open={addVexRuleDialogOpen}
         onOpenChange={setAddVexRuleDialogOpen}
-        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules`}
-        assetVersionId={assetVersion?.id ?? ""}
+        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
         onCreated={() => mutate()}
         initialTitle={vexRulePrefill?.title}
         initialCelExpression={vexRulePrefill?.celExpression}

@@ -3,7 +3,6 @@
 import type { FunctionComponent } from "react";
 import {
   Label,
-  LabelList,
   PolarAngleAxis,
   PolarRadiusAxis,
   RadialBar,
@@ -111,17 +110,9 @@ const RiskSeverityRadialChart: FunctionComponent<
           dataKey="score"
           background={{ stroke: "none" }}
           cornerRadius={3}
-          fillOpacity={0.5}
+          fillOpacity={1}
           strokeWidth={0}
-        >
-          <LabelList
-            position="insideStart"
-            dataKey="label"
-            className="font-semibold"
-            stroke="none"
-            fontSize={13}
-          />
-        </RadialBar>
+        />
         <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
           <Label
             content={({ viewBox }) => {

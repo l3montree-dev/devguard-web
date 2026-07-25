@@ -14,10 +14,12 @@ import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
+import { javascript } from "@codemirror/legacy-modes/mode/javascript";
 import { keymap, placeholder as placeholderExtension } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import valid from "purl/valid";
 import normalize from "purl/normalize";
+import { cn } from "@/lib/utils";
 import { celParseLinter, celCompletionSource } from "./celLinter";
 
 const vscodeDark = vscodeDarkInit({
@@ -212,6 +214,12 @@ interface Props {
   onSave?: () => void;
   readOnly?: boolean;
   placeholder?: string;
+  /** Wrap long lines instead of scrolling horizontally. */
+  lineWrapping?: boolean;
+  /** Extra classes for the wrapper (merged; can override the default border). */
+  className?: string;
+  /** Blend into the container: transparent editor/gutter background, no gutter border. */
+  transparent?: boolean;
 }
 
 function buildPlaceholderNode(text: string): HTMLElement {
@@ -229,7 +237,12 @@ const languageExtensions = {
   toml: StreamLanguage.define(toml),
   dependencyProxyRule: [],
   purl: [],
-  cel: [autocompletion({ override: [celCompletionSource] })],
+  // CEL has no dedicated grammar; JavaScript is close enough to colour strings,
+  // numbers, booleans, operators, property access and function calls.
+  cel: [
+    StreamLanguage.define(javascript),
+    autocompletion({ override: [celCompletionSource] }),
+  ],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
@@ -249,6 +262,9 @@ const CodeEditor = ({
   onSave,
   readOnly = false,
   placeholder,
+  lineWrapping = false,
+  className,
+  transparent = false,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -289,6 +305,7 @@ const CodeEditor = ({
         doc: valueRef.current,
         extensions: [
           basicSetup,
+          lineWrapping ? EditorView.lineWrapping : [],
           currentTheme,
           languageExtensions[language],
           linter((view) => {
@@ -308,12 +325,26 @@ const CodeEditor = ({
             }
           }),
           EditorView.theme({
-            "&": { height: "100%", fontSize: "13px" },
+            "&": {
+              height: "100%",
+              fontSize: "13px",
+              ...(transparent ? { backgroundColor: "transparent" } : {}),
+            },
             ".cm-scroller": { overflow: "auto", fontFamily: "monospace" },
             ".cm-placeholder": {
               color: "hsl(var(--muted-foreground))",
               fontStyle: "italic",
             },
+            ...(transparent
+              ? {
+                  ".cm-gutters": {
+                    backgroundColor: "transparent",
+                    border: "none",
+                  },
+                  ".cm-activeLine": { backgroundColor: "transparent" },
+                  ".cm-activeLineGutter": { backgroundColor: "transparent" },
+                }
+              : {}),
           }),
           placeholder
             ? placeholderExtension(buildPlaceholderNode(placeholder))
@@ -331,7 +362,14 @@ const CodeEditor = ({
       view.destroy();
       viewRef.current = null;
     };
-  }, [currentTheme, language, readOnly, placeholder]);
+  }, [
+    currentTheme,
+    language,
+    readOnly,
+    placeholder,
+    lineWrapping,
+    transparent,
+  ]);
 
   // Sync external value changes without recreating the editor
   useEffect(() => {
@@ -348,7 +386,10 @@ const CodeEditor = ({
   return (
     <div
       ref={containerRef}
-      className="h-full w-full overflow-hidden rounded-lg border"
+      className={cn(
+        "h-full w-full overflow-hidden rounded-lg border",
+        className,
+      )}
     />
   );
 };

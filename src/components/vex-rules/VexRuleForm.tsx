@@ -3,7 +3,7 @@
 
 "use client";
 
-import CodeEditor from "@/components/common/CodeEditor";
+import CelCodeBlock from "@/components/common/CelCodeBlock";
 import { checkCelSyntax } from "@/components/common/celLinter";
 import { browserApiClient } from "@/services/devGuardApi";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
@@ -120,7 +120,7 @@ const PathChip: FunctionComponent<{
   return (
     <span
       className={classNames(
-        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5",
+        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-sm",
         dismissed
           ? "border-dashed border-muted-foreground/30 text-muted-foreground/70 line-through"
           : vulnerable
@@ -268,7 +268,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <div className="mb-2">
+        <div className="mb-6">
           <label className="mb-2 block text-sm font-semibold">Title</label>
           <Input
             value={title}
@@ -278,14 +278,12 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
         <label className="mb-2 block text-sm font-semibold">
           CEL expression
         </label>
-        <div className="h-24">
-          <CodeEditor
-            value={celExpression}
-            language="cel"
-            onChange={onCelExpressionChange}
-            placeholder={`// examples:\n// vuln.cveId == "CVE-2021-1234"\n// vuln.componentPurl.startsWith("pkg:npm/lodash")\n// vuln.cve.cvss < 4.0\n// matchesPattern(vuln, ["*", "pkg:npm/lodash@4.17.21"])`}
-          />
-        </div>
+        <CelCodeBlock
+          value={celExpression}
+          onChange={onCelExpressionChange}
+          height={110}
+          placeholder={`// examples:\n// vuln.cveId == "CVE-2021-1234"\n// vuln.componentPurl.startsWith("pkg:npm/lodash")\n// vuln.cve.cvss < 4.0\n// matchesPattern(vuln, ["*", "pkg:npm/lodash@4.17.21"])`}
+        />
         {syntaxError || testingError ? (
           <p className="mt-1 text-xs text-destructive">
             {syntaxError?.message ?? testingError ?? "Unknown error"}
@@ -310,80 +308,83 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
       </div>
 
       {currentVuln && (
-        <div className="rounded-lg border bg-muted/30 p-3">
-          <div className="mb-2 flex flex-row items-center justify-between gap-2">
-            <span className="text-xs font-semibold">
-              Effect on the current vulnerability
-            </span>
-            {vulnEffect.verdict === true ? (
-              <Badge variant="secondary" className="gap-1 text-success">
-                <CircleCheck className="h-3.5 w-3.5" />
-                Applies to this vuln
-              </Badge>
+        <div className="mt-2">
+          <span className="text-sm font-semibold">
+            Effect on the current vulnerability
+          </span>
+          <div className="rounded-lg border bg-muted/30 p-3 mt-2">
+            <div className="mb-2 flex flex-row items-center justify-between gap-2">
+              {vulnEffect.verdict === true ? (
+                <Badge variant="success" className="gap-1 text-success">
+                  <CircleCheck className="h-3.5 w-3.5" />
+                  Applies to this vuln
+                </Badge>
+              ) : vulnEffect.verdict === false ? (
+                <Badge variant="yellow" className="gap-1 text-muted-foreground">
+                  <CircleX className="h-3.5 w-3.5" />
+                  Does not apply
+                </Badge>
+              ) : (
+                <Badge
+                  variant="secondary"
+                  className="gap-1 text-muted-foreground"
+                >
+                  <CircleHelp className="h-3.5 w-3.5" />
+                  See match count
+                </Badge>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+              <PathChip label={currentVuln.rootName} isRoot />
+              {currentVuln.vulnerabilityPath.map((purl, i) => (
+                <Fragment key={purl + i}>
+                  <PathConnector
+                    cut={i === cutIndex}
+                    dimmed={cutIndex >= 0 && i > cutIndex}
+                    title={
+                      i === cutIndex
+                        ? `${cutParent} does not call the vulnerable function of ${cutChild}`
+                        : undefined
+                    }
+                  />
+                  <PathChip
+                    label={purl}
+                    vulnerable={i === currentVuln.vulnerabilityPath.length - 1}
+                    dismissed={cutIndex >= 0 && i >= cutIndex}
+                  />
+                </Fragment>
+              ))}
+            </div>
+            {cutIndex >= 0 ? (
+              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Scissors className="mt-0.5 h-3 w-3 shrink-0 text-destructive" />
+                <span>
+                  <span className="font-medium text-foreground">
+                    {cutParent}
+                  </span>{" "}
+                  does not call the vulnerable function of{" "}
+                  <span className="font-medium text-foreground">
+                    {cutChild}
+                  </span>
+                  .
+                </span>
+              </p>
             ) : vulnEffect.verdict === false ? (
-              <Badge
-                variant="secondary"
-                className="gap-1 text-muted-foreground"
-              >
-                <CircleX className="h-3.5 w-3.5" />
-                Does not apply
-              </Badge>
-            ) : (
-              <Badge
-                variant="secondary"
-                className="gap-1 text-muted-foreground"
-              >
-                <CircleHelp className="h-3.5 w-3.5" />
-                See match count
-              </Badge>
-            )}
+              <p className="mt-2 text-xs text-muted-foreground">
+                This rule leaves the path intact — it doesn&apos;t apply to this
+                vulnerability.
+              </p>
+            ) : vulnEffect.verdict === null ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                This expression can&apos;t be previewed for a single
+                vulnerability — rely on the ref-wide match count above.
+              </p>
+            ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 text-xs">
-            <PathChip label={currentVuln.rootName} isRoot />
-            {currentVuln.vulnerabilityPath.map((purl, i) => (
-              <Fragment key={purl + i}>
-                <PathConnector
-                  cut={i === cutIndex}
-                  dimmed={cutIndex >= 0 && i > cutIndex}
-                  title={
-                    i === cutIndex
-                      ? `${cutParent} does not call the vulnerable function of ${cutChild}`
-                      : undefined
-                  }
-                />
-                <PathChip
-                  label={purl}
-                  vulnerable={i === currentVuln.vulnerabilityPath.length - 1}
-                  dismissed={cutIndex >= 0 && i >= cutIndex}
-                />
-              </Fragment>
-            ))}
-          </div>
-          {cutIndex >= 0 ? (
-            <p className="mt-2 flex items-start gap-1.5 text-xs text-muted-foreground">
-              <Scissors className="mt-0.5 h-3 w-3 shrink-0 text-destructive" />
-              <span>
-                <span className="font-medium text-foreground">{cutParent}</span>{" "}
-                does not call the vulnerable function of{" "}
-                <span className="font-medium text-foreground">{cutChild}</span>
-                {" — "}this vulnerability is dismissed.
-              </span>
-            </p>
-          ) : vulnEffect.verdict === false ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              This rule leaves the path intact — it doesn&apos;t apply to this
-              vulnerability.
-            </p>
-          ) : vulnEffect.verdict === null ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              This expression can&apos;t be previewed for a single vulnerability
-              — rely on the ref-wide match count above.
-            </p>
-          ) : null}
         </div>
       )}
 
-      <div>
+      <div className="mt-4">
         <label className="mb-2 block text-sm font-semibold">
           Justification
         </label>

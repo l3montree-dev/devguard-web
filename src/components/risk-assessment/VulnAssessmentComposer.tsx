@@ -18,7 +18,7 @@ import type { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { ChevronDown, Lightbulb } from "lucide-react";
+import { ChevronDown, Lightbulb, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { FunctionComponent, ReactNode } from "react";
@@ -266,12 +266,17 @@ const VulnAssessmentComposer: FunctionComponent<
                   </p>
                 </div>
               ) : isHandledByVexRule ? (
-                <div className="flex flex-row flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">
-                    This vuln was handled by a VEX rule. Remove or adjust the
-                    VEX rule to reopen it.
+                <div className="flex flex-row flex-wrap items-center justify-end gap-3">
+                  <p className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+                    <span>
+                      A VEX rule is handling this vulnerability, so it&apos;s
+                      locked. To reopen it, delete the VEX rule - you can still
+                      add comments below.
+                    </span>
                   </p>
                   <AsyncButton
+                    variant={isHandledByVexRule && "secondary"}
                     data-testid="add-comment"
                     onClick={() =>
                       attemptSubmit({ status: "comment", justification })
