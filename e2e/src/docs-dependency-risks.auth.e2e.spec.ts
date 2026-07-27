@@ -20,6 +20,6 @@ test.describe("Doku: Dependency Risk Tabelle aufrufen", () => {
         });
         await devguardPOM.setupSbomUpload();
         await page.waitForTimeout(5_000);
-        await docShot(page, testInfo, "01-dependency-risk-anzeigen");
+        await docShot(page, testInfo, "01-dependency-risk-table");
     });
 });

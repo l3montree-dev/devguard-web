@@ -130,7 +130,7 @@ export class DevGuardPOM {
       await closeToast.waitFor({ state: "visible", timeout: 5_000 });
       await closeToast.click();
     } catch {
-      // kein Toast innerhalb von 5s – nichts zu schliessen
+      // kein Toast da
     }
 
     await this.org().createOrganization(orgName);
