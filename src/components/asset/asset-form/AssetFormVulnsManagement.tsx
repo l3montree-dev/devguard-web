@@ -671,6 +671,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               Button={
                 <FormControl>
                   <Switch
+                    data-testid="paranoid-mode"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

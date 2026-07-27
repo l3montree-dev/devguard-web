@@ -30,5 +30,8 @@ test.describe("DevGuard customize risk scores", () => {
     await page.getByRole('combobox').click();
     await page.waitForTimeout(2_000);
     await docShot(page, testInfo, "auto-reopen-settings");
+    await page.getByTestId("paranoid-mode").click();
+    await page.waitForTimeout(2_000);
+    await docShot(page, testInfo, "paranoid-mode-settings");
   });
 });

@@ -37,6 +37,19 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().markVulnAsAcceptedRisk();
   });
 
+  test ("test sbom upload to overview", async ({ page }, testInfo) => {
+    await devguardPOM.setupSbomUpload();
+    await page.locator('#radix-_R_36itpet9esnekneabmlklb_').click();
+    await page
+      .getByRole('menuitem', { name: 'Overview' })
+      .click({ timeout: 20_000 });
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "asset-overview");
+    await page.mouse.wheel(0, 1000);
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "asset-overview-v2") ;
+  });
+
   test.skip("test auto setup to gitlab repo", async () => {
     await devguardPOM.org().redirectToNewOrg(DevGuardNavigationLevel.Organization);
     await devguardPOM.org().createOrganization("TestOrganizationGitLab");

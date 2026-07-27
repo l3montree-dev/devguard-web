@@ -133,7 +133,7 @@ export class DevGuardPOM {
     const closeToast = this.page.getByRole('button', { name: 'Close toast' }).first();
     try {
       await closeToast.waitFor({ state: "visible", timeout: 5_000 });
-      await closeToast.click();
+      await closeToast.click({ timeout: 2_000 });
     } catch {
       // no Toast visible
     }
