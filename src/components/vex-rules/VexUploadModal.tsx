@@ -73,9 +73,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   const [newVexUrl, setNewVexUrl] = useState("");
   const [newCsafUrl, setNewCsafUrl] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const [activeTab, setActiveTab] = useState<"cyclonedxvex" | "csaf">(
-    "cyclonedxvex",
-  );
+  const [activeTab, setActiveTab] = useState<"cyclonedx" | "csaf">("cyclonedx");
 
   // Use a proxy API like RiskScannerDialog does
   const setProxyApi = useCallback((emblaApi: CarouselApi) => {
@@ -91,9 +89,8 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   } = useSWR<ExternalReference[]>(open ? apiUrl : null, fetcher);
 
   const vexSources =
-    allRefs?.filter(
-      (ref) => ref.type === "cyclonedxvex" || ref.type === "csaf",
-    ) || [];
+    allRefs?.filter((ref) => ref.type === "cyclonedx" || ref.type === "csaf") ||
+    [];
 
   const vexDropzone = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -144,7 +141,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           url: newVexUrl.trim(),
-          type: "cyclonedxvex",
+          type: "cyclonedx",
         }),
       });
 
@@ -432,16 +429,16 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                         <Tabs
                           value={activeTab}
                           onValueChange={(v) => {
-                            setActiveTab(v as "cyclonedxvex" | "csaf");
+                            setActiveTab(v as "cyclonedx" | "csaf");
                           }}
                         >
                           <TabsList>
-                            <TabsTrigger value="cyclonedxvex">
+                            <TabsTrigger value="cyclonedx">
                               CycloneDX VEX
                             </TabsTrigger>
                             <TabsTrigger value="csaf">CSAF</TabsTrigger>
                           </TabsList>
-                          <TabsContent value="cyclonedxvex" className="mt-3">
+                          <TabsContent value="cyclonedx" className="mt-3">
                             <Card>
                               <CardContent className="pt-6">
                                 <div className="space-y-3">
