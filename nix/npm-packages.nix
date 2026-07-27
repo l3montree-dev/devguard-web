@@ -10,11 +10,7 @@
         ../package-lock.json
       ];
     };
-<<<<<<< HEAD
-    hash = "sha256-Tvas9cPhFjjEyqUtn2VlQ8JJmU61isGH9qNUJov9FXU=";
-=======
-    hash = "sha256-4glkJcVtsbuwS5WlYlrY14itSOCLgWWYImZrgvY8e+A=";
->>>>>>> feature/integrate-euvd
+    hash = "sha256-OJcOc1YwIetPafX3RY3NXNvdktddaH+KroDhyvbRC2I=";
   };
 
   node_modules = pkgs.runCommand "node-modules" {
