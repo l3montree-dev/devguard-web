@@ -457,7 +457,7 @@ const Index: FunctionComponent = () => {
       >
         <div className="flex flex-1 flex-col gap-2">
           <Tabs
-            defaultValue={
+            value={
               params?.has("state") ? (params.get("state") as string) : "open"
             }
           >
