@@ -11,6 +11,7 @@ import { VulnFlow } from "./flows/vuln";
 import { ArtifactFlow } from "./flows/artifact";
 import { ShareFlow } from "./flows/sharing";
 import { ModalHelper } from "./flows/modal-helper";
+import { AdvisoryHelper } from "./flows/advisory";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -61,6 +62,10 @@ export class DevGuardPOM {
 
   modal(): ModalHelper {
     return new ModalHelper(this.page);
+  }
+
+  advisory(): AdvisoryHelper {
+    return new AdvisoryHelper(this.page);
   }
 
   async loadDevGuard() {
