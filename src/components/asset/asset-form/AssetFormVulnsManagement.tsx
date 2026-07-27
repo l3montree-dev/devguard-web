@@ -404,6 +404,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
             Button={
               <FormControl>
                 <Switch
+                  data-testid="reporting-range"
                   checked={field.value}
                   onCheckedChange={(v) => {
                     form.setValue("enableTicketRange", v, {

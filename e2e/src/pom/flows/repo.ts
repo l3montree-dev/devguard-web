@@ -42,10 +42,7 @@ export class RepoFlow {
   }
 
   async settingClickthroughRepo() {
-    await this.page.getByTestId("repository-settings").click();
-    await this.page
-      .getByTestId("configure-security-requirements-button")
-      .click();
+    await this.openSecurityRequirements();
     await this.page.getByTestId("confidentiality-requirement-low").click();
     await this.page.getByTestId("integrity-requirement-high").click();
     await this.page.getByTestId("availability-requirement-low").click();
@@ -54,6 +51,13 @@ export class RepoFlow {
     await this.page.getByTestId("vuln-auto-reopen-switch").click();
     await this.page
       .getByTestId("save-vulnerability-management-settings-button")
+      .click();
+  }
+
+  async openSecurityRequirements() {
+    await this.page.getByTestId("repository-settings").click();
+    await this.page
+      .getByTestId("configure-security-requirements-button")
       .click();
   }
 }

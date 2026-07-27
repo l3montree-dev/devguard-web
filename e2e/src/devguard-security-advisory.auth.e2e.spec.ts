@@ -24,7 +24,7 @@ const SAPackage = "devguard"
 const SASemverStart = "1.2.2"
 const SASemverEnd = "1.2.2"
 
-test.describe("DevGuard handle vuln flows", () => {
+test.describe("DevGuard create security Advisory flows", () => {
   let devguardPOM: DevGuardPOM;
 
   test.beforeEach(async ({ page }) => {
