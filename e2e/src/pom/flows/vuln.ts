@@ -5,10 +5,6 @@ export class VulnFlow {
   constructor(private page: Page) {}
 
   async openFirstAffectedComponent() {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 20_000 });
     const packageRows = this.page.getByTestId("package-row");
     await expect(packageRows.first()).toBeVisible({ timeout: 180_000 });
     await packageRows.first().click();
