@@ -45,6 +45,7 @@ const PathEdge: FunctionComponent<PathEdgeProps> = ({
       <TooltipTrigger asChild>
         <button
           type="button"
+          data-testid="path-edge"
           onClick={onClick}
           className={cn(
             baseClass,

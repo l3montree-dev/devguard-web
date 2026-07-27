@@ -182,7 +182,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
               Cancel
             </Button>
             <AsyncButton
-              data-testid="mark-accepted-risk"
+              data-testid="vex-rule-mark-accepted-risk"
               onClick={() => handleSubmit("accepted")}
               disabled={!canSubmit}
               variant="secondary"
@@ -191,7 +191,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
             </AsyncButton>
             <div className="flex flex-row items-center">
               <AsyncButton
-                data-testid="mark-false-positive"
+                data-testid="vex-rule-mark-false-positive"
                 variant="default"
                 className="mr-0 rounded-r-none pr-0 capitalize"
                 onClick={() => handleSubmit("falsePositive")}
