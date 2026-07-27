@@ -11,7 +11,7 @@ import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
 
 import { fetcher } from "@/data-fetcher/fetcher";
-import { CaretDownIcon } from "@radix-ui/react-icons";
+import { ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -67,7 +67,7 @@ const AffectedComponentDetails: FunctionComponent<{
         <div className="flex flex-col gap-4">
           <Collapsible>
             <div className="rounded-lg border bg-card p-3">
-              <CollapsibleTrigger className="flex cursor-pointer w-full flex-row items-center justify-between text-sm font-semibold">
+              <CollapsibleTrigger className="group flex cursor-pointer w-full flex-row items-center justify-between text-sm font-semibold">
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}
@@ -76,7 +76,7 @@ const AffectedComponentDetails: FunctionComponent<{
                     </span>
                   </span>
                 </p>
-                <CaretDownIcon />
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
               <div className="mt-4 text-sm">
                 {" "}

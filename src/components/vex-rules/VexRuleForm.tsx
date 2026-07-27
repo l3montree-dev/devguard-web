@@ -7,18 +7,22 @@ import CelCodeBlock from "@/components/common/CelCodeBlock";
 import { checkCelSyntax } from "@/components/common/celLinter";
 import { browserApiClient } from "@/services/devGuardApi";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import {
-  ChevronRight,
-  CircleCheck,
-  CircleHelp,
-  CircleX,
-  Scissors,
-} from "lucide-react";
+import { ChevronDown, ChevronRight, Scissors } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { FunctionComponent } from "react";
-import { Badge } from "../ui/badge";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
 import { Input } from "../ui/input";
+import {
+  analyzeVexRuleEffect,
+  resolveCut,
+  type VexRuleEffect,
+  type VexRuleVulnContext,
+} from "./vexRuleParser";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -26,87 +30,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
-
-export interface VexRuleVulnContext {
-  cveID: string | null;
-  componentPurl: string;
-  // Ordered purls from the direct dependency down to the vulnerable component.
-  vulnerabilityPath: string[];
-  // Application / asset name rendered as the first (root) node.
-  rootName: string;
-}
-
-// Extracts the array from a `matchesPattern(vuln, [...])` call, if present.
-function extractPathPattern(cel: string): string[] | null {
-  const match = cel.match(
-    /matchesPattern\s*\(\s*vuln\s*,\s*(\[[\s\S]*?\])\s*\)/,
-  );
-  if (!match) return null;
-  try {
-    const parsed = JSON.parse(match[1].replace(/'/g, '"'));
-    return Array.isArray(parsed) ? parsed.map(String) : null;
-  } catch {
-    return null;
-  }
-}
-
-// The concrete (non-"*") pattern segments must appear as a contiguous suffix of the path.
-function matchPatternSuffix(
-  path: string[],
-  pattern: string[],
-): { matches: boolean; fromIndex: number } {
-  const concrete = pattern.filter((segment) => segment !== "*");
-  if (concrete.length === 0) return { matches: true, fromIndex: 0 };
-  if (concrete.length > path.length) return { matches: false, fromIndex: -1 };
-  const fromIndex = path.length - concrete.length;
-  const matches = concrete.every(
-    (segment, i) => segment === path[fromIndex + i],
-  );
-  return { matches, fromIndex: matches ? fromIndex : -1 };
-}
-
-// Best-effort, client-side evaluation of whether a rule applies to one specific vuln.
-// The backend /test endpoint only returns a ref-wide count, so this covers the common,
-// statically decidable shapes this flow produces (path patterns, cveId / componentPurl
-// checks). Combined expressions (&&, ||) return `null` — "can't tell locally".
-export function evaluateAgainstVuln(
-  cel: string,
-  vuln: VexRuleVulnContext,
-): { verdict: boolean | null; coveredFromIndex: number } {
-  const expr = cel.trim();
-  const unknown = { verdict: null, coveredFromIndex: -1 };
-  if (!expr || /&&|\|\|/.test(expr)) return unknown;
-
-  const pattern = extractPathPattern(expr);
-  if (pattern) {
-    const { matches, fromIndex } = matchPatternSuffix(
-      vuln.vulnerabilityPath,
-      pattern,
-    );
-    return { verdict: matches, coveredFromIndex: fromIndex };
-  }
-
-  const cve = expr.match(/vuln\.cveId\s*==\s*["']([^"']+)["']/);
-  if (cve) return { verdict: cve[1] === vuln.cveID, coveredFromIndex: -1 };
-
-  const purlEquals = expr.match(/vuln\.componentPurl\s*==\s*["']([^"']+)["']/);
-  if (purlEquals)
-    return {
-      verdict: purlEquals[1] === vuln.componentPurl,
-      coveredFromIndex: -1,
-    };
-
-  const purlStartsWith = expr.match(
-    /vuln\.componentPurl\.startsWith\(\s*["']([^"']+)["']\s*\)/,
-  );
-  if (purlStartsWith)
-    return {
-      verdict: vuln.componentPurl.startsWith(purlStartsWith[1]),
-      coveredFromIndex: -1,
-    };
-
-  return unknown;
-}
 
 const PathChip: FunctionComponent<{
   label: string;
@@ -173,6 +96,10 @@ interface VexRuleFormProps {
   onJustificationChange: (justification: string) => void;
   // When present, the form previews the rule's effect on this specific vulnerability.
   currentVuln?: VexRuleVulnContext;
+  // "full": title input + editable CEL expression (the expert flow).
+  // "reduced": focuses the effect on the current vulnerability; the generated CEL
+  // expression is collapsed and read-only (still copyable), the title is inherited.
+  variant?: "full" | "reduced";
 }
 
 const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
@@ -184,7 +111,9 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
   justification,
   onJustificationChange,
   currentVuln,
+  variant = "full",
 }) => {
+  const isReduced = variant === "reduced";
   const [isTesting, setIsTesting] = useState(false);
   const [matchResult, setMatchResult] = useState<{
     expr: string;
@@ -204,28 +133,24 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
       ? matchResult.count
       : null;
 
-  const vulnEffect = useMemo(
+  // What to render for this rule/vuln combination — the parser decides the kind
+  // of effect and where (if anywhere) the rule severs the dependency path.
+  const effect: VexRuleEffect = useMemo(
     () =>
       currentVuln && !hasSyntaxError
-        ? evaluateAgainstVuln(celExpression, currentVuln)
-        : { verdict: null as boolean | null, coveredFromIndex: -1 },
+        ? analyzeVexRuleEffect(celExpression, currentVuln)
+        : { type: "indeterminate", applies: null, cutIndex: -1 },
     [celExpression, currentVuln, hasSyntaxError],
   );
 
-  // Where the rule severs the path. The cut sits on the edge entering the
-  // matched suffix; everything from there down is unreachable (dismissed).
-  const path = currentVuln?.vulnerabilityPath ?? [];
-  const cutIndex =
-    vulnEffect.verdict === true && path.length > 0
-      ? vulnEffect.coveredFromIndex >= 0
-        ? vulnEffect.coveredFromIndex
-        : path.length - 1
-      : -1;
-  const cutParent =
-    cutIndex > 0
-      ? beautifyPurl(path[cutIndex - 1])
-      : (currentVuln?.rootName ?? "");
-  const cutChild = cutIndex >= 0 ? beautifyPurl(path[cutIndex]) : "";
+  // Everything from the cut node down is unreachable (rendered dismissed).
+  const cutIndex = effect.cutIndex;
+  const cut = currentVuln ? resolveCut(currentVuln, cutIndex) : null;
+  const attributeLabel = effect.matchedOn
+    ? effect.matchedOn.field === "cveId"
+      ? effect.matchedOn.value
+      : beautifyPurl(effect.matchedOn.value)
+    : "";
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -265,124 +190,145 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
     };
   }, [celExpression, hasSyntaxError, baseUrl]);
 
+  // Shared status lines below the CEL expression — kept visible in both variants.
+  const celStatus = (
+    <>
+      {syntaxError || testingError ? (
+        <p className="mt-1 text-xs text-destructive">
+          {syntaxError?.message ?? testingError ?? "Unknown error"}
+        </p>
+      ) : null}
+      {!hasSyntaxError && isTesting && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          Checking how many vulnerabilities this would affect...
+        </p>
+      )}
+      {!hasSyntaxError && !isTesting && matchCount !== null && (
+        <p
+          className={
+            "mt-1 text-xs " +
+            (matchCount > 0 ? "text-success" : "text-muted-foreground")
+          }
+        >
+          Matches {matchCount} vulnerabilit
+          {matchCount === 1 ? "y" : "ies"} in this ref
+        </p>
+      )}
+    </>
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <div className="mb-6">
-          <label className="mb-2 block text-sm font-semibold">Title</label>
-          <Input
-            value={title}
-            onChange={(e) => onTitleChange(e.target.value)}
-          />
-        </div>
-        <label className="mb-2 block text-sm font-semibold">
-          CEL expression
-        </label>
-        <CelCodeBlock
-          value={celExpression}
-          onChange={onCelExpressionChange}
-          height={110}
-          placeholder={`// examples:\n// vuln.cveId == "CVE-2021-1234"\n// vuln.componentPurl.startsWith("pkg:npm/lodash")\n// vuln.cve.cvss < 4.0\n// matchesPattern(vuln, ["*", "pkg:npm/lodash@4.17.21"])`}
-        />
-        {syntaxError || testingError ? (
-          <p className="mt-1 text-xs text-destructive">
-            {syntaxError?.message ?? testingError ?? "Unknown error"}
-          </p>
-        ) : null}
-        {!hasSyntaxError && isTesting && (
-          <p className="mt-1 text-xs text-muted-foreground">
-            Checking how many vulnerabilities this would affect...
-          </p>
+        {!isReduced && (
+          <div className="mb-6">
+            <label className="mb-2 block text-sm font-semibold">Title</label>
+            <Input
+              value={title}
+              onChange={(e) => onTitleChange(e.target.value)}
+            />
+          </div>
         )}
-        {!hasSyntaxError && !isTesting && matchCount !== null && (
-          <p
-            className={
-              "mt-1 text-xs " +
-              (matchCount > 0 ? "text-success" : "text-muted-foreground")
-            }
-          >
-            Matches {matchCount} vulnerabilit
-            {matchCount === 1 ? "y" : "ies"} in this ref
-          </p>
-        )}
-      </div>
 
-      {currentVuln && (
-        <div className="mt-2">
-          <span className="text-sm font-semibold">
-            Effect on the current vulnerability
-          </span>
-          <div className="rounded-lg border bg-muted/30 p-3 mt-2">
-            <div className="mb-2 flex flex-row items-center justify-between gap-2">
-              {vulnEffect.verdict === true ? (
-                <Badge variant="success" className="gap-1 text-success">
-                  <CircleCheck className="h-3.5 w-3.5" />
-                  Applies to this vuln
-                </Badge>
-              ) : vulnEffect.verdict === false ? (
-                <Badge variant="yellow" className="gap-1 text-muted-foreground">
-                  <CircleX className="h-3.5 w-3.5" />
-                  Does not apply
-                </Badge>
+        {currentVuln && (
+          <div className={isReduced ? "" : "mt-2"}>
+            <span className="text-sm font-semibold">
+              Effect on the current vulnerability
+            </span>
+            <div
+              className={classNames(
+                "rounded-lg border p-3 mt-2",
+                isReduced ? "border-border bg-card" : "bg-muted/30",
+              )}
+            >
+              <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                <PathChip label={currentVuln.rootName} isRoot />
+                {currentVuln.vulnerabilityPath.map((purl, i) => (
+                  <Fragment key={purl + i}>
+                    <PathConnector
+                      cut={i === cutIndex}
+                      dimmed={cutIndex >= 0 && i > cutIndex}
+                      title={
+                        i === cutIndex && cut
+                          ? `${cut.parent} does not call the vulnerable function of ${cut.child}`
+                          : undefined
+                      }
+                    />
+                    <PathChip
+                      label={purl}
+                      vulnerable={
+                        i === currentVuln.vulnerabilityPath.length - 1
+                      }
+                      dismissed={cutIndex >= 0 && i >= cutIndex}
+                    />
+                  </Fragment>
+                ))}
+              </div>
+              {effect.type === "pathCut" && cut ? (
+                <p className="mt-4 flex items-center gap-1.5 text-sm text-muted-foreground ml-0.5">
+                  <span>
+                    <span className="font-medium text-foreground">
+                      {cut.parent}
+                    </span>{" "}
+                    does not call the vulnerable function of{" "}
+                    <span className="font-medium text-foreground">
+                      {cut.child}
+                    </span>
+                    .
+                  </span>
+                </p>
+              ) : effect.type === "pathIntact" ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  This rule leaves the path intact — it doesn&apos;t apply to
+                  this vulnerability.
+                </p>
+              ) : effect.type === "attributeMatch" ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  This rule dismisses the vulnerability on every path, because
+                  it matches {attributeLabel}.
+                </p>
+              ) : effect.type === "attributeMiss" ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  This rule matches {attributeLabel} — not this vulnerability.
+                </p>
               ) : (
-                <Badge
-                  variant="secondary"
-                  className="gap-1 text-muted-foreground"
-                >
-                  <CircleHelp className="h-3.5 w-3.5" />
-                  See match count
-                </Badge>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  This expression can&apos;t be previewed for a single
+                  vulnerability — rely on the ref-wide match count below.
+                </p>
               )}
             </div>
-            <div className="flex flex-wrap items-center gap-1.5 text-xs">
-              <PathChip label={currentVuln.rootName} isRoot />
-              {currentVuln.vulnerabilityPath.map((purl, i) => (
-                <Fragment key={purl + i}>
-                  <PathConnector
-                    cut={i === cutIndex}
-                    dimmed={cutIndex >= 0 && i > cutIndex}
-                    title={
-                      i === cutIndex
-                        ? `${cutParent} does not call the vulnerable function of ${cutChild}`
-                        : undefined
-                    }
-                  />
-                  <PathChip
-                    label={purl}
-                    vulnerable={i === currentVuln.vulnerabilityPath.length - 1}
-                    dismissed={cutIndex >= 0 && i >= cutIndex}
-                  />
-                </Fragment>
-              ))}
-            </div>
-            {cutIndex >= 0 ? (
-              <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Scissors className="mt-0.5 h-3 w-3 shrink-0 text-destructive" />
-                <span>
-                  <span className="font-medium text-foreground">
-                    {cutParent}
-                  </span>{" "}
-                  does not call the vulnerable function of{" "}
-                  <span className="font-medium text-foreground">
-                    {cutChild}
-                  </span>
-                  .
-                </span>
-              </p>
-            ) : vulnEffect.verdict === false ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                This rule leaves the path intact — it doesn&apos;t apply to this
-                vulnerability.
-              </p>
-            ) : vulnEffect.verdict === null ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                This expression can&apos;t be previewed for a single
-                vulnerability — rely on the ref-wide match count above.
-              </p>
-            ) : null}
           </div>
-        </div>
-      )}
+        )}
+
+        {isReduced ? (
+          <div className="mt-6">
+            <Collapsible>
+              <CollapsibleTrigger className="group flex w-full cursor-pointer flex-row items-center justify-between text-sm font-semibold">
+                Matching rule (CEL expression)
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                <CelCodeBlock value={celExpression} readOnly />
+              </CollapsibleContent>
+            </Collapsible>
+            {celStatus}
+          </div>
+        ) : (
+          <div className="mt-6">
+            <label className="mb-2 block text-sm font-semibold">
+              CEL expression
+            </label>
+            <CelCodeBlock
+              value={celExpression}
+              onChange={onCelExpressionChange}
+              height={140}
+              placeholder={`// Examples:\n// vuln.cveId == "CVE-2021-1234"\n// vuln.componentPurl.startsWith("pkg:npm/lodash")\n// vuln.cve.cvss < 4.0\n// ROOT is a special token matching all artifacts in a repo\n// matchesPattern(vuln, ["*", "pkg:npm/foo@1.0.0", "pkg:npm/lodash@4.17.21"])`}
+            />
+            {celStatus}
+          </div>
+        )}
+      </div>
 
       <div className="mt-4">
         <label className="mb-2 block text-sm font-semibold">

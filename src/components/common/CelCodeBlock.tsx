@@ -73,7 +73,10 @@ const CelCodeBlock: FunctionComponent<CelCodeBlockProps> = ({
           )}
         </Button>
       </div>
-      <div style={height ? { height } : undefined} className="!bg-card">
+      <div
+        style={height ? { height } : undefined}
+        className={cn("!bg-card", readOnly && "pointer-events-none opacity-60")}
+      >
         <CodeEditor
           value={value}
           language="cel"

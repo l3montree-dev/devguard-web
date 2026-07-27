@@ -14,7 +14,7 @@ import {
 import type { AssetDTO, DetailedDependencyVulnDTO } from "@/types/api/api";
 import { RequirementsLevel } from "@/types/api/api";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
-import { CaretDownIcon } from "@radix-ui/react-icons";
+import { ChevronDown } from "lucide-react";
 import type { FunctionComponent, ReactNode } from "react";
 import Link from "next/link";
 import FormatDate from "./FormatDate";
@@ -236,9 +236,9 @@ const DetailedRiskAssessment: FunctionComponent<
   return (
     <div className="p-5">
       <Collapsible>
-        <CollapsibleTrigger className="flex w-full cursor-pointer flex-row items-center justify-between text-xs font-semibold">
+        <CollapsibleTrigger className="group flex w-full cursor-pointer flex-row items-center justify-between text-xs font-semibold">
           Show detailed risk assessment
-          <CaretDownIcon />
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </CollapsibleTrigger>
         <small className="text-muted-foreground">
           Last calculated at:{" "}

@@ -66,8 +66,11 @@ function tokenize(expression: string): Token[] {
       continue;
     }
 
+    // Line comment: skip to the end of the line, so a comment above or after an
+    // expression documents it without hiding the expression from the parser.
     if (char === "/" && expression[i + 1] === "/") {
-      break;
+      while (i < n && expression[i] !== "\n") i++;
+      continue;
     }
 
     if (char === '"' || char === "'") {

@@ -138,8 +138,6 @@ const PathToComponent: FunctionComponent<PathToComponentProps> = ({
   actionable = false,
   onCallClick,
 }) => {
-  console.log(path);
-  console.log(rootName);
   const nodes: Array<{ key: string; label: string; role: PathNodeRole }> = [
     { key: "root", label: rootName, role: "root" },
     ...path.map((purl, i) => ({

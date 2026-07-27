@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
+import { buildPathPatternRule } from "@/components/vex-rules/vexRuleParser";
 import VexRuleCard from "@/components/vex-rules/VexRuleCard";
 import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -63,6 +64,47 @@ import VexRuleDetailsDialog from "../../../../../../../../../../../components/ve
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
+
+// Renders nothing unless a ticket can actually be created — that needs a linked
+// issue tracker and a vulnerability that doesn't have a ticket yet.
+const CreateTicketButton: FunctionComponent<{
+  integrationName: "gitlab" | "github" | "jira" | undefined;
+  hasTicket: boolean;
+  externalEntityProviderId?: string;
+  onClick: () => void;
+}> = ({ integrationName, hasTicket, externalEntityProviderId, onClick }) => {
+  if (integrationName === undefined || hasTicket) return null;
+
+  return (
+    <Button variant="secondary" onClick={onClick}>
+      {integrationName === "gitlab" && (
+        <GitProviderIcon
+          externalEntityProviderIdOrRepositoryId={
+            externalEntityProviderId ?? "gitlab"
+          }
+        />
+      )}
+      {integrationName === "github" && (
+        <Image
+          alt="GitHub Logo"
+          width={15}
+          height={15}
+          className="dark:invert"
+          src={"/assets/github.svg"}
+        />
+      )}
+      {integrationName === "jira" && (
+        <Image
+          alt="Jira Logo"
+          width={15}
+          height={15}
+          src={"/assets/jira-svgrepo-com.svg"}
+        />
+      )}
+      <span className="ml-1">Create Ticket</span>
+    </Button>
+  );
+};
 
 const Index: FunctionComponent = () => {
   const { session } = useSession();
@@ -117,8 +159,6 @@ const Index: FunctionComponent = () => {
     mutate,
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
-
-  console.log(vuln);
 
   const isLastEventVexRule = useMemo(() => {
     if (!vuln || !vuln.events || vuln.events.length === 0) {
@@ -492,9 +532,11 @@ const Index: FunctionComponent = () => {
                               title: `${vuln.cveID ?? "Vulnerability"} not exploitable via ${beautifyPurl(
                                 suffix[0] ?? vuln.componentPurl,
                               )}`,
-                              celExpression: `matchesPattern(vuln, ${JSON.stringify(
-                                ["*", ...suffix],
-                              )})`,
+                              celExpression: buildPathPatternRule(
+                                vuln.vulnerabilityPath,
+                                edgeIndex,
+                                vuln.cveID,
+                              ),
                             });
                             setAddVexRuleDialogOpen(true);
                           }}
@@ -541,63 +583,14 @@ const Index: FunctionComponent = () => {
                           }}
                           onSubmit={handleSubmit}
                           secondaryActions={
-                            vuln.ticketId === null ? (
-                              integrationName === undefined ? (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <span>
-                                      <Button variant={"ghost"} disabled>
-                                        <span className="ml-1 text-muted-foreground">
-                                          Create Ticket
-                                        </span>
-                                      </Button>
-                                    </span>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    No repository is linked. To create a ticket,
-                                    please integrate your issue tracker in the{" "}
-                                    <Link
-                                      href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                      className="underline"
-                                    >
-                                      settings
-                                    </Link>
-                                  </TooltipContent>
-                                </Tooltip>
-                              ) : (
-                                <Button
-                                  variant={"secondary"}
-                                  onClick={() => setMitigateDialogOpen(true)}
-                                >
-                                  {integrationName === "gitlab" && (
-                                    <GitProviderIcon
-                                      externalEntityProviderIdOrRepositoryId={
-                                        asset.externalEntityProviderId ??
-                                        "gitlab"
-                                      }
-                                    />
-                                  )}
-                                  {integrationName === "github" && (
-                                    <Image
-                                      alt="GitHub Logo"
-                                      width={15}
-                                      height={15}
-                                      className="dark:invert"
-                                      src={"/assets/github.svg"}
-                                    />
-                                  )}
-                                  {integrationName === "jira" && (
-                                    <Image
-                                      alt="Jira Logo"
-                                      width={15}
-                                      height={15}
-                                      src={"/assets/jira-svgrepo-com.svg"}
-                                    />
-                                  )}
-                                  <span className="ml-1">Create Ticket</span>
-                                </Button>
-                              )
-                            ) : null
+                            <CreateTicketButton
+                              integrationName={integrationName}
+                              hasTicket={vuln.ticketId != null}
+                              externalEntityProviderId={
+                                asset.externalEntityProviderId
+                              }
+                              onClick={() => setMitigateDialogOpen(true)}
+                            />
                           }
                         />
                       </div>
@@ -705,6 +698,9 @@ const Index: FunctionComponent = () => {
         onCreated={() => mutate()}
         initialTitle={vexRulePrefill?.title}
         initialCelExpression={vexRulePrefill?.celExpression}
+        // Opened from a dependency path: the expression is generated, so show the
+        // reduced dialog focused on the effect instead of the CEL editor.
+        variant={vexRulePrefill ? "reduced" : "full"}
         currentVuln={
           vuln
             ? {

@@ -14,7 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import VexRuleForm, { type VexRuleVulnContext } from "./VexRuleForm";
+import VexRuleForm from "./VexRuleForm";
+import type { VexRuleVulnContext } from "./vexRuleParser";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "@/lib/toast";
 import {
@@ -37,6 +38,10 @@ interface AddVexRuleDialogProps {
   initialCelExpression?: string;
   // When set, the form previews the rule's effect on this specific vulnerability.
   currentVuln?: VexRuleVulnContext;
+  // "full": the expert flow with an editable CEL expression editor.
+  // "reduced": the guided flow (e.g. opened from a dependency path) — focuses the
+  // effect on the current vulnerability, the CEL expression is collapsed and read-only.
+  variant?: "full" | "reduced";
 }
 
 const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
@@ -47,7 +52,9 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   initialTitle,
   initialCelExpression,
   currentVuln,
+  variant = "full",
 }) => {
+  const isReduced = variant === "reduced";
   const [title, setTitle] = useState("");
   const [celExpression, setCelExpression] = useState("");
   const [justification, setJustification] = useState("");
@@ -119,10 +126,9 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Add VEX rule</DialogTitle>
           <DialogDescription>
-            Write a CEL (Common Expression Language) expression to automatically
-            match vulnerabilities. The variable vuln (with fields such as cveId,
-            componentPurl and vulnerabilityPath) and the helper
-            matchesPattern(vuln, pattern) are available.
+            {isReduced
+              ? "Check how this rule affects the current vulnerability, then add a justification. The matching rule was generated from the dependency path you selected."
+              : "Write a CEL (Common Expression Language) expression to automatically match vulnerabilities. The variable vuln (with fields such as cveId, componentPurl and vulnerabilityPath) and the helper matchesPattern(vuln, pattern) are available."}
           </DialogDescription>
         </DialogHeader>
         <form
@@ -138,6 +144,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
             justification={justification}
             onJustificationChange={setJustification}
             currentVuln={currentVuln}
+            variant={variant}
           />
           <DialogFooter>
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
