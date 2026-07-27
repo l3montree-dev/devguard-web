@@ -7,6 +7,7 @@ import EmptyParty from "@/components/common/EmptyParty";
 import Err from "@/components/common/Err";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -26,6 +27,7 @@ import {
   useVexRuleRecommendations,
 } from "@/components/vex-rules/useVexRuleRecommendations";
 import VexSourcesSection from "@/components/vex-rules/VexSourcesSection";
+import { useVexSources } from "@/components/vex-rules/useVexSources";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -34,7 +36,7 @@ import useDecodedParams from "@/hooks/useDecodedParams";
 import { ChevronDown } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { Paged, VexRule } from "@/types/api/api";
+import type { Paged, VexRule, VexRulePrefill } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
@@ -44,20 +46,10 @@ const VexRulesPage: FunctionComponent = () => {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [addRuleDialogOpen, setAddRuleDialogOpen] = useState(false);
-  // Seeds the create dialog when a rule is started from the playground or from a
-  // crowdsourced recommendation.
-  const [rulePrefill, setRulePrefill] = useState<
-    | {
-        celExpression: string;
-        justification?: string;
-        mechanicalJustification?: string;
-      }
-    | undefined
-  >(undefined);
+  const [rulePrefill, setRulePrefill] = useState<VexRulePrefill>();
 
   const searchParams = useSearchParams();
   const assetMenu = useAssetMenu();
-  const asset = useActiveAsset();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -82,7 +74,10 @@ const VexRulesPage: FunctionComponent = () => {
     const response = await browserApiClient(`/vex`, {
       method: "POST",
       body: await params.file.text(),
-      headers: { "X-Origin": "vex-upload" },
+      headers: {
+        "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
+        "X-Origin": "vex-upload",
+      },
     });
 
     if (!response.ok) {
@@ -100,19 +95,10 @@ const VexRulesPage: FunctionComponent = () => {
     setAddRuleDialogOpen(true);
   };
 
-  // Recommendations are derived per reference; this page is asset-wide, so it
-  // asks about the default branch.
-  const defaultRef =
-    asset?.refs.find((ref) => ref.defaultBranch)?.slug ?? asset?.refs[0]?.slug;
+  const { sources: vexSources } = useVexSources();
+
   const { recommendations } = useVexRuleRecommendations(
-    defaultRef
-      ? crowdsourcedVexingUrl({
-          organizationSlug,
-          projectSlug,
-          assetSlug,
-          assetVersionSlug: defaultRef,
-        })
-      : null,
+    crowdsourcedVexingUrl({ organizationSlug, projectSlug, assetSlug }),
   );
 
   if (isLoading && !vexRulesResponse) {
@@ -145,7 +131,7 @@ const VexRulesPage: FunctionComponent = () => {
         primaryHeadline
         forceVertical
         title="VEX rules"
-        description="VEX rules decide how vulnerabilities of this repository are handled — dismissed as a false positive or accepted as a known risk. Rules are either written here or synced from an upstream supplier."
+        description="VEX rules decide how vulnerabilities of this repository are handled - dismissed as a false positive or accepted as a known risk. Rules are either written here or synced from an upstream supplier."
         className="mb-6 mt-4"
         Button={
           <div className="flex flex-row gap-2">
@@ -188,7 +174,7 @@ const VexRulesPage: FunctionComponent = () => {
       <Section
         forceVertical
         title="Active VEX rules"
-        description="Every rule currently applied to this repository — your own and the ones synced from upstream sources."
+        description="Every rule currently applied to this repository - your own and the ones synced from upstream sources."
         className="mb-6 border-t pt-6"
       >
         {vexRules.length === 0 ? (
@@ -206,33 +192,40 @@ const VexRulesPage: FunctionComponent = () => {
         )}
       </Section>
 
-      {recommendations.length > 0 && (
-        <Section
-          forceVertical
-          title="Recommended by other DevGuard users"
-          description="Open vulnerabilities of this repository that organizations DevGuard trusts have already assessed. Nothing is applied until you create the rule."
-          className="mb-6 border-t pt-6"
-        >
-          <VexRuleRecommendationList
-            recommendations={recommendations}
-            dependencyRisksPath={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${defaultRef}/dependency-risks`}
-            onCreateRule={(entry: RecommendationEntry) => {
-              setRulePrefill({
-                celExpression: entry.recommendation.celExpression,
-                justification: entry.recommendation.justification,
-                mechanicalJustification:
-                  entry.recommendation.mechanicalJustification,
-              });
-              setAddRuleDialogOpen(true);
-            }}
-          />
-        </Section>
-      )}
+      <AuthGuard require="member">
+        {recommendations.length > 0 && (
+          <Section
+            forceVertical
+            title="Recommended by other DevGuard users"
+            description="Other users of DevGuard assessed vulnerabilities that are found in your Reposiotory already. Based on a majority vote, the following VEX rules are recommended. Nothing is applied until you create the rule."
+            className="mb-6 border-t pt-6"
+          >
+            <VexRuleRecommendationList
+              recommendations={recommendations}
+              onCreateRule={(entry: RecommendationEntry) => {
+                setRulePrefill({
+                  celExpression: entry.recommendation.celExpression,
+                  justification: entry.recommendation.justification,
+                  mechanicalJustification:
+                    entry.recommendation.mechanicalJustification,
+                  wasRecommended: true,
+                });
+                setAddRuleDialogOpen(true);
+              }}
+            />
+          </Section>
+        )}
+      </AuthGuard>
 
       <Collapsible className="mb-6 border-t pt-6">
         <CollapsibleTrigger className="group flex w-full cursor-pointer flex-row items-center justify-between">
-          <span className="text-base font-semibold leading-7 text-foreground">
+          <span className="flex flex-row items-center gap-2 text-base font-semibold leading-7 text-foreground">
             Upstream VEX sources
+            {vexSources.length > 0 && (
+              <Badge variant="secondary" className="font-medium">
+                {vexSources.length}
+              </Badge>
+            )}
           </span>
           <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </CollapsibleTrigger>
@@ -242,7 +235,7 @@ const VexRulesPage: FunctionComponent = () => {
             the components you use. Syncing a source creates the rules listed
             above.
           </p>
-          <VexSourcesSection />
+          <VexSourcesSection onAddSource={() => setUploadDialogOpen(true)} />
         </CollapsibleContent>
       </Collapsible>
 
@@ -256,9 +249,7 @@ const VexRulesPage: FunctionComponent = () => {
         onOpenChange={setAddRuleDialogOpen}
         baseUrl={vexRulesUrl}
         onCreated={() => mutate()}
-        initialCelExpression={rulePrefill?.celExpression}
-        initialJustification={rulePrefill?.justification}
-        initialMechanicalJustification={rulePrefill?.mechanicalJustification}
+        prefill={rulePrefill}
       />
       <VexExportDialog
         open={exportDialogOpen}

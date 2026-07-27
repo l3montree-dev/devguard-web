@@ -26,6 +26,9 @@ class CelSyntaxError extends Error {
   }
 }
 
+// The helper functions the VEX rule CEL environment exposes; both return a bool.
+const BOOL_FUNCTIONS = ["matchesPattern", "matchesPurl"];
+
 const PUNCTUATORS = [
   "==",
   "!=",
@@ -198,7 +201,7 @@ class CelParser {
   // statically known to evaluate to a bool - best-effort, not a real type
   // checker. VEX rules require a bool result (it gates whether the rule
   // applies), so parseProgram rejects anything that isn't recognizably one:
-  // comparisons, "in", &&/||, ! negation, matchesPattern(...), bool literals,
+  // comparisons, "in", &&/||, ! negation, the rule helpers, bool literals,
   // or a ternary of two such branches. A bare field access like
   // "vuln.cveId" is a string, not a bool, and must be wrapped in a
   // comparison to be a valid rule.
@@ -365,10 +368,9 @@ class CelParser {
         this.tokens[this.pos + 1]?.type === "punct" &&
         this.tokens[this.pos + 1].value === "(";
 
-      // matchesPattern(...) is the only function known to return a bool -
-      // everything else (bare identifiers, other calls) is treated as
-      // non-bool until compared.
-      const isBool = t.value === "matchesPattern" && isCall;
+      // Only the rule helpers are known to return a bool - everything else
+      // (bare identifiers, other calls) is treated as non-bool until compared.
+      const isBool = isCall && BOOL_FUNCTIONS.includes(t.value);
 
       this.next();
       // qualified identifiers, e.g. vuln.cve.cvss, are handled by "." in parsePostfix
@@ -445,7 +447,7 @@ export function checkCelSyntax(
     if (!isBool) {
       return {
         message:
-          "Expression must evaluate to a bool, e.g. via ==, !=, or matchesPattern(...)",
+          "Expression must evaluate to a bool, e.g. via ==, !=, matchesPattern(...) or matchesPurl(...)",
         pos: 0,
         length: expression.length,
       };
@@ -532,6 +534,13 @@ const TOP_LEVEL_COMPLETIONS: Completion[] = [
     detail: "(vuln, pattern) -> bool",
     info: "Matches vuln's dependency path (and artifact purls) against a path pattern",
     apply: "matchesPattern(vuln, )",
+  },
+  {
+    label: "matchesPurl",
+    type: "function",
+    detail: "(purl, patternPurl) -> bool",
+    info: 'Matches a purl against a purl whose version is a semver constraint, e.g. matchesPurl(vuln.componentPurl, "pkg:npm/undici@6.26.*")',
+    apply: 'matchesPurl(vuln.componentPurl, "")',
   },
 ];
 

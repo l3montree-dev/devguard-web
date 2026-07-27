@@ -21,26 +21,13 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useDropzone } from "react-dropzone";
 import { LinkIcon } from "@heroicons/react/24/outline";
-import {
-  Loader2,
-  Plus,
-  RefreshCw,
-  Trash2,
-  MoreHorizontal,
-  CloudUpload,
-} from "lucide-react";
+import { Loader2, CloudUpload } from "lucide-react";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import type { ExternalReference } from "@/types/api/api";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "../FileUpload";
 import AutoHeight from "embla-carousel-auto-height";
@@ -63,9 +50,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
 
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [branchOrTagName, setBranchOrTagName] = useState("");
-  const [branchOrTagSlug, setBranchOrTagSlug] = useState("");
-  const [isTag, setIsTag] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [vexFile, setVexFile] = useState<File | null>(null);
 
@@ -82,15 +66,12 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
   const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
 
-  const {
-    data: allRefs,
-    mutate: refsMutate,
-    isLoading: refsLoading,
-  } = useSWR<ExternalReference[]>(open ? apiUrl : null, fetcher);
-
-  const vexSources =
-    allRefs?.filter((ref) => ref.type === "cyclonedx" || ref.type === "csaf") ||
-    [];
+  // Only for its mutate: revalidating this key refreshes the sources list on the
+  // VEX rules page once a source is added here.
+  const { mutate: refsMutate } = useSWR<ExternalReference[]>(
+    open ? apiUrl : null,
+    fetcher,
+  );
 
   const vexDropzone = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -189,37 +170,12 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     }
   };
 
-  const handleTriggerSync = async (source: ExternalReference) => {
-    const syncUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references/sync/`;
-
-    try {
-      const response = await browserApiClient(syncUrl, {
-        method: "POST",
-      });
-      if (!response.ok) {
-        throw new Error(`Sync failed: ${response.statusText}`);
-      }
-      toast.success(`Syncing VEX data from ${source.url}`);
-      refsMutate();
-    } catch (error) {
-      toast.error("Failed to trigger sync");
-    }
-  };
-
-  const handleDelete = async (source: ExternalReference) => {
-    try {
-      const response = await browserApiClient(apiUrl + "/" + source.id, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(`Delete failed: ${response.statusText}`);
-      }
-      toast.success(`Removed ${source.url}`);
-      refsMutate();
-    } catch (error) {
-      toast.error("Failed to delete VEX source");
-    }
-  };
+  // The footer button submits whichever tab is open.
+  const handleAddSource = () =>
+    activeTab === "csaf" ? handleAddCsafUrl() : handleAddVexUrl();
+  const canAddSource =
+    !isAdding &&
+    (activeTab === "csaf" ? newCsafUrl.trim() : newVexUrl.trim()) !== "";
 
   const isPurlValid = (purl: string): boolean => {
     const purlRegex =
@@ -245,7 +201,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
             <CarouselItem>
               <div className="px-1 pb-2">
                 <DialogHeader>
-                  <DialogTitle>Manage VEX</DialogTitle>
+                  <DialogTitle>Add VEX information</DialogTitle>
                   <DialogDescription>
                     Choose how you want to provide VEX information to your
                     project
@@ -346,183 +302,88 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
               </div>
             </CarouselItem>
 
-            {/* Step 3: Source URL Management */}
+            {/* Step 3: Add a source URL */}
             <CarouselItem>
               <div className="px-1">
                 <DialogHeader>
-                  <DialogTitle>Manage VEX Sources</DialogTitle>
+                  <DialogTitle>Add a VEX source</DialogTitle>
                   <DialogDescription>
-                    Add and manage upstream VEX and CSAF sources
+                    Point DevGuard at an upstream VEX or CSAF URL.
                   </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-6 mt-6">
-                  {refsLoading ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      Loading...
-                    </div>
-                  ) : (
-                    <>
-                      {/* Existing Sources Section */}
-                      <div className="space-y-2">
-                        <Label className="text-sm font-semibold">
-                          Configured Sources
-                        </Label>
-                        {vexSources.length > 0 ? (
-                          <div className="space-y-2">
-                            {vexSources.map((source) => (
-                              <Card
-                                key={source.id}
-                                className="flex flex-row items-center justify-between"
-                              >
-                                <CardHeader className="flex-1">
-                                  <CardTitle className="text-sm font-mono break-all">
-                                    {source.url}
-                                  </CardTitle>
-                                  <CardDescription>
-                                    {source.type === "csaf"
-                                      ? "CSAF Source"
-                                      : "CycloneDX VEX Source"}
-                                  </CardDescription>
-                                </CardHeader>
-                                <CardContent className="p-6">
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="sm">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      <DropdownMenuItem
-                                        onClick={() =>
-                                          handleTriggerSync(source)
-                                        }
-                                      >
-                                        <RefreshCw className="h-4 w-4 mr-2" />
-                                        Trigger Sync
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem
-                                        onClick={() => handleDelete(source)}
-                                        className="text-destructive"
-                                      >
-                                        <Trash2 className="h-4 w-4 mr-2" />
-                                        Delete
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-muted-foreground text-sm">
-                            No upstream VEX sources configured yet.
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Add New Source Section */}
-                      <div className="space-y-3">
-                        <Label className="text-sm mb-2 block font-semibold">
-                          Add New Source
-                        </Label>
-                        <Tabs
-                          value={activeTab}
-                          onValueChange={(v) => {
-                            setActiveTab(v as "cyclonedx" | "csaf");
-                          }}
-                        >
-                          <TabsList>
-                            <TabsTrigger value="cyclonedx">
-                              CycloneDX VEX
-                            </TabsTrigger>
-                            <TabsTrigger value="csaf">CSAF</TabsTrigger>
-                          </TabsList>
-                          <TabsContent value="cyclonedx" className="mt-3">
-                            <Card>
-                              <CardContent className="pt-6">
-                                <div className="space-y-3">
-                                  <div>
-                                    <Label
-                                      htmlFor="vex-url"
-                                      className="text-xs"
-                                    >
-                                      VEX Source URL
-                                    </Label>
-                                    <div className="flex gap-2 mt-2">
-                                      <Input
-                                        id="vex-url"
-                                        placeholder="https://supplier.example.com/vex.json"
-                                        value={newVexUrl}
-                                        onChange={(e) =>
-                                          setNewVexUrl(e.target.value)
-                                        }
-                                        onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
-                                            handleAddVexUrl();
-                                          }
-                                        }}
-                                        className="flex-1"
-                                      />
-                                      <Button
-                                        onClick={handleAddVexUrl}
-                                        disabled={isAdding}
-                                        size="icon"
-                                      >
-                                        {isAdding ? (
-                                          <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                          <Plus className="h-4 w-4" />
-                                        )}
-                                      </Button>
-                                    </div>
-                                  </div>
+                  <div className="space-y-3">
+                    <Tabs
+                      value={activeTab}
+                      onValueChange={(v) => {
+                        setActiveTab(v as "cyclonedx" | "csaf");
+                      }}
+                    >
+                      <TabsList>
+                        <TabsTrigger value="cyclonedx">
+                          CycloneDX VEX
+                        </TabsTrigger>
+                        <TabsTrigger value="csaf">CSAF</TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="cyclonedx" className="mt-3">
+                        <Card>
+                          <CardContent className="pt-4">
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor="vex-url" className="text-xs">
+                                  VEX Source URL
+                                </Label>
+                                <div className="mt-2">
+                                  <Input
+                                    id="vex-url"
+                                    placeholder="https://supplier.example.com/vex.json"
+                                    value={newVexUrl}
+                                    onChange={(e) =>
+                                      setNewVexUrl(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddSource();
+                                      }
+                                    }}
+                                  />
                                 </div>
-                              </CardContent>
-                            </Card>
-                          </TabsContent>
-                          <TabsContent value="csaf" className="mt-3">
-                            <Card>
-                              <CardContent className="pt-6">
-                                <div className="space-y-3">
-                                  <div>
-                                    <Label
-                                      htmlFor="csaf-url"
-                                      className="text-xs"
-                                    >
-                                      CSAF URL
-                                    </Label>
-                                    <div className="flex gap-2 mt-2">
-                                      <Input
-                                        id="csaf-url"
-                                        placeholder="https://supplier.example.com/csaf.json"
-                                        value={newCsafUrl}
-                                        onChange={(e) =>
-                                          setNewCsafUrl(e.target.value)
-                                        }
-                                        className="flex-1"
-                                      />
-                                      <Button
-                                        onClick={handleAddCsafUrl}
-                                        disabled={isAdding}
-                                        size="icon"
-                                      >
-                                        {isAdding ? (
-                                          <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                          <Plus className="h-4 w-4" />
-                                        )}
-                                      </Button>
-                                    </div>
-                                  </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                      <TabsContent value="csaf" className="mt-3">
+                        <Card>
+                          <CardContent className="pt-6">
+                            <div className="space-y-3">
+                              <div>
+                                <Label htmlFor="csaf-url" className="text-xs">
+                                  CSAF URL
+                                </Label>
+                                <div className="mt-2">
+                                  <Input
+                                    id="csaf-url"
+                                    placeholder="https://supplier.example.com/csaf.json"
+                                    value={newCsafUrl}
+                                    onChange={(e) =>
+                                      setNewCsafUrl(e.target.value)
+                                    }
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        handleAddSource();
+                                      }
+                                    }}
+                                  />
                                 </div>
-                              </CardContent>
-                            </Card>
-                          </TabsContent>
-                        </Tabs>
-                      </div>
-                    </>
-                  )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
                 </div>
 
                 <div className="mt-8 flex flex-wrap flex-row gap-2 justify-end">
@@ -535,6 +396,12 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     }}
                   >
                     Back
+                  </Button>
+                  <Button onClick={handleAddSource} disabled={!canAddSource}>
+                    {isAdding && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Add VEX source
                   </Button>
                 </div>
               </div>

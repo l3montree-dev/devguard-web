@@ -9,21 +9,21 @@ import { useEffect, useRef, useState } from "react";
 
 export interface VexRuleMatchCount {
   // Syntax error of the current expression, or null when it parses.
-  syntaxError: { message: string; pos: number; length: number } | null;
-  hasSyntaxError: boolean;
+  syntaxError?: ReturnType<typeof checkCelSyntax>;
+  hasSyntaxError?: boolean;
   // A request is in flight for the current expression.
-  isTesting: boolean;
+  isTesting?: boolean;
   // The /test call failed (network, or the backend rejected the expression).
-  testingError: string | null;
+  testingError?: string | null;
   // How many vulnerabilities of this asset the expression matches; null while
   // unknown (empty, invalid or not yet tested).
   matchCount: number | null;
 }
 
 /**
- * Counts the vulnerabilities a CEL expression would match, by asking the VEX
- * rule test endpoint. Debounced, and the count is only reported while it still
- * belongs to the expression on screen — so no stale number lingers during edits.
+ * Counts the vulnerabilities an expression would match, via the rule test
+ * endpoint. Debounced, and only reported while it belongs to the current
+ * expression so no stale count lingers during edits.
  */
 export function useVexRuleMatchCount(
   baseUrl: string,

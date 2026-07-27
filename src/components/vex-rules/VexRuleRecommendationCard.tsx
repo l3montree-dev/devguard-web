@@ -7,9 +7,13 @@ import CelCodeBlock from "@/components/common/CelCodeBlock";
 import { Button } from "@/components/ui/button";
 import type { VexRuleRecommendation } from "@/types/api/api";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
+import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Users } from "lucide-react";
 import type { FunctionComponent } from "react";
 import VexRuleResult from "./VexRuleResult";
+import { Badge } from "../ui/badge";
+
+const VERIFIED_CONFIDENCE = 1;
 
 interface VexRuleRecommendationCardProps {
   recommendation: VexRuleRecommendation;
@@ -18,14 +22,14 @@ interface VexRuleRecommendationCardProps {
 }
 
 /**
- * A rule other DevGuard organizations already apply to this vulnerability. Same
- * shape as the "handled by a VEX rule" card, outlined in success rather than
- * primary — this is an offer, not a state.
+ * A rule other organizations already apply to this vulnerability. Shaped like the
+ * "handled by a VEX rule" card, outlined in success — an offer, not a state.
  */
 const VexRuleRecommendationCard: FunctionComponent<
   VexRuleRecommendationCardProps
 > = ({ recommendation, onCreateRule }) => {
   const mechanical = recommendation.mechanicalJustification;
+  console.log(recommendation);
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-success bg-card shadow-lg shadow-success/20">
@@ -54,10 +58,18 @@ const VexRuleRecommendationCard: FunctionComponent<
               </span>
             </div>
           </div>
-          <VexRuleResult
-            eventType={recommendation.eventType}
-            mechanicalJustification={mechanical}
-          />
+          <div className="flex shrink-0 flex-row items-center gap-2">
+            {recommendation.confidence >= VERIFIED_CONFIDENCE && (
+              <Badge variant="success" className="gap-1 py-1">
+                <CheckCircleIcon className="h-4 w-4" />
+                Verified
+              </Badge>
+            )}
+            <VexRuleResult
+              eventType={recommendation.eventType}
+              mechanicalJustification={mechanical}
+            />
+          </div>
         </div>
 
         {mechanical && (
@@ -82,13 +94,13 @@ const VexRuleRecommendationCard: FunctionComponent<
           </div>
         )}
 
-        <div className="mt-2 flex flex-row items-center justify-between gap-2 border-t pt-3 text-xs text-muted-foreground">
+        <div className="mt-2 flex flex-row items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
           <span className="">
             Derived from VEX rules created by other DevGuard users.
             <br />
             Nothing is applied until you create the rule.
           </span>
-          <Button size="sm" onClick={onCreateRule}>
+          <Button size="sm" onClick={onCreateRule} variant="green">
             Create VEX rule from recommendation
           </Button>
         </div>

@@ -3,12 +3,10 @@
 
 import { beautifyPurl } from "@/utils/common";
 
-// The pattern token standing for the root node of an artifact. Since every
-// artifact of an asset version has such a root, a pattern starting with ROOT
-// matches all artifacts.
-export const ROOT_TOKEN = "ROOT";
-// Matches any number of intermediate path segments.
-export const WILDCARD_TOKEN = "*";
+// Anchors a pattern at the root of every artifact.
+const ROOT_TOKEN = "ROOT";
+// Matches zero or more path segments.
+const WILDCARD_TOKEN = "*";
 
 export interface VexRuleVulnContext {
   cveID: string | null;
@@ -20,18 +18,10 @@ export interface VexRuleVulnContext {
 }
 
 /**
- * What the UI should render for a rule/vulnerability combination.
- *
- * - `pathCut`: a path rule matches — the path is severed at `cutIndex`.
- * - `pathIntact`: a path rule that does not match this path.
- * - `attributeMatch` / `attributeMiss`: a rule on a vuln attribute (cveId,
- *   componentPurl) — it dismisses the vulnerability as a whole, so no cut.
- * - `indeterminate`: the expression can't be decided client-side (combined
- *   expressions, or shapes this parser doesn't know yet).
- *
- * New expression shapes get a new type here plus a branch in the renderer.
+ * What to render for a rule/vulnerability pair. A new expression shape gets a new
+ * type here plus a branch in the renderer.
  */
-export type VexRuleEffectType =
+type VexRuleEffectType =
   | "pathCut"
   | "pathIntact"
   | "attributeMatch"
@@ -55,9 +45,9 @@ const INDETERMINATE: VexRuleEffect = {
   cutIndex: -1,
 };
 
-// CEL line comments carry the explanation of the generated rule; they are not
-// part of the expression itself.
-export function stripCelComments(cel: string): string {
+// Generated rules carry their explanation in a CEL comment, which is not part of
+// the expression.
+function stripCelComments(cel: string): string {
   return cel
     .split("\n")
     .map((line) => {
@@ -79,12 +69,10 @@ export function stripCelComments(cel: string): string {
 }
 
 /**
- * Splits an expression into its top-level `&&` operands, skipping string literals
- * and bracketed groups — purls contain "&", patterns contain commas. Returns null
- * for expressions this parser can't decompose: `||` combines two independent
- * claims, which no single cut can represent.
+ * Top-level `&&` operands, skipping string literals and brackets — purls contain
+ * "&". Null for `||`, which combines claims no single cut can represent.
  */
-export function splitTopLevelConjuncts(expr: string): string[] | null {
+function splitTopLevelConjuncts(expr: string): string[] | null {
   const parts: string[] = [];
   let depth = 0;
   let quote: string | null = null;
@@ -131,7 +119,7 @@ export function extractPathPattern(cel: string): string[] | null {
   }
 }
 
-// Splits a pattern into its ROOT anchor, its wildcards and the concrete purls.
+// A pattern's ROOT anchor, wildcards and concrete purls.
 function splitPattern(pattern: string[]): {
   anchoredAtRoot: boolean;
   hasWildcard: boolean;
@@ -148,14 +136,11 @@ function splitPattern(pattern: string[]): {
 }
 
 /**
- * Best-effort match of a path pattern against a concrete dependency path.
- *
- * A pattern anchored at ROOT without a wildcard describes the full path, so its
- * segments must line up from the direct dependency onwards. Everything else is
- * treated as a suffix rule: the concrete segments must appear as a contiguous
- * suffix of the path.
+ * Matches a pattern against a dependency path. Anchored at ROOT without a
+ * wildcard it describes the whole path; otherwise its concrete segments must form
+ * a contiguous suffix.
  */
-export function matchPathPattern(
+function matchPathPattern(
   path: string[],
   pattern: string[],
 ): { matches: boolean; fromIndex: number } {
@@ -179,14 +164,9 @@ export function matchPathPattern(
 }
 
 /**
- * Where a matched pattern severs the path — the node from which everything is
- * dismissed.
- *
- * A pattern names the disputed edge as its first two segments. When it is
- * anchored at ROOT the parent is the application root itself, so the cut sits at
- * the first concrete node. Otherwise the first concrete segment is the parent and
- * the cut sits one node below it — unless the pattern names a single component,
- * which can only mean that component itself is dismissed.
+ * Where a matched pattern severs the path. A pattern names the disputed edge as
+ * its first two segments, so the cut sits below the first concrete segment —
+ * except when ROOT is the parent, or when a single component is named.
  */
 function cutIndexFor(
   pattern: string[],
@@ -199,11 +179,9 @@ function cutIndexFor(
 }
 
 /**
- * Client-side evaluation of what a rule does to one specific vulnerability. The
- * backend /test endpoint only returns a ref-wide count, so this covers the
- * statically decidable shapes this flow produces — a rule identifying the
- * vulnerability and constraining its path is a conjunction of them. Shapes this
- * parser doesn't know are reported as `indeterminate` — "can't tell locally".
+ * What a rule does to one vulnerability. The backend /test endpoint only counts
+ * matches asset-wide, so this decides the shapes this flow produces locally and
+ * reports anything else as `indeterminate`.
  */
 export function analyzeVexRuleEffect(
   cel: string,
@@ -223,11 +201,8 @@ export function analyzeVexRuleEffect(
   return analyzeConjunct(conjuncts[0], vuln);
 }
 
-/**
- * A conjunction applies only if every operand does. The first operand that fails
- * is what the UI should explain — "the path doesn't match" or "that's a different
- * CVE" — and when they all hold, the path operand is the one carrying the cut.
- */
+// A conjunction applies only if every operand does: the first failing operand
+// explains why, and otherwise the path operand carries the cut.
 function combineConjuncts(effects: VexRuleEffect[]): VexRuleEffect {
   const failing = effects.find((effect) => effect.applies === false);
   if (failing) return failing;
@@ -278,14 +253,10 @@ function attributeEffect(
   };
 }
 
-// Both spellings of the identifier: the column on the vuln, and the id on the
-// nested CVE object. `vuln.cve` itself is that object, never a string.
+// Both spellings of the identifier — `vuln.cve` itself is the CVE object.
 const IDENTIFIER_PATTERN = /vuln\.(?:cveId|cve\.cve)\s*==\s*["']([^"']+)["']/;
 
-/**
- * The advisory a rule pins itself to (CVE-… / GHSA-…), if it does. Useful for
- * labelling a rule that isn't shown next to its vulnerability.
- */
+/** The advisory a rule pins itself to (CVE-… / GHSA-…), if it does. */
 export function extractVulnIdentifier(cel: string): string | null {
   return stripCelComments(cel).match(IDENTIFIER_PATTERN)?.[1] ?? null;
 }
@@ -318,10 +289,7 @@ function matchAttribute(
   return null;
 }
 
-/**
- * The two node names a cut sits between: the parent that is claimed not to call
- * the vulnerable function, and the child it no longer reaches.
- */
+/** The two nodes a cut sits between. */
 export function resolveCut(
   vuln: VexRuleVulnContext,
   cutIndex: number,
@@ -363,7 +331,7 @@ export function buildPathPatternRule(
   const [comment, pattern] =
     edgeIndex === 0
       ? [
-          `// "${ROOT_TOKEN}" matches all your artifacts in this repo`,
+          `// "${ROOT_TOKEN}" matches all your artifacts and refs in this repo`,
           [ROOT_TOKEN, ...path],
         ]
       : [

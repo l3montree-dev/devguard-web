@@ -19,6 +19,10 @@ import {
 } from "../ui/dialog";
 import Callout from "../common/Callout";
 import { useConfig } from "../../context/ConfigContext";
+import { useArtifacts } from "../../context/AssetVersionContext";
+import { useActiveAsset } from "../../hooks/useActiveAsset";
+import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
+import { useSelectArtifact } from "../ArtifactSelector";
 import { usePublicSharing } from "./PublicUrlSection";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { ArtifactAndPublicUrlGrid } from "./ArtifactAndPublicUrlGrid";
@@ -37,6 +41,9 @@ export default function VexDownloadModal({
   pathname,
 }: VexDownloadModalProps) {
   const config = useConfig();
+  const asset = useActiveAsset();
+  const assetVersion = useActiveAssetVersion();
+  const artifacts = useArtifacts();
   const { sharesInformation, isPublicLoading, handleTogglePublic } =
     usePublicSharing();
   const { isLoading, handleDownload: handleDownloadPdfVex } = useDownloadPdf(
@@ -44,6 +51,15 @@ export default function VexDownloadModal({
     "vulnerability-report.pdf",
     "VeX PDF",
   );
+
+  // VEX is published per artifact, so the routes behind these links require one.
+  const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
+    false,
+    artifacts.map((a) => a.artifactName),
+  );
+  const artifactQuery = new URLSearchParams({
+    artifact: selectedArtifact || "",
+  });
 
   const jsonFileName = `${assetName}_vex.json`;
   const xmlFileName = `${assetName}_vex.xml`;
@@ -54,6 +70,12 @@ export default function VexDownloadModal({
         <DialogHeader>
           <DialogTitle>
             Download VEX File for &quot;{assetName}&quot;{" "}
+            {assetVersion?.name && (
+              <Badge variant={"outline"} className="ml-1">
+                <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                {assetVersion.name}
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription>
             You can download the VEX (Vulnerability Exploitability eXchange) in
@@ -69,6 +91,20 @@ export default function VexDownloadModal({
           </DialogDescription>
         </DialogHeader>
         <hr />
+        <ArtifactAndPublicUrlGrid
+          artifacts={artifacts}
+          selectedArtifact={selectedArtifact}
+          onSelect={setSelectedArtifact}
+          sharesInformation={sharesInformation}
+          isPublicLoading={isPublicLoading}
+          onToggle={handleTogglePublic}
+          assetVersionSlug={assetVersion?.slug}
+          assetId={asset?.id}
+          devguardApiUrl={config.devguardApiUrlPublicInternet}
+          fileType="vex.json"
+          toastLabel="VEX URL"
+        />
+        <hr />
         <h4 className="font-semibold mt-4">Machine Readable Formats</h4>
         <p className="text-sm text-muted-foreground">
           The VeX is available in JSON and XML formats. Use these formats to
@@ -77,7 +113,7 @@ export default function VexDownloadModal({
         <div className="flex items-start justify-start gap-4 mt-2">
           <DelayedDownloadButton
             data-testid="download-vex-json-format"
-            href={pathname + `/../vex.json`}
+            href={pathname + `/../vex.json?${artifactQuery}`}
             icon={
               <Image
                 src="/assets/cyclonedx-logo.svg"
@@ -91,7 +127,7 @@ export default function VexDownloadModal({
             downloadFileName={jsonFileName}
           />
           <DelayedDownloadButton
-            href={pathname + `/../vex.xml`}
+            href={pathname + `/../vex.xml?${artifactQuery}`}
             icon={<FileCode className="h-5 w-auto inline-block text-success" />}
             label={"Download in XML-Format"}
             downloadFileName={xmlFileName}

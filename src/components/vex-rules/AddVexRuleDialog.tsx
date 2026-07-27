@@ -27,24 +27,30 @@ import {
 import { FieldDescription } from "@/components/ui/field";
 import { ChevronDown, CircleAlert } from "lucide-react";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
+import type {
+  CreateVexRuleRequest,
+  MechanicalJustificationType,
+  VexRuleEventType,
+  VexRulePrefill,
+} from "@/types/api/api";
 import { checkCelSyntax } from "@/components/common/celLinter";
+
+const MECHANICAL_JUSTIFICATIONS = Object.keys(
+  vexOptionMessages,
+) as MechanicalJustificationType[];
+const DEFAULT_MECHANICAL_JUSTIFICATION = MECHANICAL_JUSTIFICATIONS[2];
 
 interface AddVexRuleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   baseUrl: string;
   onCreated: () => void;
-  // Prefill the form (e.g. when opened from a specific dependency path, or from
-  // a crowdsourced recommendation).
-  initialTitle?: string;
-  initialCelExpression?: string;
-  initialJustification?: string;
-  initialMechanicalJustification?: string;
+  // Values to open with, from a dependency path, the playground or a recommendation.
+  prefill?: VexRulePrefill;
   // When set, the form previews the rule's effect on this specific vulnerability.
   currentVuln?: VexRuleVulnContext;
-  // "full": the expert flow with an editable CEL expression editor.
-  // "reduced": the guided flow (e.g. opened from a dependency path) — focuses the
-  // effect on the current vulnerability, the CEL expression is collapsed and read-only.
+  // "reduced" focuses the effect on the current vulnerability and collapses the
+  // expression; "full" is the expert flow with an editable expression.
   variant?: "full" | "reduced";
 }
 
@@ -53,10 +59,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   onOpenChange,
   baseUrl,
   onCreated,
-  initialTitle,
-  initialCelExpression,
-  initialJustification,
-  initialMechanicalJustification,
+  prefill,
   currentVuln,
   variant = "full",
 }) => {
@@ -64,27 +67,25 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   const [title, setTitle] = useState("");
   const [celExpression, setCelExpression] = useState("");
   const [justification, setJustification] = useState("");
-  const [selectedOption, setSelectedOption] = useState<string>(
-    Object.keys(vexOptionMessages)[2],
-  );
+  const [selectedOption, setSelectedOption] =
+    useState<MechanicalJustificationType>(DEFAULT_MECHANICAL_JUSTIFICATION);
 
-  // Seed the form from the prefill each time the dialog transitions to open.
-  // Adjusting state during render (React's recommended alternative to an effect).
+  // Seed from the prefill whenever the dialog opens (adjusting state during
+  // render, React's alternative to an effect).
   const [wasOpen, setWasOpen] = useState(false);
   if (open !== wasOpen) {
     setWasOpen(open);
     if (open) {
-      setTitle(initialTitle ?? "");
-      setCelExpression(initialCelExpression ?? "");
-      setJustification(initialJustification ?? "");
-      if (initialMechanicalJustification) {
-        setSelectedOption(initialMechanicalJustification);
-      }
+      setTitle(prefill?.title ?? "");
+      setCelExpression(prefill?.celExpression ?? "");
+      setJustification(prefill?.justification ?? "");
+      setSelectedOption(
+        prefill?.mechanicalJustification ?? DEFAULT_MECHANICAL_JUSTIFICATION,
+      );
     }
   }
 
-  // A rule has to say what it is and why — both are part of the VEX statement
-  // it produces, so neither can be left out.
+  // Both end up in the VEX statement, so neither can be left out.
   const missingFields = [
     title.trim() === "" && "a title",
     justification.trim() === "" && "a justification",
@@ -100,23 +101,27 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
     setCelExpression("");
     setJustification("");
     setTitle("");
-    setSelectedOption(Object.keys(vexOptionMessages)[2]);
+    setSelectedOption(DEFAULT_MECHANICAL_JUSTIFICATION);
   };
 
-  const handleSubmit = async (eventType: "falsePositive" | "accepted") => {
+  const handleSubmit = async (eventType: VexRuleEventType) => {
     if (!canSubmit) return false;
+
+    const body: CreateVexRuleRequest = {
+      title,
+      justification,
+      celExpression,
+      eventType,
+      // Only a false positive carries a mechanical justification.
+      mechanicalJustification:
+        eventType === "falsePositive" ? selectedOption : undefined,
+      wasRecommended: prefill?.wasRecommended,
+    };
 
     const resp = await browserApiClient(baseUrl + "/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title,
-        justification,
-        celExpression,
-        eventType,
-        mechanicalJustification:
-          eventType === "falsePositive" ? selectedOption : undefined,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!resp.ok) {
@@ -205,23 +210,21 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  {Object.entries(vexOptionMessages).map(
-                    ([option, description]) => (
-                      <DropdownMenuItem
-                        key={option}
-                        onClick={() => setSelectedOption(option)}
-                      >
-                        <div className="flex flex-col">
-                          <span className="capitalize">
-                            {removeUnderscores(option)}{" "}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            {description}
-                          </span>
-                        </div>
-                      </DropdownMenuItem>
-                    ),
-                  )}
+                  {MECHANICAL_JUSTIFICATIONS.map((option) => (
+                    <DropdownMenuItem
+                      key={option}
+                      onClick={() => setSelectedOption(option)}
+                    >
+                      <div className="flex flex-col">
+                        <span className="capitalize">
+                          {removeUnderscores(option)}{" "}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {vexOptionMessages[option]}
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

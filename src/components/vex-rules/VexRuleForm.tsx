@@ -230,7 +230,10 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
                 <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
-                <CelCodeBlock value={celExpression} readOnly />
+                <CelCodeBlock
+                  value={celExpression}
+                  onChange={onCelExpressionChange}
+                />
               </CollapsibleContent>
             </Collapsible>
             <VexRuleMatchStatus status={matchStatus} className="mt-1.5" />
@@ -244,7 +247,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
               value={celExpression}
               onChange={onCelExpressionChange}
               height={140}
-              placeholder={`// Examples:\n// vuln.cveId == "CVE-2021-1234"\n// vuln.componentPurl.startsWith("pkg:npm/lodash")\n// vuln.cve.cvss < 4.0\n// ROOT is a special token matching all artifacts in a repo\n// matchesPattern(vuln, ["*", "pkg:npm/foo@1.0.0", "pkg:npm/lodash@4.17.21"])`}
+              placeholder={`// Examples:\n// vuln.cveId == "CVE-2021-1234"\n// matchesPurl(vuln.componentPurl, "pkg:npm/undici@6.26.*")\n// vuln.cve.cvss < 4.0\n// ROOT is a special token matching all artifacts in a repo\n// matchesPattern(vuln, ["*", "pkg:npm/foo@1.0.0", "pkg:npm/lodash@4.17.21"])`}
             />
             <VexRuleMatchStatus status={matchStatus} className="mt-1.5" />
           </div>

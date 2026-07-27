@@ -39,10 +39,7 @@ interface VexExportDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-/**
- * Exports this repository's own VEX document. VEX is published per branch/tag
- * and artifact, so both are selected here — this page itself is asset-wide.
- */
+/** VEX is published per branch/tag and artifact, so both are selected here. */
 const VexExportDialog: FunctionComponent<VexExportDialogProps> = ({
   open,
   onOpenChange,
@@ -76,8 +73,7 @@ const VexExportDialog: FunctionComponent<VexExportDialogProps> = ({
   const [selectedArtifact, setSelectedArtifact] = useState<string | undefined>(
     undefined,
   );
-  // Fall back to the first artifact of the selected ref, so switching refs never
-  // leaves a stale artifact selected.
+  // Falling back to the first artifact keeps a ref switch from leaving a stale one.
   const artifactNames = (artifacts ?? []).map((a) => a.artifactName);
   const artifact =
     selectedArtifact && artifactNames.includes(selectedArtifact)

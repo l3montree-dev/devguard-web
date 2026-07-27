@@ -7,11 +7,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { VexRule } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { useState, type FunctionComponent } from "react";
-import VexHasEffectBadge from "./VexHasEffectBadge";
 import VexRuleActionsCell from "./VexRuleActionsCell";
 import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
 import VexRuleResult from "./VexRuleResult";
 import VexRuleSourceBadge from "./VexRuleSourceBadge";
+import VexRuleMatchStatus from "./VexRuleMatchStatus";
 
 interface VexRulesTableProps {
   rules: VexRule[];
@@ -23,10 +23,7 @@ interface VexRulesTableProps {
 
 const COLUMNS = ["Rule", "Source", "Result", "Effect", ""];
 
-/**
- * One row per rule — synced and own rules in the same flat list. Clicking a row
- * opens its details; the source is a badge, not a grouping level.
- */
+/** One flat row per rule; the source is a badge, not a grouping level. */
 const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
   rules,
   urlBase,
@@ -58,7 +55,13 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
             <tbody className="text-foreground">
               {isLoading
                 ? Array.from({ length: 5 }).map((_, row) => (
-                    <tr key={row} className="border-b last:border-0">
+                    <tr
+                      key={row}
+                      className={classNames(
+                        "border-b last:border-0",
+                        row % 2 !== 0 && "bg-card/50",
+                      )}
+                    >
                       {COLUMNS.map((_column, cell) => (
                         <td key={cell} className="p-4">
                           <Skeleton className="h-4 w-full" />
@@ -66,12 +69,15 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
                       ))}
                     </tr>
                   ))
-                : rules.map((rule) => (
+                : rules.map((rule, index) => (
                     <tr
                       data-testid="vex-rule-row"
                       key={rule.id}
                       onClick={() => setSelectedRule(rule)}
-                      className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50"
+                      className={classNames(
+                        "cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50",
+                        index % 2 !== 0 && "bg-card/50",
+                      )}
                     >
                       <td className="max-w-[420px] p-4">
                         <span className="block truncate font-medium">
@@ -93,16 +99,18 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
                         />
                       </td>
                       <td className="p-4">
-                        <VexHasEffectBadge
-                          effectCount={rule.appliesToAmountOfDependencyVulns}
+                        <VexRuleMatchStatus
+                          status={{
+                            matchCount: rule.appliesToAmountOfDependencyVulns,
+                          }}
                         />
                       </td>
-                      {/* The row opens the details dialog, so the menu has to
-                          keep its clicks to itself. */}
+                      {/* The row itself opens the dialog, so the menu keeps its
+                          clicks to itself. */}
                       <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         <VexRuleActionsCell
-                          rule={rule}
                           deleteUrl={`${urlBase}/${rule.id}`}
+                          onEdit={() => setSelectedRule(rule)}
                           onDeleted={onMutate}
                         />
                       </td>
@@ -120,7 +128,7 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
           if (!open) setSelectedRule(null);
         }}
         urlBase={urlBase}
-        onDeleted={onMutate}
+        onChanged={onMutate}
       />
     </>
   );

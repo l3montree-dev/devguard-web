@@ -27,7 +27,6 @@ import {
   crowdsourcedVexingUrl,
   useVexRuleRecommendation,
 } from "@/components/vex-rules/useVexRuleRecommendations";
-import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -39,7 +38,11 @@ import { useTourSeen } from "@/hooks/useTourSeen";
 import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { DetailedDependencyVulnDTO, VulnEventDTO } from "@/types/api/api";
+import type {
+  DetailedDependencyVulnDTO,
+  VexRulePrefill,
+  VulnEventDTO,
+} from "@/types/api/api";
 import { formatDate } from "@/utils/format";
 import { beautifyPurl } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
@@ -106,7 +109,6 @@ const CreateTicketButton: FunctionComponent<{
 };
 
 const Index: FunctionComponent = () => {
-  const { session } = useSession();
   const role = useCurrentUserRole();
 
   const activeOrg = useActiveOrg();
@@ -121,15 +123,7 @@ const Index: FunctionComponent = () => {
 
   const [addVexRuleDialogOpen, setAddVexRuleDialogOpen] = useState(false);
   const [mitigateDialogOpen, setMitigateDialogOpen] = useState(false);
-  const [vexRulePrefill, setVexRulePrefill] = useState<
-    | {
-        title: string;
-        celExpression: string;
-        justification?: string;
-        mechanicalJustification?: string;
-      }
-    | undefined
-  >(undefined);
+  const [vexRulePrefill, setVexRulePrefill] = useState<VexRulePrefill>();
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   const searchParams = useSearchParams();
@@ -165,7 +159,6 @@ const Index: FunctionComponent = () => {
       organizationSlug,
       projectSlug,
       assetSlug,
-      assetVersionSlug,
     }),
     vulnId,
   );
@@ -478,12 +471,17 @@ const Index: FunctionComponent = () => {
                     </Badge>
                   </Link>
                 )}
-                {vuln?.artifacts.map((a) => (
-                  <ArtifactBadge
-                    key={a.artifactName + vuln.id}
-                    artifactName={a.artifactName}
-                  />
-                ))}
+                {!!vuln?.artifacts.length && (
+                  <div className="flex flex-row flex-wrap items-center gap-2">
+                    <span className="text-muted-foreground">Artifacts:</span>
+                    {vuln.artifacts.map((a) => (
+                      <ArtifactBadge
+                        key={a.artifactName + vuln.id}
+                        artifactName={a.artifactName}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
@@ -529,6 +527,7 @@ const Index: FunctionComponent = () => {
                         justification: recommendation.justification,
                         mechanicalJustification:
                           recommendation.mechanicalJustification,
+                        wasRecommended: true,
                       });
                       setAddVexRuleDialogOpen(true);
                     }}
@@ -557,7 +556,7 @@ const Index: FunctionComponent = () => {
                             const suffix =
                               vuln.vulnerabilityPath.slice(edgeIndex);
                             setVexRulePrefill({
-                              title: `${vuln.cveID ?? "Vulnerability"} not exploitable via ${beautifyPurl(
+                              title: `${vuln.cveID ?? "Vulnerability"} not exploitable in ${beautifyPurl(
                                 suffix[0] ?? vuln.componentPurl,
                               )}`,
                               celExpression: buildPathPatternRule(
@@ -724,13 +723,8 @@ const Index: FunctionComponent = () => {
         onOpenChange={setAddVexRuleDialogOpen}
         baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
         onCreated={() => mutate()}
-        initialTitle={vexRulePrefill?.title}
-        initialCelExpression={vexRulePrefill?.celExpression}
-        initialJustification={vexRulePrefill?.justification}
-        initialMechanicalJustification={vexRulePrefill?.mechanicalJustification}
-        // Opened from a dependency path or a recommendation: the expression comes
-        // prefilled, so show the reduced dialog focused on the effect instead of
-        // the CEL editor.
+        prefill={vexRulePrefill}
+        // A prefilled expression means the effect matters more than the editor.
         variant={vexRulePrefill ? "reduced" : "full"}
         currentVuln={
           vuln

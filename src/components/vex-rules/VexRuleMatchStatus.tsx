@@ -8,9 +8,8 @@ import type { FunctionComponent } from "react";
 import type { VexRuleMatchCount } from "./useVexRuleMatchCount";
 
 /**
- * The one-line verdict under a CEL editor: a syntax or request error, the
- * in-flight hint, or how many vulnerabilities the expression matches. Styled
- * like inline field validation — an icon, one sentence, no box.
+ * The one-line verdict under a CEL editor — error, in-flight, or match count —
+ * styled like inline field validation.
  */
 const VexRuleMatchStatus: FunctionComponent<{
   status: VexRuleMatchCount;
@@ -57,7 +56,7 @@ const VexRuleMatchStatus: FunctionComponent<{
       <span>
         Matches{" "}
         <span className="font-medium text-foreground">{matchCount}</span>{" "}
-        vulnerabilit{matchCount === 1 ? "y" : "ies"} in this repository
+        vulnerabilit{matchCount === 1 ? "y" : "ies"}
       </span>
     </FieldDescription>
   );

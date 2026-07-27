@@ -4,84 +4,51 @@
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
+import Alert from "@/components/common/Alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetcher } from "@/data-fetcher/fetcher";
-import useDecodedParams from "@/hooks/useDecodedParams";
 import { toast } from "@/lib/toast";
+import { classNames } from "@/utils/common";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { ExternalReference } from "@/types/api/api";
-import { Loader2, MoreHorizontal, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
-import useSWR from "swr";
+import {
+  SOURCE_TYPE_LABEL,
+  useVexSources,
+  type VexSource,
+} from "./useVexSources";
 
-type VexSourceType = "cyclonedx" | "csaf";
+interface VexSourcesSectionProps {
+  // Opens the dialog that adds a VEX file or source URL.
+  onAddSource: () => void;
+}
 
-const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
-  cyclonedx: "CycloneDX VEX",
-  csaf: "CSAF",
-};
-
-const PLACEHOLDER: Record<VexSourceType, string> = {
-  cyclonedx: "https://supplier.example.com/vex.json",
-  csaf: "https://supplier.example.com/csaf/provider-metadata.json",
-};
-
-const isVexSourceType = (type: string): type is VexSourceType =>
-  type === "cyclonedx" || type === "csaf";
-
-/**
- * Upstream VEX/CSAF URLs this repository syncs rules from. Each one can be
- * re-synced or removed; the rules they produce live in the table above.
- */
-const VexSourcesSection: FunctionComponent = () => {
-  const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-  };
-  const [activeTab, setActiveTab] = useState<VexSourceType>("cyclonedx");
-  const [url, setUrl] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
-  const [syncingUrl, setSyncingUrl] = useState<string | null>(null);
+/** Upstream URLs this repository syncs rules from. */
+const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
+  onAddSource,
+}) => {
+  const [isSyncing, setIsSyncing] = useState(false);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
+  const { sources, apiUrl, error, isLoading, mutate } = useVexSources();
 
-  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
-  const {
-    data: allRefs,
-    error,
-    mutate,
-    isLoading,
-  } = useSWR<ExternalReference[]>(apiUrl, fetcher);
-
-  const sources = (allRefs ?? []).filter((ref) => isVexSourceType(ref.type));
-
-  const handleSync = async (source: ExternalReference) => {
-    setSyncingUrl(source.url);
+  // The endpoint takes no source: it re-syncs all of them, hence one button.
+  const handleSyncAll = async () => {
+    setIsSyncing(true);
     try {
       const response = await browserApiClient(`${apiUrl}/sync/`, {
         method: "POST",
       });
       if (!response.ok) throw new Error(response.statusText);
-      // The endpoint re-syncs every configured source at once.
-      toast.success("Syncing upstream VEX sources");
+      toast.success("Syncing all upstream VEX sources");
       mutate();
     } catch {
       toast.error("Failed to trigger sync");
     } finally {
-      setSyncingUrl(null);
+      setIsSyncing(false);
     }
   };
 
-  const handleDelete = async (source: ExternalReference) => {
+  const handleDelete = async (source: VexSource) => {
     setDeletingUrl(source.url);
     try {
       const response = await browserApiClient(
@@ -95,31 +62,6 @@ const VexSourcesSection: FunctionComponent = () => {
       toast.error("Failed to remove VEX source");
     } finally {
       setDeletingUrl(null);
-    }
-  };
-
-  const handleAdd = async () => {
-    if (!url.trim()) {
-      toast.error("Please enter a URL");
-      return;
-    }
-
-    setIsAdding(true);
-    try {
-      const response = await browserApiClient(`${apiUrl}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim(), type: activeTab }),
-      });
-      if (!response.ok) throw new Error(response.statusText);
-
-      toast.success(`${SOURCE_TYPE_LABEL[activeTab]} source added`);
-      setUrl("");
-      mutate();
-    } catch {
-      toast.error(`Failed to add ${SOURCE_TYPE_LABEL[activeTab]} source`);
-    } finally {
-      setIsAdding(false);
     }
   };
 
@@ -139,89 +81,65 @@ const VexSourcesSection: FunctionComponent = () => {
         </p>
       ) : (
         <ul className="flex flex-col divide-y rounded-lg border">
-          {sources.map((source) => (
+          {sources.map((source, index) => (
             <li
-              key={source.id}
-              className="flex flex-row items-center justify-between gap-3 p-3"
+              key={source.url}
+              className={classNames(
+                "flex flex-row items-center justify-between gap-3 p-3",
+                index % 2 !== 0 && "bg-card/50",
+              )}
             >
               <div className="flex min-w-0 flex-row items-center gap-3">
                 <Badge variant="outline" className="shrink-0">
-                  {SOURCE_TYPE_LABEL[source.type as VexSourceType]}
+                  {SOURCE_TYPE_LABEL[source.type]}
                 </Badge>
                 <span className="truncate font-mono text-xs text-muted-foreground">
                   {source.url}
                 </span>
               </div>
               <AuthGuard require="member">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={
-                        syncingUrl === source.url || deletingUrl === source.url
-                      }
-                    >
-                      {syncingUrl === source.url ||
-                      deletingUrl === source.url ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <MoreHorizontal className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleSync(source)}>
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Sync now
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleDelete(source)}
-                      className="text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Remove URL
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label={`Remove ${source.url}`}
+                  disabled={deletingUrl === source.url}
+                  onClick={() => handleDelete(source)}
+                >
+                  {deletingUrl === source.url ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  )}
+                </Button>
               </AuthGuard>
             </li>
           ))}
         </ul>
       )}
 
+      {/* Adding works without sources, syncing does not. */}
       <AuthGuard require="member">
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) => {
-            if (isVexSourceType(value)) setActiveTab(value);
-          }}
-        >
-          <TabsList>
-            <TabsTrigger value="cyclonedx">VEX</TabsTrigger>
-            <TabsTrigger value="csaf">CSAF</TabsTrigger>
-          </TabsList>
-          {(["cyclonedx", "csaf"] as VexSourceType[]).map((type) => (
-            <TabsContent key={type} value={type}>
-              <div className="flex flex-row gap-2">
-                <Input
-                  placeholder={PLACEHOLDER[type]}
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-                  className="flex-1"
-                />
-                <Button onClick={handleAdd} disabled={isAdding}>
-                  {isAdding ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+        <div className="flex flex-row justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={onAddSource}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add source
+          </Button>
+          {sources.length > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={isSyncing}
+              onClick={handleSyncAll}
+            >
+              {isSyncing ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" />
+              )}
+              Sync all sources
+            </Button>
+          )}
+        </div>
       </AuthGuard>
     </div>
   );

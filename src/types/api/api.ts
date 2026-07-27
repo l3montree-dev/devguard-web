@@ -1047,8 +1047,8 @@ export type VexRule = {
 
   // Rule data
   justification: string;
-  mechanicalJustification: string;
-  eventType: string;
+  mechanicalJustification: MechanicalJustificationType;
+  eventType: VexRuleEventType;
   celExpression: string;
   pathPattern: string[] | null;
   createdById: string;
@@ -1061,23 +1061,56 @@ export type VexRule = {
 
 export type VexRulesDTO = Paged<VexRule>;
 
+export type MechanicalJustificationType =
+  | "component_not_present"
+  | "vulnerable_code_not_present"
+  | "vulnerable_code_not_in_execute_path"
+  | "vulnerable_code_cannot_be_controlled_by_adversary"
+  | "inline_mitigations_already_exist";
+
+export type VexRuleEventType = "accepted" | "falsePositive";
+
+export type CreateVexRuleRequest = {
+  title: string;
+  justification: string;
+  celExpression: string;
+  eventType: VexRuleEventType;
+  mechanicalJustification?: MechanicalJustificationType;
+  // Set when the rule was adopted from a crowdsourced recommendation
+  wasRecommended?: boolean;
+};
+
+// Values the create dialog opens with, e.g. from a dependency path, the
+// expression playground or a recommendation.
+export type VexRulePrefill = {
+  celExpression: string;
+  title?: string;
+  justification?: string;
+  mechanicalJustification?: MechanicalJustificationType;
+  wasRecommended?: boolean;
+};
+
 // A rule other DevGuard organizations already apply to this vulnerability,
 // picked by trust-weighted agreement (crowdsourced vexing). Not a rule of this
 // asset yet — it becomes one once accepted.
 export type VexRuleRecommendation = {
   celExpression: string;
   justification: string;
-  mechanicalJustification: string;
-  eventType: string;
+  mechanicalJustification: MechanicalJustificationType;
+  eventType: VexRuleEventType;
+  confidence: number;
+  title: string;
+  // Metrics - indicates how many dependency vulns this rule applies to
+  appliesToAmountOfDependencyVulns: number;
 };
 
+// Mirrors dtos.ExternalReferenceDTO. A reference is identified by asset + url —
+// the API exposes no id, which is also why DELETE takes the url.
 export type ExternalReference = {
-  id: string;
   assetId: string;
-  assetVersionName: string;
   url: string;
-  type: "cyclonedx" | "csaf";
-  error: string | null;
+  type: "cyclonedx" | "csaf" | "openvex" | "unknown";
+  error?: string | null;
 };
 
 export type OrgStructure = {

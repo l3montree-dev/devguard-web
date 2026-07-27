@@ -5,24 +5,23 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SpeakerXMarkIcon, StopIcon } from "@heroicons/react/24/outline";
+import type {
+  MechanicalJustificationType,
+  VexRuleEventType,
+} from "@/types/api/api";
 import type { FunctionComponent } from "react";
 
 interface VexRuleResultProps {
-  eventType: any; // VulnEventDTO or string
-  mechanicalJustification?: string;
+  eventType: VexRuleEventType;
+  mechanicalJustification?: MechanicalJustificationType;
 }
 
 const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
   eventType,
   mechanicalJustification,
 }) => {
-  // Extract the type string - handle both object and string cases
-  const typeString =
-    typeof eventType === "string" ? eventType : eventType?.type || "unknown";
-
-  // Accepted leads to a comment but leaves the vulnerability open — a warning.
-  // A false positive closes it out.
-  if (typeString === "accepted") {
+  // Accepted leaves the vulnerability open; a false positive closes it out.
+  if (eventType === "accepted") {
     return (
       <Badge variant="yellow" className="w-fit whitespace-nowrap gap-1 py-1">
         <SpeakerXMarkIcon className="h-4 w-4" />

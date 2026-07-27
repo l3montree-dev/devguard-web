@@ -11,7 +11,7 @@ import { useState, type FunctionComponent } from "react";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
 
-// Starting points that cover the shapes rules are usually written in.
+// The shapes rules are usually written in.
 const EXAMPLES: Array<{ label: string; expression: string }> = [
   {
     label: "By advisory",
@@ -20,6 +20,10 @@ const EXAMPLES: Array<{ label: string; expression: string }> = [
   {
     label: "By component",
     expression: 'vuln.componentPurl == "pkg:npm/lodash@5.3.2"',
+  },
+  {
+    label: "By version range",
+    expression: 'matchesPurl(vuln.componentPurl, "pkg:npm/undici@>=6.0.0")',
   },
   {
     label: "By dependency path",
@@ -39,10 +43,7 @@ interface CelPlaygroundProps {
   onCreateRule: (celExpression: string) => void;
 }
 
-/**
- * A scratchpad for CEL expressions: type one, see how many vulnerabilities of
- * this repository it would match, then turn it into a rule.
- */
+/** A scratchpad: write an expression, see what it matches, turn it into a rule. */
 const CelPlayground: FunctionComponent<CelPlaygroundProps> = ({
   baseUrl,
   onCreateRule,
@@ -95,12 +96,10 @@ const CelPlayground: FunctionComponent<CelPlaygroundProps> = ({
 
         <div className="mt-2 flex flex-row flex-wrap items-center gap-2">
           <VexRuleMatchStatus status={status} />
-          {/* ml-auto keeps the button on the right edge even when the status
-              line renders nothing. */}
           <Button
             size="sm"
             variant="default"
-            className="ml-auto"
+            className="ml-auto mt-2"
             disabled={!canCreate}
             onClick={() => onCreateRule(celExpression)}
           >

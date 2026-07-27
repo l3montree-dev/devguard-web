@@ -8,22 +8,16 @@ import { browserApiClient } from "@/services/devGuardApi";
 import type { VexRuleRecommendation } from "@/types/api/api";
 import useSWR from "swr";
 
-/**
- * Recommendations live under an asset version, since they are derived from a
- * concrete vulnerability of one reference.
- */
 export function crowdsourcedVexingUrl(params: {
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
-  assetVersionSlug: string;
 }): string {
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
-  return `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/crowdsourced-vexing/recommendations`;
+  const { organizationSlug, projectSlug, assetSlug } = params;
+  return `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/crowdsourced-vexing/recommendations`;
 }
 
-// "No recommendation" is a 204, which has no body to parse — hence a fetcher of
-// its own instead of the shared one.
+// "No recommendation" is a 204 with no body, which the shared fetcher can't parse.
 const recommendationFetcher = async <T>(url: string): Promise<T | null> => {
   const resp = await browserApiClient(url);
   if (resp.status === 204) return null;

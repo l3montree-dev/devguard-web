@@ -10,17 +10,13 @@ import {
 import { Link2 } from "lucide-react";
 import type { FunctionComponent } from "react";
 
-// The vexSource the backend stamps on rules created in this UI; every other
-// value is the upstream URL the rule was synced from.
-export const MANUAL_VEX_SOURCE = "manual";
+// What the backend stamps on rules created here; anything else is the upstream URL.
+const MANUAL_VEX_SOURCE = "manual";
 
 export const isManualVexRule = (vexSource: string): boolean =>
   vexSource === MANUAL_VEX_SOURCE;
 
-/**
- * Where a rule came from. Own rules need no adornment; synced ones get a badge
- * that reveals the upstream URL on hover.
- */
+/** Own rules need no adornment; synced ones reveal their URL on hover. */
 const VexRuleSourceBadge: FunctionComponent<{ vexSource: string }> = ({
   vexSource,
 }) => {
