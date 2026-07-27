@@ -177,6 +177,15 @@ const VulnAssessmentComposer: FunctionComponent<
                       {secondaryActions}
                     </div>
                     <div className="flex flex-row items-center gap-2">
+                      <AsyncButton
+                        data-testid="mark-accepted-risk"
+                        variant="secondary"
+                        onClick={() =>
+                          attemptSubmit({ status: "accepted", justification })
+                        }
+                      >
+                        Accept
+                      </AsyncButton>
                       <div className="flex flex-row items-center">
                         <AsyncButton
                           data-testid="mark-false-positive"
@@ -237,16 +246,6 @@ const VulnAssessmentComposer: FunctionComponent<
                       <Button variant="secondary" onClick={onCreateVexRule}>
                         Create VEX Rule
                       </Button>
-
-                      <AsyncButton
-                        data-testid="mark-accepted-risk"
-                        variant="secondary"
-                        onClick={() =>
-                          attemptSubmit({ status: "accepted", justification })
-                        }
-                      >
-                        Accept
-                      </AsyncButton>
 
                       <AsyncButton
                         data-testid="add-comment"

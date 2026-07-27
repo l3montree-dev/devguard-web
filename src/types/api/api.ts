@@ -1061,6 +1061,16 @@ export type VexRule = {
 
 export type VexRulesDTO = Paged<VexRule>;
 
+// A rule other DevGuard organizations already apply to this vulnerability,
+// picked by trust-weighted agreement (crowdsourced vexing). Not a rule of this
+// asset yet — it becomes one once accepted.
+export type VexRuleRecommendation = {
+  celExpression: string;
+  justification: string;
+  mechanicalJustification: string;
+  eventType: string;
+};
+
 export type ExternalReference = {
   id: string;
   assetId: string;

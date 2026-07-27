@@ -1,5 +1,5 @@
+import { Badge } from "@/components/ui/badge";
 import type { FunctionComponent } from "react";
-import { classNames } from "@/utils/common";
 
 interface VexEffectBadgeProps {
   effectCount: number;
@@ -8,19 +8,19 @@ interface VexEffectBadgeProps {
 const VexHasEffectBadge: FunctionComponent<VexEffectBadgeProps> = ({
   effectCount,
 }) => {
+  const hasEffect = effectCount > 0;
+
+  // A rule that matches nothing is worth pointing out; one that does its job is
+  // just a fact.
   return (
-    <span
-      className={classNames(
-        "inline-flex whitespace-nowrap items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
-        effectCount > 0
-          ? "bg-muted text-muted-foreground ring-border"
-          : "bg-warning-muted text-warning ring-warning-border",
-      )}
+    <Badge
+      variant={hasEffect ? "secondary" : "danger"}
+      className="w-fit whitespace-nowrap"
     >
-      {effectCount > 0
+      {hasEffect
         ? `Applies to ${effectCount} finding${effectCount > 1 ? "s" : ""}`
         : "No effect"}
-    </span>
+    </Badge>
   );
 };
 

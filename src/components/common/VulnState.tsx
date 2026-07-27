@@ -30,14 +30,14 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
       );
     case "accepted":
       return (
-        <Badge variant="blue" className="gap-1 py-1">
+        <Badge variant="yellow" className="gap-1 py-1">
           <SpeakerXMarkIcon className="h-4 w-4" />
           Accepted
         </Badge>
       );
     case "falsePositive":
       return (
-        <Badge variant="blue" className="gap-1 py-1">
+        <Badge variant="success" className="gap-1 py-1">
           <StopIcon className="h-4 w-4" />
           False Positive
         </Badge>

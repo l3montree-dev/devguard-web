@@ -52,7 +52,7 @@ const CelCodeBlock: FunctionComponent<CelCodeBlockProps> = ({
 
   return (
     <div
-      className={cn("overflow-hidden rounded-lg border bg-muted/50", className)}
+      className={cn("overflow-hidden rounded-lg border bg-muted", className)}
     >
       <div className="flex h-9 items-center justify-between gap-2 border-b px-3">
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -75,7 +75,7 @@ const CelCodeBlock: FunctionComponent<CelCodeBlockProps> = ({
       </div>
       <div
         style={height ? { height } : undefined}
-        className={cn("!bg-card", readOnly && "pointer-events-none opacity-60")}
+        className={cn("!bg-card", readOnly && "pointer-events-none opacity-70")}
       >
         <CodeEditor
           value={value}

@@ -278,13 +278,23 @@ function attributeEffect(
   };
 }
 
+// Both spellings of the identifier: the column on the vuln, and the id on the
+// nested CVE object. `vuln.cve` itself is that object, never a string.
+const IDENTIFIER_PATTERN = /vuln\.(?:cveId|cve\.cve)\s*==\s*["']([^"']+)["']/;
+
+/**
+ * The advisory a rule pins itself to (CVE-… / GHSA-…), if it does. Useful for
+ * labelling a rule that isn't shown next to its vulnerability.
+ */
+export function extractVulnIdentifier(cel: string): string | null {
+  return stripCelComments(cel).match(IDENTIFIER_PATTERN)?.[1] ?? null;
+}
+
 function matchAttribute(
   expr: string,
   vuln: VexRuleVulnContext,
 ): VexRuleEffect | null {
-  // Both spellings of the identifier: the column on the vuln, and the id on the
-  // nested CVE object. `vuln.cve` itself is that object, never a string.
-  const cve = expr.match(/vuln\.(?:cveId|cve\.cve)\s*==\s*["']([^"']+)["']/);
+  const cve = expr.match(IDENTIFIER_PATTERN);
   if (cve) return attributeEffect(cve[1] === vuln.cveID, "cveId", cve[1]);
 
   const purlEquals = expr.match(/vuln\.componentPurl\s*==\s*["']([^"']+)["']/);

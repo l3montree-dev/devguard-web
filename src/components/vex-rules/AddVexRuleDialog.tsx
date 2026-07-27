@@ -24,7 +24,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { FieldDescription } from "@/components/ui/field";
+import { ChevronDown, CircleAlert } from "lucide-react";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { checkCelSyntax } from "@/components/common/celLinter";
 
@@ -33,9 +34,12 @@ interface AddVexRuleDialogProps {
   onOpenChange: (open: boolean) => void;
   baseUrl: string;
   onCreated: () => void;
-  // Prefill the form (e.g. when opened from a specific dependency path).
+  // Prefill the form (e.g. when opened from a specific dependency path, or from
+  // a crowdsourced recommendation).
   initialTitle?: string;
   initialCelExpression?: string;
+  initialJustification?: string;
+  initialMechanicalJustification?: string;
   // When set, the form previews the rule's effect on this specific vulnerability.
   currentVuln?: VexRuleVulnContext;
   // "full": the expert flow with an editable CEL expression editor.
@@ -51,6 +55,8 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   onCreated,
   initialTitle,
   initialCelExpression,
+  initialJustification,
+  initialMechanicalJustification,
   currentVuln,
   variant = "full",
 }) => {
@@ -70,10 +76,22 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
     if (open) {
       setTitle(initialTitle ?? "");
       setCelExpression(initialCelExpression ?? "");
+      setJustification(initialJustification ?? "");
+      if (initialMechanicalJustification) {
+        setSelectedOption(initialMechanicalJustification);
+      }
     }
   }
 
+  // A rule has to say what it is and why — both are part of the VEX statement
+  // it produces, so neither can be left out.
+  const missingFields = [
+    title.trim() === "" && "a title",
+    justification.trim() === "" && "a justification",
+  ].filter((field): field is string => typeof field === "string");
+
   const canSubmit =
+    missingFields.length === 0 &&
     celExpression.trim() !== "" &&
     checkCelSyntax(celExpression) === null &&
     justification.length <= 4000;
@@ -146,14 +164,30 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
             currentVuln={currentVuln}
             variant={variant}
           />
-          <DialogFooter>
+          {missingFields.length > 0 && (
+            <FieldDescription className="flex flex-row items-center gap-1.5 text-xs self-end">
+              <CircleAlert aria-hidden className="h-3.5 w-3.5 shrink-0" />
+              <span>
+                Add {missingFields.join(" and ")} to create this rule.
+              </span>
+            </FieldDescription>
+          )}
+          <DialogFooter className="mt-2">
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
+            <AsyncButton
+              data-testid="mark-accepted-risk"
+              onClick={() => handleSubmit("accepted")}
+              disabled={!canSubmit}
+              variant="secondary"
+            >
+              Accept risk
+            </AsyncButton>
             <div className="flex flex-row items-center">
               <AsyncButton
                 data-testid="mark-false-positive"
-                variant="secondary"
+                variant="default"
                 className="mr-0 rounded-r-none pr-0 capitalize"
                 onClick={() => handleSubmit("falsePositive")}
                 disabled={!canSubmit}
@@ -163,7 +197,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="secondary"
+                    variant="default"
                     className="flex items-center rounded-l-none pl-1 pr-2"
                     disabled={!canSubmit}
                   >
@@ -191,13 +225,6 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <AsyncButton
-              data-testid="mark-accepted-risk"
-              onClick={() => handleSubmit("accepted")}
-              disabled={!canSubmit}
-            >
-              Accept risk
-            </AsyncButton>
           </DialogFooter>
         </form>
       </DialogContent>

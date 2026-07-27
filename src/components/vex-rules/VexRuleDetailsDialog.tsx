@@ -10,7 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import CelCodeBlock from "@/components/common/CelCodeBlock";
 import VexRuleResult from "./VexRuleResult";
+import VexRuleSourceBadge from "./VexRuleSourceBadge";
 import VexHasEffectBadge from "./VexHasEffectBadge";
 import { Loader2, Trash2 } from "lucide-react";
 import { browserApiClient } from "@/services/devGuardApi";
@@ -73,8 +75,8 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
 
           <div>
             <span className="text-muted-foreground">CEL expression</span>
-            <div className="mt-1 bg-card/50 p-2 rounded-md border whitespace-pre-wrap break-words text-xs font-mono">
-              {vexRule.celExpression}
+            <div className="mt-1">
+              <CelCodeBlock value={vexRule.celExpression} readOnly />
             </div>
           </div>
 
@@ -86,6 +88,11 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
               </div>
             </div>
           )}
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-muted-foreground">Source</span>
+            <VexRuleSourceBadge vexSource={vexRule.vexSource} />
+          </div>
 
           <div className="flex items-center justify-between gap-4">
             <span className="text-muted-foreground">Rule Result</span>

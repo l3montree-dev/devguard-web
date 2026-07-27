@@ -4,12 +4,10 @@
 "use client";
 
 import CelCodeBlock from "@/components/common/CelCodeBlock";
-import { checkCelSyntax } from "@/components/common/celLinter";
-import { browserApiClient } from "@/services/devGuardApi";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { ChevronDown, ChevronRight, Scissors } from "lucide-react";
 import dynamic from "next/dynamic";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useMemo } from "react";
 import type { FunctionComponent } from "react";
 import {
   Collapsible,
@@ -17,6 +15,8 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { Input } from "../ui/input";
+import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
+import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import {
   analyzeVexRuleEffect,
   resolveCut,
@@ -114,24 +114,8 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
   variant = "full",
 }) => {
   const isReduced = variant === "reduced";
-  const [isTesting, setIsTesting] = useState(false);
-  const [matchResult, setMatchResult] = useState<{
-    expr: string;
-    count: number;
-  } | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [testingError, setTestingError] = useState<string | null>(null);
-
-  const syntaxError =
-    celExpression.trim() !== "" ? checkCelSyntax(celExpression) : null;
-  const hasSyntaxError = syntaxError !== null;
-
-  // Only surface a count that belongs to the current expression, so a stale
-  // result never lingers while the user edits (avoids a setState in the effect).
-  const matchCount =
-    !hasSyntaxError && matchResult?.expr === celExpression.trim()
-      ? matchResult.count
-      : null;
+  const matchStatus = useVexRuleMatchCount(baseUrl, celExpression);
+  const { hasSyntaxError } = matchStatus;
 
   // What to render for this rule/vuln combination — the parser decides the kind
   // of effect and where (if anywhere) the rule severs the dependency path.
@@ -152,75 +136,12 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
       : beautifyPurl(effect.matchedOn.value)
     : "";
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    const expression = celExpression.trim();
-    if (!expression || hasSyntaxError) {
-      return;
-    }
-
-    debounceRef.current = setTimeout(async () => {
-      setIsTesting(true);
-      try {
-        const resp = await browserApiClient(baseUrl + "/test", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            celExpression: [expression],
-          }),
-        });
-
-        if (!resp.ok) {
-          setTestingError("Failed to test CEL expression");
-          return;
-        } else {
-          setTestingError(null);
-        }
-
-        const data: Record<string, number> = await resp.json();
-        setMatchResult({ expr: expression, count: data[expression] ?? 0 });
-      } finally {
-        setIsTesting(false);
-      }
-    }, 500);
-
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [celExpression, hasSyntaxError, baseUrl]);
-
-  // Shared status lines below the CEL expression — kept visible in both variants.
-  const celStatus = (
-    <>
-      {syntaxError || testingError ? (
-        <p className="mt-1 text-xs text-destructive">
-          {syntaxError?.message ?? testingError ?? "Unknown error"}
-        </p>
-      ) : null}
-      {!hasSyntaxError && isTesting && (
-        <p className="mt-1 text-xs text-muted-foreground">
-          Checking how many vulnerabilities this would affect...
-        </p>
-      )}
-      {!hasSyntaxError && !isTesting && matchCount !== null && (
-        <p
-          className={
-            "mt-1 text-xs " +
-            (matchCount > 0 ? "text-success" : "text-muted-foreground")
-          }
-        >
-          Matches {matchCount} vulnerabilit
-          {matchCount === 1 ? "y" : "ies"} in this ref
-        </p>
-      )}
-    </>
-  );
-
   return (
     <div className="flex flex-col gap-4">
       <div>
-        {!isReduced && (
+        {/* The reduced variant inherits a generated title, but a rule cannot be
+            created without one — so the field appears if that title is empty. */}
+        {(!isReduced || title.trim() === "") && (
           <div className="mb-6">
             <label className="mb-2 block text-sm font-semibold">Title</label>
             <Input
@@ -312,7 +233,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
                 <CelCodeBlock value={celExpression} readOnly />
               </CollapsibleContent>
             </Collapsible>
-            {celStatus}
+            <VexRuleMatchStatus status={matchStatus} className="mt-1.5" />
           </div>
         ) : (
           <div className="mt-6">
@@ -325,7 +246,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
               height={140}
               placeholder={`// Examples:\n// vuln.cveId == "CVE-2021-1234"\n// vuln.componentPurl.startsWith("pkg:npm/lodash")\n// vuln.cve.cvss < 4.0\n// ROOT is a special token matching all artifacts in a repo\n// matchesPattern(vuln, ["*", "pkg:npm/foo@1.0.0", "pkg:npm/lodash@4.17.21"])`}
             />
-            {celStatus}
+            <VexRuleMatchStatus status={matchStatus} className="mt-1.5" />
           </div>
         )}
       </div>

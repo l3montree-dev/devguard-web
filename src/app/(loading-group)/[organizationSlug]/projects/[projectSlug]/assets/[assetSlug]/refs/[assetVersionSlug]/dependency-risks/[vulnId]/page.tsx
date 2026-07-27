@@ -19,10 +19,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import AcceptVexRuleRecommendationDialog from "@/components/vex-rules/AcceptVexRuleRecommendationDialog";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import { buildPathPatternRule } from "@/components/vex-rules/vexRuleParser";
 import VexRuleCard from "@/components/vex-rules/VexRuleCard";
+import VexRuleRecommendationCard from "@/components/vex-rules/VexRuleRecommendationCard";
+import {
+  crowdsourcedVexingUrl,
+  useVexRuleRecommendation,
+} from "@/components/vex-rules/useVexRuleRecommendations";
 import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
@@ -35,11 +39,7 @@ import { useTourSeen } from "@/hooks/useTourSeen";
 import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import type {
-  DetailedDependencyVulnDTO,
-  VexRule,
-  VulnEventDTO,
-} from "@/types/api/api";
+import type { DetailedDependencyVulnDTO, VulnEventDTO } from "@/types/api/api";
 import { formatDate } from "@/utils/format";
 import { beautifyPurl } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
@@ -60,7 +60,6 @@ import Markdown from "../../../../../../../../../../../components/common/Markdow
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
-import VexRuleDetailsDialog from "../../../../../../../../../../../components/vex-rules/VexRuleDetailsDialog";
 import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
@@ -123,20 +122,20 @@ const Index: FunctionComponent = () => {
   const [addVexRuleDialogOpen, setAddVexRuleDialogOpen] = useState(false);
   const [mitigateDialogOpen, setMitigateDialogOpen] = useState(false);
   const [vexRulePrefill, setVexRulePrefill] = useState<
-    { title: string; celExpression: string } | undefined
+    | {
+        title: string;
+        celExpression: string;
+        justification?: string;
+        mechanicalJustification?: string;
+      }
+    | undefined
   >(undefined);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
-  const [selectedVexRule, setSelectedVexRule] = useState<VexRule | null>(null);
-  const [vexRuleDialogOpen, setVexRuleDialogOpen] = useState(false);
 
   const searchParams = useSearchParams();
   const { startTour, registerSteps } = usePageTour(dependencyRiskTourSteps);
   const { showModal: shouldStartTour, markSeen } =
     useTourSeen("dependency-risk");
-  const [
-    acceptVexRuleRecommendationDialogOpen,
-    setAcceptVexRuleRecommendationDialogOpen,
-  ] = useState(false);
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
@@ -159,6 +158,17 @@ const Index: FunctionComponent = () => {
     mutate,
     error,
   } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
+
+  // What other DevGuard organizations already decided about this vulnerability.
+  const { recommendation } = useVexRuleRecommendation(
+    crowdsourcedVexingUrl({
+      organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    }),
+    vulnId,
+  );
 
   const isLastEventVexRule = useMemo(() => {
     if (!vuln || !vuln.events || vuln.events.length === 0) {
@@ -507,6 +517,24 @@ const Index: FunctionComponent = () => {
                   />
                 </div>
               )}
+              {/* Only worth offering while nothing handles this vuln yet. */}
+              {!isVexLocked && recommendation && isMember(role) && (
+                <div className="mt-6">
+                  <VexRuleRecommendationCard
+                    recommendation={recommendation}
+                    onCreateRule={() => {
+                      setVexRulePrefill({
+                        title: `${vuln?.cveID ?? "Vulnerability"} assessed as not exploitable`,
+                        celExpression: recommendation.celExpression,
+                        justification: recommendation.justification,
+                        mechanicalJustification:
+                          recommendation.mechanicalJustification,
+                      });
+                      setAddVexRuleDialogOpen(true);
+                    }}
+                  />
+                </div>
+              )}
               <div className={lockedOverlay}>
                 <div className="mt-8">
                   {vuln?.related?.advisory && (
@@ -698,8 +726,11 @@ const Index: FunctionComponent = () => {
         onCreated={() => mutate()}
         initialTitle={vexRulePrefill?.title}
         initialCelExpression={vexRulePrefill?.celExpression}
-        // Opened from a dependency path: the expression is generated, so show the
-        // reduced dialog focused on the effect instead of the CEL editor.
+        initialJustification={vexRulePrefill?.justification}
+        initialMechanicalJustification={vexRulePrefill?.mechanicalJustification}
+        // Opened from a dependency path or a recommendation: the expression comes
+        // prefilled, so show the reduced dialog focused on the effect instead of
+        // the CEL editor.
         variant={vexRulePrefill ? "reduced" : "full"}
         currentVuln={
           vuln
@@ -711,28 +742,6 @@ const Index: FunctionComponent = () => {
               }
             : undefined
         }
-      />
-      <AcceptVexRuleRecommendationDialog
-        vexRule={selectedVexRule}
-        isOpen={acceptVexRuleRecommendationDialogOpen}
-        onOpenChange={setAcceptVexRuleRecommendationDialogOpen}
-        organizationSlug={organizationSlug}
-        projectSlug={projectSlug}
-        assetSlug={assetSlug}
-        assetVersionSlug={assetVersionSlug}
-        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
-        onAccepted={() => {
-          mutate();
-        }}
-      />
-      <VexRuleDetailsDialog
-        vexRule={selectedVexRule}
-        isOpen={vexRuleDialogOpen}
-        onOpenChange={setVexRuleDialogOpen}
-        urlBase={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
-        onDeleted={() => {
-          mutate();
-        }}
       />
     </Page>
   );

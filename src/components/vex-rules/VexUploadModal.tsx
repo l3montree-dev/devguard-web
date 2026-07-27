@@ -300,8 +300,8 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                 <DialogHeader>
                   <DialogTitle>Upload VEX File</DialogTitle>
                   <DialogDescription>
-                    Select a VEX file in CycloneDX format and the branch/tag to
-                    apply it to
+                    Select a VEX file in CycloneDX format - rules are created
+                    based on the given VEX decisions.
                   </DialogDescription>
                 </DialogHeader>
 
