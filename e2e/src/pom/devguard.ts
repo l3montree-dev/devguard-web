@@ -125,6 +125,14 @@ export class DevGuardPOM {
     const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
     const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
 
+    const closeToast = this.page.getByRole('button', { name: 'Close toast' }).first();
+    try {
+      await closeToast.waitFor({ state: "visible", timeout: 5_000 });
+      await closeToast.click();
+    } catch {
+      // kein Toast innerhalb von 5s – nichts zu schliessen
+    }
+
     await this.org().createOrganization(orgName);
     await this.group().createGroup(groupName, "Test Group that contains very important projects!");
     await this.repo().createGitHubRepo(repoName, "This repo contains top secret information.");
