@@ -1,100 +1,59 @@
-import { classNames } from "@/utils/common";
 import {
-  BugAntIcon,
   CheckCircleIcon,
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
+import { Bug } from "lucide-react";
 import type { FunctionComponent } from "react";
+import type { DependencyVuln } from "../../types/api/api";
 import { Badge } from "../ui/badge";
-import type { DependencyVuln, ExpandedVulnDTOState } from "../../types/api/api";
-import { Scale, Bug } from "lucide-react";
-import { evTypeBackground } from "@/utils/view";
 
+// Uses the shared Badge color variants (muted background + matching border and
+// text) so vuln states read like every other status badge in the app.
 const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
   state,
 }) => {
-  const defaultClasses =
-    "px-2 py-1 whitespace-nowrap rounded-full flex flex-row items-center gap-1 border font-semibold";
   switch (state) {
     case "fixed":
       return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            evTypeBackground["fixed"],
-            "text-secondary-foreground",
-          )}
-        >
-          <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+        <Badge variant="success" className="gap-1 py-1">
+          <CheckCircleIcon className="h-4 w-4" />
           Fixed
-        </Badge>
-      );
-
-    case "accepted":
-      return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            defaultClasses,
-            evTypeBackground["accepted"],
-            "text-secondary-foreground",
-          )}
-        >
-          <SpeakerXMarkIcon className="-ml-1 inline-block h-4 w-4" />
-          Accepted
         </Badge>
       );
     case "implemented":
       return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            evTypeBackground["fixed"],
-            "text-secondary-foreground",
-          )}
-        >
-          <CheckCircleIcon className="-ml-1 mr-1 inline-block h-4 w-4" />
+        <Badge variant="success" className="gap-1 py-1">
+          <CheckCircleIcon className="h-4 w-4" />
           Implemented
+        </Badge>
+      );
+    case "accepted":
+      return (
+        <Badge variant="yellow" className="gap-1 py-1">
+          <SpeakerXMarkIcon className="h-4 w-4" />
+          Accepted
         </Badge>
       );
     case "falsePositive":
       return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            defaultClasses,
-            evTypeBackground["falsePositive"],
-          )}
-        >
-          <StopIcon className="-ml-1 inline-block h-4 w-4" />
+        <Badge variant="success" className="gap-1 py-1">
+          <StopIcon className="h-4 w-4" />
           False Positive
         </Badge>
       );
     case "notApplicable":
       return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            defaultClasses,
-            evTypeBackground["falsePositive"],
-          )}
-        >
-          <StopIcon className="-ml-1 inline-block h-4 w-4" />
+        <Badge variant="blue" className="gap-1 py-1">
+          <StopIcon className="h-4 w-4" />
           Not Applicable
         </Badge>
       );
-
     case "open":
     default:
       return (
-        <Badge
-          variant={"default"}
-          className={classNames(
-            "text-secondary-foreground px-3 py-1 bg-secondary",
-          )}
-        >
-          <Bug className="-ml-1 inline-block h-4 w-4 mr-1" />
+        <Badge variant="danger" className="gap-1 py-1">
+          <Bug className="h-4 w-4" />
           Open
         </Badge>
       );

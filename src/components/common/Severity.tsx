@@ -19,22 +19,30 @@ export const getSeverityClassNames = (severity: string, gray: boolean) => {
     }
 };
 
-export const severityToColor = (severity: string, gray?: boolean) => {
+export const severityToColor = (
+  severity: string,
+  gray?: boolean,
+  opacity: number = 100,
+) => {
+  // opacity is a percentage (0-100); 100 renders the color fully opaque.
+  const color = (variable: string) => `hsl(var(${variable}) / ${opacity}%)`;
+
   if (gray) {
-    return "hsl(var(--muted-foreground))";
-  } else
-    switch (severity) {
-      case "CRITICAL":
-        return "hsl(var(--severity-critical))";
-      case "HIGH":
-        return "hsl(var(--severity-high))";
-      case "MEDIUM":
-        return "hsl(var(--severity-medium))";
-      case "LOW":
-        return "hsl(var(--severity-low))";
-      default:
-        return "hsl(var(--muted-foreground))";
-    }
+    return color("--muted-foreground");
+  }
+
+  switch (severity) {
+    case "CRITICAL":
+      return color("--severity-critical");
+    case "HIGH":
+      return color("--severity-high");
+    case "MEDIUM":
+      return color("--severity-medium");
+    case "LOW":
+      return color("--severity-low");
+    default:
+      return color("--muted-foreground");
+  }
 };
 
 export const riskToSeverity = (risk: number) => {

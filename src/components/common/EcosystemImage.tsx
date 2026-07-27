@@ -54,8 +54,8 @@ const EcosystemImage = ({
           <span>
             <Image
               alt={"Logo von " + getEcosystem(packageName)}
-              width={size ?? 24}
-              height={size ?? 24}
+              width={size ?? 20}
+              height={size ?? 20}
               className={classNames(
                 "inline-block",
                 invertSvgOnDark(getEcosystem(packageName)) ? "dark:invert" : "",

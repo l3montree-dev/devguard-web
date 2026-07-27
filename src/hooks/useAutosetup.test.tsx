@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 
+import { TOASTER_ID } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import { useAutosetup } from "./useAutosetup";
 
@@ -63,6 +64,10 @@ describe("useAutosetup", () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false);
     });
-    expect(toast).toHaveBeenCalledWith("Failed to setup GitLab integration");
+    // Toasts go through @/lib/toast, which routes them to devguard's toaster.
+    expect(toast).toHaveBeenCalledWith(
+      "Failed to setup GitLab integration",
+      expect.objectContaining({ toasterId: TOASTER_ID }),
+    );
   });
 });
