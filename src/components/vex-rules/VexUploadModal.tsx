@@ -231,7 +231,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent>
         <Carousel
           opts={{
             watchDrag: false,
