@@ -21,6 +21,15 @@ export class OrgFlow {
     await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
   }
 
+  async openGroups() {
+    await this.page
+      .locator(`${DevGuardNavigationLevel.Organization} [data-testid="nav-org-groups"]`)
+      .click({ timeout: 30_000 });
+    await this.page
+      .getByTestId("create-group-button")
+      .waitFor({ state: "visible", timeout: 30_000 });
+  }
+
   async inviteUserOrg(mail: string) {
     await this.page.getByTestId("nav-org-settings").click();
     await this.page.getByTestId("add-member-button").waitFor({ state: "visible", timeout: 10_000 });

@@ -72,6 +72,7 @@ export const useProjectMenu = () => {
     isActive: pathname.startsWith(
       `/${orgSlug}/projects/${projectSlug}/compliance-postures`,
     ),
+    testId: "nav-group-compliance-postures",
   });
 
   if (isAdmin(currentUserRole)) {

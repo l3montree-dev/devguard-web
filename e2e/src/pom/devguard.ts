@@ -12,6 +12,7 @@ import { ArtifactFlow } from "./flows/artifact";
 import { ShareFlow } from "./flows/sharing";
 import { ModalHelper } from "./flows/modal-helper";
 import { AdvisoryHelper } from "./flows/advisory";
+import { ComplianceFlow } from "./flows/compliance";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -66,6 +67,10 @@ export class DevGuardPOM {
 
   advisory(): AdvisoryHelper {
     return new AdvisoryHelper(this.page);
+  }
+
+  compliance(): ComplianceFlow {
+    return new ComplianceFlow(this.page);
   }
 
   async loadDevGuard() {

@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { DevGuardNavigationLevel } from "../devguard";
 
 export class GroupFlow {
   constructor(private page: Page) {}
@@ -26,6 +27,17 @@ export class GroupFlow {
     await this.page.getByTestId("group-description").click();
     await this.page.getByTestId("group-description").fill(description);
     await this.page.getByTestId("create-group-submit-button").click();
+  }
+
+  async openSubgroupsAndRepositories() {
+    await this.page
+      .locator(
+        `${DevGuardNavigationLevel.Group} [data-testid="nav-group-subgroups-repositories"]`,
+      )
+      .click({ timeout: 30_000 });
+    await this.page
+      .getByTestId("create-repository-button")
+      .waitFor({ state: "visible", timeout: 30_000 });
   }
 
   async createNewSubgroup() {
