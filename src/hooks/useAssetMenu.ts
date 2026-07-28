@@ -153,7 +153,7 @@ export const useAssetMenu = () => {
             "/compliance-postures",
           Icon: ShieldCheck,
           isActive: pathname.includes("compliance-postures"),
-          testId: "nav-asset-compliance-postures",
+          testId: "nav-asset-overview-compliance-postures",
         },
       ],
     });
@@ -278,6 +278,7 @@ export const useAssetMenu = () => {
         isActive: pathname.startsWith(
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance-postures`,
         ),
+        testId: "nav-asset-compliance-postures",
       },
       {
         title: "Artifacts",

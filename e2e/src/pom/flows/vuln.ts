@@ -16,12 +16,6 @@ export class VulnFlow {
   }
 
   async openFirstAffectedComponent() {
-    // Follows the SBOM upload, whose toast covers the asset nav.
-    await new ModalHelper(this.page).dismissToasts();
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 20_000 });
     const packageRows = this.page.getByTestId("package-row");
     await expect(packageRows.first()).toBeVisible({ timeout: 180_000 });
     await packageRows.first().click();
@@ -50,8 +44,6 @@ export class VulnFlow {
     await expect(markAcceptedRisk).toBeHidden({ timeout: 20_000 });
   }
 
-  // Clicking an edge of the path to the component opens the reduced VEX rule
-  // dialog, prefilled with a rule that cuts exactly that edge.
   async markEdgeAsDoesNotCallVulnerableFunction() {
     const firstEdge = this.page.getByTestId("path-edge").first();
     await expect(firstEdge).toBeVisible({ timeout: 20_000 });
@@ -72,8 +64,6 @@ export class VulnFlow {
   }
 
   async verifyVEXRule() {
-    // Follows rule creation or a VEX upload, both of which toast.
-    await new ModalHelper(this.page).dismissToasts();
     await this.page
       .getByTestId("nav-asset-dependency-risks")
       .locator("button")
@@ -96,7 +86,6 @@ export class VulnFlow {
   }
 
   async filterDependencyRisksTable() {
-    await new ModalHelper(this.page).dismissToasts();
     await this.page
       .getByTestId("nav-asset-dependency-risks")
       .locator("a")

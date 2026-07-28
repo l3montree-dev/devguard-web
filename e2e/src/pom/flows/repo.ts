@@ -49,6 +49,9 @@ export class RepoFlow {
     await this.page.getByTestId("availability-requirement-low").click();
     await this.page.getByTestId("save-security-requirements-button").click();
     await this.page.getByTestId("enable-public-access-switch").click();
+    await this.page.mouse.wheel(0, 300);
+    await this.page.waitForTimeout(3_000);
+    await docShot(this.page, test.info(), "public-access");
     await this.page.getByTestId("vuln-auto-reopen-switch").click();
     await this.page
       .getByTestId("save-vulnerability-management-settings-button")
@@ -63,8 +66,8 @@ export class RepoFlow {
   }
 
   async openDependencyGraph() {
-    await this.page.locator('#radix-_R_76itpet9esnekneabmlklb_').click();
-    await this.page.getByTestId('nav-asset-dependency-insights').click();
+    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
+    await this.page.getByTestId("nav-asset-dependency-insights").click();
     await this.page.waitForTimeout(5_000);
     await docShot(this.page, test.info(), "dependency-insights-overview");
     await this.page.getByTestId("open-dependency-graph").click();

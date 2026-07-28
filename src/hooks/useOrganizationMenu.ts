@@ -63,6 +63,7 @@ export const useOrganizationMenu = () => {
           isActive: decodedPathName.startsWith(
             "/" + decodedOrgSlug + "/compliance-postures",
           ),
+          testId: "nav-org-compliance-postures",
         },
         {
           title: "Settings",

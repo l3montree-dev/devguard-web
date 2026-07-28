@@ -12,6 +12,7 @@ import { ArtifactFlow } from "./flows/artifact";
 import { ShareFlow } from "./flows/sharing";
 import { ModalHelper } from "./flows/modal-helper";
 import { AdvisoryHelper } from "./flows/advisory";
+import { ComplianceFlow } from "./flows/compliance";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -68,6 +69,10 @@ export class DevGuardPOM {
     return new AdvisoryHelper(this.page);
   }
 
+  compliance(): ComplianceFlow {
+    return new ComplianceFlow(this.page);
+  }
+
   async loadDevGuard() {
     await this.page.goto(this.devGuardDomain);
     await this.verifyOnDevGuardURL();
@@ -84,19 +89,6 @@ export class DevGuardPOM {
       new RegExp(`^${this.devGuardDomain}/login`),
       { timeout: 15_000 },
     );
-  }
-
-  async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
-    const themeChooser = this.page.locator(
-      `${level} [data-testid="theme-chooser"]`,
-    );
-    await themeChooser.click();
-    await this.page.getByTestId("light-mode").waitFor({ state: "visible" });
-    await this.page.getByTestId("light-mode").click();
-    await this.page.getByTestId("light-mode").waitFor({ state: "hidden" });
-    await themeChooser.click({ timeout: 10_000 });
-    await this.page.getByTestId("dark-mode").waitFor({ state: "visible" });
-    await this.page.getByTestId("dark-mode").click();
   }
 
   async loadAndRegister() {
@@ -122,24 +114,22 @@ export class DevGuardPOM {
   }
 
   async createTestOrganizationGroupAndRepo(options?: {
-  orgName?: string;
-  groupName?: string;
-  repoName?: string;
+    orgName?: string;
+    groupName?: string;
+    repoName?: string;
   }) {
     const orgName = options?.orgName ?? `Test Org ${Date.now()}`;
     const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
     const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
 
-    const closeToast = this.page.getByRole('button', { name: 'Close toast' }).first();
-    try {
-      await closeToast.waitFor({ state: "visible", timeout: 5_000 });
-      await closeToast.click({ timeout: 2_000 });
-    } catch {
-      // no Toast visible
-    }
-
     await this.org().createOrganization(orgName);
-    await this.group().createGroup(groupName, "Test Group that contains very important projects!");
-    await this.repo().createGitHubRepo(repoName, "This repo contains top secret information.");
+    await this.group().createGroup(
+      groupName,
+      "Test Group that contains very important projects!",
+    );
+    await this.repo().createGitHubRepo(
+      repoName,
+      "This repo contains top secret information.",
+    );
   }
 }
