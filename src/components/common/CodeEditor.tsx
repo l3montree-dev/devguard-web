@@ -4,6 +4,7 @@ import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { yaml } from "@codemirror/lang-yaml";
 import { linter, lintGutter } from "@codemirror/lint";
 import type { Diagnostic } from "@codemirror/lint";
+import { autocompletion } from "@codemirror/autocomplete";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { vscodeDarkInit, vscodeLight } from "@uiw/codemirror-theme-vscode";
@@ -13,10 +14,13 @@ import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
-import { keymap } from "@codemirror/view";
+import { javascript } from "@codemirror/legacy-modes/mode/javascript";
+import { keymap, placeholder as placeholderExtension } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import valid from "purl/valid";
 import normalize from "purl/normalize";
+import { cn } from "@/lib/utils";
+import { celParseLinter, celCompletionSource } from "./celLinter";
 
 const vscodeDark = vscodeDarkInit({
   settings: {
@@ -209,6 +213,22 @@ interface Props {
   onValidation?: (isValid: boolean, diagnostics: Diagnostic[]) => void;
   onSave?: () => void;
   readOnly?: boolean;
+  placeholder?: string;
+  /** Wrap long lines instead of scrolling horizontally. */
+  lineWrapping?: boolean;
+  /** Extra classes for the wrapper (merged; can override the default border). */
+  className?: string;
+  /** Blend into the container: transparent editor/gutter background, no gutter border. */
+  transparent?: boolean;
+}
+
+function buildPlaceholderNode(text: string): HTMLElement {
+  const container = document.createElement("div");
+  text.split("\n").forEach((line, i) => {
+    if (i > 0) container.appendChild(document.createElement("br"));
+    container.appendChild(document.createTextNode(line));
+  });
+  return container;
 }
 
 const languageExtensions = {
@@ -217,6 +237,12 @@ const languageExtensions = {
   toml: StreamLanguage.define(toml),
   dependencyProxyRule: [],
   purl: [],
+  // CEL has no dedicated grammar; JavaScript is close enough to colour strings,
+  // numbers, booleans, operators, property access and function calls.
+  cel: [
+    StreamLanguage.define(javascript),
+    autocompletion({ override: [celCompletionSource] }),
+  ],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
@@ -225,6 +251,7 @@ const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   toml: tomlParseLinter(),
   dependencyProxyRule: dependencyProxyRuleParseLinter(),
   purl: purlParseLinter(),
+  cel: celParseLinter(),
 };
 
 const CodeEditor = ({
@@ -234,17 +261,24 @@ const CodeEditor = ({
   onValidation,
   onSave,
   readOnly = false,
+  placeholder,
+  lineWrapping = false,
+  className,
+  transparent = false,
 }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
   const onChangeRef = useRef(onChange);
-  onChangeRef.current = onChange;
   const onValidationRef = useRef(onValidation);
-  onValidationRef.current = onValidation;
   const onSaveRef = useRef(onSave);
-  onSaveRef.current = onSave;
   const valueRef = useRef(value);
-  valueRef.current = value;
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+    onValidationRef.current = onValidation;
+    onSaveRef.current = onSave;
+    valueRef.current = value;
+  });
 
   const { resolvedTheme } = useTheme();
   const currentTheme = resolvedTheme === "dark" ? vscodeDark : vscodeLight;
@@ -271,6 +305,7 @@ const CodeEditor = ({
         doc: valueRef.current,
         extensions: [
           basicSetup,
+          lineWrapping ? EditorView.lineWrapping : [],
           currentTheme,
           languageExtensions[language],
           linter((view) => {
@@ -290,9 +325,30 @@ const CodeEditor = ({
             }
           }),
           EditorView.theme({
-            "&": { height: "100%", fontSize: "13px" },
+            "&": {
+              height: "100%",
+              fontSize: "13px",
+              ...(transparent ? { backgroundColor: "transparent" } : {}),
+            },
             ".cm-scroller": { overflow: "auto", fontFamily: "monospace" },
+            ".cm-placeholder": {
+              color: "hsl(var(--muted-foreground))",
+              fontStyle: "italic",
+            },
+            ...(transparent
+              ? {
+                  ".cm-gutters": {
+                    backgroundColor: "transparent",
+                    border: "none",
+                  },
+                  ".cm-activeLine": { backgroundColor: "transparent" },
+                  ".cm-activeLineGutter": { backgroundColor: "transparent" },
+                }
+              : {}),
           }),
+          placeholder
+            ? placeholderExtension(buildPlaceholderNode(placeholder))
+            : [],
           tabExtension,
           saveKeymap,
         ],
@@ -306,7 +362,14 @@ const CodeEditor = ({
       view.destroy();
       viewRef.current = null;
     };
-  }, [currentTheme, language, readOnly]);
+  }, [
+    currentTheme,
+    language,
+    readOnly,
+    placeholder,
+    lineWrapping,
+    transparent,
+  ]);
 
   // Sync external value changes without recreating the editor
   useEffect(() => {
@@ -323,7 +386,10 @@ const CodeEditor = ({
   return (
     <div
       ref={containerRef}
-      className="h-full w-full overflow-hidden rounded-lg border"
+      className={cn(
+        "h-full w-full overflow-hidden rounded-lg border",
+        className,
+      )}
     />
   );
 };

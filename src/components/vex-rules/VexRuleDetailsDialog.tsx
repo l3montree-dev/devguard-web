@@ -1,6 +1,10 @@
-import type { VexRule } from "@/types/api/api";
-import { useMemo, useState } from "react";
-import type { FunctionComponent } from "react";
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+"use client";
+
+import Alert from "@/components/common/Alert";
+import { AsyncButton, Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,260 +13,218 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import VexRuleResult from "./VexRuleResult";
-import VexHasEffectBadge from "./VexHasEffectBadge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Loader2, Trash2 } from "lucide-react";
-import { browserApiClient } from "@/services/devGuardApi";
+import { FieldDescription } from "@/components/ui/field";
 import { toast } from "@/lib/toast";
-import { Badge } from "@/components/ui/badge";
-import Section from "@/components/common/Section";
-import DependencyGraph from "../DependencyGraph";
-import { convertPathsToTree } from "../../utils/dependencyGraphHelpers";
-import ListItem from "../common/ListItem";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { truncateMiddle } from "../../utils/common";
+import { browserApiClient } from "@/services/devGuardApi";
+import type { CreateVexRuleRequest, VexRule } from "@/types/api/api";
+import { CircleAlert } from "lucide-react";
+import { useState, type FunctionComponent } from "react";
+import { checkCelSyntax } from "@/components/common/celLinter";
+import VexRuleForm from "./VexRuleForm";
+import VexRuleResult from "./VexRuleResult";
+import VexRuleSourceBadge, { isManualVexRule } from "./VexRuleSourceBadge";
+import VexRuleMatchStatus from "./VexRuleMatchStatus";
 
 interface VexRuleDetailsDialogProps {
   vexRule: VexRule | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  organizationSlug?: string;
-  projectSlug?: string;
-  assetSlug?: string;
-  assetVersionSlug?: string;
-  urlBase?: string;
-  onDeleted?: () => void;
-  onReapplied?: () => void;
+  // API base of this asset's VEX rules, e.g. /organizations/o/.../vex-rules
+  urlBase: string;
+  // Called after the rule was deleted or recreated, so callers can refetch.
+  onChanged?: () => void;
 }
+
+// The parts of a rule this dialog edits; the rest is recreated verbatim.
+type EditableRule = Pick<
+  CreateVexRuleRequest,
+  "title" | "celExpression" | "justification"
+>;
+
+const editableOf = (rule: VexRule): EditableRule => ({
+  title: rule.title ?? "",
+  celExpression: rule.celExpression ?? "",
+  justification: rule.justification ?? "",
+});
 
 const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   vexRule,
   isOpen,
   onOpenChange,
-  organizationSlug,
-  projectSlug,
-  assetSlug,
-  assetVersionSlug,
-  urlBase: deleteUrlBase,
-  onDeleted,
-  onReapplied,
+  urlBase,
+  onChanged,
 }) => {
+  const [draft, setDraft] = useState<EditableRule>({
+    title: "",
+    celExpression: "",
+    justification: "",
+  });
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isReapplying, setIsReapplying] = useState(false);
 
-  const graph = useMemo(() => {
-    if (!vexRule?.pathPattern)
-      return {
-        id: "(*)",
-        name: "(*)",
-        children: [],
-        risk: 0,
-        parents: [],
-        nodeType: "component" as const,
-      };
+  // Seed the draft from the rule being shown, keyed by id so opening a different
+  // row reseeds (React's recommended alternative to an effect).
+  const [seededId, setSeededId] = useState<string | null>(null);
+  if (vexRule && vexRule.id !== seededId) {
+    setSeededId(vexRule.id);
+    setDraft(editableOf(vexRule));
+  }
 
-    const g = convertPathsToTree([vexRule.pathPattern], [], false);
-
-    return g;
-  }, [vexRule?.pathPattern]);
+  // Closing discards the draft, so the next open starts from the rule again.
+  const handleOpenChange = (next: boolean) => {
+    if (!next) setSeededId(null);
+    onOpenChange(next);
+  };
 
   if (!vexRule) return null;
 
-  const handleDelete = async () => {
-    if (!deleteUrlBase) return;
+  const original = editableOf(vexRule);
+  const isDirty =
+    draft.title !== original.title ||
+    draft.celExpression !== original.celExpression ||
+    draft.justification !== original.justification;
 
+  const missingFields = [
+    draft.title.trim() === "" && "a title",
+    draft.justification.trim() === "" && "a justification",
+  ].filter((field): field is string => typeof field === "string");
+
+  const canUpdate =
+    isDirty &&
+    missingFields.length === 0 &&
+    draft.celExpression.trim() !== "" &&
+    checkCelSyntax(draft.celExpression) === null;
+
+  const createRule = (rule: EditableRule) => {
+    const body: CreateVexRuleRequest = {
+      ...rule,
+      eventType: vexRule.eventType,
+      mechanicalJustification: vexRule.mechanicalJustification,
+    };
+    return browserApiClient(`${urlBase}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  };
+
+  const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await browserApiClient(`${deleteUrlBase}/${vexRule.id}`, {
+      const resp = await browserApiClient(`${urlBase}/${vexRule.id}`, {
         method: "DELETE",
       });
-      toast.success("VEX rule deleted successfully");
-      onOpenChange(false);
-      onDeleted?.();
-    } catch (error) {
+      if (!resp.ok) throw new Error(resp.statusText);
+
+      toast.success("VEX rule deleted");
+      handleOpenChange(false);
+      onChanged?.();
+    } catch {
       toast.error("Failed to delete VEX rule");
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const handleReapply = async () => {
-    if (!deleteUrlBase) return;
+  const handleUpdate = async () => {
+    if (!canUpdate) return false;
 
-    setIsReapplying(true);
-
-    const resp = await browserApiClient(
-      `${deleteUrlBase}/${vexRule.id}/reapply`,
-      {
-        method: "POST",
-      },
-    );
-    if (!resp.ok) {
-      toast.error("Failed to reapply VEX rule");
-    } else {
-      toast.success("VEX rule reapplied successfully");
-      onReapplied?.();
+    // The id derives from the expression, so the old row goes first.
+    const deleted = await browserApiClient(`${urlBase}/${vexRule.id}`, {
+      method: "DELETE",
+    });
+    if (!deleted.ok) {
+      toast.error("Failed to update VEX rule: could not remove the old rule");
+      return false;
     }
-    setIsReapplying(false);
+
+    const created = await createRule(draft);
+    if (!created.ok) {
+      // Put it back rather than leaving the asset without the rule.
+      const restored = await createRule(original);
+      toast.error(
+        restored.ok
+          ? "Failed to update VEX rule — the previous rule was restored"
+          : "Failed to update VEX rule and to restore the previous one",
+      );
+      onChanged?.();
+      return false;
+    }
+
+    toast.success("VEX rule updated");
+    handleOpenChange(false);
+    onChanged?.();
+    return true;
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>VEX Rule Details</DialogTitle>
+          <DialogTitle>VEX rule</DialogTitle>
           <DialogDescription>
-            View and manage the details of this VEX rule
+            Change the expression, title or justification and update the rule.
+            Rules are identified by their expression, so updating recreates it —
+            the current rule is deleted and a new one is created
+            {isManualVexRule(vexRule.vexSource)
+              ? "."
+              : ", which makes it your own rule instead of a synced one."}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-6">
-          {/* Path Pattern */}
-          <Section
-            className="mb-0"
-            title="Path Pattern"
-            description={
-              <p>
-                The dependency path where this rule applies. The wildcard * will
-                match any component (Zero or more).{" "}
-                <Link href="https://devguard.org/explanations/vulnerability-management/mitigation-strategies#vex-rules-automating-mitigation-at-scale">
-                  Check out the documentation for path patterns
-                </Link>
-              </p>
-            }
-            forceVertical
-          >
-            <div className={"h-72 w-full rounded-lg border bg-muted"}>
-              <DependencyGraph
-                variant="compact"
-                width={100}
-                height={200}
-                vulns={[]}
-                graph={graph}
-              />
-            </div>
-          </Section>
-
-          {/* Justification */}
-          {vexRule.justification && (
-            <Section
-              className="mb-0"
-              title="Justification"
-              description="The reason why this vulnerability is not applicable or can be accepted. This is usually provided by the vulnerability management team or the rule source."
-              forceVertical
-            >
-              <div className="bg-card/50 p-3 rounded-md text-sm border whitespace-pre-wrap break-words">
-                {vexRule.justification}
-              </div>
-            </Section>
-          )}
-          {/* CVE ID */}
-          <ListItem
-            Title="CVE ID"
-            Description="The Common Vulnerabilities and Exposures identifier"
-            Button={
-              organizationSlug &&
-              projectSlug &&
-              assetSlug &&
-              assetVersionSlug ? (
-                <Link
-                  href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/dependency-risks?search=${encodeURIComponent(vexRule.cveId)}&state=closed`}
-                  className="whitespace-nowrap text-primary text-sm hover:underline"
-                >
-                  {vexRule.cveId}
-                </Link>
-              ) : null
-            }
+        <div className="flex flex-row flex-wrap items-center gap-2">
+          <VexRuleResult
+            eventType={vexRule.eventType}
+            mechanicalJustification={vexRule.mechanicalJustification}
           />
-          {/* Mechanical Justification */}
-          {vexRule.mechanicalJustification && (
-            <Section
-              title="Mechanical Justification"
-              description="Additional technical justification provided by the rule source"
-              forceVertical
-            >
-              <div className="bg-card/50 p-3 rounded-md border whitespace-pre-wrap break-words">
-                {vexRule.mechanicalJustification}
-              </div>
-            </Section>
-          )}
-
-          {/* VEX Source */}
-          {vexRule.vexSource && (
-            <ListItem
-              Title="VEX Source"
-              Description="The source or document that defines this VEX rule"
-              Button={
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge variant="outline">
-                      {truncateMiddle(vexRule.vexSource, 20)}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent className="whitespace-normal">
-                    {vexRule.vexSource}
-                  </TooltipContent>
-                </Tooltip>
-              }
-            />
-          )}
-
-          {/* Rule Result */}
-          <ListItem
-            Title="Rule Result"
-            Description="The outcome of this rule when applied to vulnerabilities"
-            Button={
-              <VexRuleResult
-                eventType={vexRule.eventType}
-                mechanicalJustification={vexRule.mechanicalJustification}
-              />
-            }
-          ></ListItem>
-
-          {/* Has Effect */}
-          <ListItem
-            Title="Has Effect"
-            Description="Number of dependency vulnerabilities affected by this rule"
-            Button={
-              <VexHasEffectBadge
-                effectCount={vexRule.appliesToAmountOfDependencyVulns}
-              />
-            }
-          ></ListItem>
+          <VexRuleMatchStatus
+            status={{ matchCount: vexRule.appliesToAmountOfDependencyVulns }}
+          />
+          <VexRuleSourceBadge vexSource={vexRule.vexSource} />
         </div>
 
-        <DialogFooter className="mt-10">
-          <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          {deleteUrlBase && (
-            <>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="gap-2"
-              >
-                {isDeleting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Trash2 className="h-4 w-4" />
-                )}
-                Delete Rule
-              </Button>
-              <Button
-                onClick={handleReapply}
-                disabled={isReapplying}
-                className="gap-2"
-              >
-                {isReapplying && <Loader2 className="h-4 w-4 animate-spin" />}
-                Reapply
-              </Button>
-            </>
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(e) => e.preventDefault()}
+        >
+          <VexRuleForm
+            baseUrl={urlBase}
+            title={draft.title}
+            onTitleChange={(title) => setDraft((d) => ({ ...d, title }))}
+            celExpression={draft.celExpression}
+            onCelExpressionChange={(celExpression) =>
+              setDraft((d) => ({ ...d, celExpression }))
+            }
+            justification={draft.justification}
+            onJustificationChange={(justification) =>
+              setDraft((d) => ({ ...d, justification }))
+            }
+          />
+          {missingFields.length > 0 && (
+            <FieldDescription className="flex flex-row items-center gap-1.5 self-end text-xs">
+              <CircleAlert aria-hidden className="h-3.5 w-3.5 shrink-0" />
+              <span>
+                Add {missingFields.join(" and ")} to update this rule.
+              </span>
+            </FieldDescription>
           )}
-        </DialogFooter>
+          <DialogFooter className="mt-2">
+            <Button variant="secondary" onClick={() => handleOpenChange(false)}>
+              Cancel
+            </Button>
+            <Alert
+              onConfirm={handleDelete}
+              title="Delete VEX rule"
+              description="Vulnerabilities this rule handles will reopen. This cannot be undone."
+            >
+              <Button variant="destructive" disabled={isDeleting}>
+                Delete rule
+              </Button>
+            </Alert>
+            <AsyncButton onClick={handleUpdate} disabled={!canUpdate}>
+              Update VEX rule (recreate)
+            </AsyncButton>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

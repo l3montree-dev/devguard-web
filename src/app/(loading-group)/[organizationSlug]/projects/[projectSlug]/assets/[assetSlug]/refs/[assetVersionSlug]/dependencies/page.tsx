@@ -39,6 +39,8 @@ import {
   beautifyPurl,
   classNames,
   extractVersion,
+  extractPurlQualifiers,
+  formatPurlQualifiers,
   licenses,
 } from "@/utils/common";
 import { buildFilterSearchParams } from "@/utils/url";
@@ -257,8 +259,13 @@ const columnsDef: ColumnDef<
               <span className="font-medium truncate w-full">
                 {beautifyPurl(row.getValue())}
               </span>
-              <span className="text-xs text-muted-foreground">
-                {extractVersion(row.getValue())}
+              <span className="flex min-w-0 flex-row items-center gap-2 text-xs text-muted-foreground">
+                <span>{extractVersion(row.getValue())}</span>
+                {extractPurlQualifiers(row.getValue()) && (
+                  <span className="max-w-64 truncate whitespace-nowrap">
+                    {formatPurlQualifiers(row.getValue())}
+                  </span>
+                )}
               </span>
             </span>
           </TooltipTrigger>
@@ -772,12 +779,10 @@ const Index: FunctionComponent = () => {
         assetVersionName={assetVersion?.name}
       />
       <VexDownloadModal
-        artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
         pathname={pathname || ""}
         assetName={asset?.name}
-        assetVersionName={assetVersion?.name}
       />
     </Page>
   );
