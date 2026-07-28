@@ -36,7 +36,6 @@ export class ComplianceFlow {
     testId: string,
     screenshotName: string,
   ) {
-
     const navItem = this.page.locator(`${level} [data-testid="${testId}"]`);
     await navItem.waitFor({ state: "visible", timeout: 30_000 });
     await navItem.click({ timeout: 30_000 });

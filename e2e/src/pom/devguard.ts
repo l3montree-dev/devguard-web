@@ -114,16 +114,22 @@ export class DevGuardPOM {
   }
 
   async createTestOrganizationGroupAndRepo(options?: {
-  orgName?: string;
-  groupName?: string;
-  repoName?: string;
+    orgName?: string;
+    groupName?: string;
+    repoName?: string;
   }) {
     const orgName = options?.orgName ?? `Test Org ${Date.now()}`;
     const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
     const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
 
     await this.org().createOrganization(orgName);
-    await this.group().createGroup(groupName, "Test Group that contains very important projects!");
-    await this.repo().createGitHubRepo(repoName, "This repo contains top secret information.");
+    await this.group().createGroup(
+      groupName,
+      "Test Group that contains very important projects!",
+    );
+    await this.repo().createGitHubRepo(
+      repoName,
+      "This repo contains top secret information.",
+    );
   }
 }

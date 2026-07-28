@@ -25,7 +25,9 @@ export class OrgFlow {
 
   async openGroups() {
     await this.page
-      .locator(`${DevGuardNavigationLevel.Organization} [data-testid="nav-org-groups"]`)
+      .locator(
+        `${DevGuardNavigationLevel.Organization} [data-testid="nav-org-groups"]`,
+      )
       .click({ timeout: 30_000 });
     await this.page
       .getByTestId("create-group-button")
@@ -34,7 +36,9 @@ export class OrgFlow {
 
   async inviteUserOrg(mail: string) {
     await this.page.getByTestId("nav-org-settings").click();
-    await this.page.getByTestId("add-member-button").waitFor({ state: "visible", timeout: 10_000 });
+    await this.page
+      .getByTestId("add-member-button")
+      .waitFor({ state: "visible", timeout: 10_000 });
     await this.page.getByTestId("add-member-button").click();
     await this.page.getByTestId("mail-input").fill(mail);
     await this.page

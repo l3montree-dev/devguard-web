@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test";
 import { test, type Page } from "@playwright/test";
-import { ModalHelper } from "./modal-helper";
 import { docShot } from "../../doc-shot";
 
 export class ShareFlow {
@@ -15,7 +14,7 @@ export class ShareFlow {
     await this.page
       .getByTestId("download-sbom-json-format")
       .waitFor({ state: "visible", timeout: 5_000 });
-    await docShot(this.page, test.info(), "download-sbom-document")
+    await docShot(this.page, test.info(), "download-sbom-document");
     const [download] = await Promise.all([
       this.page.waitForEvent("download"),
       this.page.getByTestId("download-sbom-json-format").click(),

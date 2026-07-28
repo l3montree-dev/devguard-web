@@ -4,7 +4,9 @@ export class ModalHelper {
   constructor(private page: Page) {}
 
   async dismissToastIfPresent() {
-    const closeToast = this.page.getByRole('button', { name: 'Close toast' }).first();
+    const closeToast = this.page
+      .getByRole("button", { name: "Close toast" })
+      .first();
     try {
       await closeToast.waitFor({ state: "visible", timeout: 5_000 });
       await closeToast.click({ timeout: 2_000 });
