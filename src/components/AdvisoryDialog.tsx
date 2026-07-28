@@ -185,7 +185,11 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Advisory title" {...field} />
+                    <Input
+                      data-testid="title-security-advisory"
+                      placeholder="Advisory title"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -230,6 +234,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                   </div>
                   <FormControl>
                     <Input
+                      data-testid="vectorString-security-advisory"
                       placeholder="CVSS:4.0/AV:N/AC:L/…"
                       {...field}
                       onChange={(e) => handleVectorChange(e.target.value)}
@@ -332,7 +337,11 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                         <FormItem>
                           <FormLabel>Ecosystem</FormLabel>
                           <FormControl>
-                            <Input placeholder="go, npm, pypi…" {...field} />
+                            <Input
+                              data-testid="ecosystem-security-advisory"
+                              placeholder="go, npm, pypi…"
+                              {...field}
+                            />
                           </FormControl>
                         </FormItem>
                       )}
@@ -345,7 +354,11 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                         <FormItem>
                           <FormLabel>Package Name</FormLabel>
                           <FormControl>
-                            <Input placeholder="pkg:example" {...field} />
+                            <Input
+                              data-testid="packageName-security-advisory"
+                              placeholder="pkg:example"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -366,6 +379,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                           <FormLabel>Semver Start</FormLabel>
                           <FormControl>
                             <Input
+                              data-testid="semverStart-security-advisory"
                               placeholder="0.0.0"
                               {...field}
                               value={field.value ?? ""}
@@ -397,8 +411,8 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                             return true;
                           }
                           return (
-                            compareSemver(value, start) > 0 ||
-                            "Must be greater than Semver Start"
+                            compareSemver(value, start) >= 0 ||
+                            "Must be greater than or equal to Semver Start"
                           );
                         },
                       }}
@@ -406,7 +420,11 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                         <FormItem>
                           <FormLabel>Semver End</FormLabel>
                           <FormControl>
-                            <Input placeholder="1.0.0" {...(field as any)} />
+                            <Input
+                              data-testid="semverEnd-security-advisory"
+                              placeholder="1.0.0"
+                              {...(field as any)}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -436,7 +454,11 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                data-testid="submit-security-advisory"
+                type="submit"
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? submittingLabel : submitLabel}
               </Button>
             </DialogFooter>

@@ -1,4 +1,5 @@
-import type { Page } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
+import { docShot } from "../../doc-shot";
 
 export class RepoFlow {
   constructor(private page: Page) {}
@@ -42,10 +43,7 @@ export class RepoFlow {
   }
 
   async settingClickthroughRepo() {
-    await this.page.getByTestId("repository-settings").click();
-    await this.page
-      .getByTestId("configure-security-requirements-button")
-      .click();
+    await this.openSecurityRequirements();
     await this.page.getByTestId("confidentiality-requirement-low").click();
     await this.page.getByTestId("integrity-requirement-high").click();
     await this.page.getByTestId("availability-requirement-low").click();
@@ -55,5 +53,22 @@ export class RepoFlow {
     await this.page
       .getByTestId("save-vulnerability-management-settings-button")
       .click();
+  }
+
+  async openSecurityRequirements() {
+    await this.page.getByTestId("repository-settings").click();
+    await this.page
+      .getByTestId("configure-security-requirements-button")
+      .click();
+  }
+
+  async openDependencyGraph() {
+    await this.page.locator('#radix-_R_76itpet9esnekneabmlklb_').click();
+    await this.page.getByTestId('nav-asset-dependency-insights').click();
+    await this.page.waitForTimeout(5_000);
+    await docShot(this.page, test.info(), "dependency-insights-overview");
+    await this.page.getByTestId("open-dependency-graph").click();
+    await this.page.waitForTimeout(5_000);
+    await docShot(this.page, test.info(), "dependency-insights-graph");
   }
 }

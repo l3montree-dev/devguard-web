@@ -530,6 +530,7 @@ const Index: FunctionComponent = () => {
           </Button>
 
           <Link
+            data-testid="open-dependency-graph"
             className={classNames(
               buttonVariants({ variant: "default" }),
               "!text-primary-foreground",

@@ -404,6 +404,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
             Button={
               <FormControl>
                 <Switch
+                  data-testid="reporting-range"
                   checked={field.value}
                   onCheckedChange={(v) => {
                     form.setValue("enableTicketRange", v, {
@@ -670,6 +671,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               Button={
                 <FormControl>
                   <Switch
+                    data-testid="paranoid-mode"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

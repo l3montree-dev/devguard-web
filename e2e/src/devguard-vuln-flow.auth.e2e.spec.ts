@@ -3,6 +3,9 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM, DevGuardNavigationLevel } from "./pom/devguard";
 import path from "path";
+import { docShot } from "./doc-shot";
+
+test.use({ viewport: { width: 1440, height: 900 } });
 
 test.describe("DevGuard handle vuln flows", () => {
   let devguardPOM: DevGuardPOM;
@@ -13,11 +16,13 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.createTestOrganizationGroupAndRepo();
   });
 
-  test("test sbom upload to false positive", async () => {
-    await devguardPOM.setupSbomUpload();
-    await devguardPOM.vuln().openFirstAffectedComponent();
-    await devguardPOM.vuln().markVulnAsFalsePositive();
-  });
+  test("test sbom upload to false positive", async ({ page }, testInfo) => {
+  await devguardPOM.setupSbomUpload();
+  await page.waitForTimeout(5_000);
+  await docShot(page, testInfo, "dependency-risk-table");
+  await devguardPOM.vuln().openFirstAffectedComponent();
+  await devguardPOM.vuln().markVulnAsFalsePositive();
+});
 
   test("test sbom upload to path vexxing and verification of vex rule", async () => {
     await devguardPOM.setupSbomUpload();
@@ -30,6 +35,19 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM.vuln().markVulnAsAcceptedRisk();
+  });
+
+  test ("test sbom upload to overview", async ({ page }, testInfo) => {
+    await devguardPOM.setupSbomUpload();
+    await page.locator('#radix-_R_36itpet9esnekneabmlklb_').click();
+    await page
+      .getByRole('menuitem', { name: 'Overview' })
+      .click({ timeout: 20_000 });
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "asset-overview");
+    await page.mouse.wheel(0, 1000);
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "asset-overview-v2") ;
   });
 
   test.skip("test auto setup to gitlab repo", async () => {

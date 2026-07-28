@@ -11,6 +11,7 @@ import { VulnFlow } from "./flows/vuln";
 import { ArtifactFlow } from "./flows/artifact";
 import { ShareFlow } from "./flows/sharing";
 import { ModalHelper } from "./flows/modal-helper";
+import { AdvisoryHelper } from "./flows/advisory";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -61,6 +62,10 @@ export class DevGuardPOM {
 
   modal(): ModalHelper {
     return new ModalHelper(this.page);
+  }
+
+  advisory(): AdvisoryHelper {
+    return new AdvisoryHelper(this.page);
   }
 
   async loadDevGuard() {
@@ -124,6 +129,14 @@ export class DevGuardPOM {
     const orgName = options?.orgName ?? `Test Org ${Date.now()}`;
     const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
     const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
+
+    const closeToast = this.page.getByRole('button', { name: 'Close toast' }).first();
+    try {
+      await closeToast.waitFor({ state: "visible", timeout: 5_000 });
+      await closeToast.click({ timeout: 2_000 });
+    } catch {
+      // no Toast visible
+    }
 
     await this.org().createOrganization(orgName);
     await this.group().createGroup(groupName, "Test Group that contains very important projects!");

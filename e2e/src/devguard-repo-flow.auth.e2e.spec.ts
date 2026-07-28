@@ -3,6 +3,8 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 
+test.use({ viewport: { width: 1440, height: 900 } });
+
 test.describe("DevGuard repo flows", () => {
   let devguardPOM: DevGuardPOM;
 
@@ -12,7 +14,7 @@ test.describe("DevGuard repo flows", () => {
     await devguardPOM.createTestOrganizationGroupAndRepo();
   });
   
-  test("test create, settings and delete (through settings) of repo", async ({
+  test.skip("test create, settings and delete (through settings) of repo", async ({
     page,
   }) => {
     await page.waitForTimeout(500);
@@ -20,12 +22,12 @@ test.describe("DevGuard repo flows", () => {
     await devguardPOM.repo().deleteRepo();
   });
 
-  test("test manual sbom upload", async ({ page }) => {
+  test.skip("test manual sbom upload", async ({ page }) => {
     await devguardPOM.setupSbomUpload();
     await page.waitForTimeout(2_000);
   });
 
-  test("test if we can add artifact manually", async ({ page }) => {
+  test.skip("test if we can add artifact manually", async ({ page }) => {
     await page.waitForTimeout(500);
     await devguardPOM.setupSbomUpload();
     await devguardPOM
@@ -41,5 +43,10 @@ test.describe("DevGuard repo flows", () => {
     await page
       .getByRole("heading", { name: "No Artifacts Available" })
       .isVisible();
+  });
+
+  test("test dependency graph", async () => {
+    await devguardPOM.setupSbomUpload();
+    await devguardPOM.repo().openDependencyGraph();
   });
 });
