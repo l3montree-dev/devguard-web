@@ -28,9 +28,9 @@ test.describe("DevGuard customize risk scores", () => {
     await page.mouse.wheel(0, 300); 
     await page.getByTestId("vuln-auto-reopen-switch").click();
     await page.getByRole('combobox').click();
-    await page.locator('html').click();
     await page.waitForTimeout(2_000);
     await docShot(page, testInfo, "auto-reopen-settings");
+    await page.locator('html').click();
     await page.getByTestId("paranoid-mode").click();
     await page.waitForTimeout(2_000);
     await docShot(page, testInfo, "paranoid-mode-settings");
