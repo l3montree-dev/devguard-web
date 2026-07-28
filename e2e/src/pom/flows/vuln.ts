@@ -16,15 +16,6 @@ export class VulnFlow {
   }
 
   async openFirstAffectedComponent() {
-<<<<<<< HEAD
-=======
-    // Follows the SBOM upload, whose toast covers the asset nav.
-    await new ModalHelper(this.page).dismissToasts();
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 20_000 });
->>>>>>> origin/main
     const packageRows = this.page.getByTestId("package-row");
     await expect(packageRows.first()).toBeVisible({ timeout: 180_000 });
     await packageRows.first().click();
@@ -76,7 +67,7 @@ export class VulnFlow {
 
   async verifyVEXRule() {
     // Follows rule creation or a VEX upload, both of which toast.
-    await new ModalHelper(this.page).dismissToasts();
+    await new ModalHelper(this.page).dismissToastIfPresent();
     await this.page
       .getByTestId("nav-asset-dependency-risks")
       .locator("button")
@@ -99,7 +90,7 @@ export class VulnFlow {
   }
 
   async filterDependencyRisksTable() {
-    await new ModalHelper(this.page).dismissToasts();
+    await new ModalHelper(this.page).dismissToastIfPresent();
     await this.page
       .getByTestId("nav-asset-dependency-risks")
       .locator("a")

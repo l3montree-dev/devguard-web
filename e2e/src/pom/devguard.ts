@@ -86,11 +86,9 @@ export class DevGuardPOM {
     );
   }
 
-  async testLightDarkSystemMode(level: DevGuardNavigationLevel) {
-    const themeChooser = this.page.locator(
-      `${level} [data-testid="theme-chooser"]`,
-    );
-    await themeChooser.click();
+  async testLightDarkSystemMode() {
+    const themeChooser = this.page.getByTestId('theme-chooser');
+    await themeChooser.click({ timeout: 10_000 });
     await this.page.getByTestId("light-mode").waitFor({ state: "visible" });
     await this.page.getByTestId("light-mode").click();
     await this.page.getByTestId("light-mode").waitFor({ state: "hidden" });
@@ -130,13 +128,7 @@ export class DevGuardPOM {
     const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
     const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
 
-    const closeToast = this.page.getByRole('button', { name: 'Close toast' }).first();
-    try {
-      await closeToast.waitFor({ state: "visible", timeout: 5_000 });
-      await closeToast.click({ timeout: 2_000 });
-    } catch {
-      // no Toast visible
-    }
+    await this.modal().dismissToastIfPresent();
 
     await this.org().createOrganization(orgName);
     await this.group().createGroup(groupName, "Test Group that contains very important projects!");

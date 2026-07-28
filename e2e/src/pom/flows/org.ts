@@ -22,9 +22,8 @@ export class OrgFlow {
   }
 
   async inviteUserOrg(mail: string) {
-    // The org nav sits under the toaster; a leftover toast would block the click.
-    await new ModalHelper(this.page).dismissToasts();
     await this.page.getByTestId("nav-org-settings").click();
+    await this.page.getByTestId("add-member-button").waitFor({ state: "visible", timeout: 10_000 });
     await this.page.getByTestId("add-member-button").click();
     await this.page.getByTestId("mail-input").fill(mail);
     await this.page
@@ -53,8 +52,6 @@ export class OrgFlow {
   }
 
   async verifyMemberInSettings(memberName: string) {
-    // Follows a role change, so a success toast is likely covering the nav.
-    await new ModalHelper(this.page).dismissToasts();
     await this.page.getByTestId("nav-org-settings").click();
     await this.page.reload();
     await expect(this.page.locator("tbody").getByText(memberName)).toBeVisible({
