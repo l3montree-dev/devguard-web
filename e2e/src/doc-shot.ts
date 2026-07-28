@@ -11,13 +11,24 @@ export interface DocShotOptions {
 
 const HIDE_DEV_OVERLAY_CSS = "nextjs-portal { display: none !important; }";
 
+const SAFE_NAME = /^[a-zA-Z0-9_-]+$/;
+
+function safeScreenshotName(name: string): string {
+  if (!SAFE_NAME.test(name)) {
+    throw new Error(
+      `Invalid screenshot name "${name}": only letters, digits, "-" and "_" are allowed.`,
+    );
+  }
+  return name;
+}
+
 export async function docShot(
   page: Page,
   testInfo: TestInfo,
   name: string,
   options: DocShotOptions = {},
 ): Promise<string> {
-  const file = path.join(DOC_SCREENSHOT_DIR, `${name}.png`);
+  const file = path.join(DOC_SCREENSHOT_DIR, `${safeScreenshotName(name)}.png`);
 
   await page.addStyleTag({ content: HIDE_DEV_OVERLAY_CSS });
 
