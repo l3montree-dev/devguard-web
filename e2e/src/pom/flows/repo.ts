@@ -49,6 +49,7 @@ export class RepoFlow {
     await this.page.getByTestId("availability-requirement-low").click();
     await this.page.getByTestId("save-security-requirements-button").click();
     await this.page.getByTestId("enable-public-access-switch").click();
+    await this.page.mouse.wheel(0, 300);
     await this.page.waitForTimeout(3_000);
     await docShot(this.page, test.info(), "public-access")
     await this.page.getByTestId("vuln-auto-reopen-switch").click();

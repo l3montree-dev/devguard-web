@@ -47,7 +47,6 @@ test.describe("DevGuard repo flows", () => {
 
   test("test dependency graph", async () => {
     await devguardPOM.setupSbomUpload();
-    await devguardPOM.modal().dismissToastIfPresent();
     await devguardPOM.repo().openDependencyGraph();
   });
 });

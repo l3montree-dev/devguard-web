@@ -19,6 +19,8 @@ export class OrgFlow {
       .getByRole("button", { name: "Create Organization" })
       .click();
     await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
+    await this.page.waitForTimeout(10_000);
+    await new ModalHelper(this.page).dismissToastIfPresent();
   }
 
   async openGroups() {

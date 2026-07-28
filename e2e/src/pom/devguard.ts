@@ -91,17 +91,6 @@ export class DevGuardPOM {
     );
   }
 
-  async testLightDarkSystemMode() {
-    const themeChooser = this.page.getByTestId('theme-chooser');
-    await themeChooser.click({ timeout: 10_000 });
-    await this.page.getByTestId("light-mode").waitFor({ state: "visible" });
-    await this.page.getByTestId("light-mode").click();
-    await this.page.getByTestId("light-mode").waitFor({ state: "hidden" });
-    await themeChooser.click({ timeout: 10_000 });
-    await this.page.getByTestId("dark-mode").waitFor({ state: "visible" });
-    await this.page.getByTestId("dark-mode").click();
-  }
-
   async loadAndRegister() {
     await this.loadDevGuard();
     await this.registerNewUser();
@@ -132,8 +121,6 @@ export class DevGuardPOM {
     const orgName = options?.orgName ?? `Test Org ${Date.now()}`;
     const groupName = options?.groupName ?? `Test Group ${Date.now()}`;
     const repoName = options?.repoName ?? `Test Repo ${Date.now()}`;
-
-    await this.modal().dismissToastIfPresent();
 
     await this.org().createOrganization(orgName);
     await this.group().createGroup(groupName, "Test Group that contains very important projects!");
