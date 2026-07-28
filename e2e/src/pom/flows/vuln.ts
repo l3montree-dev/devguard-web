@@ -44,8 +44,6 @@ export class VulnFlow {
     await expect(markAcceptedRisk).toBeHidden({ timeout: 20_000 });
   }
 
-  // Clicking an edge of the path to the component opens the reduced VEX rule
-  // dialog, prefilled with a rule that cuts exactly that edge.
   async markEdgeAsDoesNotCallVulnerableFunction() {
     const firstEdge = this.page.getByTestId("path-edge").first();
     await expect(firstEdge).toBeVisible({ timeout: 20_000 });
