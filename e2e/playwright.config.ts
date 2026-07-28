@@ -33,6 +33,13 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "retain-on-failure",
     video: "retain-on-failure",
+    /* Without this an action defaults to no timeout of its own, so a single
+       click on a selector that no longer exists eats the whole test budget
+       (5 minutes, and again on retry). Kept generous, because a click may
+       legitimately retry for a while: toasts render top-center for 6s each and
+       intercept pointer events over the nav. Explicit per-call timeouts still
+       win, e.g. the long wait for the SBOM scan to produce rows. */
+    actionTimeout: 60_000,
   },
   timeout: 5 * 60 * 1000, // 5 minutes per test
 

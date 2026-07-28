@@ -282,7 +282,7 @@ const RiskFeedItem = ({
               </div>
 
               {Boolean(msg) && (
-                <div className="mdx-editor-content p-2">
+                <div className="mdx-editor-content p-2 pt-3 bg-card/40">
                   <Markdown
                     rehypePlugins={[
                       [rehypeExternalLinks, { target: "_blank" }],
@@ -423,7 +423,7 @@ export default function RiskAssessmentFeed({
   return (
     <div>
       <ul className="relative flex flex-col pb-10 text-foreground" role="list">
-        {groupedEvents.length > 3 && (
+        {groupedEvents.length > 2 && (
           <div className="relative mb-10">
             <div className="border-dotted border-l-2 h-20 absolute left-3.5 -bottom-10" />
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -433,7 +433,7 @@ export default function RiskAssessmentFeed({
                   variant="ghost"
                 >
                   {isOpen ? "Hide" : "Show"} whole history (+
-                  {groupedEvents.length - 3} elements)
+                  {groupedEvents.length - 2} elements)
                 </Button>
                 <AuthGuard require="admin">
                   <DropdownMenu>
@@ -463,7 +463,7 @@ export default function RiskAssessmentFeed({
 
               <CollapsibleContent className="flex mt-10 flex-col gap-10">
                 {groupedEvents
-                  .slice(0, groupedEvents.length - 3)
+                  .slice(0, groupedEvents.length - 2)
                   .map((groupOrEvent, index) => {
                     if (Array.isArray(groupOrEvent)) {
                       return (
@@ -522,7 +522,7 @@ export default function RiskAssessmentFeed({
         )}
         <div className="flex flex-col gap-10">
           {groupedEvents
-            .slice(Math.max(groupedEvents.length - 3, 0), groupedEvents.length)
+            .slice(Math.max(groupedEvents.length - 2, 0), groupedEvents.length)
             .map((groupOrEvent, index) => {
               if (Array.isArray(groupOrEvent)) {
                 return (

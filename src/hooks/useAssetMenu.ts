@@ -255,8 +255,6 @@ export const useAssetMenu = () => {
               projectSlug +
               "/assets/" +
               assetSlug +
-              "/refs/" +
-              assetVersionSlug +
               "/vex-rules",
             Icon: BookCheckIcon,
             isActive: pathname.includes("vex-rules"),

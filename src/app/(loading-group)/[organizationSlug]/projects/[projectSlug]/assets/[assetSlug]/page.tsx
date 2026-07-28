@@ -262,12 +262,7 @@ const Index: FunctionComponent = () => {
                             <div className="flex items-center justify-between">
                               {icon}
                               {recommended && (
-                                <Badge
-                                  variant="default"
-                                  className="text-xs text-primary-foreground"
-                                >
-                                  Recommended
-                                </Badge>
+                                <Badge variant="default">Recommended</Badge>
                               )}
                             </div>
                             <span className="text-base font-medium">

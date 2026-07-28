@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { FunctionComponent } from "react";
-import { Loader2, MoreHorizontal, Trash2 } from "lucide-react";
+import { Loader2, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import Alert from "@/components/common/Alert";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,18 +13,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { VexRule } from "@/types/api/api";
 
 interface VexRuleActionsCellProps {
-  rule: VexRule;
-  onDeleted: () => void;
   deleteUrl: string;
+  onEdit: () => void;
+  onDeleted: () => void;
 }
 
 const VexRuleActionsCell: FunctionComponent<VexRuleActionsCellProps> = ({
-  rule,
-  onDeleted,
   deleteUrl,
+  onEdit,
+  onDeleted,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -39,7 +39,7 @@ const VexRuleActionsCell: FunctionComponent<VexRuleActionsCellProps> = ({
         throw new Error("Failed to delete VEX rule");
       }
 
-      toast.success(`Deleted VEX rule for ${rule.cveId}`);
+      toast.success("VEX rule deleted");
       onDeleted();
     } catch (error) {
       toast.error("Failed to delete VEX rule");
@@ -60,14 +60,26 @@ const VexRuleActionsCell: FunctionComponent<VexRuleActionsCellProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="text-destructive"
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete
+        <DropdownMenuItem onClick={onEdit}>
+          <Pencil className="h-4 w-4 mr-2" />
+          Edit
         </DropdownMenuItem>
+        <Alert
+          onConfirm={handleDelete}
+          title="Delete VEX rule"
+          description="Vulnerabilities this rule handles will reopen. This cannot be undone."
+        >
+          {/* Keeping the menu open on select lets the confirmation take over —
+              a closing menu would unmount its own trigger. */}
+          <DropdownMenuItem
+            onSelect={(e) => e.preventDefault()}
+            disabled={isDeleting}
+            className="text-destructive"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </DropdownMenuItem>
+        </Alert>
       </DropdownMenuContent>
     </DropdownMenu>
   );
