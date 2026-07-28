@@ -7,7 +7,7 @@ export class ShareFlow {
 
   async downloadSBOMFile() {
     // Follows the SBOM upload, whose toast covers the asset nav.
-    await new ModalHelper(this.page).dismissToasts();
+    await new ModalHelper(this.page).dismissToastIfPresent();
     await this.page
       .getByTestId("nav-asset-dependency-risks")
       .locator("a")
@@ -25,7 +25,7 @@ export class ShareFlow {
 
   async downloadVEXFile() {
     // Follows VEX rule creation, whose toast covers the asset nav.
-    await new ModalHelper(this.page).dismissToasts();
+    await new ModalHelper(this.page).dismissToastIfPresent();
     await this.page
       .getByTestId("nav-asset-dependency-risks")
       .locator("a")

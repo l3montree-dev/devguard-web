@@ -35,8 +35,8 @@ test.describe("DevGuard create security Advisory flows", () => {
 
   test("test create security advisory", async ({ page }, testInfo) => {
   await devguardPOM.setupSbomUpload();
-  await page.locator('#radix-_R_56itpet9esnekneabmlklb_').click();
-  await page.getByTestId('nav-asset-advisory').click();
+  await page.getByTestId("nav-asset-code-risks-chevron").click();
+  await page.getByTestId("nav-asset-advisory").click();
   await page.setViewportSize({ width: 1440, height: 1800 });
   await page.getByTestId("create-security-advisory").click();
   await page.waitForTimeout(5_000);

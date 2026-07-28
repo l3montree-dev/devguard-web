@@ -63,8 +63,8 @@ export class RepoFlow {
   }
 
   async openDependencyGraph() {
-    await this.page.locator('#radix-_R_76itpet9esnekneabmlklb_').click();
-    await this.page.getByTestId('nav-asset-dependency-insights').click();
+    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
+    await this.page.getByTestId("nav-asset-dependency-insights").click();
     await this.page.waitForTimeout(5_000);
     await docShot(this.page, test.info(), "dependency-insights-overview");
     await this.page.getByTestId("open-dependency-graph").click();

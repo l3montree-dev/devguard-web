@@ -39,7 +39,7 @@ test.describe("DevGuard handle vuln flows", () => {
 
   test ("test sbom upload to overview", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
-    await page.locator('#radix-_R_36itpet9esnekneabmlklb_').click();
+    await page.getByTestId("nav-asset-overview-chevron").click();
     await page
       .getByRole('menuitem', { name: 'Overview' })
       .click({ timeout: 20_000 });
