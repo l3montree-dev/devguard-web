@@ -5,8 +5,7 @@ import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";
 
-const envPath = path.resolve(__dirname, "../.env");
-dotenv.config({ path: envPath });
+dotenv.config();
 
 export async function generateOTP(secret: string) {
   const totp = new OTPAuth.TOTP({
@@ -60,8 +59,6 @@ export async function loginToDevGuardUsingOpenCode(page: Page) {
 }
 
 function loadEnvVariables() {
-  console.log(`Loading environment variables from: ${envPath}`);
-
   const config = {
     openCode: {
       username: process.env.OPEN_CODE_USERNAME!,
