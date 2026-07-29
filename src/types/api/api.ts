@@ -1102,6 +1102,13 @@ export type VexRuleRecommendation = {
   title: string;
   // Metrics - indicates how many dependency vulns this rule applies to
   appliesToAmountOfDependencyVulns: number;
+
+  verifiedVotes: number;
+  totalVotes: number;
+
+  // if the recommendation is from your own org, the API will return the asset slug and project slug to indicate that it is not a crowdsourced recommendation
+  assetSlug?: string;
+  projectSlug?: string;
 };
 
 // Mirrors dtos.ExternalReferenceDTO. A reference is identified by asset + url —

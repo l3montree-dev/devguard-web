@@ -37,10 +37,6 @@ const VexRuleRecommendationCard: FunctionComponent<
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-70 invert dark:invert-0"
-        style={{
-          backgroundImage: "url(/assets/background/dot-texture.svg)",
-          backgroundRepeat: "repeat",
-        }}
       />
 
       <div className="relative z-10 flex flex-col gap-3 p-5">
@@ -51,20 +47,26 @@ const VexRuleRecommendationCard: FunctionComponent<
             </span>
             <div className="flex flex-col">
               <span className="text-base font-medium text-muted-foreground">
-                Recommended by other DevGuard users
+                {recommendation.assetSlug && recommendation.projectSlug
+                  ? "Recommended by your organization"
+                  : "Recommended by other DevGuard users"}
               </span>
               <span className="text-base font-semibold">
-                Others assess this vulnerability as not exploitable
+                {recommendation.assetSlug && recommendation.projectSlug
+                  ? "Your organization"
+                  : "Other DevGuard users"}{" "}
+                assess this vulnerability as not exploitable
               </span>
             </div>
           </div>
           <div className="flex shrink-0 flex-row items-center gap-2">
-            {recommendation.confidence >= VERIFIED_CONFIDENCE && (
-              <Badge variant="success" className="gap-1 py-1">
-                <CheckCircleIcon className="h-4 w-4" />
-                Verified
-              </Badge>
-            )}
+            {!recommendation.assetSlug &&
+              recommendation.confidence >= VERIFIED_CONFIDENCE && (
+                <Badge variant="success" className="gap-1 py-1">
+                  <CheckCircleIcon className="h-4 w-4" />
+                  Verified
+                </Badge>
+              )}
             <VexRuleResult
               eventType={recommendation.eventType}
               mechanicalJustification={mechanical}
@@ -96,8 +98,6 @@ const VexRuleRecommendationCard: FunctionComponent<
 
         <div className="mt-2 flex flex-row items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
           <span className="">
-            Derived from VEX rules created by other DevGuard users.
-            <br />
             Nothing is applied until you create the rule.
           </span>
           <Button size="sm" onClick={onCreateRule} variant="green">

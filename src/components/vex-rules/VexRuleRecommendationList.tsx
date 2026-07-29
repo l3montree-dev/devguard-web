@@ -10,6 +10,7 @@ import type { FunctionComponent } from "react";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import VexRuleResult from "./VexRuleResult";
 import { extractVulnIdentifier } from "./vexRuleParser";
+import { Badge } from "../ui/badge";
 
 export interface RecommendationEntry {
   vulnID: string;
@@ -37,6 +38,11 @@ const VexRuleRecommendationList: FunctionComponent<
           )}
         >
           <div className="flex min-w-0 flex-col gap-1">
+            {entry.recommendation.assetSlug && (
+              <span className="text-xs text-muted-foreground">
+                Created by your organization
+              </span>
+            )}
             <span className="text-sm font-medium">
               {entry.recommendation.title}
             </span>

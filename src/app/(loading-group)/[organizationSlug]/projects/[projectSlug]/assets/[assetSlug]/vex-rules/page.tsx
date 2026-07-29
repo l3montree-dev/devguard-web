@@ -196,7 +196,7 @@ const VexRulesPage: FunctionComponent = () => {
         {recommendations.length > 0 && (
           <Section
             forceVertical
-            title="Recommended by other DevGuard users"
+            title="Recommended by other DevGuard users or other assessments in your organization"
             description="Other users of DevGuard assessed vulnerabilities that are found in your Reposiotory already. Based on a majority vote, the following VEX rules are recommended. Nothing is applied until you create the rule."
             className="mb-6 border-t pt-6"
           >
