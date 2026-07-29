@@ -10,6 +10,7 @@ import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { Lock } from "lucide-react";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
+import Markdown from "../common/Markdown";
 
 interface VexRuleCardProps {
   vexRule: VexRule;
@@ -59,9 +60,9 @@ const VexRuleCard: FunctionComponent<VexRuleCardProps> = ({
         )}
 
         {vexRule.justification && (
-          <p className="border-l-2 border-border pl-3 text-sm text-muted-foreground">
-            {vexRule.justification}
-          </p>
+          <div className="border-l-2 border-border pl-3 text-sm text-muted-foreground">
+            <Markdown>{vexRule.justification}</Markdown>
+          </div>
         )}
 
         {vexRule.celExpression && (
