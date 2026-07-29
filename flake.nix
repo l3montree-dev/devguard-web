@@ -20,6 +20,7 @@
         pkgsLinuxArm64 = nixpkgs.legacyPackages.aarch64-linux;
         nodejs = import ./nix/nodejs.nix { inherit pkgs pkgsLinuxAmd64 pkgsLinuxArm64; };
         nodejsLinuxLibs = nodejs.linuxLibs;
+        devguardWebSBOM = import ./nix/sbom-lib.nix { inherit pkgs; };
 
         devguardWeb = pkgs.stdenv.mkDerivation {
           name = "devguard-web";
@@ -63,7 +64,8 @@
         mkDevguardWebOCI = linuxPkgs: node: pkgs.dockerTools.buildLayeredImage {
           name = "devguard-web-oci";
           tag = "latest";
-          contents = [ node pkgs.cacert ] ++ (nodejsLinuxLibs linuxPkgs);
+          # devguardWebSBOM lands at /sboms/devguard-web.json (default --sbomPath).
+          contents = [ node pkgs.cacert devguardWebSBOM ] ++ (nodejsLinuxLibs linuxPkgs);
           fakeRootCommands = ''
             # Copy standalone output to /app (outside Nix store) so Next.js
             # can write its cache at runtime. The Nix store is read-only.
@@ -82,6 +84,7 @@
       {
         packages = {
           default = devguardWeb;
+          sbom = devguardWebSBOM;
           node_modulesArm64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxArm64; }).patchedNodeModules;
           node_modulesAmd64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxAmd64; }).patchedNodeModules;
           "devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;
