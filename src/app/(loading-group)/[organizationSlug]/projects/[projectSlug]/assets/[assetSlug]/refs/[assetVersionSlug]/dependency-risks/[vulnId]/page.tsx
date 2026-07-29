@@ -691,7 +691,6 @@ const Index: FunctionComponent = () => {
                 <div data-tour="affected-component">
                   <AffectedComponentDetails vuln={vuln} />
                 </div>
-                <ManagementDecisions uri={uri} />
               </div>
             ) : (
               <div className="border-l flex-col pl-4 flex gap-8">
