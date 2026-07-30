@@ -80,7 +80,6 @@ const AcceptRiskDialog: FunctionComponent<AcceptRiskDialogProps> = ({
               Justification
             </label>
             <MarkdownEditor
-              className="!bg-card"
               placeholder="Add your comment here..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
