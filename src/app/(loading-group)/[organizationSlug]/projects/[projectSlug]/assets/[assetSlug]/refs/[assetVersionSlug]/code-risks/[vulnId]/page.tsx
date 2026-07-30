@@ -17,7 +17,7 @@ import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
-import Markdown from "react-markdown";
+import Markdown from "@/components/common/Markdown";
 
 import { Badge } from "@/components/ui/badge";
 import {

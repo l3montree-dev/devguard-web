@@ -52,7 +52,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import Markdown from "react-markdown";
+import Markdown from "../common/Markdown";
 import rehypeExternalLinks from "rehype-external-links";
 import remarkGfm from "remark-gfm";
 import Alert from "../common/Alert";

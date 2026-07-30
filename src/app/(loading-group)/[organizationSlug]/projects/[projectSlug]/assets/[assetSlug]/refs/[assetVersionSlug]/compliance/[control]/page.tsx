@@ -6,7 +6,7 @@ import type { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import type { FunctionComponent } from "react";
-import Markdown from "react-markdown";
+import Markdown from "@/components/common/Markdown";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
