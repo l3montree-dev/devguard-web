@@ -22,6 +22,15 @@
         nodejsLinuxLibs = nodejs.linuxLibs;
         devguardWebSBOM = import ./nix/sbom-lib.nix { inherit pkgs; };
 
+        # relevant for sourcemaps
+        ciTag =
+          let
+            github = if builtins.getEnv "GITHUB_REF_TYPE" == "tag"
+                     then builtins.getEnv "GITHUB_REF_NAME" else "";
+            gitlab = builtins.getEnv "CI_COMMIT_TAG";
+          in if github != "" then github else gitlab;
+        releaseName = if ciTag != "" then ciTag else "main";
+
         devguardWeb = pkgs.stdenv.mkDerivation {
           name = "devguard-web";
           src = pkgs.lib.fileset.toSource {
@@ -41,11 +50,14 @@
           nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
             export NODE_OPTIONS="--max-old-space-size=4096"
-            export GIT_COMMIT_SHA="${self.rev or "dev"}"
+            export GIT_COMMIT_SHA="${self.rev or "main"}"
+            # sourcemap relevant
+            export NEXT_PUBLIC_VERSION="${releaseName}"
             cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
             node ./node_modules/next/dist/bin/next build --turbopack
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+            echo -n "$NEXT_PUBLIC_VERSION" > .next/RELEASE
           '';
           installPhase = ''
             mkdir -p $out

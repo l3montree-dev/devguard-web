@@ -152,6 +152,7 @@ const nextConfig = {
     turbopackFileSystemCacheForDev: true,
     useCache: true,
   },
+  productionBrowserSourceMaps: true,
   cacheComponents: true,
   output: "standalone",
 };
@@ -173,12 +174,13 @@ module.exports = withSentryConfig(module.exports, {
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: false,
+  },
 
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
-  // disabled: causes excessive memory usage during webpack compilation in CI
-  widenClientFileUpload: false,
+  telemetry: false,
+
+  widenClientFileUpload: true,
 
   // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
   // This can increase your server load as well as your hosting bill.
