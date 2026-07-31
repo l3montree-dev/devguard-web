@@ -12,9 +12,11 @@ import { InputWithButton } from "./ui/input-with-button";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 interface OrgFormProps {
+  autoFocus?: boolean;
   forceVertical?: boolean;
 }
 export const OrgForm: FunctionComponent<OrgFormProps> = ({
+  autoFocus = false,
   forceVertical = true,
 }) => {
   const activeOrg = useActiveOrg();
@@ -39,7 +41,11 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
             <FormItem>
               <FormLabel>Organization name*</FormLabel>
               <FormControl>
-                <Input data-testid="org-name-label" {...field} />
+                <Input
+                  autoFocus={autoFocus}
+                  data-testid="org-name-label"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
