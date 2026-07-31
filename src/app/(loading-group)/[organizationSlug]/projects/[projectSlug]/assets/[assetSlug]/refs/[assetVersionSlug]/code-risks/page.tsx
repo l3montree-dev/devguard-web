@@ -474,21 +474,22 @@ const Index: FunctionComponent = () => {
                       <tr key={headerGroup.id}>
                         <AuthGuard require="member">
                           <th className="w-10 p-4 text-left">
-                            <div onClick={(e) => e.stopPropagation()}>
-                              <Checkbox
-                                checked={
-                                  allPageSelected
-                                    ? true
-                                    : somePageSelected
-                                      ? "indeterminate"
-                                      : false
-                                }
-                                onCheckedChange={() =>
-                                  handleToggleAll(pageSelectableIds)
-                                }
-                                disabled={pageSelectableIds.length === 0}
-                              />
-                            </div>
+                            {pageSelectableIds.length > 0 && (
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <Checkbox
+                                  checked={
+                                    allPageSelected
+                                      ? true
+                                      : somePageSelected
+                                        ? "indeterminate"
+                                        : false
+                                  }
+                                  onCheckedChange={() =>
+                                    handleToggleAll(pageSelectableIds)
+                                  }
+                                />
+                              </div>
+                            )}
                           </th>
                         </AuthGuard>
                         {headerGroup.headers.map((header) => (
