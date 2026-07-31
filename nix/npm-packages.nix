@@ -14,7 +14,7 @@
   };
 
   node_modules = pkgs.runCommand "node-modules" {
-    nativeBuildInputs = [ pkgs.nodejs_24 ];
+    nativeBuildInputs = [ pkgs.nodejs_26 ];
   } ''
     export HOME=$TMPDIR
     cp ${../package.json} package.json
@@ -25,7 +25,7 @@
   '';
 
   patchedNodeModules = pkgs.runCommand "node-modules-patched" {
-    nativeBuildInputs = [ pkgs.nodejs_24 ];
+    nativeBuildInputs = [ pkgs.nodejs_26 ];
   } ''
     set -euo pipefail
     mkdir -p $out
