@@ -23,7 +23,7 @@ import VexRuleRecommendationList, {
 } from "@/components/vex-rules/VexRuleRecommendationList";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
 import {
-  crowdsourcedVexingUrl,
+  vexRuleRecommendationsURL,
   useVexRuleRecommendations,
 } from "@/components/vex-rules/useVexRuleRecommendations";
 import VexSourcesSection from "@/components/vex-rules/VexSourcesSection";
@@ -98,7 +98,7 @@ const VexRulesPage: FunctionComponent = () => {
   const { sources: vexSources } = useVexSources();
 
   const { recommendations } = useVexRuleRecommendations(
-    crowdsourcedVexingUrl({ organizationSlug, projectSlug, assetSlug }),
+    vexRuleRecommendationsURL({ organizationSlug, projectSlug, assetSlug }),
   );
 
   if (isLoading && !vexRulesResponse) {

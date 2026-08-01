@@ -8,13 +8,13 @@ import { browserApiClient } from "@/services/devGuardApi";
 import type { VexRuleRecommendation } from "@/types/api/api";
 import useSWR from "swr";
 
-export function crowdsourcedVexingUrl(params: {
+export function vexRuleRecommendationsURL(params: {
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
 }): string {
   const { organizationSlug, projectSlug, assetSlug } = params;
-  return `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/crowdsourced-vexing/recommendations`;
+  return `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules/recommendations`;
 }
 
 // "No recommendation" is a 204 with no body, which the shared fetcher can't parse.

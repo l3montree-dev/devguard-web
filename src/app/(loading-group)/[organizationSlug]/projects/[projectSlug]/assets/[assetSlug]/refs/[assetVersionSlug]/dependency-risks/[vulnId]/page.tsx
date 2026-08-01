@@ -24,7 +24,7 @@ import { buildPathPatternRule } from "@/components/vex-rules/vexRuleParser";
 import VexRuleCard from "@/components/vex-rules/VexRuleCard";
 import VexRuleRecommendationCard from "@/components/vex-rules/VexRuleRecommendationCard";
 import {
-  crowdsourcedVexingUrl,
+  vexRuleRecommendationsURL,
   useVexRuleRecommendation,
 } from "@/components/vex-rules/useVexRuleRecommendations";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -155,7 +155,7 @@ const Index: FunctionComponent = () => {
 
   // What other DevGuard organizations already decided about this vulnerability.
   const { recommendation } = useVexRuleRecommendation(
-    crowdsourcedVexingUrl({
+    vexRuleRecommendationsURL({
       organizationSlug,
       projectSlug,
       assetSlug,
