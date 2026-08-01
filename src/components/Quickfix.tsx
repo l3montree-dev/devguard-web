@@ -1,63 +1,14 @@
 import CopyCode from "@/components/common/CopyCode";
 import { DocDrawer } from "@/components/common/DocDrawer";
+import Purl from "@/components/common/Purl";
 import type {
   DependencyVuln,
   DetailedDependencyVulnDTO,
 } from "@/types/api/api";
-import {
-  beautifyPurl,
-  isValidPackagePurl,
-  purlToDisplayString,
-} from "@/utils/common";
-import { diffChars } from "diff";
-import { ArrowRight } from "lucide-react";
+import { extractVersion, isValidPackagePurl } from "@/utils/common";
+import { Wrench } from "lucide-react";
 import { PackageURL } from "packageurl-js";
 import type { FunctionComponent } from "react";
-import { Badge } from "./ui/badge";
-interface DiffHighlighterProps {
-  oldVersionPurl: string;
-  newVersionPurl?: string; // has to be a purl
-}
-
-export const DiffHighlighter: FunctionComponent<DiffHighlighterProps> = ({
-  oldVersionPurl: oldVersionPurl,
-  newVersionPurl: newVersionPurl,
-}) => {
-  if (!isValidPackagePurl(oldVersionPurl)) {
-    return <span className="font-mono text-xs">{oldVersionPurl}</span>;
-  }
-
-  const { namespace, name, version } = PackageURL.fromString(oldVersionPurl);
-  const fullName = namespace ? `${namespace}/${name}` : name;
-
-  if (newVersionPurl && isValidPackagePurl(newVersionPurl)) {
-    const { version: newVer } = PackageURL.fromString(newVersionPurl);
-    const differences = diffChars(
-      fullName + "@" + version,
-      fullName + "@" + newVer,
-    );
-
-    return (
-      <div className="font-mono text-xs">
-        {differences.map((part, index) => (
-          <span
-            key={index}
-            className={
-              part.added
-                ? "text-success font-mono"
-                : part.removed
-                  ? "bg-destructive-muted text-destructive"
-                  : ""
-            }
-          >
-            {!part.removed && part.value}
-          </span>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
 
 function renderQuickFixText(
   fixedVersionPurl: string | null | undefined,
@@ -141,55 +92,52 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   const vulnerabilityPath = vuln.vulnerabilityPath[0];
 
   return (
-    <>
-      <div className="">
-        <div className="flex flex-row mb-2 gap-0.5 items-center"></div>
-        <div className="relative rounded-lg border bg-card p-4 border">
-          <div className="text-sm">
-            {!fixedVersionPurl ? (
-              <span className="text-xs text-muted-foreground">
-                {`No Update for ${beautifyPurl(vulnerabilityPath)} that patches ${vuln.cveID}`}
+    <div className="relative overflow-hidden rounded-lg border border-success bg-card shadow-lg shadow-success/20">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-70 invert dark:invert-0"
+      />
+
+      <div className="relative z-10 flex flex-col gap-3 p-5">
+        <div className="flex flex-row items-start justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-success-muted text-success">
+              <Wrench className="h-4 w-4" />
+            </span>
+            <div className="flex flex-col">
+              <span className="text-base font-medium text-muted-foreground">
+                {fixedVersionPurl
+                  ? "Quick Fix available"
+                  : "No Quick Fix available"}
               </span>
-            ) : (
-              <>
-                <Badge
-                  variant="outline"
-                  className="absolute top-0 left-0 -translate-y-1/2 bg-success text-success-foreground border-success flex items-center gap-1"
-                >
-                  Resolve Vulnerability
-                </Badge>
-                <div className="flex flex-col gap-1 items-left">
-                  <div className="flex flex-row gap-1">
-                    <span>Fix the vulnerability </span>
-                    <span className="font-semibold">{vuln.cveID}</span>
-                  </div>
-                  <div className="flex flex-row gap-1">
-                    <span> by upgrading from: </span>
-                    <span className="flex flex-row gap-2">
-                      <Badge className="font-mono" variant={"outline"}>
-                        {purlToDisplayString(vulnerabilityPath)}
-                      </Badge>
-                      <ArrowRight className="w-4" />
-                      <Badge
-                        variant={"outline"}
-                        className="font-mono scale-100 relative border-2"
-                      >
-                        <DiffHighlighter
-                          oldVersionPurl={vulnerabilityPath}
-                          newVersionPurl={fixedVersionPurl ?? ""}
-                        />
-                      </Badge>
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-2 flex">
-                  <CopyCode codeString={ecosystemUpdate} language="shell" />
-                </div>
-              </>
-            )}
+              <span className="text-base font-semibold">
+                {fixedVersionPurl ? (
+                  `Resolve ${vuln.cveID} by upgrading`
+                ) : (
+                  <>
+                    No update for <Purl purl={vulnerabilityPath} /> patches{" "}
+                    {vuln.cveID}
+                  </>
+                )}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="mb-2">
+
+        {fixedVersionPurl && (
+          <>
+            <p className="text-sm text-muted-foreground">
+              Update to <Purl variant="compact" purl={vulnerabilityPath} />{" "}
+              patches {vuln.cveID}
+            </p>
+
+            <div className="mt-1 flex">
+              <CopyCode codeString={ecosystemUpdate} language="shell" />
+            </div>
+          </>
+        )}
+
+        <div className="mt-2 flex flex-row items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
           <DocDrawer
             triggerLabel="See how Quick Fix works"
             drawerTitle="Quick Fixes with DevGuard"
@@ -198,7 +146,7 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
           />
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -44,7 +44,7 @@ import type {
   VulnEventDTO,
 } from "@/types/api/api";
 import { formatDate } from "@/utils/format";
-import { beautifyPurl } from "@/utils/common";
+import { beautifyPurl, purlWithVersion } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import { Lock } from "lucide-react";
 import Image from "next/image";
@@ -515,6 +515,64 @@ const Index: FunctionComponent = () => {
                   />
                 </div>
               )}
+              <div data-tour="path" className={lockedOverlay}>
+                {!graphLoading && (
+                  <div className="mt-6">
+                    {vuln && vuln.vulnerabilityPath.length > 0 && (
+                      <PathToComponent
+                        rootNames={
+                          vuln.artifacts.length > 0
+                            ? vuln.artifacts.map((a) =>
+                                assetVersion?.name
+                                  ? purlWithVersion(
+                                      a.artifactName,
+                                      assetVersion.name,
+                                    )
+                                  : a.artifactName,
+                              )
+                            : [asset.name]
+                        }
+                        path={vuln.vulnerabilityPath}
+                        pathCount={graphResponse?.length}
+                        actionable={vuln.state === "open" && isMember(role)}
+                        onCallClick={(edgeIndex) => {
+                          const suffix =
+                            vuln.vulnerabilityPath.slice(edgeIndex);
+                          setVexRulePrefill({
+                            title: `${vuln.cveID ?? "Vulnerability"} not exploitable in ${beautifyPurl(
+                              suffix[0] ?? vuln.componentPurl,
+                            )}`,
+                            celExpression: buildPathPatternRule(
+                              vuln.vulnerabilityPath,
+                              edgeIndex,
+                              vuln.cveID,
+                            ),
+                          });
+                          setAddVexRuleDialogOpen(true);
+                        }}
+                      />
+                    )}
+                    {(vuln?.vulnerabilityPath.length || 0) === 0 && (
+                      <div className="mt-4">
+                        <Callout intent="warning" showIcon>
+                          There are more than 12 different paths which lead to
+                          this vulnerability in your dependency tree. Therefore
+                          the graph is not displayed by default to avoid
+                          performance issues.
+                          {isMember(role)
+                            ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
+                            : ""}
+                        </Callout>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              {vuln && (
+                <div className="mt-6">
+                  <Quickfix vuln={vuln} />
+                </div>
+              )}
               {/* Only worth offering while nothing handles this vuln yet. */}
               {!isVexLocked && recommendation && isMember(role) && (
                 <div className="mt-6">
@@ -543,48 +601,6 @@ const Index: FunctionComponent = () => {
                     />
                   )}
                 </div>
-                <div data-tour="path">
-                  {!graphLoading && (
-                    <div className="mt-10">
-                      {vuln && vuln.vulnerabilityPath.length > 0 && (
-                        <PathToComponent
-                          rootName={asset.name}
-                          path={vuln.vulnerabilityPath}
-                          pathCount={graphResponse?.length}
-                          actionable={vuln.state === "open" && isMember(role)}
-                          onCallClick={(edgeIndex) => {
-                            const suffix =
-                              vuln.vulnerabilityPath.slice(edgeIndex);
-                            setVexRulePrefill({
-                              title: `${vuln.cveID ?? "Vulnerability"} not exploitable in ${beautifyPurl(
-                                suffix[0] ?? vuln.componentPurl,
-                              )}`,
-                              celExpression: buildPathPatternRule(
-                                vuln.vulnerabilityPath,
-                                edgeIndex,
-                                vuln.cveID,
-                              ),
-                            });
-                            setAddVexRuleDialogOpen(true);
-                          }}
-                        />
-                      )}
-                      {(vuln?.vulnerabilityPath.length || 0) === 0 && (
-                        <div className="mt-4">
-                          <Callout intent="warning" showIcon>
-                            There are more than 12 different paths which lead to
-                            this vulnerability in your dependency tree.
-                            Therefore the graph is not displayed by default to
-                            avoid performance issues.
-                            {isMember(role)
-                              ? " You can still mark this vulnerability as false positive or accept the risk using the buttons below."
-                              : ""}
-                          </Callout>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 {vuln ? (
                   <div className="mt-10">
@@ -597,7 +613,6 @@ const Index: FunctionComponent = () => {
                         vuln.directDependencyFixedVersion
                       }
                     />
-                    {vuln && <Quickfix vuln={vuln} />}
                     {(isMember(role) || vuln.ticketUrl) && (
                       <div data-tour="vuln-management">
                         <VulnAssessmentComposer

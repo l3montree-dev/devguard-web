@@ -17,7 +17,7 @@ import React from "react";
 import Image from "next/image";
 import { classNames, getEcosystem } from "@/utils/common";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { Package } from "lucide-react";
 
 const invertSvgOnDark = (ecosystem: string) =>
   ["apk", "bitnami", "cargo"].includes(ecosystem);
@@ -74,8 +74,8 @@ const EcosystemImage = ({
   }
 
   return (
-    <span className="italic block rounded-full text-sm">
-      <QuestionMarkCircleIcon width={size ?? 20} height={size ?? 20} />
+    <span className="block text-muted-foreground">
+      <Package width={size ?? 20} height={size ?? 20} />
     </span>
   );
 };

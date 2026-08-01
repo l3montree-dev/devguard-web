@@ -29,7 +29,6 @@ const VexRuleRecommendationCard: FunctionComponent<
   VexRuleRecommendationCardProps
 > = ({ recommendation, onCreateRule }) => {
   const mechanical = recommendation.mechanicalJustification;
-  console.log(recommendation);
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-success bg-card shadow-lg shadow-success/20">

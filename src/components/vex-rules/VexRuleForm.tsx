@@ -4,7 +4,8 @@
 "use client";
 
 import CelCodeBlock from "@/components/common/CelCodeBlock";
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import Purl from "@/components/common/Purl";
+import { classNames } from "@/utils/common";
 import { ChevronDown, ChevronRight, Scissors } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Fragment, useMemo } from "react";
@@ -33,17 +34,14 @@ const MarkdownEditor = dynamic(
 
 const PathChip: FunctionComponent<{
   label: string;
-  isRoot?: boolean;
   vulnerable?: boolean;
   // The rule cut the path above this node, so it is no longer reachable.
   dismissed?: boolean;
-}> = ({ label, isRoot, vulnerable, dismissed }) => {
-  const name = isRoot ? label : beautifyPurl(label);
-  const version = isRoot ? "" : extractVersion(label);
+}> = ({ label, vulnerable, dismissed }) => {
   return (
     <span
       className={classNames(
-        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-sm",
+        "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-sm",
         dismissed
           ? "border-dashed border-muted-foreground/30 text-muted-foreground/70 line-through"
           : vulnerable
@@ -51,8 +49,7 @@ const PathChip: FunctionComponent<{
             : "border-muted-foreground/40 text-foreground",
       )}
     >
-      <span className="max-w-[10rem] truncate">{name}</span>
-      {version && <span className="opacity-70">{version}</span>}
+      <Purl purl={label} variant="compact" showQualifiers={false} />
     </span>
   );
 };
@@ -130,11 +127,20 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
   // Everything from the cut node down is unreachable (rendered dismissed).
   const cutIndex = effect.cutIndex;
   const cut = currentVuln ? resolveCut(currentVuln, cutIndex) : null;
-  const attributeLabel = effect.matchedOn
-    ? effect.matchedOn.field === "cveId"
-      ? effect.matchedOn.value
-      : beautifyPurl(effect.matchedOn.value)
-    : "";
+  const attributeLabel = effect.matchedOn ? (
+    effect.matchedOn.field === "cveId" ? (
+      effect.matchedOn.value
+    ) : (
+      <Purl
+        purl={effect.matchedOn.value}
+        variant="compact"
+        showQualifiers={false}
+        className="inline-flex align-middle"
+      />
+    )
+  ) : (
+    ""
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -163,7 +169,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
               )}
             >
               <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                <PathChip label={currentVuln.rootName} isRoot />
+                <PathChip label={currentVuln.rootName} />
                 {currentVuln.vulnerabilityPath.map((purl, i) => (
                   <Fragment key={purl + i}>
                     <PathConnector
@@ -171,7 +177,9 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
                       dimmed={cutIndex >= 0 && i > cutIndex}
                       title={
                         i === cutIndex && cut
-                          ? `${cut.parent} does not call the vulnerable function of ${cut.child}`
+                          ? cutIndex === 0
+                            ? `No artifact of ${cut.parent} calls the vulnerable function of ${cut.child}`
+                            : `${cut.parent} does not call the vulnerable function of ${cut.child}`
                           : undefined
                       }
                     />
@@ -187,16 +195,30 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
               </div>
               {effect.type === "pathCut" && cut ? (
                 <p className="mt-4 flex items-center gap-1.5 text-sm text-muted-foreground ml-0.5">
-                  <span>
-                    <span className="font-medium text-foreground">
-                      {cut.parent}
-                    </span>{" "}
-                    does not call the vulnerable function of{" "}
-                    <span className="font-medium text-foreground">
-                      {cut.child}
+                  {cutIndex === 0 ? (
+                    <span>
+                      No artifact of{" "}
+                      <span className="font-medium text-foreground">
+                        {cut.parent}
+                      </span>{" "}
+                      calls the vulnerable function of{" "}
+                      <span className="font-medium text-foreground">
+                        {cut.child}
+                      </span>
+                      .
                     </span>
-                    .
-                  </span>
+                  ) : (
+                    <span>
+                      <span className="font-medium text-foreground">
+                        {cut.parent}
+                      </span>{" "}
+                      does not call the vulnerable function of{" "}
+                      <span className="font-medium text-foreground">
+                        {cut.child}
+                      </span>
+                      .
+                    </span>
+                  )}
                 </p>
               ) : effect.type === "pathIntact" ? (
                 <p className="mt-2 text-xs text-muted-foreground">

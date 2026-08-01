@@ -1,17 +1,13 @@
 "use client";
 
-import EcosystemImage from "@/components/common/EcosystemImage";
-import { Badge } from "@/components/ui/badge";
+import Purl from "@/components/common/Purl";
 import {
   Item,
   ItemContent,
   ItemDescription,
-  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
-import { beautifyPurl, extractVersion } from "@/utils/common";
-import { Boxes } from "lucide-react";
 import type { FunctionComponent } from "react";
 
 export type PathNodeRole = "root" | "dependency" | "vulnerable";
@@ -26,42 +22,33 @@ interface PathNodeProps {
   // Either a purl (dependency / vulnerable) or the application name (root).
   label: string;
   role: PathNodeRole;
+  // False for roots grouped inside the shared cluster box - the cluster
+  // already draws the border, so each entry inside it stays borderless.
+  bordered?: boolean;
 }
 
-const PathNode: FunctionComponent<PathNodeProps> = ({ label, role }) => {
-  const isRoot = role === "root";
+const PathNode: FunctionComponent<PathNodeProps> = ({
+  label,
+  role,
+  bordered = true,
+}) => {
   const isVulnerable = role === "vulnerable";
-
-  const name = isRoot ? label : beautifyPurl(label);
-  const version = isRoot ? "" : extractVersion(label);
 
   return (
     <Item
-      variant="outline"
+      variant={bordered ? "outline" : "default"}
       size="sm"
       className={cn(
-        "max-w-[15rem]",
-        isVulnerable ? "border-destructive/40" : "border-muted-foreground/40",
+        // "max-w-[20rem]",
+        bordered &&
+          (isVulnerable
+            ? "border-destructive/40"
+            : "border-muted-foreground/40"),
       )}
     >
-      <ItemMedia
-        variant="icon"
-        className={cn(isVulnerable && "border-destructive/40 text-destructive")}
-      >
-        {isRoot ? (
-          <Boxes className="text-primary" />
-        ) : (
-          <EcosystemImage packageName={label} size={16} />
-        )}
-      </ItemMedia>
       <ItemContent>
         <ItemTitle>
-          <span className="truncate">{name}</span>
-          {version && (
-            <Badge variant="outline" className="shrink-0 font-normal">
-              {version}
-            </Badge>
-          )}
+          <Purl purl={label} showQualifiers={false} />
         </ItemTitle>
         <ItemDescription className={cn(isVulnerable && "text-destructive/80")}>
           {roleDescription[role]}

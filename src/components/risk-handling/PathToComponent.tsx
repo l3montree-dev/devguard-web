@@ -17,8 +17,10 @@ import PathEdge from "./PathEdge";
 import PathNode, { type PathNodeRole } from "./PathNode";
 
 interface PathToComponentProps {
-  // Application / asset name rendered as the first (root) node.
-  rootName: string;
+  // Purls of the artifacts this vulnerability was found in - a vuln can show up
+  // in more than one build (e.g. several container images), all sharing the
+  // same first hop, so they're rendered as a cluster of root nodes.
+  rootNames: string[];
   // Ordered purls from the direct dependency down to the vulnerable component.
   path: string[];
   // Number of dependency paths this vulnerability is reachable through.
@@ -128,33 +130,33 @@ const buildLinePath = (rects: NodeRect[]): string => {
 };
 
 type Item =
+  | { key: string; kind: "roots"; labels: string[] }
   | { key: string; kind: "node"; label: string; role: PathNodeRole }
   | { key: string; kind: "edge"; index: number };
 
 const PathToComponent: FunctionComponent<PathToComponentProps> = ({
-  rootName,
+  rootNames,
   path,
   pathCount,
   actionable = false,
   onCallClick,
 }) => {
-  const nodes: Array<{ key: string; label: string; role: PathNodeRole }> = [
-    { key: "root", label: rootName, role: "root" },
-    ...path.map((purl, i) => ({
+  const chainNodes: Array<{ key: string; label: string; role: PathNodeRole }> =
+    path.map((purl, i) => ({
       key: `${purl}-${i}`,
       label: purl,
       role: (i === path.length - 1
         ? "vulnerable"
         : "dependency") as PathNodeRole,
-    })),
-  ];
+    }));
 
-  // Interleave nodes with the actionable "calls vulnerable function" edges.
-  const items: Item[] = [];
-  nodes.forEach((node, i) => {
+  // The root cluster and the first chain edge share the semantics the single
+  // root node used to have: edge index 0 disputes "does the first hop really
+  // get called", regardless of which artifact's root it originates from.
+  const items: Item[] = [{ key: "roots", kind: "roots", labels: rootNames }];
+  chainNodes.forEach((node, i) => {
+    items.push({ key: `edge-${i}`, kind: "edge", index: i });
     items.push({ kind: "node", ...node });
-    if (i < nodes.length - 1)
-      items.push({ key: `edge-${i}`, kind: "edge", index: i });
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -181,7 +183,7 @@ const PathToComponent: FunctionComponent<PathToComponentProps> = ({
 
   // Re-measure when the path changes or the container resizes, since resizing
   // is what makes the items re-wrap onto a different number of lines.
-  const pathKey = nodes.map((n) => n.label).join("|");
+  const pathKey = [...rootNames, ...chainNodes.map((n) => n.label)].join("|");
   useEffect(() => {
     measure();
     const container = containerRef.current;
@@ -229,7 +231,7 @@ const PathToComponent: FunctionComponent<PathToComponentProps> = ({
             stroke="hsl(var(--muted-foreground))"
             strokeOpacity={0.5}
             strokeWidth={2}
-            strokeLinecap="round"
+            strokeLinecap="butt"
             strokeLinejoin="round"
           />
         </svg>
@@ -244,7 +246,13 @@ const PathToComponent: FunctionComponent<PathToComponentProps> = ({
               // every wrapped line is nudged right, leaving room for the return.
               className={idx === 0 ? "-ml-6" : undefined}
             >
-              {item.kind === "node" ? (
+              {item.kind === "roots" ? (
+                <div className="flex flex-wrap border items-center gap-2 rounded-lg bg-card p-2">
+                  {item.labels.map((label, i) => (
+                    <PathNode key={`${label}-${i}`} label={label} role="root" />
+                  ))}
+                </div>
+              ) : item.kind === "node" ? (
                 <PathNode label={item.label} role={item.role} />
               ) : (
                 <PathEdge

@@ -14,14 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
-import {
-  beautifyPurl,
-  classNames,
-  extractPurlQualifiers,
-  extractVersion,
-  formatPurlQualifiers,
-  stateLabels,
-} from "@/utils/common";
+import { classNames, stateLabels } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -29,12 +22,12 @@ import React, { type FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
 import { isMember, useCurrentUserRole } from "../../hooks/useUserRole";
 import Severity, { CVSSBadge } from "../common/Severity";
+import Purl from "../common/Purl";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
-import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
 import Link from "next/link";
 import { WrenchIcon } from "lucide-react";
@@ -141,23 +134,34 @@ const VulnWithCveTableRow = ({
                         {vuln.vulnerabilityPath.map((p, i) => (
                           <span key={i}>
                             {i > 0 && " → "}
-                            <Badge variant="outline">{beautifyPurl(p)}</Badge>
+                            <Purl
+                              purl={p}
+                              showIcon={false}
+                              showVersion={false}
+                              showQualifiers={false}
+                            />
                           </span>
                         ))}
                       </span>
                     ) : (
                       <span>
-                        <Badge variant="outline">
-                          {beautifyPurl(vuln.vulnerabilityPath[0])}
-                        </Badge>
+                        <Purl
+                          purl={vuln.vulnerabilityPath[0]}
+                          showIcon={false}
+                          showVersion={false}
+                          showQualifiers={false}
+                        />
                         {" → ... → "}
-                        <Badge variant="outline">
-                          {beautifyPurl(
+                        <Purl
+                          purl={
                             vuln.vulnerabilityPath[
                               vuln.vulnerabilityPath.length - 1
-                            ],
-                          )}
-                        </Badge>
+                            ]
+                          }
+                          showIcon={false}
+                          showVersion={false}
+                          showQualifiers={false}
+                        />
                       </span>
                     )}
                   </div>
@@ -167,8 +171,7 @@ const VulnWithCveTableRow = ({
                 <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
                   {vuln.vulnerabilityPath.map((el, i) => (
                     <span className="flex flex-row items-center gap-1" key={i}>
-                      <EcosystemImage size={12} packageName={el} />
-                      {beautifyPurl(el)}
+                      <Purl purl={el} showVersion={false} showQualifiers={false} />
                       {i < vuln.vulnerabilityPath.length - 1 ? " → " : null}
                     </span>
                   ))}
@@ -213,10 +216,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     () => row.original.vulns.some(isQuickfixAvailable),
     [row.original.vulns],
   );
-  const packageQualifiers = extractPurlQualifiers(row.original.packageName);
-  const displayPackageQualifiers = formatPurlQualifiers(
-    row.original.packageName,
-  );
   const isActivelyExploited = row.original.vulns.some(
     (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
   );
@@ -251,26 +250,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             ) : (
               <ChevronRightIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             )}
-            <EcosystemImage packageName={row.original.packageName} size={16} />
-            <span className="font-medium truncate">
-              {beautifyPurl(row.original.packageName)}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {extractVersion(row.original.packageName)}
-            </span>
-
-            {packageQualifiers && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="max-w-64 truncate whitespace-nowrap text-xs text-muted-foreground">
-                    {displayPackageQualifiers}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-sm break-all">
-                  {packageQualifiers}
-                </TooltipContent>
-              </Tooltip>
-            )}
+            <Purl purl={row.original.packageName} />
             {isActivelyExploited ? (
               <WarningWithDescription
                 description={
