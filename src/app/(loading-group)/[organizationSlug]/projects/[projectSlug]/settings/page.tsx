@@ -255,7 +255,7 @@ These identifiers are managed by the external system and are treated as immutabl
             <CopyInput
               value={
                 config.devguardApiUrlPublicInternet +
-                "api/v1" +
+                "/api/v1" +
                 "/organizations/" +
                 activeOrg.slug +
                 "/projects/" +
