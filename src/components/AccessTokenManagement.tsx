@@ -221,6 +221,7 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
                     <DatePicker
                       date={expiryDate}
                       onDateChange={handleExpiryDateChange}
+                      variant="onCard"
                     />
                     {expiryDate && !expiryError && (
                       <span className="text-xs text-muted-foreground">
