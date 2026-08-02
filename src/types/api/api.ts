@@ -1103,6 +1103,8 @@ export type VexRuleRecommendation = {
   // Metrics - indicates how many dependency vulns this rule applies to
   appliesToAmountOfDependencyVulns: number;
 
+  type: "crowdsourced" | "session" | "upstream";
+  source: string;
   verifiedVotes: number;
   totalVotes: number;
 

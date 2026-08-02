@@ -41,6 +41,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
 import useSWR from "swr";
+import Link from "next/link";
 
 const VexRulesPage: FunctionComponent = () => {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
@@ -196,8 +197,24 @@ const VexRulesPage: FunctionComponent = () => {
         {recommendations.length > 0 && (
           <Section
             forceVertical
-            title="Recommended by other DevGuard users or other assessments in your organization"
-            description="Other users of DevGuard assessed vulnerabilities that are found in your Reposiotory already. Based on a majority vote, the following VEX rules are recommended. Nothing is applied until you create the rule."
+            title="Recommendations based on your organisation assessments, upstream sources and other DevGuard users"
+            description={
+              <>
+                Other users of DevGuard assessed vulnerabilities that are found
+                in your Reposiotory already. Based on a majority vote, the
+                following VEX rules are recommended. Nothing is applied until
+                you create the rule. You can find the list of official upstream
+                sources that devguard syncs{" "}
+                <Link
+                  href={
+                    "https://github.com/l3montree-dev/devguard/blob/main/vulndb/upstream_vex_service.go#L27"
+                  }
+                  target="_blank"
+                >
+                  in the GitHub repository
+                </Link>
+              </>
+            }
             className="mb-6 border-t pt-6"
           >
             <VexRuleRecommendationList
@@ -209,6 +226,7 @@ const VexRulesPage: FunctionComponent = () => {
                   mechanicalJustification:
                     entry.recommendation.mechanicalJustification,
                   wasRecommended: true,
+                  title: entry.recommendation.title,
                 });
                 setAddRuleDialogOpen(true);
               }}
@@ -220,7 +238,7 @@ const VexRulesPage: FunctionComponent = () => {
       <Collapsible className="mb-6 border-t pt-6">
         <CollapsibleTrigger className="group flex w-full cursor-pointer flex-row items-center justify-between">
           <span className="flex flex-row items-center gap-2 text-base font-semibold leading-7 text-foreground">
-            Upstream VEX sources
+            Your additional Upstream VEX sources
             {vexSources.length > 0 && (
               <Badge variant="secondary" className="font-medium">
                 {vexSources.length}

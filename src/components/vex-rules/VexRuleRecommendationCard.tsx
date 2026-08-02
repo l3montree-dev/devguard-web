@@ -46,14 +46,18 @@ const VexRuleRecommendationCard: FunctionComponent<
             </span>
             <div className="flex flex-col">
               <span className="text-base font-medium text-muted-foreground">
-                {recommendation.assetSlug && recommendation.projectSlug
+                {recommendation.type === "session"
                   ? "Recommended by your organization"
-                  : "Recommended by other DevGuard users"}
+                  : recommendation.type === "upstream"
+                    ? "Imported from official upstream source"
+                    : "Recommended by other DevGuard users"}
               </span>
               <span className="text-base font-semibold">
-                {recommendation.assetSlug && recommendation.projectSlug
+                {recommendation.type === "session"
                   ? "Your organization"
-                  : "Other DevGuard users"}{" "}
+                  : recommendation.type === "upstream"
+                    ? "Upstream sources"
+                    : "Other DevGuard users"}{" "}
                 assess this vulnerability as not exploitable
               </span>
             </div>

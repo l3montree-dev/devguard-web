@@ -11,6 +11,7 @@ import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import VexRuleResult from "./VexRuleResult";
 import { extractVulnIdentifier } from "./vexRuleParser";
 import { Badge } from "../ui/badge";
+import { VerifiedIcon } from "lucide-react";
 
 export interface RecommendationEntry {
   vulnID: string;
@@ -38,9 +39,19 @@ const VexRuleRecommendationList: FunctionComponent<
           )}
         >
           <div className="flex min-w-0 flex-col gap-1">
-            {entry.recommendation.assetSlug && (
+            {entry.recommendation.type === "origin" && (
               <span className="text-xs text-muted-foreground">
                 Created by your organization
+              </span>
+            )}
+            {entry.recommendation.type == "upstream" && (
+              <span className="text-xs text-muted-foreground flex flex-row items-center gap-1">
+                <VerifiedIcon size={14} /> Synced from official sources
+                {entry.recommendation.source && (
+                  <span className="text-xs text-muted-foreground">
+                    ({entry.recommendation.source})
+                  </span>
+                )}
               </span>
             )}
             <span className="text-sm font-medium">
