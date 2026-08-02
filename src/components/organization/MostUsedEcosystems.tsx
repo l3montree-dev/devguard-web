@@ -103,7 +103,7 @@ const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
                       </div>
                       <div className="text-muted-foreground mt-1.5 grid gap-0.5 pl-[18px]">
                         <span>Total: {entry.totalCount}</span>
-                        <span>Share: {(entry.amount * 100).toFixed(1)}%</span>
+                        <span>Share: {(entry.amount).toFixed(1)}%</span>
                       </div>
                     </div>
                   );
