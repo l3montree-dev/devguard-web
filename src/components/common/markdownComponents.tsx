@@ -14,6 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Components } from "react-markdown";
+import CopyCode from "./CopyCode";
 
 // Shared prose styling for markdown rendered inside cards. Pass to the
 // <Markdown> wrapper in @/components/common/Markdown so remark-gfm stays
@@ -33,7 +34,7 @@ export const markdownComponents: (linkBaseURL?: string) => Components = (
   h4: ({ children }) => (
     <h4 className="mb-1 mt-3 text-sm font-semibold">{children}</h4>
   ),
-  p: ({ children }) => <p className="my-2 leading-relaxed">{children}</p>,
+  p: ({ children }) => <p className="my-2 leading-relaxed whitespace-pre-wrap">{children}</p>,
   ul: ({ children }) => (
     <ul className="my-2 ml-5 list-disc space-y-1">{children}</ul>
   ),
@@ -68,17 +69,12 @@ export const markdownComponents: (linkBaseURL?: string) => Components = (
       {children}
     </a>
   ),
-  code: ({ className, children, ...props }) => {
-    const isBlock = className?.startsWith("language-");
-    if (isBlock) {
-      return (
-        <code className={className} {...props}>
-          {children}
-        </code>
-      );
-    }
-    return (
-      <code className="rounded bg-muted px-1 py-0.5 font-mono text-[0.875em]">
+  code: ({ children, node }) => {
+    const isBlock = node?.position?.start.line !== node?.position?.end.line;
+    return isBlock ? (
+      <CopyCode codeString={children ? children.toString() : ""} />
+    ) : (
+      <code className="border rounded-sm bg-secondary p-1/4 before:content-none after:content-none">
         {children}
       </code>
     );

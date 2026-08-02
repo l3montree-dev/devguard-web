@@ -8,9 +8,9 @@ export class VulnFlow {
   // The assessment justification and the VEX rule justification both use the
   // markdown editor, so scope it when a dialog adds a second one to the page.
   private async fillJustification(text: string, scope?: Locator) {
-    const editor = (scope ?? this.page)
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph");
+    const editor = (scope ?? this.page).getByRole("textbox", {
+      name: /^Add (?:a |your )comment/,
+    });
     await editor.click();
     await editor.fill(text);
   }

@@ -26,7 +26,6 @@
     "@heroicons/react": "^2.2.0",
     "@iarna/toml": "^2.2.5",
     "@ltonetwork/http-message-signatures": "^0.1.12",
-    "@mdxeditor/editor": "^4.0.4",
     "@ory/client-fetch": "1.22.66",
     "@ory/elements-react": "1.2.0",
     "@ory/nextjs": "1.0.0-rc.1",

@@ -70,7 +70,6 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
               Justification
             </label>
             <MarkdownEditor
-              className="!bg-card"
               placeholder="Add your justification for mitigating this vulnerability..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}

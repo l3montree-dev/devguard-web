@@ -154,12 +154,10 @@ const VulnAssessmentComposer: FunctionComponent<
 
   return (
     <div className="flex flex-col gap-2">
-      <Card className="" onKeyDown={handleShortcut}>
-        <CardContent className="flex flex-col gap-3 pt-6">
+        <div className="flex flex-col gap-3 pt-6">
           <AuthGuard require="member">
             <>
               <MarkdownEditor
-                className=""
                 value={justification}
                 setValue={(value) => setJustification(value ?? "")}
                 placeholder={
@@ -321,8 +319,7 @@ const VulnAssessmentComposer: FunctionComponent<
               </Link>
             </small>
           )}
-        </CardContent>
-      </Card>
+        </div>
 
       <AuthGuard require="member">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs text-muted-foreground justify-center mt-4">

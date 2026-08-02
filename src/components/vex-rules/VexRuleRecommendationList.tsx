@@ -39,7 +39,7 @@ const VexRuleRecommendationList: FunctionComponent<
           )}
         >
           <div className="flex min-w-0 flex-col gap-1">
-            {entry.recommendation.type === "origin" && (
+            {entry.recommendation.type === "session" && (
               <span className="text-xs text-muted-foreground">
                 Created by your organization
               </span>

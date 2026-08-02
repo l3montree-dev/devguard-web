@@ -205,7 +205,6 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <MarkdownEditor
-                      className="!bg-card"
                       placeholder={`### Summary\nShort summary of the problem. Make the impact and severity as clear as possible.\n\n### Details\nGive all details on the vulnerability.`}
                       value={field.value}
                       setValue={(value) => field.onChange(value ?? "")}
