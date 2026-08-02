@@ -5,10 +5,12 @@
 
 import CelCodeBlock from "@/components/common/CelCodeBlock";
 import { Button } from "@/components/ui/button";
+import { documentationLinks } from "@/const/documentationLinks";
 import type { VexRuleRecommendation } from "@/types/api/api";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Users } from "lucide-react";
+import Link from "next/link";
 import type { FunctionComponent } from "react";
 import VexRuleResult from "./VexRuleResult";
 import { Badge } from "../ui/badge";
@@ -102,6 +104,17 @@ const VexRuleRecommendationCard: FunctionComponent<
         <div className="mt-2 flex flex-row items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
           <span className="">
             Nothing is applied until you create the rule.
+            <br />
+            Read the{" "}
+            <Link
+              href={documentationLinks.vexRecommendationWhitepaper}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-link hover:underline"
+            >
+              VEX sharing whitepaper
+            </Link>
+            .
           </span>
           <Button size="sm" onClick={onCreateRule} variant="green">
             Create VEX rule from recommendation
