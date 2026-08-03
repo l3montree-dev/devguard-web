@@ -1,6 +1,9 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import { ModalHelper } from "./modal-helper";
+import { docShot } from "../../doc-shot";
+import type { TestInfo } from "@playwright/test";
+import { DevGuardNavigationLevel } from "../devguard";
 
 export class VulnFlow {
   constructor(private page: Page) {}
@@ -44,7 +47,10 @@ export class VulnFlow {
     await expect(markAcceptedRisk).toBeHidden({ timeout: 20_000 });
   }
 
-  async markEdgeAsDoesNotCallVulnerableFunction() {
+  async markEdgeAsDoesNotCallVulnerableFunction(
+    testInfo: TestInfo,
+    doScreenshot: boolean = true,
+  ) {
     const firstEdge = this.page.getByTestId("path-edge").first();
     await expect(firstEdge).toBeVisible({ timeout: 20_000 });
     await firstEdge.click();
@@ -59,6 +65,9 @@ export class VulnFlow {
       "The vulnerable function is not called along this path.",
       dialog,
     );
+    if (doScreenshot) {
+      docShot(this.page, testInfo, "vex-rule-mark-false-positive-from-path");
+    }
     await dialog.getByTestId("vex-rule-mark-false-positive").click();
     await expect(dialog).toBeHidden({ timeout: 20_000 });
   }
@@ -83,6 +92,87 @@ export class VulnFlow {
     await expect(
       dialog.getByText(/Matches \d+ vulnerabilit(y|ies)/).first(),
     ).toBeVisible({ timeout: 20_000 });
+  }
+
+  async expectVulnState(state: string) {
+    await expect(this.page.getByTestId("vuln-state")).toHaveText(state, {
+      timeout: 20_000,
+    });
+  }
+
+  async expectVulnStateEventually(state: string) {
+    await expect(async () => {
+      await this.page
+        .getByTestId("nav-asset-dependency-risks")
+        .locator("a")
+        .click({ timeout: 20_000 });
+      await this.openFirstAffectedComponent();
+      await expect(this.page.getByTestId("vuln-state")).toHaveText(state, {
+        timeout: 5_000,
+      });
+    }).toPass({ timeout: 60_000, intervals: [2_000] });
+  }
+
+  async deleteFirstVexRule(testInfo: TestInfo) {
+    await this.page
+      .getByTestId("nav-asset-dependency-risks")
+      .locator("button")
+      .click({ timeout: 20_000 });
+    await this.page
+      .getByTestId("nav-asset-vex-rules")
+      .click({ timeout: 20_000 });
+
+    const firstRuleRow = this.page.getByTestId("vex-rule-row").first();
+    await expect(firstRuleRow).toBeVisible({ timeout: 20_000 });
+
+    await firstRuleRow.getByRole("button").click();
+    docShot(this.page, testInfo, "vex-rule-delete-confirmation-dialog");
+    await this.page.getByRole("menuitem", { name: "Delete" }).click();
+
+    const confirmButton = this.page.getByTestId("alert-confirm-button");
+    await expect(confirmButton).toBeVisible({ timeout: 10_000 });
+    await confirmButton.click();
+
+    await expect(firstRuleRow).toBeHidden({ timeout: 20_000 });
+  }
+
+  async expectVexRuleRecommendationVisible(testInfo?: TestInfo) {
+    const card = this.page.getByTestId("vex-rule-recommendation-card");
+    await expect(card).toBeVisible({ timeout: 20_000 });
+    if (testInfo) {
+      await docShot(this.page, testInfo, "vex-rule-recommendation-card", {
+        locator: card,
+      });
+    }
+  }
+
+  async createVexRuleFromRecommendation() {
+    await this.page
+      .getByRole("button", { name: "Create VEX rule from recommendation" })
+      .click({ timeout: 20_000 });
+
+    const dialog = this.page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("heading", { name: "Add VEX rule", exact: true }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    await dialog.getByTestId("vex-rule-mark-false-positive").click();
+    await expect(dialog).toBeHidden({ timeout: 20_000 });
+  }
+
+  async openGroups() {
+    await this.page
+      .getByRole("img", { name: /^DevGuard Logo$/ })
+      .last()
+      .click({ timeout: 20_000 });
+    await this.page
+      .locator(
+        `${DevGuardNavigationLevel.Organization} [data-testid="nav-org-groups"]`,
+      )
+      .click({ timeout: 30_000 });
+    await this.page
+      .getByTestId("create-group-button")
+      .waitFor({ state: "visible", timeout: 30_000 });
   }
 
   async filterDependencyRisksTable() {

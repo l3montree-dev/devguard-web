@@ -33,7 +33,10 @@ const VexRuleRecommendationCard: FunctionComponent<
   const mechanical = recommendation.mechanicalJustification;
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-success bg-card shadow-lg shadow-success/20">
+    <div
+      data-testid="vex-rule-recommendation-card"
+      className="relative overflow-hidden rounded-lg border border-success bg-card shadow-lg shadow-success/20"
+    >
       {/* Subtle dot-grid texture */}
       <div
         aria-hidden

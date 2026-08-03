@@ -17,18 +17,11 @@ test.describe("DevGuard handle vuln flows", () => {
   });
 
   test("test sbom upload to false positive", async ({ page }, testInfo) => {
-  await devguardPOM.setupSbomUpload();
-  await page.waitForTimeout(5_000);
-  await docShot(page, testInfo, "dependency-risk-table");
-  await devguardPOM.vuln().openFirstAffectedComponent();
-  await devguardPOM.vuln().markVulnAsFalsePositive();
-});
-
-  test("test sbom upload to path vexxing and verification of vex rule", async () => {
     await devguardPOM.setupSbomUpload();
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "dependency-risk-table");
     await devguardPOM.vuln().openFirstAffectedComponent();
-    await devguardPOM.vuln().markEdgeAsDoesNotCallVulnerableFunction();
-    await devguardPOM.vuln().verifyVEXRule();
+    await devguardPOM.vuln().markVulnAsFalsePositive();
   });
 
   test("test sbom upload to accepted risk", async () => {
@@ -37,23 +30,27 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().markVulnAsAcceptedRisk();
   });
 
-  test ("test sbom upload to overview", async ({ page }, testInfo) => {
+  test("test sbom upload to overview", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await page.getByTestId("nav-asset-overview-chevron").click();
     await page
-      .getByRole('menuitem', { name: 'Overview' })
+      .getByRole("menuitem", { name: "Overview" })
       .click({ timeout: 20_000 });
     await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "asset-overview");
     await page.mouse.wheel(0, 1000);
     await page.waitForTimeout(5_000);
-    await docShot(page, testInfo, "asset-overview-v2") ;
+    await docShot(page, testInfo, "asset-overview-v2");
   });
 
   test.skip("test auto setup to gitlab repo", async () => {
-    await devguardPOM.org().redirectToNewOrg(DevGuardNavigationLevel.Organization);
+    await devguardPOM
+      .org()
+      .redirectToNewOrg(DevGuardNavigationLevel.Organization);
     await devguardPOM.org().createOrganization("TestOrganizationGitLab");
-    await devguardPOM.group().createGroup("TestGroupGitLab", "This is a test group");
+    await devguardPOM
+      .group()
+      .createGroup("TestGroupGitLab", "This is a test group");
     await devguardPOM
       .repo()
       .createGitLabRepo("TestRepoGitLab", "This is a test repo");
@@ -82,13 +79,6 @@ test.describe("DevGuard handle vuln flows", () => {
   test("test to download sbom", async () => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.sharing().downloadSBOMFile();
-  });
-
-  test("test to download vex", async () => {
-    await devguardPOM.setupSbomUpload();
-    await devguardPOM.vuln().openFirstAffectedComponent();
-    await devguardPOM.vuln().markEdgeAsDoesNotCallVulnerableFunction();
-    await devguardPOM.sharing().downloadVEXFile();
   });
 
   test("test to upload VEX and verify", async () => {

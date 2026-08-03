@@ -131,5 +131,7 @@ export class DevGuardPOM {
       repoName,
       "This repo contains top secret information.",
     );
+
+    return { orgName, groupName, repoName };
   }
 }
