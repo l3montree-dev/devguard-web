@@ -66,7 +66,11 @@ export class VulnFlow {
       dialog,
     );
     if (doScreenshot) {
-      docShot(this.page, testInfo, "vex-rule-mark-false-positive-from-path");
+      await docShot(
+        this.page,
+        testInfo,
+        "vex-rule-mark-false-positive-from-path",
+      );
     }
     await dialog.getByTestId("vex-rule-mark-false-positive").click();
     await expect(dialog).toBeHidden({ timeout: 20_000 });
