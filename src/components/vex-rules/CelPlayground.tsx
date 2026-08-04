@@ -95,7 +95,7 @@ const CelPlayground: FunctionComponent<CelPlaygroundProps> = ({
         />
 
         <div className="mt-2 flex flex-row flex-wrap items-center gap-2">
-          <VexRuleMatchStatus status={status} />
+          <VexRuleMatchStatus scope="open" status={status} />
           <Button
             size="sm"
             variant="default"
