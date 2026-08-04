@@ -507,14 +507,6 @@ const Index: FunctionComponent = () => {
                   <Skeleton className="w-full h-20" />
                 )}
               </div>
-              {isVexLocked && lockingVexRule && (
-                <div className="mt-6">
-                  <VexRuleCard
-                    vexRule={lockingVexRule}
-                    vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/vex-rules`}
-                  />
-                </div>
-              )}
               <div data-tour="path" className={lockedOverlay}>
                 {!graphLoading && (
                   <div className="mt-6">
@@ -568,11 +560,21 @@ const Index: FunctionComponent = () => {
                   </div>
                 )}
               </div>
-              {vuln && (
+              {isVexLocked && lockingVexRule && (
                 <div className="mt-6">
-                  <Quickfix vuln={vuln} />
+                  <VexRuleCard
+                    vexRule={lockingVexRule}
+                    vexRulesUrl={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/vex-rules`}
+                  />
                 </div>
               )}
+              <div className={lockedOverlay}>
+                {vuln && (
+                  <div className="mt-6">
+                    <Quickfix vuln={vuln} />
+                  </div>
+                )}
+              </div>
               {/* Only worth offering while nothing handles this vuln yet. */}
               {!isVexLocked && recommendation && isMember(role) && (
                 <div className="mt-6">
