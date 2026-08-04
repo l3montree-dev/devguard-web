@@ -14,7 +14,8 @@ import type { VexRuleMatchCount } from "./useVexRuleMatchCount";
 const VexRuleMatchStatus: FunctionComponent<{
   status: VexRuleMatchCount;
   className?: string;
-}> = ({ status, className }) => {
+  scope?: "open" | "all";
+}> = ({ status, className, scope = "all" }) => {
   const { syntaxError, hasSyntaxError, isTesting, testingError, matchCount } =
     status;
   const error = syntaxError?.message ?? testingError;
@@ -39,7 +40,7 @@ const VexRuleMatchStatus: FunctionComponent<{
     return (
       <FieldDescription className={base}>
         <Loader2 aria-hidden className={cn(icon, "animate-spin")} />
-        <span>Checking how many vulnerabilities this would affect...</span>
+        <span>Checking how many open vulnerabilities this would affect...</span>
       </FieldDescription>
     );
   }
@@ -56,7 +57,8 @@ const VexRuleMatchStatus: FunctionComponent<{
       <span>
         Matches{" "}
         <span className="font-medium text-foreground">{matchCount}</span>{" "}
-        vulnerabilit{matchCount === 1 ? "y" : "ies"}
+        {scope === "open" ? "open " : ""}vulnerabilit
+        {matchCount === 1 ? "y" : "ies"}
       </span>
     </FieldDescription>
   );

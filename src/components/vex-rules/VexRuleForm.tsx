@@ -258,7 +258,11 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
                 />
               </CollapsibleContent>
             </Collapsible>
-            <VexRuleMatchStatus status={matchStatus} className="mt-1.5" />
+            <VexRuleMatchStatus
+              status={matchStatus}
+              scope="open"
+              className="mt-1.5"
+            />
           </div>
         ) : (
           <div className="mt-6">
@@ -271,7 +275,11 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
               height={140}
               placeholder={`// Examples:\n// vuln.cveId == "CVE-2021-1234"\n// matchesPurl(vuln.componentPurl, "pkg:npm/undici@6.26.*")\n// vuln.cve.cvss < 4.0\n// ROOT is a special token matching all artifacts in a repo\n// matchesPattern(vuln, ["*", "pkg:npm/foo@1.0.0", "pkg:npm/lodash@4.17.21"])`}
             />
-            <VexRuleMatchStatus status={matchStatus} className="mt-1.5" />
+            <VexRuleMatchStatus
+              status={matchStatus}
+              scope="open"
+              className="mt-1.5"
+            />
           </div>
         )}
       </div>
