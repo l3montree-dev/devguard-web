@@ -183,7 +183,7 @@ const Index: FunctionComponent = () => {
         activeOrg.slug +
         "/projects/" +
         project?.slug +
-        "/assets" +
+        "/assets/" +
         asset.slug +
         "/members/" +
         id,
