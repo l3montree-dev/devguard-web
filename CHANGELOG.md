@@ -10,6 +10,14 @@ For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3mo
 
 - **Member promotion URL** — fixed a wrong URL used when promoting an organization member
 - **OpenVex and CSAF URLs** — handle a missing basePath when building these URLs
+- **Top components occurrences header** — prevented the heading from wrapping
+- **Organization setup** — autofocus the organization name field during setup
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@happykawayigt](https://github.com/happykawayigt)** — fixed the top components occurrences header wrapping
 
 ---
 
