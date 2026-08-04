@@ -4,6 +4,15 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.12.1] — 2026-08-04
+
+### Fixed
+
+- **Member promotion URL** — fixed a wrong URL used when promoting an organization member
+- **OpenVex and CSAF URLs** — handle a missing basePath when building these URLs
+
+---
+
 ## [v1.12.0] — 2026-08-02
 
 ### Added
