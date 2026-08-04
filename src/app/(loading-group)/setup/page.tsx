@@ -17,8 +17,9 @@
 import OrgRegisterForm from "@/components/OrgRegister";
 import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 
 const Lanyard = dynamic(
@@ -28,11 +29,24 @@ const Lanyard = dynamic(
 
 export default function SetupOrg() {
   const session = useSession();
+  const instanceSettings = useInstanceSettings();
+
+  const pathname = usePathname();
+  const [lanyardKey, setLanyardKey] = useState(0);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setLanyardKey((k) => k + 1);
+  }, [pathname]);
+
   if (session.session === null) {
     redirect("/login");
   }
 
-  const instanceSettings = useInstanceSettings();
   if (instanceSettings?.singleOrganizationMode) {
     redirect("/join");
   }
@@ -43,7 +57,11 @@ export default function SetupOrg() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
           <div className="">
             <div className="absolute inset-0 z-10 -top-10 w-1/2">
-              <Lanyard position={[0, 0, 20]} gravity={[0, -40, 0]} />
+              <Lanyard
+                key={lanyardKey}
+                position={[0, 0, 20]}
+                gravity={[0, -40, 0]}
+              />
             </div>
           </div>
           <div className="px-6 pb-24 pt-20 sm:pb-32 lg:px-8 lg:py-24">
