@@ -303,7 +303,7 @@ These identifiers are managed by the external system and are treated as immutabl
               />
             ))}
 
-            {project.webhooks.length > 0 && <hr />}
+            {project.webhooks?.length > 0 && <hr />}
             <ListItem
               Title={
                 <div className="flex flex-row items-center">Add a Webhook</div>
