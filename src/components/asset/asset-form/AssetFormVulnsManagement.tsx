@@ -552,14 +552,14 @@ const PublicUrlsSection: FunctionComponent<{
       label:
         "OpenVex-URL (Always up to date vulnerability information in OpenVex format)",
       nameKey: "openvex-url",
-      value: `${basePath}/openvex.json/`,
+      value: basePath ? `${basePath}/openvex.json/` : "",
       copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
       label:
         "CSAF-URL (Always up to date vulnerability information in CSAF format)",
       nameKey: "csaf-url",
-      value: `${basePath}/csaf.json/`,
+      value: basePath ? `${basePath}/csaf.json/` : "",
       copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
