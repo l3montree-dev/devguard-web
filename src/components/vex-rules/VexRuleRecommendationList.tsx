@@ -6,16 +6,14 @@
 import { Button } from "@/components/ui/button";
 import type { VexRuleRecommendation } from "@/types/api/api";
 import { classNames } from "@/utils/common";
+import { VerifiedIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import VexRuleResult from "./VexRuleResult";
-import { extractVulnIdentifier } from "./vexRuleParser";
-import { Badge } from "../ui/badge";
-import { VerifiedIcon } from "lucide-react";
 
 export interface RecommendationEntry {
   vulnID: string;
-  recommendation: VexRuleRecommendation;
+  recommendation: Omit<VexRuleRecommendation,  "appliesToAmountOfDependencyVulns"> ;
 }
 
 interface VexRuleRecommendationListProps {
@@ -70,13 +68,6 @@ const VexRuleRecommendationList: FunctionComponent<
                 entry.recommendation.mechanicalJustification
               }
             />
-            <VexRuleMatchStatus
-              status={{
-                matchCount:
-                  entry.recommendation.appliesToAmountOfDependencyVulns,
-              }}
-            />
-
             <Button size="sm" variant="secondary">
               Create rule
             </Button>
