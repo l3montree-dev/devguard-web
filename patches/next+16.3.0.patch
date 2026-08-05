@@ -1,0 +1,44 @@
+diff --git a/node_modules/next/dist/lib/typescript/runTypeScriptCli.js b/node_modules/next/dist/lib/typescript/runTypeScriptCli.js
+index 0000000..0000000 100644
+--- a/node_modules/next/dist/lib/typescript/runTypeScriptCli.js
++++ b/node_modules/next/dist/lib/typescript/runTypeScriptCli.js
+@@ -47,9 +47,17 @@ function getTypeScriptPackageInfo(baseDir) {
+     var _packageJson_bin;
+     let packageJsonPath;
+     try {
+-        packageJsonPath = (0, _resolvefrom.resolveFrom)(baseDir, 'typescript/package.json');
++        // devguard-web patch: prefer the real TS7 compiler aliased under
++        // "@typescript/native" for CLI-mode builds, so "typescript" itself can
++        // stay pinned to the @typescript/typescript6 API-compat package for
++        // tools (typescript-eslint) that still require the removed v6 API.
++        packageJsonPath = (0, _resolvefrom.resolveFrom)(baseDir, '@typescript/native/package.json');
+     } catch  {
+-        return null;
++        try {
++            packageJsonPath = (0, _resolvefrom.resolveFrom)(baseDir, 'typescript/package.json');
++        } catch  {
++            return null;
++        }
+     }
+     const packageJson = JSON.parse((0, _nodefs.readFileSync)(packageJsonPath, 'utf8'));
+     const packageDir = _nodepath.default.dirname(packageJsonPath);
+diff --git a/node_modules/next/dist/lib/verify-typescript-setup.js b/node_modules/next/dist/lib/verify-typescript-setup.js
+index 0000000..0000000 100644
+--- a/node_modules/next/dist/lib/verify-typescript-setup.js
++++ b/node_modules/next/dist/lib/verify-typescript-setup.js
+@@ -133,6 +133,15 @@ async function verifyAndRunTypeScript({ dir, distDir, cacheDir, strictRouteTyp
+         ];
+         // Ensure TypeScript and necessary `@types/*` are installed:
+         let deps = (0, _hasnecessarydependencies.hasNecessaryDependencies)(dir, requiredPackages);
++        // devguard-web patch: hasNecessaryDependencies only checks for
++        // 'typescript/bin/tsc' under the literal "typescript" package name, but
++        // our patched getTypeScriptPackageInfo() already resolved a real CLI
++        // binary via the "@typescript/native" alias (real TS7) when "typescript"
++        // itself is pinned to the @typescript/typescript6 API-compat package.
++        // Trust that result instead of re-triggering an auto-install.
++        if (useTypeScriptCli && installedTypeScript && installedTypeScript.tscPath) {
++            deps.missing = (deps.missing || []).filter((dep)=>dep.pkg !== 'typescript');
++        }
+         // If @typescript/native-preview is installed and only the typescript package is missing,
+         // we can skip auto-installing typescript since the native preview provides TS compilation.
+         // However, we still need @types/react and @types/node for type checking.
