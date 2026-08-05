@@ -25,6 +25,8 @@
         --set-interpreter ${interpreter} \
         --set-rpath ${pkgs.lib.makeLibraryPath (linuxLibs targetPkgs)} \
         bin/node
+      # remove npm and npx
+      rm -rf bin/npm bin/npx lib
     '';
 
   aarch64-darwin = pkgs.stdenv.mkDerivation {
