@@ -94,9 +94,9 @@ const buildColumnsDef = (
     meta: { className: "w-24 whitespace-nowrap" },
     cell: (info) => {
       const advisory = info.row.original;
-      if (advisory.visibility !== "public") return null;
+      if (advisory.state !== "public") return null;
       const year = new Date(advisory.createdAt).getFullYear();
-      const href = `${csafBaseUrl}/csaf/white/${year}/dgsa-${year}-${advisory.id}.json`;
+      const href = `${csafBaseUrl}/csaf/white/${year}/dgsa-${advisory.id}.json`;
       return (
         <a
           href={href}

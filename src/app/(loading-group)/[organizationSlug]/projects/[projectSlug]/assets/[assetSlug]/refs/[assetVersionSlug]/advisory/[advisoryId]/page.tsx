@@ -6,11 +6,13 @@ import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { SecurityAdvisory } from "@/types/api/api";
+import type {
+  DetailedSecurityAdvisoryDTO,
+  VulnEventDTO,
+} from "@/types/api/api";
 import Severity from "@/components/common/Severity";
 import Markdown from "@/components/common/Markdown";
-import FormatDate from "@/components/risk-assessment/FormatDate";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { AsyncButton, Button } from "@/components/ui/button";
 import { browserApiClient } from "@/services/devGuardApi";
 import {
   AlertDialog,
@@ -38,11 +40,27 @@ import AdvisoryDialog, {
 } from "@/components/AdvisoryDialog";
 import AuthGuard from "@/components/AuthGuard";
 import { useConfig } from "@/context/ConfigContext";
+import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
+import { withVPrefix } from "@/services/versionCheck";
+import { useDeleteEvent } from "@/hooks/useDeleteEvent";
+import { Card, CardContent } from "@/components/ui/card";
+import { useSession } from "@/context/SessionContext";
+import dynamic from "next/dynamic";
+
+const MarkdownEditor = dynamic(
+  () => import("@/components/common/MarkdownEditor"),
+  { ssr: false },
+);
 
 const Index = () => {
   const router = useRouter();
   const params = useDecodedParams();
   const config = useConfig();
+  const deleteEvent = useDeleteEvent();
+  const { session } = useSession();
+  const [justification, setJustification] = useState<string | undefined>(
+    undefined,
+  );
   const {
     organizationSlug,
     projectSlug,
@@ -78,10 +96,13 @@ const Index = () => {
   };
 
   const handlePublishAdvisory = async () => {
-    const resp = await browserApiClient(`${advisoryUrl}` + `/${advisoryId}/`, {
-      method: "PATCH",
-      body: JSON.stringify({ visibility: "public" }),
-    });
+    const resp = await browserApiClient(
+      `${advisoryUrl}` + `/${advisoryId}/events/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status: "published" }),
+      },
+    );
     if (resp.ok) {
       toast.success("Advisory published successfully");
       mutate(`${advisoryUrl}` + `/${advisoryId}/`);
@@ -95,10 +116,13 @@ const Index = () => {
   };
 
   const handleWithdrawAdvisory = async () => {
-    const resp = await browserApiClient(`${advisoryUrl}` + `/${advisoryId}/`, {
-      method: "PATCH",
-      body: JSON.stringify({ visibility: "withdrawn" }),
-    });
+    const resp = await browserApiClient(
+      `${advisoryUrl}` + `/${advisoryId}/events/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ status: "withdrawn" }),
+      },
+    );
     if (resp.ok) {
       toast.success("Advisory withdrawn successfully");
       mutate(`${advisoryUrl}` + `/${advisoryId}/`);
@@ -130,7 +154,8 @@ const Index = () => {
     data: advisory,
     isLoading,
     error,
-  } = useSWR<SecurityAdvisory>(
+    mutate: mutateAdvisory,
+  } = useSWR<DetailedSecurityAdvisoryDTO>(
     organizationSlug &&
       projectSlug &&
       assetSlug &&
@@ -163,7 +188,7 @@ const Index = () => {
     ? parseCvssVector(advisory.vectorString)
     : null;
   const csafYear = new Date(advisory.createdAt).getFullYear();
-  const csafUrl = `${config.devguardApiUrlPublicInternet}/api/v1/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/csaf/white/${csafYear}/dgsa-${csafYear}-${advisory.id}.json`;
+  const csafUrl = `${config.devguardApiUrlPublicInternet}/api/v1/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/csaf/white/${csafYear}/dgsa-${advisory.id}.json`;
   const metricDefs =
     parsed?.version === "4.0"
       ? CVSS40_METRICS
@@ -179,7 +204,7 @@ const Index = () => {
       title: "Are you sure you want to delete this advisory?",
       description:
         "This action cannot be undone. All data associated with this advisory will be deleted.",
-      confirmClassName: buttonVariants({ variant: "default" }),
+      variant: "destructive",
       onConfirm: handleDeleteAdvisory,
     },
     publish: {
@@ -187,7 +212,7 @@ const Index = () => {
       title: "Are you sure you want to publish this advisory?",
       description:
         "NOTE: This feature is still work in progress. This publishment will only add the Advisory to the CSAF report. This action cannot be undone. All data associated with this advisory will be published.",
-      confirmClassName: buttonVariants({ variant: "default" }),
+      variant: "default",
       onConfirm: handlePublishAdvisory,
     },
     withdraw: {
@@ -197,7 +222,7 @@ const Index = () => {
       title: "Are you sure you want to withdraw this advisory?",
       description:
         "This action cannot be undone. The advisory stays public but is marked as withdrawn and can no longer be changed.",
-      confirmClassName: buttonVariants({ variant: "destructive" }),
+      variant: "destructive",
       onConfirm: handleWithdrawAdvisory,
     },
   } as const;
@@ -211,10 +236,79 @@ const Index = () => {
   } as const;
 
   const visibilityBadge = visibilityConfig[
-    advisory.visibility as keyof typeof visibilityConfig
+    advisory.state as keyof typeof visibilityConfig
   ] ?? {
-    label: advisory.visibility,
+    label: advisory.state,
     variant: "secondary" as const,
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    await deleteEvent(eventId);
+    mutateAdvisory();
+  };
+
+  const handleSubmit = async (data: {
+    status?: VulnEventDTO["type"];
+    justification?: string;
+    mechanicalJustification?: string;
+  }): Promise<boolean> => {
+    if (data.status === undefined || !advisory) {
+      return false;
+    }
+
+    if (!Boolean(data.justification)) {
+      toast.error("Please provide a justification");
+      return false;
+    }
+
+    const optimisticEvent = {
+      type: data.status,
+      id: "optimistic",
+      createdAt: new Date().toISOString(),
+      justification: data.justification ?? "",
+      mechanicalJustification: data.mechanicalJustification ?? "",
+      userId: session?.identity.id ?? "",
+      vulnId: advisory.id,
+      vulnType: "securityAdvisory",
+      vulnerabilityName: advisory.title ?? advisory.id,
+      createdByVexRule: false,
+    } as VulnEventDTO;
+
+    const mutatePromise = mutateAdvisory(
+      async (current) => {
+        const resp = await browserApiClient(
+          `${advisoryUrl}` + `/${advisoryId}/events/`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          },
+        );
+        const json = await resp.json();
+
+        if (!json.events) {
+          toast.error("Failed to add comment");
+          throw new Error("Failed to add comment");
+        }
+        setJustification("");
+        return {
+          ...current!,
+          ...json,
+          events: current!.events.concat([json.events.slice(-1)[0]]),
+        };
+      },
+      {
+        optimisticData: {
+          ...advisory,
+          events: advisory.events.concat([optimisticEvent]),
+        },
+        rollbackOnError: true,
+        revalidate: false,
+      },
+    );
+
+    mutatePromise.then(() => toast.success("Comment added")).catch(() => {});
+    return true;
   };
 
   return (
@@ -234,7 +328,7 @@ const Index = () => {
             <Badge className="h-full" variant={visibilityBadge.variant}>
               {visibilityBadge.label}
             </Badge>
-            {advisory.visibility !== "draft" && (
+            {advisory.state !== "draft" && (
               <a
                 href={csafUrl}
                 target="_blank"
@@ -265,10 +359,12 @@ const Index = () => {
                     <tr key={pkg.id} className="border-b last:border-0">
                       <td className="p-3 font-medium">{pkg.packageName}</td>
                       <td className="p-3 text-muted-foreground">
-                        {pkg.semverStart ? `< v${pkg.semverStart}` : "—"}
+                        {pkg.versionStart
+                          ? `< ${withVPrefix(pkg.versionStart)}`
+                          : "—"}
                       </td>
                       <td className="p-3 text-muted-foreground">
-                        {pkg.semverEnd ? `v${pkg.semverEnd}` : "—"}
+                        {pkg.versionEnd ? withVPrefix(pkg.versionEnd) : "—"}
                       </td>
                     </tr>
                   ))}
@@ -283,36 +379,77 @@ const Index = () => {
               <Markdown>{advisory.description}</Markdown>
             </div>
           )}
-          {advisory.visibility === "draft" && (
-            <div className="flex justify-end my-4 gap-2">
-              <AuthGuard require="admin">
-                <Button
-                  onClick={() => setConfirm("delete")}
-                  variant="destructive"
-                >
-                  Delete Draft
-                </Button>
-                <Button onClick={() => setEditOpen(true)} variant="outline">
-                  Change Draft
-                </Button>
-                <Button onClick={() => setConfirm("publish")} variant="default">
-                  Publish Draft
-                </Button>
-              </AuthGuard>
+          {advisory.events && advisory.events.length > 0 && (
+            <div className="mt-16">
+              <RiskAssessmentFeed
+                vulnerabilityName={advisory.title ?? advisory.id}
+                events={advisory.events}
+                page="security-advisory"
+                deleteEvent={handleDeleteEvent}
+              />
             </div>
           )}
-          {advisory.visibility === "public" && (
-            <div className="flex justify-end my-4 gap-2">
+          <Card>
+            <CardContent className="mt-4">
               <AuthGuard require="admin">
-                <Button
-                  onClick={() => setConfirm("withdraw")}
-                  variant="destructive"
-                >
-                  Withdraw Advisory
-                </Button>
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold">
+                      Comment
+                    </label>
+                    <MarkdownEditor
+                      placeholder="Add your comment here..."
+                      value={justification ?? ""}
+                      setValue={setJustification}
+                    />
+                  </div>
+                  <div className="flex flex-row justify-end gap-1">
+                    <div className="flex flex-row items-start gap-2 pt-2">
+                      {advisory.state === "draft" && (
+                        <>
+                          <Button
+                            onClick={() => setConfirm("delete")}
+                            variant="destructive"
+                          >
+                            Delete Draft
+                          </Button>
+                          <Button
+                            onClick={() => setEditOpen(true)}
+                            variant="outline"
+                          >
+                            Change Draft
+                          </Button>
+                          <Button
+                            onClick={() => setConfirm("publish")}
+                            variant="secondary"
+                          >
+                            Publish Draft
+                          </Button>
+                        </>
+                      )}
+                      {advisory.state === "public" && (
+                        <Button
+                          onClick={() => setConfirm("withdraw")}
+                          variant="destructive"
+                        >
+                          Withdraw Advisory
+                        </Button>
+                      )}
+                      <AsyncButton
+                        data-testid="add-comment"
+                        onClick={() =>
+                          handleSubmit({ status: "comment", justification })
+                        }
+                        variant={"default"}
+                      >
+                        Comment
+                      </AsyncButton>
+                    </div>
+                  </div>
+                </div>
               </AuthGuard>
-            </div>
-          )}
+            </CardContent>
+          </Card>
         </div>
 
         <div className="w-full lg:w-72 shrink-0">
@@ -396,7 +533,7 @@ const Index = () => {
             affectedPackages: (advisory.affectedPackages ?? []).map(
               ({ id, ...rest }) => rest,
             ),
-            visibility: advisory.visibility,
+            state: advisory.state,
           }}
           onSubmit={handleChangeAdvisory}
         />
@@ -418,7 +555,7 @@ const Index = () => {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className={activeConfirm?.confirmClassName}
+              variant={activeConfirm?.variant}
               onClick={() => activeConfirm?.onConfirm()}
             >
               <span>Confirm</span>

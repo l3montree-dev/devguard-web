@@ -15,6 +15,10 @@ export interface VersionCheckResult {
   updateAvailable: boolean;
 }
 
+export function withVPrefix(version: string): string {
+  return /^v/i.test(version) ? version : `v${version}`;
+}
+
 /** Parse a semver-style tag "v1.2.3" → [1, 2, 3]. Returns null on failure. */
 function parseSemver(tag: string): [number, number, number] | null {
   const m = tag.match(/^v?(\d+)\.(\d+)\.(\d+)/);

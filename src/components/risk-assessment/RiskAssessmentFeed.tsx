@@ -43,7 +43,9 @@ import {
   WrenchIcon,
 } from "@heroicons/react/24/outline";
 import {
+  ArrowDownToDot,
   Component,
+  Eye,
   GitBranchIcon,
   GitPullRequestCreateArrowIcon,
   Scale,
@@ -108,6 +110,12 @@ export function EventTypeIcon({
       return <Component className="h-4 w-4" />;
     case "removedComplianceComponent":
       return <Unlink className="h-4 w-4" />;
+    case "published":
+      return <Eye className="h-4 w-4" />;
+    case "withdrawn":
+      return <ArrowDownToDot className="h-4 w-4" />;
+    case "created":
+      return <Sparkles className="h-4 w-4" />;
   }
 }
 
