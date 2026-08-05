@@ -394,7 +394,7 @@ const Index = () => {
             severity: advisory.severity,
             vectorString: advisory.vectorString,
             affectedPackages: (advisory.affectedPackages ?? []).map(
-              ({ id, ...rest }) => rest,
+              ({ ...rest }) => rest,
             ),
             visibility: advisory.visibility,
           }}
