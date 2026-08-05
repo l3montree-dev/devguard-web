@@ -16,7 +16,7 @@ test.describe("DevGuard handle vuln flows", () => {
     ({ groupName } = await devguardPOM.createTestOrganizationGroupAndRepo());
   });
 
-  test.skip("test sbom upload to path vexxing and verification of vex rule", async ({
+  test("test sbom upload to path vexxing and verification of vex rule", async ({
     page,
   }, testInfo) => {
     await devguardPOM.setupSbomUpload();
@@ -25,7 +25,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().verifyVEXRule();
   });
 
-  test.skip("test to download vex", async ({ page }, testInfo) => {
+  test("test to download vex", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM
@@ -34,14 +34,14 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.sharing().downloadVEXFile();
   });
 
-  test.skip("test to upload VEX and verify", async () => {
+  test("test to upload VEX and verify", async () => {
     await devguardPOM.setupSbomUpload();
     const inputFile = path.join(__dirname, "../assets/", "vex.json");
     await devguardPOM.setup().uploadVEX(inputFile);
     await devguardPOM.vuln().verifyVEXRule();
   });
 
-  test.skip("test to delete a vex rule", async ({}, testInfo) => {
+  test("test to delete a vex rule", async ({}, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM
