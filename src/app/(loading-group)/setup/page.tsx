@@ -19,7 +19,6 @@ import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
 import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 
 const Lanyard = dynamic(
@@ -31,17 +30,7 @@ export default function SetupOrg() {
   const session = useSession();
   const instanceSettings = useInstanceSettings();
 
-  const pathname = usePathname();
-  const [lanyardKey, setLanyardKey] = useState(0);
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    setLanyardKey((k) => k + 1);
-  }, [pathname]);
+  const lanyardKey = usePathname() ?? "setup";
 
   if (session.session === null) {
     redirect("/login");
