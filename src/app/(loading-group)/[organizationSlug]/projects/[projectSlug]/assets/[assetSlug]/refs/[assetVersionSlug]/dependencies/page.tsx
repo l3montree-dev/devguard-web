@@ -163,6 +163,10 @@ const LicenseCall = (props: {
     }
   };
 
+  useEffect(() => {
+    setLicense(props.license.licenseId);
+  }, [props.license]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
