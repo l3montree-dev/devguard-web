@@ -26,8 +26,6 @@ import { DocDrawer } from "@/components/common/DocDrawer";
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
 }> = ({ vuln }) => {
-  const { theme } = useTheme();
-
   const purl = vuln.componentPurl;
 
   const url = useMemo(
@@ -39,14 +37,6 @@ const AffectedComponentDetails: FunctionComponent<{
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-
-  // Compute the matched CVE from the fetched data
-  const activeCVE = useMemo(() => {
-    if (!data) return null;
-    return (
-      data.vulns.find((vulnInPkg) => vuln.cveID === vulnInPkg.CVEID) ?? null
-    );
-  }, [data, vuln.cveID]);
 
   if (isLoading) {
     return (
@@ -93,11 +83,7 @@ const AffectedComponentDetails: FunctionComponent<{
                     Fixed in:{" "}
                   </span>
                   <Badge variant={"outline"}>
-                    {vuln.directDependencyFixedVersion ||
-                      "" ||
-                      vuln.componentFixedVersion ||
-                      "" ||
-                      "no patch available"}
+                    {vuln.componentFixedVersion || "" || "no patch available"}
                   </Badge>
                 </div>
                 <CollapsibleContent className="border-t pt-4 mt-4">
