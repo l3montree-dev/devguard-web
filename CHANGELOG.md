@@ -4,6 +4,29 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.12.2] — 2026-08-05
+
+### Added
+
+- **VEX format detection in risk scanner upload** — CSAF VEX and OpenVEX files are now recognized when uploading via the risk scanner dialog
+
+### Fixed
+
+- **Quickfix** — simplified and improved reliability of the affected-component quickfix flow; quickfixes are now only shown when actually available, and bulk updates work correctly in the dependency risk table
+- **VEX rule position and locked overlay** — fixed incorrect positioning of the VEX rule card and the quickfix locked overlay on the vulnerability detail page
+- **Open vulnerabilities** — fixed CEL playground, VEX rule form, and match status handling for open vulnerabilities
+- **License editor showing stale data** — the license picker on the dependencies page could show the previously-opened dependency's license after switching rows
+- **Advisory affected packages not saving correctly** — editing an advisory dropped the `id` of existing affected packages, causing them to be treated as new entries instead of updates
+- **Top components table** — added a link icon and truncated long names to fix overflow
+- **Setup page** — fixed the Lanyard redirect and reworked the invite-copilot comment flow
+- **Project settings** — guard against missing `project.webhooks`
+
+### Changed
+
+- **VEX rule recommendation list** — removed the inline rule-match component, as it was hard to keep in sync with live testing results
+
+---
+
 ## [v1.12.1] — 2026-08-04
 
 ### Fixed
