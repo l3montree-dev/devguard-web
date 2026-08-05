@@ -35,17 +35,21 @@
           name = "devguard-web";
           src = pkgs.lib.fileset.toSource {
             root = ./.;
-            fileset = pkgs.lib.fileset.unions [
-              ./src
-              ./public
-              ./next.config.js
-              ./postcss.config.js
-              ./tailwind.config.js
-              ./tsconfig.json
-              ./package.json
-              ./components.json
-              ./sentry.server.config.ts
-            ];
+            fileset = pkgs.lib.fileset.difference
+              (pkgs.lib.fileset.unions [
+                ./src
+                ./public
+                ./next.config.js
+                ./postcss.config.js
+                ./tailwind.config.js
+                ./tsconfig.json
+                ./package.json
+                ./components.json
+                ./sentry.server.config.ts
+              ])
+              (pkgs.lib.fileset.fileFilter
+                (file: pkgs.lib.strings.hasSuffix ".test.ts" file.name || pkgs.lib.strings.hasSuffix ".test.tsx" file.name)
+                ./src);
           };
           nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
