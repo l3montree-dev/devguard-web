@@ -13,7 +13,10 @@ import VexRuleResult from "./VexRuleResult";
 
 export interface RecommendationEntry {
   vulnID: string;
-  recommendation: Omit<VexRuleRecommendation,  "appliesToAmountOfDependencyVulns"> ;
+  recommendation: Omit<
+    VexRuleRecommendation,
+    "appliesToAmountOfDependencyVulns"
+  >;
 }
 
 interface VexRuleRecommendationListProps {

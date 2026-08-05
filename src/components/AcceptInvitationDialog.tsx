@@ -6,12 +6,7 @@ import { Form } from "./ui/form";
 
 import { InvitationForm } from "@/components/InvitationForm";
 import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 import { toast } from "@/lib/toast";
 
@@ -39,7 +34,10 @@ const extractInvitationCode = (input: string): string | undefined => {
   }
 };
 
-export default function AcceptInvitationDialog({ isOpen, onOpenChange }: Props) {
+export default function AcceptInvitationDialog({
+  isOpen,
+  onOpenChange,
+}: Props) {
   const form = useForm<InvitationFormValues>();
 
   const router = useRouter();

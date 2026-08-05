@@ -393,9 +393,7 @@ const Index = () => {
             description: advisory.description,
             severity: advisory.severity,
             vectorString: advisory.vectorString,
-            affectedPackages: (advisory.affectedPackages ?? []).map(
-              ({ ...rest }) => rest,
-            ),
+            affectedPackages: advisory.affectedPackages ?? [],
             visibility: advisory.visibility,
           }}
           onSubmit={handleChangeAdvisory}

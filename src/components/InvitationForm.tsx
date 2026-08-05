@@ -27,8 +27,7 @@ export const InvitationForm: FunctionComponent<OrgFormProps> = ({
         rules={{
           validate: (value) =>
             // Allows every character as long as one letter or number is given.
-            /[a-z0-9]/i.test(value ?? "") ||
-            "The invitation can not be empty.",
+            /[a-z0-9]/i.test(value ?? "") || "The invitation can not be empty.",
         }}
         render={({ field }) => (
           <FormItem>
