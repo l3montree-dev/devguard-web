@@ -335,16 +335,16 @@ const Index: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex gap-2">
-        <DelayedDownloadButton
-          href={pathname + "/../sarif.json"}
-          label={"Download Sarif"}
-          downloadFileName={assetSlug + "_sarif.json"}
-        />
-        <AuthGuard require="admin">
-          <Button onClick={() => setIsOpen(true)} variant="default">
-            Identify Risks
-          </Button>
-        </AuthGuard>
+          <DelayedDownloadButton
+            href={pathname + "/../sarif.json"}
+            label={"Download Sarif"}
+            downloadFileName={assetSlug + "_sarif.json"}
+          />
+          <AuthGuard require="admin">
+            <Button onClick={() => setIsOpen(true)} variant="default">
+              Identify Risks
+            </Button>
+          </AuthGuard>
         </div>
       </div>
       <Section
@@ -474,21 +474,22 @@ const Index: FunctionComponent = () => {
                       <tr key={headerGroup.id}>
                         <AuthGuard require="member">
                           <th className="w-10 p-4 text-left">
-                            <div onClick={(e) => e.stopPropagation()}>
-                              <Checkbox
-                                checked={
-                                  allPageSelected
-                                    ? true
-                                    : somePageSelected
-                                      ? "indeterminate"
-                                      : false
-                                }
-                                onCheckedChange={() =>
-                                  handleToggleAll(pageSelectableIds)
-                                }
-                                disabled={pageSelectableIds.length === 0}
-                              />
-                            </div>
+                            {pageSelectableIds.length > 0 && (
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <Checkbox
+                                  checked={
+                                    allPageSelected
+                                      ? true
+                                      : somePageSelected
+                                        ? "indeterminate"
+                                        : false
+                                  }
+                                  onCheckedChange={() =>
+                                    handleToggleAll(pageSelectableIds)
+                                  }
+                                />
+                              </div>
+                            )}
                           </th>
                         </AuthGuard>
                         {headerGroup.headers.map((header) => (

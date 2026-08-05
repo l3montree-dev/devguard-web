@@ -111,7 +111,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   // Manual integration state
   const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
-  const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sarif");
+  const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sbom");
   const updateOrg = useUpdateOrganization();
 
   const [sbomFileName, setSbomFileName] = useState<string | undefined>();
@@ -338,7 +338,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     if (resp.ok) {
       await refreshAssetData();
       onOpenChange(false);
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/vex-rules/`;
+      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/vex-rules/`;
       toast.success("VEX has successfully been sent!");
     } else {
       toast.error("VEX has not been sent successfully");

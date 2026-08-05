@@ -25,9 +25,12 @@ const toast = Object.assign(
       sonnerToast.message(message, withId(data)),
     loading: (message: ToastMessage, data?: ExternalToast) =>
       sonnerToast.loading(message, withId(data)),
-    promise: sonnerToast.promise.bind(sonnerToast),
-    custom: sonnerToast.custom.bind(sonnerToast),
-    dismiss: sonnerToast.dismiss.bind(sonnerToast),
+    promise: ((...args: Parameters<typeof sonnerToast.promise>) =>
+      sonnerToast.promise(...args)) as typeof sonnerToast.promise,
+    custom: ((...args: Parameters<typeof sonnerToast.custom>) =>
+      sonnerToast.custom(...args)) as typeof sonnerToast.custom,
+    dismiss: ((...args: Parameters<typeof sonnerToast.dismiss>) =>
+      sonnerToast.dismiss(...args)) as typeof sonnerToast.dismiss,
   },
 );
 

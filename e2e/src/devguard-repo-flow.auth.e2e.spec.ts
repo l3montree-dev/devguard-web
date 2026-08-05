@@ -3,6 +3,8 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 
+test.use({ viewport: { width: 1440, height: 900 } });
+
 test.describe("DevGuard repo flows", () => {
   let devguardPOM: DevGuardPOM;
 
@@ -41,5 +43,10 @@ test.describe("DevGuard repo flows", () => {
     await page
       .getByRole("heading", { name: "No Artifacts Available" })
       .isVisible();
+  });
+
+  test("test dependency graph", async () => {
+    await devguardPOM.setupSbomUpload();
+    await devguardPOM.repo().openDependencyGraph();
   });
 });

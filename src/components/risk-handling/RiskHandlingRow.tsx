@@ -14,14 +14,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
-import {
-  beautifyPurl,
-  classNames,
-  extractPurlQualifiers,
-  extractVersion,
-  formatPurlQualifiers,
-  stateLabels,
-} from "@/utils/common";
+import { classNames, stateLabels } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Row } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
@@ -29,14 +22,17 @@ import React, { type FunctionComponent, useMemo, useState } from "react";
 import useDecodedPathname from "../../hooks/useDecodedPathname";
 import { isMember, useCurrentUserRole } from "../../hooks/useUserRole";
 import Severity, { CVSSBadge } from "../common/Severity";
+import Purl from "../common/Purl";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
 import { Tooltip, TooltipContent } from "../ui/tooltip";
 import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
-import EcosystemImage from "../common/EcosystemImage";
 import { groupBy } from "lodash";
 import Link from "next/link";
+import { WrenchIcon } from "lucide-react";
+import { isQuickfixAvailable } from "../Quickfix";
+import WarningWithDescription from "../common/WarningWithDescription";
 
 interface Props {
   row: Row<VulnByPackage>;
@@ -62,6 +58,24 @@ const CvssCell = ({ cvss }: { cvss?: number | null }) => (
     )}
   </div>
 );
+
+const WrenchIndicator = ({ message }: { message: string }) => (
+  <Tooltip>
+    <TooltipTrigger className="flex" onClick={(e) => e.stopPropagation()}>
+      <WrenchIcon className="h-4 w-4 text-muted-foreground" />
+    </TooltipTrigger>
+    <TooltipContent className="max-w-xs">{message}</TooltipContent>
+  </Tooltip>
+);
+
+const QuickfixWrench = ({ vuln }: { vuln: VulnWithCVE }) => {
+  if (!isQuickfixAvailable(vuln)) {
+    return null;
+  }
+  return (
+    <WrenchIndicator message="A quick fix is available: this vulnerability can be resolved by a direct dependency update. Consider prioritizing it as it can be resolved faster. Open the vulnerability to see the exact upgrade command." />
+  );
+};
 
 const VulnWithCveTableRow = ({
   vuln,
@@ -120,23 +134,34 @@ const VulnWithCveTableRow = ({
                         {vuln.vulnerabilityPath.map((p, i) => (
                           <span key={i}>
                             {i > 0 && " → "}
-                            <Badge variant="outline">{beautifyPurl(p)}</Badge>
+                            <Purl
+                              purl={p}
+                              showIcon={false}
+                              showVersion={false}
+                              showQualifiers={false}
+                            />
                           </span>
                         ))}
                       </span>
                     ) : (
                       <span>
-                        <Badge variant="outline">
-                          {beautifyPurl(vuln.vulnerabilityPath[0])}
-                        </Badge>
+                        <Purl
+                          purl={vuln.vulnerabilityPath[0]}
+                          showIcon={false}
+                          showVersion={false}
+                          showQualifiers={false}
+                        />
                         {" → ... → "}
-                        <Badge variant="outline">
-                          {beautifyPurl(
+                        <Purl
+                          purl={
                             vuln.vulnerabilityPath[
                               vuln.vulnerabilityPath.length - 1
-                            ],
-                          )}
-                        </Badge>
+                            ]
+                          }
+                          showIcon={false}
+                          showVersion={false}
+                          showQualifiers={false}
+                        />
                       </span>
                     )}
                   </div>
@@ -146,8 +171,7 @@ const VulnWithCveTableRow = ({
                 <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
                   {vuln.vulnerabilityPath.map((el, i) => (
                     <span className="flex flex-row items-center gap-1" key={i}>
-                      <EcosystemImage size={12} packageName={el} />
-                      {beautifyPurl(el)}
+                      <Purl purl={el} showVersion={false} showQualifiers={false} />
                       {i < vuln.vulnerabilityPath.length - 1 ? " → " : null}
                     </span>
                   ))}
@@ -165,7 +189,9 @@ const VulnWithCveTableRow = ({
       <td className="py-3 px-4">
         <CvssCell cvss={vuln.cve?.cvss} />
       </td>
-      <td className="py-3 px-4"></td>
+      <td className="py-3 px-4">
+        <QuickfixWrench vuln={vuln} />
+      </td>
     </tr>
   );
 };
@@ -186,9 +212,12 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     () => groupBy(row.original.vulns, "cveID"),
     [row.original.vulns],
   );
-  const packageQualifiers = extractPurlQualifiers(row.original.packageName);
-  const displayPackageQualifiers = formatPurlQualifiers(
-    row.original.packageName,
+  const packageHasQuickfix = useMemo(
+    () => row.original.vulns.some(isQuickfixAvailable),
+    [row.original.vulns],
+  );
+  const isActivelyExploited = row.original.vulns.some(
+    (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
   );
 
   const toggleCve = (cveID: string) => {
@@ -221,26 +250,21 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             ) : (
               <ChevronRightIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             )}
-            <EcosystemImage packageName={row.original.packageName} size={16} />
-            <span className="font-medium truncate">
-              {beautifyPurl(row.original.packageName)}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {extractVersion(row.original.packageName)}
-            </span>
-
-            {packageQualifiers && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="max-w-64 truncate whitespace-nowrap text-xs text-muted-foreground">
-                    {displayPackageQualifiers}
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-sm break-all">
-                  {packageQualifiers}
-                </TooltipContent>
-              </Tooltip>
-            )}
+            <Purl purl={row.original.packageName} />
+            {isActivelyExploited ? (
+              <WarningWithDescription
+                description={
+                  <>
+                    <span className="font-bold">
+                      A vulnerability in this package is actively exploited!
+                    </span>
+                    <br />
+                    Present in official KEV catalogue. See the details page for
+                    more information.
+                  </>
+                }
+              />
+            ) : null}
           </div>
         </td>
         <td className="py-3 px-4 flex">
@@ -250,9 +274,14 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           <CvssCell cvss={row.original.maxCvss} />
         </td>
         <td className="py-3 px-4">
-          <Badge variant="outline" className="w-fit">
-            {row.original.vulnCount}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="w-fit">
+              {row.original.vulnCount}
+            </Badge>
+            {packageHasQuickfix && (
+              <WrenchIndicator message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
+            )}
+          </div>
         </td>
       </tr>
 
@@ -281,6 +310,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
 
           const pathExplosionOrOnlySinglePath =
             isPathExplosion || !hasMultiplePaths;
+
+          const cveHasQuickfix = vulns.some(isQuickfixAvailable);
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
@@ -342,7 +373,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       disabled={!isMemberRole}
                     />
                     <span className="font-medium text-foreground">{cveID}</span>
-
                     {isPathExplosion ? (
                       <Tooltip>
                         <TooltipTrigger>
@@ -364,6 +394,22 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         {vulns.length} path{vulns.length !== 1 ? "s" : ""}
                       </Badge>
                     ) : null}
+                    {sortedVulns[0]?.cve?.cisaExploitAdd ||
+                    sortedVulns[0]?.cve?.euvdExploitAdd ? (
+                      <WarningWithDescription
+                        description={
+                          <>
+                            <span className="font-bold">
+                              This vulnerability is known to be actively
+                              exploited!
+                            </span>
+                            <br />
+                            Present in official KEV catalogue. See the details
+                            page for more information.
+                          </>
+                        }
+                      />
+                    ) : null}
                   </div>
                 </td>
                 <td className="py-2 px-4 flex">
@@ -372,7 +418,17 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 <td className="py-2 px-4">
                   <CvssCell cvss={sortedVulns[0]?.cve?.cvss} />
                 </td>
-                <td />
+                <td className="py-2 px-4">
+                  {cveHasQuickfix && (
+                    <WrenchIndicator
+                      message={
+                        pathExplosionOrOnlySinglePath
+                          ? "A quick fix is available for this vulnerability. Open it to see the exact upgrade command."
+                          : "A quick fix is available for one of this vulnerability's dependency paths. Expand it to find the affected path and the upgrade command."
+                      }
+                    />
+                  )}
+                </td>
               </tr>
 
               {/* Individual vulnerability paths */}

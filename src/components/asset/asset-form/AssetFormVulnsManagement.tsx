@@ -40,6 +40,7 @@ import { ClipboardDocumentIcon } from "@heroicons/react/20/solid";
 import { toast } from "@/lib/toast";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -372,6 +373,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
                         </FormItem>
                       )}
                     />
+                    <Badge variant="secondary">OR</Badge>
                     <FormField
                       name="riskAutomaticTicketThreshold"
                       control={form.control}
@@ -402,6 +404,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
             Button={
               <FormControl>
                 <Switch
+                  data-testid="reporting-range"
                   checked={field.value}
                   onCheckedChange={(v) => {
                     form.setValue("enableTicketRange", v, {
@@ -549,14 +552,14 @@ const PublicUrlsSection: FunctionComponent<{
       label:
         "OpenVex-URL (Always up to date vulnerability information in OpenVex format)",
       nameKey: "openvex-url",
-      value: `${basePath}/openvex.json/`,
+      value: basePath ? `${basePath}/openvex.json/` : "",
       copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
       label:
         "CSAF-URL (Always up to date vulnerability information in CSAF format)",
       nameKey: "csaf-url",
-      value: `${basePath}/csaf.json/`,
+      value: basePath ? `${basePath}/csaf.json/` : "",
       copyToastDescription: "The CSAF-URL has been copied to your clipboard.",
     },
     {
@@ -612,12 +615,14 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   // Clear selected artifact whenever the selected version changes
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedArtifact("");
   }, [selectedVersionSlug]);
 
   // Auto-select first artifact when artifacts load, but only if there is no valid selection
   React.useEffect(() => {
     if (!artifacts || artifacts.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedArtifact("");
       return;
     }
@@ -666,6 +671,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               Button={
                 <FormControl>
                   <Switch
+                    data-testid="paranoid-mode"
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

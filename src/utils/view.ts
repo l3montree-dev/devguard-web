@@ -24,6 +24,7 @@ import type {
 import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
 import { config } from "../config";
+import { getUserFullName, type User } from "@/types/auth";
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
     case "mitigate":
@@ -309,11 +310,11 @@ export const findUser = (
     };
   }
   if (currentUser?.id === id) {
+    const fullName = getUserFullName(currentUser as unknown as User);
     return {
       displayName: "You",
       avatarUrl: currentUser.traits?.picture,
-      realName:
-        currentUser.traits?.name.first + " " + currentUser.traits?.name.last,
+      realName: fullName || currentUser.traits?.email || "You",
     };
   }
   const user = org?.members.find((u) => u.id === id);

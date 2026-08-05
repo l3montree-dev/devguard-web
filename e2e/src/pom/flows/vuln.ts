@@ -1,14 +1,21 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import { ModalHelper } from "./modal-helper";
 
 export class VulnFlow {
   constructor(private page: Page) {}
 
+  // The assessment justification and the VEX rule justification both use the
+  // markdown editor, so scope it when a dialog adds a second one to the page.
+  private async fillJustification(text: string, scope?: Locator) {
+    const editor = (scope ?? this.page).getByRole("textbox", {
+      name: /^Add (?:a |your )comment/,
+    });
+    await editor.click();
+    await editor.fill(text);
+  }
+
   async openFirstAffectedComponent() {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 20_000 });
     const packageRows = this.page.getByTestId("package-row");
     await expect(packageRows.first()).toBeVisible({ timeout: 180_000 });
     await packageRows.first().click();
@@ -18,42 +25,42 @@ export class VulnFlow {
     await cveRows.first().click();
   }
 
+  // The assessment composer submits inline: write the justification first, then
+  // the action button records the decision — there is no confirmation dialog.
   async markVulnAsFalsePositive() {
-    await this.page.getByTestId("mark-false-positive").click();
-    await this.page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
-    await this.page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .fill("This is a false positive because...");
-    await this.page.getByTestId("confirm-false-positive").click();
+    const markFalsePositive = this.page.getByTestId("mark-false-positive");
+    await expect(markFalsePositive).toBeVisible({ timeout: 20_000 });
+    await this.fillJustification("This is a false positive because...");
+    await markFalsePositive.click();
+    // Leaving the open state removes the assessment actions from the composer.
+    await expect(markFalsePositive).toBeHidden({ timeout: 20_000 });
   }
 
   async markVulnAsAcceptedRisk() {
-    await this.page.getByTestId("mark-accepted-risk").click();
-    await this.page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .click();
-    await this.page
-      .getByRole("textbox", { name: "editable markdown" })
-      .getByRole("paragraph")
-      .fill("This is an accepted risk because...");
-    await this.page.getByTestId("confirm-accepted-risk").click();
+    const markAcceptedRisk = this.page.getByTestId("mark-accepted-risk");
+    await expect(markAcceptedRisk).toBeVisible({ timeout: 20_000 });
+    await this.fillJustification("This is an accepted risk because...");
+    await markAcceptedRisk.click();
+    await expect(markAcceptedRisk).toBeHidden({ timeout: 20_000 });
   }
 
   async markEdgeAsDoesNotCallVulnerableFunction() {
-    const firstEdge = this.page.locator(".react-flow__edge").first();
-    await expect(firstEdge).toBeVisible({ timeout: 10_000 });
+    const firstEdge = this.page.getByTestId("path-edge").first();
+    await expect(firstEdge).toBeVisible({ timeout: 20_000 });
     await firstEdge.click();
 
-    const menuItem = this.page.getByTestId(
-      "vex-does-not-call-vulnerable-function",
+    const dialog = this.page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("heading", { name: "Add VEX rule", exact: true }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    // Title and expression come from the path; the justification does not.
+    await this.fillJustification(
+      "The vulnerable function is not called along this path.",
+      dialog,
     );
-    await expect(menuItem).toBeVisible({ timeout: 5_000 });
-    await menuItem.click();
+    await dialog.getByTestId("vex-rule-mark-false-positive").click();
+    await expect(dialog).toBeHidden({ timeout: 20_000 });
   }
 
   async verifyVEXRule() {
@@ -64,16 +71,18 @@ export class VulnFlow {
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });
-    const firstHeaderRow = this.page.getByTestId("vex-header-row").first();
-    await expect(firstHeaderRow).toBeVisible({ timeout: 20_000 });
-    await firstHeaderRow.click();
     const firstRuleRow = this.page.getByTestId("vex-rule-row").first();
     await expect(firstRuleRow).toBeVisible({ timeout: 20_000 });
     await firstRuleRow.click();
-    const dialog = this.page.getByLabel("VEX Rule Details");
-    await expect(dialog.getByText(/Applies to \d+ findings?/)).toBeVisible({
-      timeout: 20_000,
-    });
+
+    const dialog = this.page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("heading", { name: "VEX rule", exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+    // The rule is only meaningful if it actually resolves against findings.
+    await expect(
+      dialog.getByText(/Matches \d+ vulnerabilit(y|ies)/).first(),
+    ).toBeVisible({ timeout: 20_000 });
   }
 
   async filterDependencyRisksTable() {

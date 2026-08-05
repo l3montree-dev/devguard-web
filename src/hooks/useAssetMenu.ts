@@ -153,7 +153,7 @@ export const useAssetMenu = () => {
             "/compliance-postures",
           Icon: ShieldCheck,
           isActive: pathname.includes("compliance-postures"),
-          testId: "nav-asset-compliance-postures",
+          testId: "nav-asset-overview-compliance-postures",
         },
       ],
     });
@@ -255,14 +255,30 @@ export const useAssetMenu = () => {
               projectSlug +
               "/assets/" +
               assetSlug +
-              "/refs/" +
-              assetVersionSlug +
               "/vex-rules",
             Icon: BookCheckIcon,
             isActive: pathname.includes("vex-rules"),
             testId: "nav-asset-vex-rules",
           },
         ],
+      },
+      {
+        title: "Compliance Postures",
+        href:
+          "/" +
+          orgSlug +
+          "/projects/" +
+          projectSlug +
+          "/assets/" +
+          assetSlug +
+          "/refs/" +
+          assetVersionSlug +
+          "/compliance-postures",
+        Icon: ShieldCheck,
+        isActive: pathname.startsWith(
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance-postures`,
+        ),
+        testId: "nav-asset-compliance-postures",
       },
       {
         title: "Artifacts",

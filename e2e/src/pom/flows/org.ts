@@ -19,10 +19,26 @@ export class OrgFlow {
       .getByRole("button", { name: "Create Organization" })
       .click();
     await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
+    await this.page.waitForTimeout(10_000);
+    await new ModalHelper(this.page).dismissToastIfPresent();
+  }
+
+  async openGroups() {
+    await this.page
+      .locator(
+        `${DevGuardNavigationLevel.Organization} [data-testid="nav-org-groups"]`,
+      )
+      .click({ timeout: 30_000 });
+    await this.page
+      .getByTestId("create-group-button")
+      .waitFor({ state: "visible", timeout: 30_000 });
   }
 
   async inviteUserOrg(mail: string) {
     await this.page.getByTestId("nav-org-settings").click();
+    await this.page
+      .getByTestId("add-member-button")
+      .waitFor({ state: "visible", timeout: 10_000 });
     await this.page.getByTestId("add-member-button").click();
     await this.page.getByTestId("mail-input").fill(mail);
     await this.page

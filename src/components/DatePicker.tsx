@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
+import { Input, type InputProps } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
@@ -17,11 +17,12 @@ interface DatePickerProps {
   date: Date | undefined;
   label?: string;
   onDateChange: (date: Date | undefined) => void;
+  variant?: InputProps["variant"];
 }
 
 const DATE_FORMAT = "dd/MM/yyyy";
 
-export function DatePicker({ date, onDateChange }: DatePickerProps) {
+export function DatePicker({ date, onDateChange, variant }: DatePickerProps) {
   const [inputValue, setInputValue] = useState(
     date ? format(date, DATE_FORMAT) : "",
   );
@@ -49,6 +50,7 @@ export function DatePicker({ date, onDateChange }: DatePickerProps) {
         value={inputValue}
         onChange={handleInputChange}
         placeholder={format(new Date(), DATE_FORMAT)}
+        variant={variant}
         className="w-[120px] font-normal tabular-nums"
         maxLength={10}
       />

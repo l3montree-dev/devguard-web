@@ -4,6 +4,93 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.12.1] — 2026-08-04
+
+### Fixed
+
+- **Member promotion URL** — fixed a wrong URL used when promoting an organization member
+- **OpenVex and CSAF URLs** — handle a missing basePath when building these URLs
+- **Top components occurrences header** — prevented the heading from wrapping
+- **Organization setup** — autofocus the organization name field during setup
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@happykawayigt](https://github.com/happykawayigt)** — fixed the top components occurrences header wrapping
+
+---
+
+## [v1.12.0] — 2026-08-02
+
+### Added
+
+- **VEX rule recommendations** — assessments other DevGuard organizations or users already made on a vulnerability are now surfaced as a prominent recommendation card on the vulnerability detail page and the VEX rules page, based on majority vote across session and upstream sources, with a "Create VEX rule from recommendation" action and a link to the VEX sharing whitepaper
+- **Shared `Purl` component** — package purls (icon, name, version, qualifiers) now render consistently across the dependency risk table, quick fix, vulnerability path graph, and VEX rule dialogs, with a hover tooltip exposing the full raw purl for copying
+- **Multi-artifact path graph** — the vulnerability path graph now shows every artifact a vulnerability was found in as a shared root cluster feeding into the same first dependency, instead of a single, sometimes-misleading root node
+- **Quick fix redesign** — restyled to match the VEX rule recommendation card's visual language
+- **Package qualifiers in insights table**
+- **Reworked markdown editor** — new GitHub-style markdown editor
+
+### Fixed
+
+- **Error page** — client-side rendering errors are no longer mislabeled as "500 Internal Server Error"; the boundary now tells real HTTP errors apart from rendering exceptions, and adds a "Try again" action (with a short automatic retry), a Sentry event reference, full technical details, and a prefilled "Create an Issue" link
+- **VEX rule effect wording** — a rule that dismisses a vulnerability at the artifact root now reads "No artifact of X calls the vulnerable function of Y" instead of implying a single application called it
+- **Markdown rendering in VEX cards**
+- **Avatar fallback initials**
+- **Expiry date input background**
+- **MostUsedEcosystems percentage calculation**
+- **API URL concatenation in group settings**
+- **VEX rules tab state handling**
+
+### Changed
+
+- **VEX rules page** moved from asset-version level to asset level
+- **Dependencies and CI** — Node 26, source map upload, Playwright test restructuring
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@Guflly](https://github.com/Guflly)** — fixed the expiry date input background
+- **[@Rishav-Bagri](https://github.com/Rishav-Bagri)** — fixed markdown rendering in VEX cards
+- **[@kudala-bharani](https://github.com/kudala-bharani)** — added the VEX recommendation whitepaper link
+- **[@MNTarentula](https://github.com/MNTarentula)** — fixed user avatar fallback initials
+
+---
+
+## [v1.11.0] — 2026-07-24
+
+### Added
+
+- **Notification banner** — added a global banner to highlight important updates, contributor calls, or ongoing issues
+- **CSIRT advisory display** — advisories are now shown in an expandable box below vulnerability badges, with the advisory description parsed into markdown segments and linked to the source document
+- **KEV information on vulnerabilities** — Known Exploited Vulnerabilities callouts added to the vulnerability detail page and risk handling row, with a tooltip explaining the KEV data
+- **Quick fix symbols** — quick fix indicators added to the dependency risk table
+- **Personal access tokens** — reworked into four dedicated PAT sections, with tokens and the create flow renamed for clarity
+- **Org join flow** — joining an organization added to the create-organization flow; accept-invitation flow reworked into a dialog
+
+### Fixed
+
+- **Reporting range** — fixed an issue with the reporting date range
+- **SBOM/SARIF manual upload** — fixed the switch between SBOM and SARIF for manual uploads
+- **Dependency Proxy docs** — fixed broken documentation URLs
+- **Dependency vulnerability API type** — adjusted to support the `related` field
+- **Compliance postures in asset menu** — added missing menu entry for compliance postures in asset menu
+
+### Changed
+
+- **Dependencies** — updated Next.js, Node (26.5.0), and other npm packages; removed `sbomnix`
+- **Access token components** — renamed and consolidated (`RelationCard`, markdown components)
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@eliashaeussler](https://github.com/eliashaeussler)** — fixed broken Dependency Proxy documentation URLs
+
+---
+
 ## [v1.10.1] — 2026-07-20
 
 ### Fixed

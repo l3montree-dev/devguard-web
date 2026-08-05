@@ -10,11 +10,11 @@
         ../package-lock.json
       ];
     };
-    hash = "sha256-tFT75wUXlWOTPRfx1A1TMwCL4zIP3an8bHIlSmM7Gzs=";
+    hash = "sha256-V7LCfEv0FRiDi9zw+pFSv86R0HHFSAVPMzvP59DB9PQ=";
   };
 
   node_modules = pkgs.runCommand "node-modules" {
-    nativeBuildInputs = [ pkgs.nodejs_24 ];
+    nativeBuildInputs = [ pkgs.nodejs_26 ];
   } ''
     export HOME=$TMPDIR
     cp ${../package.json} package.json
@@ -25,7 +25,7 @@
   '';
 
   patchedNodeModules = pkgs.runCommand "node-modules-patched" {
-    nativeBuildInputs = [ pkgs.nodejs_24 ];
+    nativeBuildInputs = [ pkgs.nodejs_26 ];
   } ''
     set -euo pipefail
     mkdir -p $out

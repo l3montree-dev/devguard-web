@@ -17,17 +17,12 @@ export default function RootHeader() {
     ...(!instanceSettings?.singleOrganizationMode
       ? [
           {
-            title: "Create Organization",
+            title: "Add Organization",
             href: "/setup",
             Icon: PlusIcon,
           },
         ]
       : []),
-    {
-      title: "Join Organization",
-      href: "/join",
-      Icon: ArrowRightEndOnRectangleIcon,
-    },
     {
       title: "User-Settings",
       href: "/user-settings",

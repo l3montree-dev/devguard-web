@@ -9,20 +9,27 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-utils.url = "github:numtide/flake-utils";
-    sbomnix.url = "github:tiiuae/sbomnix";
-    sbomnix.inputs.nixpkgs.follows = "nixpkgs"; # share the same nixpkgs pin
   };
 
-  outputs = { self, nixpkgs, flake-utils, sbomnix }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        sbomnixPkgs = sbomnix.packages.${system};
         npmPackages = (import ./nix/npm-packages.nix { inherit pkgs; });
         pkgsLinuxAmd64 = nixpkgs.legacyPackages.x86_64-linux;
         pkgsLinuxArm64 = nixpkgs.legacyPackages.aarch64-linux;
         nodejs = import ./nix/nodejs.nix { inherit pkgs pkgsLinuxAmd64 pkgsLinuxArm64; };
         nodejsLinuxLibs = nodejs.linuxLibs;
+        devguardWebSBOM = import ./nix/sbom-lib.nix { inherit pkgs; };
+
+        # relevant for sourcemaps
+        ciTag =
+          let
+            github = if builtins.getEnv "GITHUB_REF_TYPE" == "tag"
+                     then builtins.getEnv "GITHUB_REF_NAME" else "";
+            gitlab = builtins.getEnv "CI_COMMIT_TAG";
+          in if github != "" then github else gitlab;
+        releaseName = if ciTag != "" then ciTag else "main";
 
         devguardWeb = pkgs.stdenv.mkDerivation {
           name = "devguard-web";
@@ -43,11 +50,14 @@
           nativeBuildInputs = [ nodejs.${system} pkgs.cacert ];
           buildPhase = ''
             export NODE_OPTIONS="--max-old-space-size=4096"
-            export GIT_COMMIT_SHA="${self.rev or "dev"}"
+            export GIT_COMMIT_SHA="${self.rev or "main"}"
+            # sourcemap relevant
+            export NEXT_PUBLIC_VERSION="${releaseName}"
             cp -r ${npmPackages.patchedNodeModules}/node_modules ./node_modules
             chmod -R u+w ./node_modules
             node ./node_modules/next/dist/bin/next build --turbopack
             cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/
+            echo -n "$NEXT_PUBLIC_VERSION" > .next/RELEASE
           '';
           installPhase = ''
             mkdir -p $out
@@ -66,7 +76,8 @@
         mkDevguardWebOCI = linuxPkgs: node: pkgs.dockerTools.buildLayeredImage {
           name = "devguard-web-oci";
           tag = "latest";
-          contents = [ node pkgs.cacert ] ++ (nodejsLinuxLibs linuxPkgs);
+          # devguardWebSBOM lands at /sboms/devguard-web.json (default --sbomPath).
+          contents = [ node pkgs.cacert devguardWebSBOM ] ++ (nodejsLinuxLibs linuxPkgs);
           fakeRootCommands = ''
             # Copy standalone output to /app (outside Nix store) so Next.js
             # can write its cache at runtime. The Nix store is read-only.
@@ -85,6 +96,7 @@
       {
         packages = {
           default = devguardWeb;
+          sbom = devguardWebSBOM;
           node_modulesArm64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxArm64; }).patchedNodeModules;
           node_modulesAmd64 = (import ./nix/npm-packages.nix { pkgs = pkgsLinuxAmd64; }).patchedNodeModules;
           "devguard-web-amd64" = mkDevguardWebOCI pkgsLinuxAmd64 nodejsLinuxAmd64;

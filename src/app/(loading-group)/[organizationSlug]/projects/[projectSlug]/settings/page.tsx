@@ -17,7 +17,7 @@ import Link from "next/link";
 import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
 import MembersTable from "../../../../../../components/MembersTable";
@@ -29,6 +29,7 @@ import { Label } from "../../../../../../components/ui/label";
 import { useUpdateProject } from "../../../../../../context/ProjectContext";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useConfig } from "../../../../../../context/ConfigContext";
+import AccessTokenManagement from "@/components/AccessTokenManagement";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -38,6 +39,21 @@ const Index: FunctionComponent = () => {
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const config = useConfig();
   const router = useRouter();
+
+  let { organizationSlug, projectSlug } = useDecodedParams() as {
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  };
+
+  const url =
+    "/organizations/" +
+    organizationSlug +
+    "/projects/" +
+    projectSlug +
+    "/pats/";
+
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     if (!project) {
       return;
@@ -239,7 +255,7 @@ These identifiers are managed by the external system and are treated as immutabl
             <CopyInput
               value={
                 config.devguardApiUrlPublicInternet +
-                "api/v1" +
+                "/api/v1" +
                 "/organizations/" +
                 activeOrg.slug +
                 "/projects/" +
@@ -287,7 +303,7 @@ These identifiers are managed by the external system and are treated as immutabl
               />
             ))}
 
-            {project.webhooks.length > 0 && <hr />}
+            {project.webhooks?.length > 0 && <hr />}
             <ListItem
               Title={
                 <div className="flex flex-row items-center">Add a Webhook</div>
@@ -335,6 +351,14 @@ These identifiers are managed by the external system and are treated as immutabl
           </>
         )}
         <hr />
+        <AccessTokenManagement
+          url={url}
+          section={{
+            title: "Generate your Group Access Tokens",
+            description:
+              "Manage your group access tokens that scanners and other integrations use to authenticate with DevGuard on your behalf.",
+          }}
+        />
         <Section
           id="config-files"
           title="Configuration Files"

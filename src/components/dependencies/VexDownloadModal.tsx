@@ -7,8 +7,6 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import type { Dispatch, SetStateAction } from "react";
-import type { ArtifactDTO } from "../../types/api/api";
-import { useSelectArtifact } from "../ArtifactSelector";
 import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -21,8 +19,10 @@ import {
 } from "../ui/dialog";
 import Callout from "../common/Callout";
 import { useConfig } from "../../context/ConfigContext";
-import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
+import { useArtifacts } from "../../context/AssetVersionContext";
 import { useActiveAsset } from "../../hooks/useActiveAsset";
+import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
+import { useSelectArtifact } from "../ArtifactSelector";
 import { usePublicSharing } from "./PublicUrlSection";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { ArtifactAndPublicUrlGrid } from "./ArtifactAndPublicUrlGrid";
@@ -31,22 +31,19 @@ interface VexDownloadModalProps {
   showVexModal: boolean;
   setShowVexModal: Dispatch<SetStateAction<boolean>>;
   assetName?: string;
-  assetVersionName?: string;
   pathname: string;
-  artifacts: Array<ArtifactDTO>;
 }
 
 export default function VexDownloadModal({
   showVexModal,
   setShowVexModal,
   assetName,
-  assetVersionName,
   pathname,
-  artifacts,
 }: VexDownloadModalProps) {
   const config = useConfig();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
+  const artifacts = useArtifacts();
   const { sharesInformation, isPublicLoading, handleTogglePublic } =
     usePublicSharing();
   const { isLoading, handleDownload: handleDownloadPdfVex } = useDownloadPdf(
@@ -55,10 +52,14 @@ export default function VexDownloadModal({
     "VeX PDF",
   );
 
+  // VEX is published per artifact, so the routes behind these links require one.
   const { selectedArtifact, setSelectedArtifact } = useSelectArtifact(
     false,
-    (artifacts ?? []).map((a) => a.artifactName),
+    artifacts.map((a) => a.artifactName),
   );
+  const artifactQuery = new URLSearchParams({
+    artifact: selectedArtifact || "",
+  });
 
   const jsonFileName = `${assetName}_vex.json`;
   const xmlFileName = `${assetName}_vex.xml`;
@@ -69,10 +70,12 @@ export default function VexDownloadModal({
         <DialogHeader>
           <DialogTitle>
             Download VEX File for &quot;{assetName}&quot;{" "}
-            <Badge variant={"outline"} className="ml-1">
-              <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-              {assetVersionName}
-            </Badge>
+            {assetVersion?.name && (
+              <Badge variant={"outline"} className="ml-1">
+                <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                {assetVersion.name}
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription>
             You can download the VEX (Vulnerability Exploitability eXchange) in
@@ -80,8 +83,8 @@ export default function VexDownloadModal({
             <div className="mt-4">
               <Callout intent="neutral">
                 <span>
-                  <strong>Note:</strong> You can share the standard VEX for any
-                  of your artifacts. That does not export your VEX Rules.
+                  <strong>Note:</strong> You can share the standard VEX for this
+                  repository. That does not export your VEX Rules.
                 </span>
               </Callout>
             </div>
@@ -110,12 +113,7 @@ export default function VexDownloadModal({
         <div className="flex items-start justify-start gap-4 mt-2">
           <DelayedDownloadButton
             data-testid="download-vex-json-format"
-            href={
-              pathname +
-              `/../vex.json?${new URLSearchParams({
-                artifact: selectedArtifact as string,
-              })}`
-            }
+            href={pathname + `/../vex.json?${artifactQuery}`}
             icon={
               <Image
                 src="/assets/cyclonedx-logo.svg"
@@ -129,12 +127,7 @@ export default function VexDownloadModal({
             downloadFileName={jsonFileName}
           />
           <DelayedDownloadButton
-            href={
-              pathname +
-              `/../vex.xml?${new URLSearchParams({
-                artifact: selectedArtifact as string,
-              })}`
-            }
+            href={pathname + `/../vex.xml?${artifactQuery}`}
             icon={<FileCode className="h-5 w-auto inline-block text-success" />}
             label={"Download in XML-Format"}
             downloadFileName={xmlFileName}
@@ -155,7 +148,7 @@ export default function VexDownloadModal({
         </p>
 
         <Button
-          onClick={() => handleDownloadPdfVex(selectedArtifact)}
+          onClick={() => handleDownloadPdfVex()}
           variant="secondary"
           disabled={isLoading}
         >

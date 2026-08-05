@@ -11,7 +11,7 @@ import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
 
 import { fetcher } from "@/data-fetcher/fetcher";
-import { CaretDownIcon } from "@radix-ui/react-icons";
+import { ChevronDown } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,65 +62,21 @@ const AffectedComponentDetails: FunctionComponent<{
 
   return (
     <div>
-      {vuln.cve?.relationships && vuln.cve.relationships.length > 0 && (
-        <div className="p-5">
-          <h3 className="mb-2 text-sm font-semibold">
-            Vulnerability Details{" "}
-            <Image
-              src={
-                theme === "light" ? "/logos/osv-black.png" : "/logos/osv.png"
-              }
-              alt="OSV Logo"
-              width={40}
-              height={40}
-              className="inline-block ml-2 mb-1"
-            />
-          </h3>
-          <div className="flex flex-col gap-2">
-            <div className="rounded-lg border bg-card p-4">
-              {vuln.cve?.relationships && (
-                <table className="w-full table-auto border-collapse">
-                  <tbody>
-                    {vuln.cve?.relationships?.map((rel) => (
-                      <tr
-                        className="text-sm"
-                        key={rel.relationshipType + rel.targetCve}
-                      >
-                        <td className="capitalize font-semibold">
-                          {rel.relationshipType}
-                        </td>
-                        <td>{rel.targetCve}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-            <Link
-              target="_blank"
-              className="text-xs"
-              href={"https://osv.dev/vulnerability/" + vuln.cveID}
-            >
-              See vulnerability on osv.dev
-            </Link>
-          </div>
-        </div>
-      )}
       <div className="p-5">
-        <h3 className="mb-2 text-sm font-semibold">Affected component</h3>
+        <h3 className="mb-2 text-xs font-semibold">Affected component</h3>
         <div className="flex flex-col gap-4">
           <Collapsible>
-            <div className="rounded-lg border bg-card p-4">
-              <CollapsibleTrigger className="flex cursor-pointer w-full flex-row items-center justify-between text-sm font-semibold">
+            <div className="rounded-lg border bg-card p-3">
+              <CollapsibleTrigger className="group flex cursor-pointer w-full flex-row items-center justify-between text-sm font-semibold">
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}
-                    <span className="flex-1 text-left">
+                    <span className="flex-1 text-left mt-0.75 text-xs">
                       {beautifyPurl(purl)}
                     </span>
                   </span>
                 </p>
-                <CaretDownIcon />
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
               <div className="mt-4 text-sm">
                 {" "}
@@ -193,18 +149,45 @@ const AffectedComponentDetails: FunctionComponent<{
                         </Link>
                       ))}
                   </div>
+                  {vuln.cve?.relationships &&
+                    vuln.cve.relationships.length > 0 && (
+                      <div className="mt-3 flex flex-col text-xs">
+                        <span className="text-muted-foreground">
+                          Relationships:
+                        </span>
+                        <ul className="mt-1 list-none space-y-0.5">
+                          {vuln.cve.relationships.map((rel) => (
+                            <li
+                              key={rel.relationshipType + rel.targetCve}
+                              className="flex flex-row gap-2"
+                            >
+                              <Link
+                                href={`https://osv.dev/vulnerability/${rel.targetCve}`}
+                                target="_blank"
+                                className="!text-xs"
+                              >
+                                {rel.targetCve}
+                              </Link>
+                              <span className="capitalize text-muted-foreground">
+                                ({rel.relationshipType})
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  <div className="mt-4 border-t pt-4">
+                    <DocDrawer
+                      triggerLabel="See how DevGuard matches vulnerabilities"
+                      drawerTitle="Vulnerability Matching"
+                      mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/vulnerability-management/vulnerability-matching.mdx"
+                      docsUrl="https://docs.devguard.org/explanations/vulnerability-management/vulnerability-matching/"
+                    />
+                  </div>
                 </CollapsibleContent>
               </div>
             </div>
           </Collapsible>
-        </div>
-        <div className="mt-1">
-          <DocDrawer
-            triggerLabel="See how DevGuard matches vulnerabilities"
-            drawerTitle="Vulnerability Matching"
-            mdxUrl="https://raw.githubusercontent.com/l3montree-dev/devguard-documentation/main/src/pages/explanations/vulnerability-management/vulnerability-matching.mdx"
-            docsUrl="https://docs.devguard.org/explanations/vulnerability-management/vulnerability-matching/"
-          />
         </div>
       </div>
     </div>

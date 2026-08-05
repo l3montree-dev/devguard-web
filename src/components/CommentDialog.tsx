@@ -59,7 +59,6 @@ const CommentDialog: FunctionComponent<CommentDialogProps> = ({
           <div>
             <label className="mb-2 block text-sm font-semibold">Comment</label>
             <MarkdownEditor
-              className="!bg-card"
               placeholder="Add your comment here..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}

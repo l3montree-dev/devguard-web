@@ -7,7 +7,7 @@ import {
   findUser,
 } from "../utils/view";
 
-import Markdown from "react-markdown";
+import Markdown from "./common/Markdown";
 
 import { beautifyPurl, classNames } from "../utils/common";
 import FormatDate from "./risk-assessment/FormatDate";

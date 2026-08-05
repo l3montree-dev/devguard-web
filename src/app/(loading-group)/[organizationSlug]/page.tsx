@@ -61,7 +61,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
-import { Loader2 } from "lucide-react";
+import { Loader2, Megaphone } from "lucide-react";
 import useSWR from "swr";
 import EmptyParty from "../../../components/common/EmptyParty";
 import ListRenderer from "../../../components/common/ListRenderer";

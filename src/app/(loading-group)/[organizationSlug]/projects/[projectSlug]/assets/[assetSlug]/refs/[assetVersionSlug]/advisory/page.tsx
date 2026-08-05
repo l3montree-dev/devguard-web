@@ -200,7 +200,11 @@ const Index: FunctionComponent = () => {
       <div className="flex flex-row items-center justify-end">
         <div className="flex flex-row gap-2">
           <AuthGuard require="admin">
-            <Button onClick={() => setDialogOpen(true)} variant="default">
+            <Button
+              onClick={() => setDialogOpen(true)}
+              variant="default"
+              data-testid="create-security-advisory"
+            >
               Create Security Advisory
             </Button>
           </AuthGuard>

@@ -5,32 +5,44 @@ import type {
 import { browserApiClient } from "./devGuardApi";
 import { generateKeyPair } from "./keyService";
 
-async function createPat(data: {
-  description: string;
-  scopes: string;
-  expiryDateUnix: number;
-  symmetric: true;
-}): Promise<SeeOncePatWithBearerToken>;
-async function createPat(data: {
-  description: string;
-  scopes: string;
-  expiryDateUnix: number;
-  symmetric?: false;
-}): Promise<SeeOncePatWithPrivKey>;
-async function createPat(data: {
-  description: string;
-  scopes: string;
-  expiryDateUnix: number;
-  symmetric?: boolean;
-}): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken>;
-async function createPat(data: {
-  description: string;
-  scopes: string;
-  expiryDateUnix: number;
-  symmetric?: boolean;
-}): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken> {
+async function createPat(
+  data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric: true;
+  },
+  url?: string,
+): Promise<SeeOncePatWithBearerToken>;
+async function createPat(
+  data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: false;
+  },
+  url?: string,
+): Promise<SeeOncePatWithPrivKey>;
+async function createPat(
+  data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: boolean;
+  },
+  url?: string,
+): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken>;
+async function createPat(
+  data: {
+    description: string;
+    scopes: string;
+    expiryDateUnix: number;
+    symmetric?: boolean;
+  },
+  url: string = "/pats/",
+): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken> {
   if (data.symmetric) {
-    const resp = await browserApiClient("/pats/", {
+    const resp = await browserApiClient(url, {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -47,7 +59,7 @@ async function createPat(data: {
 
   const d = { ...data, pubKey: publicKey };
 
-  const resp = await browserApiClient("/pats/", {
+  const resp = await browserApiClient(url, {
     method: "POST",
     // send hex-encoded pubkey
     body: JSON.stringify(d),

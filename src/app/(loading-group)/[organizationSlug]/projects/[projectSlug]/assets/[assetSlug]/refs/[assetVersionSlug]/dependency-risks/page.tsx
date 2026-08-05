@@ -441,12 +441,10 @@ const Index: FunctionComponent = () => {
         </div>
       </div>
       <VexDownloadModal
-        artifacts={artifacts}
         showVexModal={showVexModal}
         setShowVexModal={setShowVexModal}
         pathname={pathname}
         assetName={asset?.name}
-        assetVersionName={assetVersion?.name}
       />
       <Section
         forceVertical
@@ -457,7 +455,7 @@ const Index: FunctionComponent = () => {
       >
         <div className="flex flex-1 flex-col gap-2">
           <Tabs
-            defaultValue={
+            value={
               params?.has("state") ? (params.get("state") as string) : "open"
             }
           >

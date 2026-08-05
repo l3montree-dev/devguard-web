@@ -1,0 +1,49 @@
+name: E2E Tests Scheduled Main Instance
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */6 * * *"
+
+permissions: read-all
+
+jobs:
+  e2e-scheduled-main:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #v7.0.0
+        with:
+          node-version: '26'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create frontend .env
+        run: |
+          cat > .env << 'EOF'
+          DEVGUARD_DOMAIN=https://main.devguard.org
+          DEVGUARD_EMAIL_LOGIN_USERNAME=test-user-XXX
+          DEVGUARD_EMAIL_LOGIN_PASSWORD=Test1234!secure
+          OPEN_CODE_USERNAME=placeholder
+          OPEN_CODE_PASSWORD=placeholder
+          OPEN_CODE_TOTP_SECRET=placeholder
+          EOF
+
+      - name: Run E2E tests
+        run: |
+          docker run --rm \
+            --network host \
+            -v ${{ github.workspace }}:/work \
+            -w /work \
+            -u $(id -u):$(id -g) \
+            -e CI=true \
+            -e HOME=/tmp \
+            mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48 \
+            npm run e2e

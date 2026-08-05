@@ -6,7 +6,7 @@ import type { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import type { FunctionComponent } from "react";
-import Markdown from "react-markdown";
+import Markdown from "@/components/common/Markdown";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -27,7 +27,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import ColoredBadge from "@/components/common/ColoredBadge";
-import PatSection from "@/components/PatSection";
+import AccessTokenSection from "@/components/AccessTokenSection";
 import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
@@ -214,10 +214,7 @@ const Index = () => {
                       ></CopyCodeFragment>
                     </div>
                     <div className="mt-10">
-                      <PatSection
-                        description="Personal access token to create attestations"
-                        {...pat}
-                      />
+                      <AccessTokenSection description="Repository access token" />
                     </div>
                   </div>
                 </CardContent>

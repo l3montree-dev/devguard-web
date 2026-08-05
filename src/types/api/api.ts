@@ -301,6 +301,8 @@ interface BaseVulnEventDTO {
   uri: string | null;
   createdByVexRule: boolean;
   userAgent: string;
+  vexRuleId?: string | null;
+  vexRule?: VexRule | null;
 }
 
 export interface ExternalReferenceErrorDTO {
@@ -467,6 +469,7 @@ export interface CVE {
   cisaActionDue?: string;
   cisaRequiredAction?: string;
   cisaVulnerabilityName?: string;
+  euvdExploitAdd?: string;
 
   vector?: string;
 }
@@ -512,8 +515,15 @@ export interface VulnWithCVE extends DependencyVuln {
     | null;
 }
 
+interface related {
+  // related exposes all related cves under their respective relationship type
+  // if you want to access them add them here (e.g. alias: CVE[];); they are currently omitted to avoid clutter
+  advisory?: CVE[];
+}
+
 export interface DetailedDependencyVulnDTO extends VulnWithCVE {
   events: VulnEventDTO[];
+  related?: related;
 }
 
 export interface DependencyVulnHints {
@@ -1047,6 +1057,8 @@ export type VexRule = {
   // Primary key
   id: string;
 
+  title: string;
+
   // Composite key components
   assetId: string;
   cveId: string;
@@ -1054,9 +1066,10 @@ export type VexRule = {
 
   // Rule data
   justification: string;
-  mechanicalJustification: string;
-  eventType: string;
-  pathPattern: string[];
+  mechanicalJustification: MechanicalJustificationType;
+  eventType: VexRuleEventType;
+  celExpression: string;
+  pathPattern: string[] | null;
   createdById: string;
   createdAt: string;
   updatedAt: string;
@@ -1067,13 +1080,65 @@ export type VexRule = {
 
 export type VexRulesDTO = Paged<VexRule>;
 
+export type MechanicalJustificationType =
+  | "component_not_present"
+  | "vulnerable_code_not_present"
+  | "vulnerable_code_not_in_execute_path"
+  | "vulnerable_code_cannot_be_controlled_by_adversary"
+  | "inline_mitigations_already_exist";
+
+export type VexRuleEventType = "accepted" | "falsePositive";
+
+export type CreateVexRuleRequest = {
+  title: string;
+  justification: string;
+  celExpression: string;
+  eventType: VexRuleEventType;
+  mechanicalJustification?: MechanicalJustificationType;
+  // Set when the rule was adopted from a crowdsourced recommendation
+  wasRecommended?: boolean;
+};
+
+// Values the create dialog opens with, e.g. from a dependency path, the
+// expression playground or a recommendation.
+export type VexRulePrefill = {
+  celExpression: string;
+  title?: string;
+  justification?: string;
+  mechanicalJustification?: MechanicalJustificationType;
+  wasRecommended?: boolean;
+};
+
+// A rule other DevGuard organizations already apply to this vulnerability,
+// picked by trust-weighted agreement (crowdsourced vexing). Not a rule of this
+// asset yet — it becomes one once accepted.
+export type VexRuleRecommendation = {
+  celExpression: string;
+  justification: string;
+  mechanicalJustification: MechanicalJustificationType;
+  eventType: VexRuleEventType;
+  confidence: number;
+  title: string;
+  // Metrics - indicates how many dependency vulns this rule applies to
+  appliesToAmountOfDependencyVulns: number;
+
+  type: "crowdsourced" | "session" | "upstream";
+  source: string;
+  verifiedVotes: number;
+  totalVotes: number;
+
+  // if the recommendation is from your own org, the API will return the asset slug and project slug to indicate that it is not a crowdsourced recommendation
+  assetSlug?: string;
+  projectSlug?: string;
+};
+
+// Mirrors dtos.ExternalReferenceDTO. A reference is identified by asset + url —
+// the API exposes no id, which is also why DELETE takes the url.
 export type ExternalReference = {
-  id: string;
   assetId: string;
-  assetVersionName: string;
   url: string;
-  type: "cyclonedxvex" | "csaf";
-  error: string | null;
+  type: "cyclonedx" | "csaf" | "openvex" | "unknown";
+  error?: string | null;
 };
 
 export type OrgStructure = {

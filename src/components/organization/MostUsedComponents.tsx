@@ -36,7 +36,9 @@ const MostUsedComponents: FunctionComponent<Props> = ({ topComponents }) => {
               <thead className="border-b text-foreground">
                 <tr>
                   <th className="p-4 text-left font-medium">Package</th>
-                  <th className="p-4 text-right font-medium">Occurrences</th>
+                  <th className="whitespace-nowrap p-4 text-right font-medium">
+                    Occurrences
+                  </th>
                 </tr>
               </thead>
               <tbody>

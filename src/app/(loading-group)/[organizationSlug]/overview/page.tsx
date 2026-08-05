@@ -65,7 +65,14 @@ const OrganizationOverview: FunctionComponent = () => {
 
   const is404 = error instanceof FetcherError && error.status === 404;
   const isError = !isStatisticsLoading && error && !is404;
-  const hasNoData = !isStatisticsLoading && (is404 || !orgStatistics);
+  const isEmptyResponse =
+    !!orgStatistics &&
+    !orgStatistics.topProjects?.length &&
+    !orgStatistics.topAssets?.length &&
+    !orgStatistics.topArtifacts?.length;
+
+  const hasNoData =
+    !isStatisticsLoading && (is404 || !orgStatistics || isEmptyResponse);
 
   return (
     <Page

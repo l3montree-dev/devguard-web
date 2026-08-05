@@ -5,6 +5,8 @@ export const documentationLinks = {
   sbomExplaining: "https://devguard.org/explanations/explaining-sboms",
   vexExplaining:
     "https://devguard.org/explanations/compliance/csaf-vex-explained",
+  vexRecommendationWhitepaper:
+    "https://devguard.org/research-development/vex-sharing-trust-based-knowledge-based-collaborative-share-vulnerability-management-decisions-in-devguard.pdf",
   artifactExplaining:
     "https://devguard.org/explanations/core-concepts/artifacts",
   artifactVersioning:
