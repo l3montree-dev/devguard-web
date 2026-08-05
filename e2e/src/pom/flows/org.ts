@@ -34,6 +34,16 @@ export class OrgFlow {
       .waitFor({ state: "visible", timeout: 30_000 });
   }
 
+  async openGroup(groupName: string) {
+    await this.page
+      .getByRole("link", { name: groupName })
+      .first()
+      .click({ timeout: 30_000 });
+    await this.page
+      .getByTestId("nav-group-subgroups-repositories")
+      .waitFor({ state: "visible", timeout: 30_000 });
+  }
+
   async inviteUserOrg(mail: string) {
     await this.page.getByTestId("nav-org-settings").click();
     await this.page

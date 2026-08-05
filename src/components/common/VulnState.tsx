@@ -16,35 +16,47 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
   switch (state) {
     case "fixed":
       return (
-        <Badge variant="success" className="gap-1 py-1">
+        <Badge
+          data-testid="vuln-state"
+          variant="success"
+          className="gap-1 py-1"
+        >
           <CheckCircleIcon className="h-4 w-4" />
           Fixed
         </Badge>
       );
     case "implemented":
       return (
-        <Badge variant="success" className="gap-1 py-1">
+        <Badge
+          data-testid="vuln-state"
+          variant="success"
+          className="gap-1 py-1"
+        >
           <CheckCircleIcon className="h-4 w-4" />
           Implemented
         </Badge>
       );
     case "accepted":
       return (
-        <Badge variant="yellow" className="gap-1 py-1">
+        <Badge data-testid="vuln-state" variant="yellow" className="gap-1 py-1">
           <SpeakerXMarkIcon className="h-4 w-4" />
           Accepted
         </Badge>
       );
     case "falsePositive":
       return (
-        <Badge variant="success" className="gap-1 py-1">
+        <Badge
+          data-testid="vuln-state"
+          variant="success"
+          className="gap-1 py-1"
+        >
           <StopIcon className="h-4 w-4" />
           False Positive
         </Badge>
       );
     case "notApplicable":
       return (
-        <Badge variant="blue" className="gap-1 py-1">
+        <Badge data-testid="vuln-state" variant="blue" className="gap-1 py-1">
           <StopIcon className="h-4 w-4" />
           Not Applicable
         </Badge>
@@ -52,7 +64,7 @@ const VulnState: FunctionComponent<{ state: DependencyVuln["state"] }> = ({
     case "open":
     default:
       return (
-        <Badge variant="danger" className="gap-1 py-1">
+        <Badge data-testid="vuln-state" variant="danger" className="gap-1 py-1">
           <Bug className="h-4 w-4" />
           Open
         </Badge>
