@@ -34,6 +34,9 @@
     "verbatimModuleSyntax": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "types": [
+      "jest"
+    ],
     "paths": {
       "@/*": [
         "./src/*"
