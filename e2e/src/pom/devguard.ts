@@ -25,7 +25,7 @@ export class DevGuardPOM {
   readonly devGuardDomain = envConfig.devGuard.domain;
 
   constructor(public page: Page) {
-    new LoggingAnalyzer(page);
+    LoggingAnalyzer.attach(page);
     // page.on("close", () => expect(loggingAnalyzer.logs).toEqual([])); // todo!!
   }
 
