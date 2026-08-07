@@ -19,7 +19,7 @@ export class OrgFlow {
       .getByRole("button", { name: "Create Organization" })
       .click();
     await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
-    await this.page.waitForTimeout(10_000);
+    await this.page.waitForTimeout(5_000);
     await new ModalHelper(this.page).dismissToastIfPresent();
   }
 
@@ -28,10 +28,10 @@ export class OrgFlow {
       .locator(
         `${DevGuardNavigationLevel.Organization} [data-testid="nav-org-groups"]`,
       )
-      .click({ timeout: 30_000 });
+      .click({ timeout: 15_000 });
     await this.page
       .getByTestId("create-group-button")
-      .waitFor({ state: "visible", timeout: 30_000 });
+      .waitFor({ state: "visible", timeout: 15_000 });
   }
 
   async openGroup(groupName: string) {
