@@ -97,30 +97,26 @@ test.describe("DevGuard handle vuln flows", () => {
       .fill(
         "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-10-0/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Darm64%26tag%3Dv1.10.0-arm64/sbom.json/",
       );
-    await page.getByRole("button", { name: "Create", exact: true }).click();
+    await page.getByTestId("setup-information-sources-create").click();
     await page.reload();
     await page
       .getByTestId("nav-asset-dependency-risks")
       .locator("button")
       .click({ timeout: 20_000 });
     await page.getByTestId("nav-asset-vex-rules").click({ timeout: 20_000 });
+    await page.getByTestId("upstream-vex-sources-trigger").click();
+    await page.getByTestId("vex-sources-add-button").click();
+    await page.getByTestId("supply-vex-source-url").click();
+    await page.getByTestId("vex-source-url-input").click();
     await page
-      .getByRole("button", { name: "Your additional Upstream VEX" })
-      .click();
-    await page.getByRole("button", { name: "Add source" }).click();
-    await page.getByText("Supply a source URLConfigure").click();
-    await page.getByRole("textbox", { name: "VEX Source URL" }).click();
-    await page
-      .getByRole("textbox", { name: "VEX Source URL" })
+      .getByTestId("vex-source-url-input")
       .fill(
         "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-10-0/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Darm64%26tag%3Dv1.10.0-arm64/vex.json/",
       );
-    await page.getByRole("button", { name: "Add VEX source" }).click();
+    await page.getByTestId("add-vex-source-submit-button").click();
     await page.reload();
-    await page
-      .getByRole("button", { name: "Your additional Upstream VEX" })
-      .click();
-    await page.getByRole("button", { name: "Sync all sources" }).click();
+    await page.getByTestId("upstream-vex-sources-trigger").click();
+    await page.getByTestId("vex-sources-sync-all-button").click();
     await page.reload();
     await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "upstream-vex-rules");
