@@ -95,7 +95,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await page
       .getByTestId("upstream-url-field")
       .fill(
-        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-12-2/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Damd64%26tag%3Dv1.12.2-amd64/sbom.json/",
+        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-10-0/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Darm64%26tag%3Dv1.10.0-arm64/sbom.json/",
       );
     await page.getByRole("button", { name: "Create", exact: true }).click();
     await page.reload();
@@ -113,7 +113,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await page
       .getByRole("textbox", { name: "VEX Source URL" })
       .fill(
-        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-12-2/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Damd64%26tag%3Dv1.12.2-amd64/vex.json/",
+        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-10-0/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Darm64%26tag%3Dv1.10.0-arm64/vex.json/",
       );
     await page.getByRole("button", { name: "Add VEX source" }).click();
     await page.reload();
