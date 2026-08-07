@@ -3,8 +3,9 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import path from "path";
+import { docShot } from "./doc-shot";
 
-test.use({ viewport: { width: 1440, height: 900 } });
+test.use({ viewport: { width: 1440, height: 1200 } });
 
 test.describe("DevGuard handle vuln flows", () => {
   let devguardPOM: DevGuardPOM;
@@ -81,5 +82,48 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().expectVexRuleRecommendationVisible(testInfo);
     await devguardPOM.vuln().createVexRuleFromRecommendation();
     await devguardPOM.vuln().expectVulnState("False Positive");
+  });
+
+  test("test to use upstream vex url and sync it", async ({
+    page,
+  }, testInfo) => {
+    await page.getByTestId("supplier-url-card").click();
+    await page.getByTestId("artifact-name-input").click();
+    await page.getByTestId("artifact-name-input").fill("DevGuardSBOM");
+    await page.getByTestId("sbom-url-upload-button").click();
+    await page.getByTestId("upstream-url-field").click();
+    await page
+      .getByTestId("upstream-url-field")
+      .fill(
+        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-12-2/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Damd64%26tag%3Dv1.12.2-amd64/sbom.json/",
+      );
+    await page.getByRole("button", { name: "Create", exact: true }).click();
+    await page.reload();
+    await page
+      .getByTestId("nav-asset-dependency-risks")
+      .locator("button")
+      .click({ timeout: 20_000 });
+    await page.getByTestId("nav-asset-vex-rules").click({ timeout: 20_000 });
+    await page
+      .getByRole("button", { name: "Your additional Upstream VEX" })
+      .click();
+    await page.getByRole("button", { name: "Add source" }).click();
+    await page.getByText("Supply a source URLConfigure").click();
+    await page.getByRole("textbox", { name: "VEX Source URL" }).click();
+    await page
+      .getByRole("textbox", { name: "VEX Source URL" })
+      .fill(
+        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-12-2/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Damd64%26tag%3Dv1.12.2-amd64/vex.json/",
+      );
+    await page.getByRole("button", { name: "Add VEX source" }).click();
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Your additional Upstream VEX" })
+      .click();
+    await page.getByRole("button", { name: "Sync all sources" }).click();
+    await page.reload();
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "upstream-vex-rules");
+    await page.waitForTimeout(5_000);
   });
 });
