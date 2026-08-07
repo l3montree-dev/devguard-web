@@ -117,6 +117,13 @@ const AutomatedIntegrationSlide: FunctionComponent<
         <AccessTokenSection description="Risk Identification using CLI Setup" />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
+        <Button
+          variant={"secondary"}
+          id="devguard-cli-scan-back-to-selection"
+          onClick={() => api?.scrollTo(prevIndex)}
+          >
+          Back
+        </Button>
         <Button id="automated-integration-continue" onClick={onClose}>
           Finish Setup
         </Button>

@@ -38,9 +38,11 @@ export const SetupInformationSourceSlide: FunctionComponent<
   // this is necessary since we sometimes add a purl and thus the form object changes
   // we do this dynamically in the artifact form itself.
   const sourceURLs = sources.reduce((acc, curr) => acc + curr.url, "");
+  // validation messages change the slide height, otherwise the buttons get cut off
+  const errorFields = Object.keys(form.formState.errors).join(",");
   useEffect(() => {
     api?.reInit();
-  }, [api, sourceURLs]);
+  }, [api, sourceURLs, errorFields]);
 
   const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
     if (data.informationSources.length === 0) {
@@ -77,7 +79,15 @@ export const SetupInformationSourceSlide: FunctionComponent<
           onSubmit={form.handleSubmit(handleSubmit)}
         >
           <ArtifactForm form={form} isEditMode={false} />
-          <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
+          <div className="mt-4 flex flex-wrap flex-row gap-2 justify-end">
+            <Button
+              variant={"secondary"}
+              type="button"
+              id="supplier-provided-sbom-back-to-selection"
+              onClick={() => api?.scrollTo(prevIndex)}
+            >
+              Back
+            </Button>
             <Button
               isSubmitting={form.formState.isSubmitting}
               id="setup-information-sources-create"
