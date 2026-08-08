@@ -139,7 +139,7 @@ ${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug
         <div className="mt-0 flex flex-wrap flex-row gap-2 justify-end">
           <Button
             variant={"secondary"}
-            id="install-devguard-cli-back-to-selection"
+            id="devguard-cli-scan-back-to-selection"
             onClick={() => api?.scrollTo(prevIndex)}
           >
             Back

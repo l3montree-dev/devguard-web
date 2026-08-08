@@ -512,7 +512,7 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
       <div className="mt-4 flex flex-row gap-2 justify-end">
         <Button
             variant={"secondary"}
-            id="devguard-cli-scan-back-to-selection"
+            id="scanner-options-back-to-selection"
             onClick={() => api?.scrollTo(prevIndex)}
           >
             Back

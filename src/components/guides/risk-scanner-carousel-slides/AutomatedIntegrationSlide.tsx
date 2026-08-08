@@ -119,7 +119,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
       <div className="mt-10 flex flex-row gap-2 justify-end">
         <Button
           variant={"secondary"}
-          id="devguard-cli-scan-back-to-selection"
+          id="automated-integration-back-to-selection"
           onClick={() => api?.scrollTo(prevIndex)}
           >
           Back

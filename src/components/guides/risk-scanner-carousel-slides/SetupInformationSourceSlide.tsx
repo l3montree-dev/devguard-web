@@ -83,7 +83,7 @@ export const SetupInformationSourceSlide: FunctionComponent<
             <Button
               variant={"secondary"}
               type="button"
-              id="supplier-provided-sbom-back-to-selection"
+              id="setup-information-sources-back-to-selection"
               onClick={() => api?.scrollTo(prevIndex)}
             >
               Back
