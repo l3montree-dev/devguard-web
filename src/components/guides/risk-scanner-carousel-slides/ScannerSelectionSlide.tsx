@@ -1,7 +1,6 @@
 import { CubeTransparentIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
@@ -13,21 +12,22 @@ import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { classNames } from "@/utils/common";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
+type Setup =
+  | "devguard-tools"
+  | "own-setup"
+  | "information-source"
+  | "devguard-cli";
+
 interface ScannerSelectionSlideProps {
   api?: {
     scrollTo: (index: number) => void;
   };
-  prevIndex: number;
-  selectedSetup?:
-    "devguard-tools" | "own-setup" | "information-source" | "devguard-cli";
+  selectedSetup?: Setup;
   devguardToolsSlideIndex: number;
   devguardCliSlideIndex: number;
   customSetupSlideIndex: number;
   informationSourceSlideIndex: number;
-  setSelectedSetup: (
-    setup:
-      "devguard-tools" | "own-setup" | "information-source" | "devguard-cli",
-  ) => void;
+  setSelectedSetup: (setup: Setup) => void;
 }
 
 export default function ScannerSelectionSlide({
@@ -38,8 +38,20 @@ export default function ScannerSelectionSlide({
   informationSourceSlideIndex,
   devguardToolsSlideIndex,
   customSetupSlideIndex,
-  prevIndex,
 }: ScannerSelectionSlideProps) {
+  const selectAndContinue = (setup: Setup) => {
+    setSelectedSetup(setup);
+    api?.scrollTo(
+      setup === "devguard-tools"
+        ? devguardToolsSlideIndex
+        : setup === "information-source"
+          ? informationSourceSlideIndex
+          : setup === "devguard-cli"
+            ? devguardCliSlideIndex
+            : customSetupSlideIndex,
+    );
+  };
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -51,7 +63,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer",
             selectedSetup === "devguard-tools" ? "border-primary" : "",
           )}
-          onClick={() => setSelectedSetup("devguard-tools")}
+          onClick={() => selectAndContinue("devguard-tools")}
         >
           <CardHeader>
             <CardTitle className="text-lg flex flex-row items-center leading-tight">
@@ -78,7 +90,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2",
             selectedSetup === "devguard-cli" ? "border-primary" : "",
           )}
-          onClick={() => setSelectedSetup("devguard-cli")}
+          onClick={() => selectAndContinue("devguard-cli")}
         >
           <CardHeader>
             <CardTitle className="text-lg flex flex-row items-center leading-tight">
@@ -106,7 +118,7 @@ export default function ScannerSelectionSlide({
             selectedSetup === "own-setup" ? "border-primary" : "",
           )}
           data-testid="own-setup-card"
-          onClick={() => setSelectedSetup("own-setup")}
+          onClick={() => selectAndContinue("own-setup")}
         >
           <CardHeader>
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -131,7 +143,7 @@ export default function ScannerSelectionSlide({
             "cursor-pointer mt-2   ",
             selectedSetup === "information-source" ? "border-primary" : "",
           )}
-          onClick={() => setSelectedSetup("information-source")}
+          onClick={() => selectAndContinue("information-source")}
         >
           <CardHeader>
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
@@ -147,34 +159,6 @@ export default function ScannerSelectionSlide({
             </CardDescription>
           </CardHeader>
         </Card>
-      </div>
-      <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
-        <Button
-          variant={"secondary"}
-          data-testid="scanner-selection-back"
-          onClick={() => {
-            api?.scrollTo(prevIndex); // Back to SetupMethodSelectionSlide
-          }}
-        >
-          Back
-        </Button>
-        <Button
-          disabled={selectedSetup === undefined}
-          data-testid="scanner-selection-continue"
-          onClick={() => {
-            api?.scrollTo(
-              selectedSetup === "devguard-tools"
-                ? devguardToolsSlideIndex
-                : selectedSetup === "information-source"
-                  ? informationSourceSlideIndex
-                  : selectedSetup === "devguard-cli"
-                    ? devguardCliSlideIndex
-                    : customSetupSlideIndex,
-            ); // Forward to slide 3
-          }}
-        >
-          {selectedSetup === undefined ? "Select a Scanner" : "Continue"}
-        </Button>
       </div>
     </CarouselItem>
   );

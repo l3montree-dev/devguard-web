@@ -595,7 +595,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               selectedSetup={selectedSetup}
               setSelectedSetup={setSelectedSetup}
-              prevIndex={prevIndex}
               informationSourceSlideIndex={15}
               devguardCliSlideIndex={16}
               devguardToolsSlideIndex={7}
@@ -654,6 +653,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               cliSlideIndex={12}
               fileUploadSlideIndex={13}
+              prevIndex={prevIndex}
             />
             <AutomatedIntegrationSlide
               apiUrl={apiUrl}
