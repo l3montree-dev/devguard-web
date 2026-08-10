@@ -393,11 +393,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
         },
       );
       if (artifactResp.ok) {
-        toast.success("Information source setup successfully created!");
-        router.push(
-          `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`,
-        );
         onOpenChange(false);
+        window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`;
       } else {
         // read the body, we get external reference error dtos here, we can show the user which urls were invalid and why
         const errorBody = await artifactResp.json();
