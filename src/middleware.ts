@@ -18,13 +18,9 @@ export async function middleware(request: NextRequest) {
   }
 
   const body = await response.json();
-  if (!body?.ui?.nodes) {
-    return response;
-  }
+  const rewritten = body?.ui?.nodes ? rewriteFlow(body) : body;
 
-  // On errors, ORy loads form json directly instead of loading it through the component,
-  // so we have to apply the rewrite directly on the form 
-  return NextResponse.json(rewriteFlow(body), {
+  return NextResponse.json(rewritten, { 
     status: response.status,
     headers: response.headers,
   });
