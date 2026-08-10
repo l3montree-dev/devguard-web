@@ -28,6 +28,21 @@ export const buildFilterSearchParams = (
   });
 };
 
+// Accepts either a full invitation url or a bare code.
+export const extractInvitationCode = (input: string): string | undefined => {
+  const trimmed = input.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  try {
+    const url = new URL(trimmed);
+    return url.searchParams.get("code") ?? undefined;
+  } catch {
+    return trimmed;
+  }
+};
+
 export function urlToBaseURL(url: string): string {
   const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
   const formatedUrl = url.split(regex);
