@@ -80,15 +80,15 @@ export default function VexDownloadModal({
           <DialogDescription>
             You can download the VEX (Vulnerability Exploitability eXchange) in
             machine readable formats and an accessible PDF if available.
-            <div className="mt-4">
-              <Callout intent="neutral">
-                <span>
-                  <strong>Note:</strong> You can share the standard VEX for this
-                  repository. That does not export your VEX Rules.
-                </span>
-              </Callout>
-            </div>
           </DialogDescription>
+          <div className="mt-4">
+            <Callout intent="neutral">
+              <span>
+                <strong>Note:</strong> You can share the standard VEX for this
+                repository. That does not export your VEX Rules.
+              </span>
+            </Callout>
+          </div>
         </DialogHeader>
         <hr />
         <ArtifactAndPublicUrlGrid

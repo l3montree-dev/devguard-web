@@ -7,19 +7,28 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
-import { Input } from "./ui/input";
+import { Input, type InputProps } from "./ui/input";
 
 interface OrgFormProps {
   forceVertical?: boolean;
+  title?: string;
+  description?: string;
+  className?: string;
+  inputVariant?: InputProps["variant"];
 }
 
 export const InvitationForm: FunctionComponent<OrgFormProps> = ({
   forceVertical = true,
+  title = "General Information",
+  description = "Enter the invitation link of the organization.",
+  className,
+  inputVariant,
 }) => (
   <Section
-    description="Enter the invitation link of the organization."
-    title="General Information"
+    description={description}
+    title={title}
     forceVertical={forceVertical}
+    className={className}
   >
     <div className="mt-6">
       <FormField
@@ -33,7 +42,7 @@ export const InvitationForm: FunctionComponent<OrgFormProps> = ({
           <FormItem>
             <FormLabel>Organization invitation url/code*</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input variant={inputVariant} {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

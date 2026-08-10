@@ -14,7 +14,7 @@ import { loginComponentOverrides } from "../../components/ory/overrides";
 import { Card, CardContent } from "../../components/ui/card";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
-import { Skeleton } from "../../components/ui/skeleton";
+import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import ThemeToggle from "@/components/misc/ThemeToggle";
@@ -34,15 +34,6 @@ const LoginForm = async ({ searchParams }: OryPageParams) => {
     />
   );
 };
-
-const LoginFormSkeleton = () => (
-  <div className="flex flex-col gap-4">
-    <Skeleton className="h-10 w-full" />
-    <Skeleton className="h-10 w-full" />
-    <Skeleton className="h-10 w-full" />
-    <Skeleton className="h-5 w-1/2 self-center" />
-  </div>
-);
 
 const LoginPage = (props: OryPageParams) => {
   return (
@@ -79,7 +70,7 @@ const LoginPage = (props: OryPageParams) => {
                     />
                   </div>
 
-                  <Suspense fallback={<LoginFormSkeleton />}>
+                  <Suspense fallback={<FlowSkeleton />}>
                     <LoginForm searchParams={props.searchParams} />
                   </Suspense>
 
