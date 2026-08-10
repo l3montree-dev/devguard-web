@@ -9,7 +9,15 @@ import type {
 } from "@/types/api/api";
 import { useEffect, useState, useRef } from "react";
 import { EventEmitter } from "events";
-import { uniqBy, isEqual } from "lodash";
+import { uniqBy, isEqual, findLast } from "lodash";
+
+const hasPrivKey = (
+  pat:
+    | AsymmetricPersonalAccessTokenDTO
+    | SymmetricPersonalAccessTokenDTO
+    | SeeOncePatWithPrivKey
+    | SeeOncePatWithBearerToken,
+): pat is SeeOncePatWithPrivKey => "privKey" in pat && Boolean(pat.privKey);
 
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
@@ -100,11 +108,6 @@ export default function usePersonalAccessToken(
     personalAccessTokens,
     onDeletePat: handleDeletePat,
     onCreatePat: handleCreatePat,
-    pat:
-      personalAccessTokens.length > 0
-        ? (personalAccessTokens[
-            personalAccessTokens.length - 1
-          ] as SeeOncePatWithPrivKey)
-        : undefined,
+    pat: findLast(personalAccessTokens, hasPrivKey),
   };
 }
