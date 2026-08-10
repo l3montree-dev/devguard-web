@@ -10,7 +10,12 @@ import {
 } from "@/components/ui/select";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { useSearchParams } from "next/navigation";
-import { useState, type FunctionComponent } from "react";
+import {
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type FunctionComponent,
+} from "react";
 
 interface Props {
   frameworks: string[];
@@ -19,15 +24,31 @@ const FRAMEWORK_FILTER_KEY = "filterQuery[framework][is]";
 const ALL_FRAMEWORKS = "__all__";
 const LOCAL_STORAGE_KEY = "compliance-framework-filter";
 
+const subscribeToStorage = (onStoreChange: () => void) => {
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+};
+
 const FrameworkSelect: FunctionComponent<Props> = ({ frameworks }) => {
   const searchParams = useSearchParams();
 
   const push = useRouterQuery();
   const [search, setSearch] = useState("");
 
+  const stored = useSyncExternalStore(
+    subscribeToStorage,
+    () => localStorage.getItem(LOCAL_STORAGE_KEY),
+    () => null,
+  );
+
   const fromUrl = searchParams?.get(FRAMEWORK_FILTER_KEY);
-  const selectedFramework =
-    fromUrl ?? localStorage.getItem(LOCAL_STORAGE_KEY) ?? ALL_FRAMEWORKS;
+  const selectedFramework = fromUrl ?? stored ?? ALL_FRAMEWORKS;
+
+  useEffect(() => {
+    if (!fromUrl && stored) {
+      push({ [FRAMEWORK_FILTER_KEY]: stored, page: 1 });
+    }
+  }, [fromUrl, stored, push]);
 
   const filtered = frameworks.filter((f) =>
     f.toLowerCase().includes(search.toLowerCase()),
@@ -42,6 +63,7 @@ const FrameworkSelect: FunctionComponent<Props> = ({ frameworks }) => {
         } else {
           localStorage.setItem(LOCAL_STORAGE_KEY, value);
         }
+        window.dispatchEvent(new Event("storage"));
         push({
           [FRAMEWORK_FILTER_KEY]: value === ALL_FRAMEWORKS ? undefined : value,
           page: 1,
