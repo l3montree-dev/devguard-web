@@ -81,6 +81,7 @@ export const SetupInformationSourceSlide: FunctionComponent<
             <Button
               isSubmitting={form.formState.isSubmitting}
               id="setup-information-sources-create"
+              data-testid="setup-information-sources-create"
               type="submit"
             >
               Create

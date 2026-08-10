@@ -3,8 +3,9 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import path from "path";
+import { docShot } from "./doc-shot";
 
-test.use({ viewport: { width: 1440, height: 900 } });
+test.use({ viewport: { width: 1440, height: 1200 } });
 
 test.describe("DevGuard handle vuln flows", () => {
   let devguardPOM: DevGuardPOM;
@@ -81,5 +82,44 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().expectVexRuleRecommendationVisible(testInfo);
     await devguardPOM.vuln().createVexRuleFromRecommendation();
     await devguardPOM.vuln().expectVulnState("False Positive");
+  });
+
+  test("test to use upstream vex url and sync it", async ({
+    page,
+  }, testInfo) => {
+    await page.getByTestId("supplier-url-card").click();
+    await page.getByTestId("artifact-name-input").click();
+    await page.getByTestId("artifact-name-input").fill("DevGuardSBOM");
+    await page.getByTestId("sbom-url-upload-button").click();
+    await page.getByTestId("upstream-url-field").click();
+    await page
+      .getByTestId("upstream-url-field")
+      .fill(
+        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-10-0/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Darm64%26tag%3Dv1.10.0-arm64/sbom.json/",
+      );
+    await page.getByTestId("setup-information-sources-create").click();
+    await page.reload();
+    await page
+      .getByTestId("nav-asset-dependency-risks")
+      .locator("button")
+      .click({ timeout: 20_000 });
+    await page.getByTestId("nav-asset-vex-rules").click({ timeout: 20_000 });
+    await page.getByTestId("upstream-vex-sources-trigger").click();
+    await page.getByTestId("vex-sources-add-button").click();
+    await page.getByTestId("supply-vex-source-url").click();
+    await page.getByTestId("vex-source-url-input").click();
+    await page
+      .getByTestId("vex-source-url-input")
+      .fill(
+        "https://api.main.devguard.org/api/v1/public/169319b7-8170-469f-9e31-f87b6054e507/refs/v1-10-0/artifacts/pkg%3Aoci%2Fdevguard-web%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard-web%26arch%3Darm64%26tag%3Dv1.10.0-arm64/vex.json/",
+      );
+    await page.getByTestId("add-vex-source-submit-button").click();
+    await page.reload();
+    await page.getByTestId("upstream-vex-sources-trigger").click();
+    await page.getByTestId("vex-sources-sync-all-button").click();
+    await page.reload();
+    await page.waitForTimeout(5_000);
+    await docShot(page, testInfo, "upstream-vex-rules");
+    await page.waitForTimeout(5_000);
   });
 });

@@ -236,7 +236,10 @@ const VexRulesPage: FunctionComponent = () => {
       </AuthGuard>
 
       <Collapsible className="mb-6 border-t pt-6">
-        <CollapsibleTrigger className="group flex w-full cursor-pointer flex-row items-center justify-between">
+        <CollapsibleTrigger
+          data-testid="upstream-vex-sources-trigger"
+          className="group flex w-full cursor-pointer flex-row items-center justify-between"
+        >
           <span className="flex flex-row items-center gap-2 text-base font-semibold leading-7 text-foreground">
             Your additional Upstream VEX sources
             {vexSources.length > 0 && (

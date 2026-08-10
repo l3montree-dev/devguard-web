@@ -5,7 +5,17 @@ import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";
 
-dotenv.config();
+// Playwright is launched from the repository root (`npm run e2e`), so a bare
+// dotenv.config() picks up the Next.js `.env` there and never sees the e2e
+// secrets. Load `e2e/.env` first and let the root `.env` fill in whatever it
+// does not define — with dotenv the first file to define a key wins.
+dotenv.config({
+  path: [
+    path.resolve(__dirname, "../.env"),
+    path.resolve(__dirname, "../../.env"),
+  ],
+  quiet: true,
+});
 
 export async function generateOTP(secret: string) {
   const totp = new OTPAuth.TOTP({
