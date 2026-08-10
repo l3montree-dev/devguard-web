@@ -3,6 +3,7 @@
 
 import Head from "next/head";
 import Image from "next/image";
+import { Suspense } from "react";
 
 import { Login } from "@ory/elements-react/theme";
 import { getLoginFlow } from "@ory/nextjs/app";
@@ -13,17 +14,37 @@ import { loginComponentOverrides } from "../../components/ory/overrides";
 import { Card, CardContent } from "../../components/ui/card";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
+import { Skeleton } from "../../components/ui/skeleton";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import ThemeToggle from "@/components/misc/ThemeToggle";
 
-const LoginPage = async (props: OryPageParams) => {
-  const flow = await getLoginFlow(oryConfig, props.searchParams);
+const LoginForm = async ({ searchParams }: OryPageParams) => {
+  const flow = await getLoginFlow(oryConfig, searchParams);
 
   if (!flow) {
     return null;
   }
 
+  return (
+    <Login
+      config={oryConfig}
+      flow={flow}
+      components={loginComponentOverrides}
+    />
+  );
+};
+
+const LoginFormSkeleton = () => (
+  <div className="flex flex-col gap-4">
+    <Skeleton className="h-10 w-full" />
+    <Skeleton className="h-10 w-full" />
+    <Skeleton className="h-10 w-full" />
+    <Skeleton className="h-5 w-1/2 self-center" />
+  </div>
+);
+
+const LoginPage = (props: OryPageParams) => {
   return (
     <>
       <Head>
@@ -58,11 +79,9 @@ const LoginPage = async (props: OryPageParams) => {
                     />
                   </div>
 
-                  <Login
-                    config={oryConfig}
-                    flow={flow}
-                    components={loginComponentOverrides}
-                  />
+                  <Suspense fallback={<LoginFormSkeleton />}>
+                    <LoginForm searchParams={props.searchParams} />
+                  </Suspense>
 
                   <p className="mt-6 text-center text-xs text-muted-foreground">
                     By using DevGuard you agree to our <TermsOfUseLink /> and{" "}

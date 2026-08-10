@@ -3,6 +3,7 @@ import "focus-visible";
 
 import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
+import { connection } from "next/server";
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
@@ -59,30 +60,9 @@ export default function RootLayout({
           // eslint-disable-next-line @next/next/no-sync-scripts
           <script src="/dev-theme-init.js" />
         )*/}
-        {config.theme.cssUrl && (
-          <link rel="stylesheet" href={config.theme.cssUrl} />
-        )}
-        {config.theme.jsUrl && (
-          <script
-            defer
-            src={config.theme.jsUrl}
-            {...(config.theme.jsIntegrity && {
-              integrity: config.theme.jsIntegrity,
-              crossOrigin: "anonymous",
-            })}
-          ></script>
-        )}
-        {config.analytics.scriptUrl && config.analytics.websiteId && (
-          <script
-            defer
-            src={config.analytics.scriptUrl}
-            data-website-id={config.analytics.websiteId}
-            {...(config.analytics.integrity && {
-              integrity: config.analytics.integrity,
-              crossOrigin: "anonymous",
-            })}
-          />
-        )}
+        <Suspense fallback={null}>
+          <RuntimeEnvTags />
+        </Suspense>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -101,29 +81,51 @@ export default function RootLayout({
   );
 }
 
+// envs are empty during `next build` - with cacheComponents
+// is prerendered at build time, but have to render at
+// request time — otherwise hydration fails.
+async function RuntimeEnvTags() {
+  await connection();
+
+  return (
+    <>
+      {config.theme.cssUrl && (
+        <link rel="stylesheet" href={config.theme.cssUrl} />
+      )}
+      {config.theme.jsUrl && (
+        <script
+          defer
+          src={config.theme.jsUrl}
+          {...(config.theme.jsIntegrity && {
+            integrity: config.theme.jsIntegrity,
+            crossOrigin: "anonymous",
+          })}
+        ></script>
+      )}
+      {config.analytics.scriptUrl && config.analytics.websiteId && (
+        <script
+          defer
+          src={config.analytics.scriptUrl}
+          data-website-id={config.analytics.websiteId}
+          {...(config.analytics.integrity && {
+            integrity: config.analytics.integrity,
+            crossOrigin: "anonymous",
+          })}
+        />
+      )}
+    </>
+  );
+}
+
 async function SessionShell({ children }: { children: React.ReactNode }) {
+  let session: Awaited<ReturnType<typeof fetchSession>>;
+  let orgs: OrganizationDTO[] = [];
+
   try {
-    const session = await fetchSession();
-    let orgs: OrganizationDTO[] = [];
+    session = await fetchSession();
     if (session) {
       orgs = await fetchOrgs();
     }
-
-    return (
-      <ClientContextWrapper
-        Provider={SessionProvider}
-        value={{
-          session,
-          organizations: orgs,
-        }}
-      >
-        <TourContextProvider>
-          <MobileGate>{children}</MobileGate>
-          <Toaster />
-          {process.env.NODE_ENV === "development" && <CSSVariableEditor />}
-        </TourContextProvider>
-      </ClientContextWrapper>
-    );
   } catch (error) {
     return (
       <MobileGate>
@@ -131,4 +133,20 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
       </MobileGate>
     );
   }
+
+  return (
+    <ClientContextWrapper
+      Provider={SessionProvider}
+      value={{
+        session,
+        organizations: orgs,
+      }}
+    >
+      <TourContextProvider>
+        <MobileGate>{children}</MobileGate>
+        <Toaster />
+        {process.env.NODE_ENV === "development" && <CSSVariableEditor />}
+      </TourContextProvider>
+    </ClientContextWrapper>
+  );
 }
