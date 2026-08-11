@@ -5,10 +5,6 @@ import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";
 
-// Playwright is launched from the repository root (`npm run e2e`), so a bare
-// dotenv.config() picks up the Next.js `.env` there and never sees the e2e
-// secrets. Load `e2e/.env` first and let the root `.env` fill in whatever it
-// does not define — with dotenv the first file to define a key wins.
 dotenv.config({
   path: [
     path.resolve(__dirname, "../.env"),
@@ -105,25 +101,15 @@ function loadEnvVariables() {
   return config;
 }
 
-/**
- * Console noise the dev server and our third-party dependencies produce on
- * every single run. Forwarding it teaches us to ignore the log, which is
- * exactly how a real error slips through — so it is dropped instead.
- * Set E2E_VERBOSE_CONSOLE=1 to print everything again while debugging.
- */
 const IGNORED_BROWSER_MESSAGES: RegExp[] = [
   /Download the React DevTools/,
   /^\[HMR\]/,
   /^\[Fast Refresh\]/,
-  /has either width or height modified, but not the other/,
-  /was preloaded using link preload but not used/,
   /THREE\.Clock: This module has been deprecated/,
   /using deprecated parameters for the initialization function/,
   /The Ory SDK is missing a required function/,
   /The relying party ID is not a registrable domain suffix/,
   /GL Driver Message/,
-  /Form submission canceled because the form is not connected/,
-  /Failed to load resource.*\b4\d\d\b.*\/self-service\//,
 ];
 
 const analyzers = new WeakMap<Page, LoggingAnalyzer>();
@@ -133,10 +119,6 @@ export class LoggingAnalyzer {
 
   private readonly alreadyPrinted = new Set<string>();
 
-  /**
-   * A page may be wrapped by several POMs, and attaching a listener per POM
-   * printed every message once per wrapper. All wrappers share one analyzer.
-   */
   static attach(page: Page): LoggingAnalyzer {
     let analyzer = analyzers.get(page);
     if (!analyzer) {
