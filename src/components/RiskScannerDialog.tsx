@@ -218,18 +218,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
-  const refreshAssetData = async () => {
-    // fetch the asset again
-    const updatedAsset = await browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}`,
-      { method: "GET" },
-    );
-    if (updatedAsset.ok) {
-      const assetData = await updatedAsset.json();
-      updateAsset(assetData);
-    }
-  };
-
   const updateAsset = useUpdateAsset();
   const uploadSBOM = async (params: {
     branchOrTagName: string;
@@ -262,7 +250,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     );
 
     if (resp.ok) {
-      await refreshAssetData();
       // This was a total upfuck...
       // When you are reading this farytail of a shit show your will be enlightet...
       // When you have a fresh repository (asset) next catches a 404 and seems to store that in their beautiful cache, a very beautiful cache.
@@ -305,7 +292,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
 
     if (resp.ok) {
-      await refreshAssetData();
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/code-risks/`;
       onOpenChange(false);
       toast.success("SARIF report has successfully been sent!");
@@ -340,7 +326,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
 
     if (resp.ok) {
-      await refreshAssetData();
       onOpenChange(false);
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/vex-rules/`;
       toast.success("VEX has successfully been sent!");
