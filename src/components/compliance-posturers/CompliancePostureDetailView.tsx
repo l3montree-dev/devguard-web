@@ -97,7 +97,13 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
-import { ChevronRightIcon } from "lucide-react";
+import {
+  ArrowDownToLineIcon,
+  ArrowUpFromLineIcon,
+  ChevronRightIcon,
+  EqualIcon,
+  GitMergeIcon,
+} from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import useSWR from "swr";
@@ -112,12 +118,44 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
+type ControlRelationship =
+  | "equivalent-to"
+  | "intersects-with"
+  | "subset-of"
+  | "superset-of";
+
+const relationshipDescription: Record<ControlRelationship, string> = {
+  "equivalent-to": "This control is equivalent to the related control.",
+  "intersects-with":
+    "This control partially overlaps with the related control.",
+  "subset-of": "This control is a subset of the related control.",
+  "superset-of": "This control is a superset of the related control.",
+};
+
+function RelationshipIcon({
+  relationship,
+}: {
+  relationship: ControlRelationship;
+}) {
+  const className = "h-3 w-3";
+  switch (relationship) {
+    case "equivalent-to":
+      return <EqualIcon className={className} />;
+    case "intersects-with":
+      return <GitMergeIcon className={className} />;
+    case "subset-of":
+      return <ArrowDownToLineIcon className={className} />;
+    case "superset-of":
+      return <ArrowUpFromLineIcon className={className} />;
+  }
+}
+
 function MappedControlsGroup({
   framework,
-  controlIds,
+  controls,
 }: {
   framework: string;
-  controlIds: string[];
+  controls: { relatedControlId: string; relationship: ControlRelationship }[];
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -129,14 +167,25 @@ function MappedControlsGroup({
 
         <span className="text-start">{framework}</span>
         <span className="ml-1 text-xs text-muted-foreground whitespace-nowrap">
-          ({controlIds.length})
+          ({controls.length})
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1 flex flex-wrap">
-        {controlIds.map((id) => (
-          <Badge key={id} variant="secondary" className="mr-2 mb-2">
-            {id}
-          </Badge>
+        {controls.map(({ relatedControlId, relationship }) => (
+          <Tooltip key={relatedControlId}>
+            <TooltipTrigger asChild>
+              <Badge
+                variant="secondary"
+                className="mr-2 mb-2 flex cursor-default items-center gap-1"
+              >
+                <RelationshipIcon relationship={relationship} />
+                {relatedControlId}
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent>
+              {relationshipDescription[relationship]}
+            </TooltipContent>
+          </Tooltip>
         ))}
       </CollapsibleContent>
     </Collapsible>
@@ -1270,18 +1319,28 @@ const CompliancePostureDetailView = ({
                             vuln.mappedControls as {
                               relatedFramework: string;
                               relatedControlId: string;
+                              relationship: ControlRelationship;
                             }[]
-                          ).reduce<Record<string, string[]>>((acc, control) => {
-                            (acc[control.relatedFramework] ??= []).push(
-                              control.relatedControlId,
-                            );
+                          ).reduce<
+                            Record<
+                              string,
+                              {
+                                relatedControlId: string;
+                                relationship: ControlRelationship;
+                              }[]
+                            >
+                          >((acc, control) => {
+                            (acc[control.relatedFramework] ??= []).push({
+                              relatedControlId: control.relatedControlId,
+                              relationship: control.relationship,
+                            });
                             return acc;
                           }, {}),
-                        ).map(([framework, controlIds]) => (
+                        ).map(([framework, controls]) => (
                           <MappedControlsGroup
                             key={framework}
                             framework={framework}
-                            controlIds={controlIds}
+                            controls={controls}
                           />
                         ))}
                       </dd>

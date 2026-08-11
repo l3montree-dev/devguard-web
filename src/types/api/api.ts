@@ -737,6 +737,7 @@ export interface CompliancePostureWithControlDTO {
   mappedControls: {
     relatedFramework: string;
     relatedControlId: string;
+    relationship: "equivalent-to" | "intersects-with" | "subset-of" | "superset-of";
   }[];
 }
 
