@@ -154,149 +154,97 @@ const VulnAssessmentComposer: FunctionComponent<
 
   return (
     <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-3 pt-6">
-          <AuthGuard require="member">
-            <>
-              <MarkdownEditor
-                value={justification}
-                setValue={(value) => setJustification(value ?? "")}
-                placeholder={
-                  isOpen
-                    ? "Add a comment, or pick an assessment below…"
-                    : "Add a comment…"
-                }
-                maxLength={MAX_LENGTH}
-              />
+      <div className="flex flex-col gap-3 pt-6">
+        <AuthGuard require="member">
+          <>
+            <MarkdownEditor
+              value={justification}
+              setValue={(value) => setJustification(value ?? "")}
+              placeholder={
+                isOpen
+                  ? "Add a comment, or pick an assessment below…"
+                  : "Add a comment…"
+              }
+              maxLength={MAX_LENGTH}
+            />
 
-              {isOpen ? (
-                <div className="flex flex-col gap-1.5 mt-1">
-                  <div className="flex flex-row flex-wrap items-center justify-between gap-2">
-                    <div className="flex flex-row items-center gap-2">
-                      {secondaryActions}
-                    </div>
-                    <div className="flex flex-row items-center gap-2">
-                      <AsyncButton
-                        data-testid="mark-accepted-risk"
-                        variant="secondary"
-                        onClick={() =>
-                          attemptSubmit({ status: "accepted", justification })
-                        }
-                      >
-                        Accept
-                      </AsyncButton>
-                      <div className="flex flex-row items-center">
-                        <AsyncButton
-                          data-testid="mark-false-positive"
-                          variant="secondary"
-                          className="rounded-r-none"
-                          onClick={() =>
-                            attemptSubmit({
-                              status: "falsePositive",
-                              justification,
-                              mechanicalJustification: fpOption,
-                            })
-                          }
-                        >
-                          False Positive
-                        </AsyncButton>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="secondary"
-                              className="-ml-px rounded-l-none px-2"
-                              aria-label="Choose false positive justification"
-                            >
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="max-w-sm">
-                            {Object.entries(vexOptionMessages).map(
-                              ([option, description]) => (
-                                <DropdownMenuItem
-                                  key={option}
-                                  onClick={() => setFpOption(option)}
-                                >
-                                  <div className="flex flex-row items-start gap-2">
-                                    <CheckIcon
-                                      className={classNames(
-                                        "mt-0.5 h-4 w-4 shrink-0",
-                                        option === fpOption
-                                          ? "opacity-100"
-                                          : "opacity-0",
-                                      )}
-                                    />
-                                    <div className="flex flex-col">
-                                      <span className="capitalize">
-                                        {removeUnderscores(option)}
-                                      </span>
-                                      <span className="text-xs text-muted-foreground">
-                                        {description}
-                                      </span>
-                                    </div>
-                                  </div>
-                                </DropdownMenuItem>
-                              ),
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-
-                      <Button variant="secondary" onClick={onCreateVexRule}>
-                        Create VEX Rule
-                      </Button>
-
-                      <AsyncButton
-                        data-testid="add-comment"
-                        onClick={() =>
-                          attemptSubmit({ status: "comment", justification })
-                        }
-                      >
-                        Comment
-                      </AsyncButton>
-                    </div>
-                  </div>
-                  <p className="text-right text-xs text-muted-foreground mt-2">
-                    False positive reason:{" "}
-                    <span className="capitalize text-foreground">
-                      {removeUnderscores(fpOption)}
-                    </span>
-                  </p>
-                </div>
-              ) : isHandledByVexRule ? (
-                <div className="flex flex-row flex-wrap items-center justify-end gap-3">
-                  <p className="flex items-start gap-2 text-sm text-muted-foreground">
-                    <Lock className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span>
-                      A VEX rule is handling this vulnerability, so it&apos;s
-                      locked. To reopen it, delete the VEX rule - you can still
-                      add comments below.
-                    </span>
-                  </p>
-                  <AsyncButton
-                    variant={isHandledByVexRule && "secondary"}
-                    data-testid="add-comment"
-                    onClick={() =>
-                      attemptSubmit({ status: "comment", justification })
-                    }
-                  >
-                    Comment
-                  </AsyncButton>
-                </div>
-              ) : (
+            {isOpen ? (
+              <div className="flex flex-col gap-1.5 mt-1">
                 <div className="flex flex-row flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">
-                    You can reopen this vuln if you plan to mitigate the risk
-                    now, or accepted it by accident.
-                  </p>
+                  <div className="flex flex-row items-center gap-2">
+                    {secondaryActions}
+                  </div>
                   <div className="flex flex-row items-center gap-2">
                     <AsyncButton
+                      data-testid="mark-accepted-risk"
                       variant="secondary"
                       onClick={() =>
-                        attemptSubmit({ status: "reopened", justification })
+                        attemptSubmit({ status: "accepted", justification })
                       }
                     >
-                      Reopen
+                      Accept
                     </AsyncButton>
+                    <div className="flex flex-row items-center">
+                      <AsyncButton
+                        data-testid="mark-false-positive"
+                        variant="secondary"
+                        className="rounded-r-none"
+                        onClick={() =>
+                          attemptSubmit({
+                            status: "falsePositive",
+                            justification,
+                            mechanicalJustification: fpOption,
+                          })
+                        }
+                      >
+                        False Positive
+                      </AsyncButton>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="secondary"
+                            className="-ml-px rounded-l-none px-2"
+                            aria-label="Choose false positive justification"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="max-w-sm">
+                          {Object.entries(vexOptionMessages).map(
+                            ([option, description]) => (
+                              <DropdownMenuItem
+                                key={option}
+                                onClick={() => setFpOption(option)}
+                              >
+                                <div className="flex flex-row items-start gap-2">
+                                  <CheckIcon
+                                    className={classNames(
+                                      "mt-0.5 h-4 w-4 shrink-0",
+                                      option === fpOption
+                                        ? "opacity-100"
+                                        : "opacity-0",
+                                    )}
+                                  />
+                                  <div className="flex flex-col">
+                                    <span className="capitalize">
+                                      {removeUnderscores(option)}
+                                    </span>
+                                    <span className="text-xs text-muted-foreground">
+                                      {description}
+                                    </span>
+                                  </div>
+                                </div>
+                              </DropdownMenuItem>
+                            ),
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+
+                    <Button variant="secondary" onClick={onCreateVexRule}>
+                      Create VEX Rule
+                    </Button>
+
                     <AsyncButton
                       data-testid="add-comment"
                       onClick={() =>
@@ -307,19 +255,71 @@ const VulnAssessmentComposer: FunctionComponent<
                     </AsyncButton>
                   </div>
                 </div>
-              )}
-            </>
-          </AuthGuard>
+                <p className="text-right text-xs text-muted-foreground mt-2">
+                  False positive reason:{" "}
+                  <span className="capitalize text-foreground">
+                    {removeUnderscores(fpOption)}
+                  </span>
+                </p>
+              </div>
+            ) : isHandledByVexRule ? (
+              <div className="flex flex-row flex-wrap items-center justify-end gap-3">
+                <p className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>
+                    A VEX rule is handling this vulnerability, so it&apos;s
+                    locked. To reopen it, delete the VEX rule - you can still
+                    add comments below.
+                  </span>
+                </p>
+                <AsyncButton
+                  variant={isHandledByVexRule && "secondary"}
+                  data-testid="add-comment"
+                  onClick={() =>
+                    attemptSubmit({ status: "comment", justification })
+                  }
+                >
+                  Comment
+                </AsyncButton>
+              </div>
+            ) : (
+              <div className="flex flex-row flex-wrap items-center justify-between gap-2">
+                <p className="text-sm text-muted-foreground">
+                  You can reopen this vuln if you plan to mitigate the risk now,
+                  or accepted it by accident.
+                </p>
+                <div className="flex flex-row items-center gap-2">
+                  <AsyncButton
+                    variant="secondary"
+                    onClick={() =>
+                      attemptSubmit({ status: "reopened", justification })
+                    }
+                  >
+                    Reopen
+                  </AsyncButton>
+                  <AsyncButton
+                    data-testid="add-comment"
+                    onClick={() =>
+                      attemptSubmit({ status: "comment", justification })
+                    }
+                  >
+                    Comment
+                  </AsyncButton>
+                </div>
+              </div>
+            )}
+          </>
+        </AuthGuard>
 
-          {ticketUrl && (
-            <small className="block w-full text-right text-muted-foreground">
-              Comment will be synced with{" "}
-              <Link href={ticketUrl} target="_blank">
-                {ticketUrl}
-              </Link>
-            </small>
-          )}
-        </div>
+        {ticketUrl && (
+          <small className="block w-full text-right text-muted-foreground">
+            Comment will be synced with{" "}
+            <Link href={ticketUrl} target="_blank">
+              {ticketUrl}
+            </Link>
+          </small>
+        )}
+      </div>
 
       <AuthGuard require="member">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-1 text-xs text-muted-foreground justify-center mt-4">

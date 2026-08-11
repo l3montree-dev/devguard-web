@@ -3,6 +3,7 @@
 
 import Head from "next/head";
 import Image from "next/image";
+import { Suspense } from "react";
 import { Registration } from "@ory/elements-react/theme";
 import { getRegistrationFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
@@ -14,20 +15,30 @@ import { rewriteFlow } from "../../types/auth";
 import { config } from "../../config";
 import { redirect } from "next/navigation";
 import { Card, CardContent } from "../../components/ui/card";
+import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import ThemeToggle from "@/components/misc/ThemeToggle";
 
-// Renders the registration page
-const RegistrationPage = async (props: OryPageParams) => {
-  if (!config.registrationEnabled) {
-    redirect("/login");
-  }
-
-  const flow = await getRegistrationFlow(oryConfig, props.searchParams);
+const RegistrationForm = async ({ searchParams }: OryPageParams) => {
+  const flow = await getRegistrationFlow(oryConfig, searchParams);
   if (!flow) {
     return null;
+  }
+
+  return (
+    <Registration
+      flow={rewriteFlow(flow)}
+      config={oryConfig}
+      components={oryComponentOverrides}
+    />
+  );
+};
+
+const RegistrationPage = (props: OryPageParams) => {
+  if (!config.registrationEnabled) {
+    redirect("/login");
   }
 
   return (
@@ -64,11 +75,9 @@ const RegistrationPage = async (props: OryPageParams) => {
                     />
                   </div>
 
-                  <Registration
-                    flow={rewriteFlow(flow)}
-                    config={oryConfig}
-                    components={oryComponentOverrides}
-                  />
+                  <Suspense fallback={<FlowSkeleton />}>
+                    <RegistrationForm searchParams={props.searchParams} />
+                  </Suspense>
 
                   <p className="mt-6 text-center text-xs text-muted-foreground">
                     By using DevGuard you agree to our <TermsOfUseLink /> and{" "}

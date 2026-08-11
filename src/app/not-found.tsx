@@ -5,8 +5,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { useConfig } from "@/context/ConfigContext";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { getUserFullName } from "@/types/auth";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import LoggedInAs from "@/components/misc/LoggedInAs";
 import { classNames } from "../utils/common";
 
 export default function NotFoundPage() {
@@ -33,23 +32,7 @@ export default function NotFoundPage() {
           {user ? (
             <div className="flex flex-row items-center gap-4">
               <div className="text-muted-foreground flex items-center gap-4">
-                You are currently logged in as{" "}
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-xs">
-                      {getUserFullName(user)
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm text-left text-muted-foreground">
-                    {getUserFullName(user)}
-                    <br />
-                    {user.traits.email ? user.traits.email : "No email"}
-                  </span>
-                </div>
+                You are currently logged in as <LoggedInAs user={user} />
               </div>
               <Link
                 href="/"

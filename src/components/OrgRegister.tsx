@@ -92,7 +92,7 @@ export default function OrgRegisterForm() {
           >
             Create Organization
           </Button>
-        </div >
+        </div>
       </form>
       <AcceptInvitationDialog
         isOpen={acceptInvitationOpen}

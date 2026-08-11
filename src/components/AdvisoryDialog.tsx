@@ -45,7 +45,7 @@ export interface AdvisoryFormData {
   description: string;
   severity: string;
   vectorString: string;
-  affectedPackages: Omit<AdvisoryAffectedPackage, "id">[];
+  affectedPackages: (Omit<AdvisoryAffectedPackage, "id"> & { id?: string })[];
   state: string;
 }
 
@@ -56,7 +56,7 @@ interface AdvisoryDialogProps {
   initialValues?: AdvisoryFormData;
 }
 
-type PackageRow = Omit<AdvisoryAffectedPackage, "id">;
+type PackageRow = Omit<AdvisoryAffectedPackage, "id"> & { id?: string };
 
 const emptyPackage = (): PackageRow => ({
   ecosystem: "",

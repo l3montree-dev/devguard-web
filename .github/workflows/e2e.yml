@@ -51,6 +51,12 @@ jobs:
       - name: Start frontend
         run: NEXT_TELEMETRY_DISABLED=1 E2E_TESTS=true npm run start &
 
+      - name: Wait for kratos to be ready
+        run: |
+          echo "Waiting for kratos..."
+          timeout 120 bash -c 'until curl -sf http://localhost:4434/admin/health/alive > /dev/null 2>&1; do sleep 3; done'
+          echo "Kratos ready."
+
       - name: Wait for backend to be ready
         run: |
           echo "Waiting for devguard-api..."
@@ -72,5 +78,5 @@ jobs:
             -u $(id -u):$(id -g) \
             -e CI=true \
             -e HOME=/tmp \
-            mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48 \
+            mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07 \
             npm run e2e

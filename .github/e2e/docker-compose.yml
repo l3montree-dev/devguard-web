@@ -50,8 +50,9 @@ services:
 
   devguard-migrate:
     image: ghcr.io/l3montree-dev/devguard:main
+    pull_policy: always
     tmpfs:
-      - /tmp:size=1G
+      - /tmp:size=1G,mode=1777
     depends_on:
       postgresql:
         condition: service_healthy
@@ -66,8 +67,9 @@ services:
 
   devguard-vulndb-import:
     image: ghcr.io/l3montree-dev/devguard:main
+    pull_policy: always
     tmpfs:
-      - /tmp:size=4G
+      - /tmp:size=4G,mode=1777
     depends_on:
       postgresql:
         condition: service_healthy
@@ -84,12 +86,13 @@ services:
   
   devguard-api:
     image: ghcr.io/l3montree-dev/devguard:main
+    pull_policy: always
     volumes:
       - type: bind
         source: ./test-secret.pem
         target: /test-secret.pem
     tmpfs:
-      - /tmp:size=1G
+      - /tmp:size=1G,mode=1777
     depends_on:
       postgresql:
         condition: service_healthy

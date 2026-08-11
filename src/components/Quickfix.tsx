@@ -57,26 +57,15 @@ export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   }
   return vuln.directDependencyFixedVersion;
 }
-export function isQuickfixApplicable(vuln: QuickfixVuln): boolean {
-  if (!vuln.vulnerabilityPath || vuln.vulnerabilityPath.length === 0) {
-    return false;
-  }
-
-  const vulnerabilityPath = vuln.vulnerabilityPath[0];
-
-  if (!isValidPackagePurl(vulnerabilityPath)) {
-    return false;
-  }
-
-  const isDirectDep = vuln.vulnerabilityPath.length === 1;
-  const ecosystem = PackageURL.fromString(vulnerabilityPath).type;
-  const hasResolver = ecosystem === "deb" || ecosystem === "npm";
-
-  return isDirectDep || hasResolver;
-}
 
 export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
-  return isQuickfixApplicable(vuln) && getFixedVersionPurl(vuln) !== null;
+  const fixedVersionPurl = getFixedVersionPurl(vuln);
+  const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
+  return (
+    fixedVersionPurl !== null &&
+    ecosystemUpdate !== "" &&
+    vuln.vulnerabilityPath.length > 0
+  );
 }
 
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
@@ -84,12 +73,13 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
 }) => {
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
-
-  if (!isQuickfixApplicable(vuln) || !vuln.vulnerabilityPath) {
+  if (
+    fixedVersionPurl === null ||
+    ecosystemUpdate === "" ||
+    vuln.vulnerabilityPath.length === 0
+  ) {
     return null;
   }
-
-  const vulnerabilityPath = vuln.vulnerabilityPath[0];
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-success bg-card shadow-lg shadow-success/20">
@@ -106,37 +96,26 @@ const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
             </span>
             <div className="flex flex-col">
               <span className="text-base font-medium text-muted-foreground">
-                {fixedVersionPurl
-                  ? "Quick Fix available"
-                  : "No Quick Fix available"}
+                Quick Fix available
               </span>
               <span className="text-base font-semibold">
-                {fixedVersionPurl ? (
-                  `Resolve ${vuln.cveID} by upgrading`
-                ) : (
-                  <>
-                    No update for <Purl purl={vulnerabilityPath} /> patches{" "}
-                    {vuln.cveID}
-                  </>
-                )}
+                {`Resolve ${vuln.cveID} by upgrading`}
               </span>
             </div>
           </div>
         </div>
+        <p className="text-sm text-muted-foreground">
+          <Purl variant="compact" purl={fixedVersionPurl} /> patches{" "}
+          {vuln.cveID} found in{" "}
+          <Purl
+            variant="compact"
+            purl={vuln.vulnerabilityPath[vuln.vulnerabilityPath.length - 1]}
+          />
+        </p>
 
-        {fixedVersionPurl && (
-          <>
-            <p className="text-sm text-muted-foreground">
-              Update to <Purl variant="compact" purl={vulnerabilityPath} />{" "}
-              patches {vuln.cveID}
-            </p>
-
-            <div className="mt-1 flex">
-              <CopyCode codeString={ecosystemUpdate} language="shell" />
-            </div>
-          </>
-        )}
-
+        <div className="mt-1 flex">
+          <CopyCode codeString={ecosystemUpdate} language="shell" />
+        </div>
         <div className="mt-2 flex flex-row items-center justify-between gap-2 border-t pt-4 text-xs text-muted-foreground">
           <DocDrawer
             triggerLabel="See how Quick Fix works"

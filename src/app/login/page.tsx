@@ -3,6 +3,7 @@
 
 import Head from "next/head";
 import Image from "next/image";
+import { Suspense } from "react";
 
 import { Login } from "@ory/elements-react/theme";
 import { getLoginFlow } from "@ory/nextjs/app";
@@ -13,17 +14,28 @@ import { loginComponentOverrides } from "../../components/ory/overrides";
 import { Card, CardContent } from "../../components/ui/card";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
+import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import ThemeToggle from "@/components/misc/ThemeToggle";
 
-const LoginPage = async (props: OryPageParams) => {
-  const flow = await getLoginFlow(oryConfig, props.searchParams);
+const LoginForm = async ({ searchParams }: OryPageParams) => {
+  const flow = await getLoginFlow(oryConfig, searchParams);
 
   if (!flow) {
     return null;
   }
 
+  return (
+    <Login
+      config={oryConfig}
+      flow={flow}
+      components={loginComponentOverrides}
+    />
+  );
+};
+
+const LoginPage = (props: OryPageParams) => {
   return (
     <>
       <Head>
@@ -58,11 +70,9 @@ const LoginPage = async (props: OryPageParams) => {
                     />
                   </div>
 
-                  <Login
-                    config={oryConfig}
-                    flow={flow}
-                    components={loginComponentOverrides}
-                  />
+                  <Suspense fallback={<FlowSkeleton />}>
+                    <LoginForm searchParams={props.searchParams} />
+                  </Suspense>
 
                   <p className="mt-6 text-center text-xs text-muted-foreground">
                     By using DevGuard you agree to our <TermsOfUseLink /> and{" "}

@@ -49,6 +49,46 @@ interface Props {
   }) => Promise<void>;
 }
 
+const SelectionCheckbox = ({
+  checked,
+  onToggle,
+  disabled,
+  className,
+  ariaLabel,
+}: {
+  checked: boolean | "indeterminate";
+  onToggle: () => void;
+  disabled?: boolean;
+  className?: string;
+  ariaLabel?: string;
+}) => (
+  <div
+    className={classNames(
+      "relative flex size-4 shrink-0 items-center justify-center",
+      className,
+    )}
+  >
+    <Checkbox
+      checked={checked}
+      onCheckedChange={onToggle}
+      disabled={disabled}
+      aria-label={ariaLabel}
+    />
+    <span
+      aria-hidden
+      className={classNames(
+        "absolute -inset-2",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+      )}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (disabled) return;
+        onToggle();
+      }}
+    />
+  </div>
+);
+
 const CvssCell = ({ cvss }: { cvss?: number | null }) => (
   <div className="flex">
     {cvss == null || cvss === -1 ? (
@@ -108,13 +148,13 @@ const VulnWithCveTableRow = ({
       <td className="py-3 pl-[72px] pr-4">
         <div className="flex items-start gap-3">
           {selectable && (
-            <div className="pt-0.5 ml-6" onClick={(e) => e.stopPropagation()}>
-              <Checkbox
-                checked={selected}
-                onCheckedChange={onToggle}
-                disabled={!isMemberRole}
-              />
-            </div>
+            <SelectionCheckbox
+              className="mt-0.5 ml-6"
+              checked={selected}
+              onToggle={onToggle}
+              disabled={!isMemberRole}
+              ariaLabel="Select vulnerability path"
+            />
           )}
           <div className="flex-1 min-w-0">
             <Tooltip>
@@ -171,7 +211,11 @@ const VulnWithCveTableRow = ({
                 <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
                   {vuln.vulnerabilityPath.map((el, i) => (
                     <span className="flex flex-row items-center gap-1" key={i}>
-                      <Purl purl={el} showVersion={false} showQualifiers={false} />
+                      <Purl
+                        purl={el}
+                        showVersion={false}
+                        showQualifiers={false}
+                      />
                       {i < vuln.vulnerabilityPath.length - 1 ? " → " : null}
                     </span>
                   ))}
@@ -220,6 +264,19 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
   );
 
+  const packageSelectableIds = useMemo(
+    () =>
+      row.original.vulns.filter((v) => v.state !== "fixed").map((v) => v.id),
+    [row.original.vulns],
+  );
+  const showPackageSelectAll = packageSelectableIds.length > 0;
+  const allPackageSelected =
+    packageSelectableIds.length > 0 &&
+    packageSelectableIds.every((id) => selectedVulnIds.has(id));
+  const somePackageSelected = packageSelectableIds.some((id) =>
+    selectedVulnIds.has(id),
+  );
+
   const toggleCve = (cveID: string) => {
     setExpandedCves((prev) => {
       const next = new Set(prev);
@@ -249,6 +306,34 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               <ChevronDownIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             ) : (
               <ChevronRightIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            )}
+            {showPackageSelectAll ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="flex">
+                    <SelectionCheckbox
+                      checked={
+                        allPackageSelected
+                          ? true
+                          : somePackageSelected
+                            ? "indeterminate"
+                            : false
+                      }
+                      onToggle={() => onToggleAll(packageSelectableIds)}
+                      disabled={!isMemberRole}
+                      ariaLabel={`Select all vulnerabilities of ${row.original.packageName}`}
+                    />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Select {packageSelectableIds.length === 1 ? "" : "all"}{" "}
+                  {packageSelectableIds.length} vulnerabilit
+                  {packageSelectableIds.length === 1 ? "y" : "ies"} of this
+                  package
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <div className="size-4 shrink-0" />
             )}
             <Purl purl={row.original.packageName} />
             {isActivelyExploited ? (
@@ -296,10 +381,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const someSelected = selectableIds.some((id) =>
             selectedVulnIds.has(id),
           );
-          const selectedIds = selectableIds.filter((id) =>
-            selectedVulnIds.has(id),
-          );
-
           const hasMultiplePaths = vulns.length > 1;
           const isCveExpanded = expandedCves.has(cveID);
           const sortedVulns = vulns.sort(
@@ -360,7 +441,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         )}
                       </button>
                     )}
-                    <Checkbox
+                    <SelectionCheckbox
                       className={pathExplosionOrOnlySinglePath ? "ml-8" : ""}
                       checked={
                         allSelected
@@ -369,8 +450,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                             ? "indeterminate"
                             : false
                       }
-                      onCheckedChange={() => onToggleAll(selectableIds)}
+                      onToggle={() => onToggleAll(selectableIds)}
                       disabled={!isMemberRole}
+                      ariaLabel={`Select all paths of ${cveID}`}
                     />
                     <span className="font-medium text-foreground">{cveID}</span>
                     {isPathExplosion ? (

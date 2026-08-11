@@ -34,7 +34,9 @@ export const markdownComponents: (linkBaseURL?: string) => Components = (
   h4: ({ children }) => (
     <h4 className="mb-1 mt-3 text-sm font-semibold">{children}</h4>
   ),
-  p: ({ children }) => <p className="my-2 leading-relaxed whitespace-pre-wrap">{children}</p>,
+  p: ({ children }) => (
+    <p className="my-2 leading-relaxed whitespace-pre-wrap">{children}</p>
+  ),
   ul: ({ children }) => (
     <ul className="my-2 ml-5 list-disc space-y-1">{children}</ul>
   ),

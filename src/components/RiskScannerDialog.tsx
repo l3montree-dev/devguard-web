@@ -129,12 +129,16 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
           const txt = reader.result as string;
           const parsed = JSON.parse(txt);
 
-          if (parsed?.bomFormat === "CycloneDX") {
+          if (
+            parsed?.bomFormat === "CycloneDX" ||
+            parsed?.document?.category === "csaf_vex" ||
+            parsed?.["@context"] === "https://openvex.dev/ns/v0.2.0"
+          ) {
             vexContentRef.current = txt;
             setVexFileName(file.name);
           } else {
             toast.error(
-              "VEX file does not follow CycloneDX format or Version is < 1.6",
+              "VEX file does not follow CycloneDX format or CSAF/VEX format or OpenVEX format",
             );
           }
         } catch (_e) {

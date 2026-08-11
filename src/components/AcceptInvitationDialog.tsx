@@ -6,14 +6,10 @@ import { Form } from "./ui/form";
 
 import { InvitationForm } from "@/components/InvitationForm";
 import { Button } from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 import { toast } from "@/lib/toast";
+import { extractInvitationCode } from "@/utils/url";
 
 interface Props {
   isOpen: boolean;
@@ -24,22 +20,10 @@ interface InvitationFormValues {
   "invitation-url": string;
 }
 
-const extractInvitationCode = (input: string): string | undefined => {
-  const trimmed = input.trim();
-  if (!trimmed) {
-    return undefined;
-  }
-
-  try {
-    const url = new URL(trimmed);
-    const code = url.searchParams.get("code");
-    return code ?? undefined;
-  } catch {
-    return trimmed;
-  }
-};
-
-export default function AcceptInvitationDialog({ isOpen, onOpenChange }: Props) {
+export default function AcceptInvitationDialog({
+  isOpen,
+  onOpenChange,
+}: Props) {
   const form = useForm<InvitationFormValues>();
 
   const router = useRouter();

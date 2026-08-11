@@ -7,10 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/20/solid";
 import { beautifyPurl, extractVersion } from "@/utils/common";
 import EcosystemImage from "../common/EcosystemImage";
 import Link from "next/link";
 import { documentationLinks } from "@/const/documentationLinks";
+import { truncateMiddle } from "@/utils/common";
 
 interface Props {
   topComponents: ComponentUsageInOrg[];
@@ -63,9 +65,12 @@ const MostUsedComponents: FunctionComponent<Props> = ({ topComponents }) => {
                             )}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="truncate !text-foreground"
+                            className="inline-flex min-w-0 items-center gap-1 !text-foreground"
                           >
-                            {beautifyPurl(entry.purl)}
+                            <span className="truncate">
+                              {truncateMiddle(beautifyPurl(entry.purl), 45)}
+                            </span>
+                            <ArrowTopRightOnSquareIcon className="h-[1em] w-[1em] shrink-0" />
                           </Link>
                           {version && (
                             <span className="text-xs text-muted-foreground">

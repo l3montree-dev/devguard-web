@@ -461,14 +461,11 @@ export const normalizeContentTree = (
   } = {};
 
   contentTree.forEach((element) => {
+    const { assets: _assets, ...project } = element;
     element.assets.forEach((asset) => {
       assetMap[asset.id] = {
         ...asset,
-        project: {
-          ...element,
-          // @ts-expect-error
-          assets: undefined, // remove assets to avoid circular reference
-        },
+        project,
       };
     });
   });

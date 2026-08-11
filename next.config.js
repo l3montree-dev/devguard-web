@@ -142,6 +142,9 @@ const nextConfig = {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
   generateBuildId: async () => process.env.GIT_COMMIT_SHA ?? "dev",
+  env: {
+    NEXT_PUBLIC_BUILD_YEAR: String(new Date().getFullYear()),
+  },
   turbopack: {
     resolveAlias: {
       istextorbinary: "./src/lib/istextorbinary-wrapper.js",
