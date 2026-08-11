@@ -33,7 +33,9 @@ export async function fetchContentTree(organizationSlug: string) {
       if (contentTree.status === 402) {
         throw new HttpError("Payment Required", { statusCode: 402 });
       }
-      throw new HttpError();
+      throw new HttpError("An unexpected error occurred", {
+        statusCode: contentTree.status,
+      });
     }
 
     const contentTreeData = await contentTree.json();

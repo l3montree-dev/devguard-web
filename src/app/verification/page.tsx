@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import Head from "next/head";
+import { Suspense } from "react";
 import { Verification } from "@ory/elements-react/theme";
 import { getVerificationFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
@@ -9,15 +10,27 @@ import Image from "next/image";
 import { Card, CardContent } from "../../components/ui/card";
 import oryConfig from "../../ory.config";
 import { oryComponentOverrides } from "../../components/ory/overrides";
+import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 
-const VerificationPage = async (props: OryPageParams) => {
-  const flow = await getVerificationFlow(oryConfig, props.searchParams);
+const VerificationForm = async ({ searchParams }: OryPageParams) => {
+  const flow = await getVerificationFlow(oryConfig, searchParams);
   if (!flow) {
     return null;
   }
+
+  return (
+    <Verification
+      flow={flow}
+      config={oryConfig}
+      components={oryComponentOverrides}
+    />
+  );
+};
+
+const VerificationPage = (props: OryPageParams) => {
   return (
     <>
       <Head>
@@ -49,11 +62,9 @@ const VerificationPage = async (props: OryPageParams) => {
                     />
                   </div>
 
-                  <Verification
-                    flow={flow}
-                    config={oryConfig}
-                    components={oryComponentOverrides}
-                  />
+                  <Suspense fallback={<FlowSkeleton />}>
+                    <VerificationForm searchParams={props.searchParams} />
+                  </Suspense>
                 </div>
 
                 {/* Right: container yard scene */}

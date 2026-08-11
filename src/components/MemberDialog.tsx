@@ -62,13 +62,13 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
               {activeOrg.name}
             </span>{" "}
             by entering their email address.
-            <div className="mt-2">
-              <Callout intent="warning">
-                Currently DevGuard does not send any E-Mails. Please copy the
-                link and forward it manually.
-              </Callout>
-            </div>
           </DialogDescription>
+          <div className="mt-2">
+            <Callout intent="warning">
+              Currently DevGuard does not send any E-Mails. Please copy the link
+              and forward it manually.
+            </Callout>
+          </div>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleInvite)}>

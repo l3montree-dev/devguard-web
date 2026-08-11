@@ -9,12 +9,22 @@ import ContainerYardScene from "@/components/threejs/ContainerYardScene";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
+import { Form } from "../../components/ui/form";
+import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
+import { InvitationForm } from "@/components/InvitationForm";
 import { getLogoutUrl } from "@/server/actions/logout";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
+import LoggedInAs from "@/components/misc/LoggedInAs";
+import { extractInvitationCode } from "@/utils/url";
+
+interface InvitationFormValues {
+  "invitation-url": string;
+}
 
 const AcceptInvitation = () => {
   const user = useCurrentUser();
@@ -22,37 +32,64 @@ const AcceptInvitation = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const form = useForm<InvitationFormValues>();
+  const [failed, setFailed] = useState(false);
+
+  const code = searchParams?.get("code");
+
   const handleLogout = async () => {
     const logoutUrl = await getLogoutUrl();
     window.location.href = logoutUrl;
   };
 
-  useEffect(() => {
-    (async function () {
-      if (!searchParams?.get("code")) {
-        return;
-      }
-
+  const acceptCode = useCallback(
+    async (code: string) => {
       const resp = await browserApiClient("/accept-invitation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ code: searchParams?.get("code") }),
+        body: JSON.stringify({ code }),
       });
 
       if (!resp.ok) {
-        return {
-          props: {},
-        };
+        return false;
       }
 
-      // the invitation was accepted - redirect the user to the organization
       const { slug } = await resp.json();
-      // redirect the user
+      localStorage.setItem("lastActiveOrg", slug);
       router.replace(`/${slug}`);
-    })();
-  }, [searchParams, router]);
+      return true;
+    },
+    [router],
+  );
+
+  const handleJoinOrganization = useCallback(
+    async (data: InvitationFormValues) => {
+      const pasted = extractInvitationCode(data["invitation-url"]);
+
+      if (!pasted) {
+        form.setError("invitation-url", {
+          type: "manual",
+          message: "Please enter a valid invitation url or code.",
+        });
+        return;
+      }
+
+      setFailed(!(await acceptCode(pasted)));
+    },
+    [acceptCode, form],
+  );
+
+  const autoSubmitted = useRef(false);
+  useEffect(() => {
+    if (!code || autoSubmitted.current) {
+      return;
+    }
+    autoSubmitted.current = true;
+    form.setValue("invitation-url", code);
+    form.handleSubmit(handleJoinOrganization)();
+  }, [code, form, handleJoinOrganization]);
 
   return (
     <>
@@ -86,51 +123,69 @@ const AcceptInvitation = () => {
                   </div>
 
                   <h2 className="text-center text-xl font-semibold leading-normal">
-                    Accept your invitation
+                    Join your organization
                   </h2>
                   <p className="mt-4 text-center text-sm text-muted-foreground">
-                    You have been invited to join an organization on DevGuard.
-                    We just need to check you are logged in with the correct
-                    account to accept the invitation.
+                    Paste the invitation link you received by e-mail. It is
+                    bound to a specific e-mail address, so you need to be logged
+                    in with the invited account.
                   </p>
 
                   <hr className="my-8 border-t" />
 
-                  <div className="">
-                    <h3 className="text-lg font-semibold mb-4 text-destructive">
-                      Invitation failed
-                    </h3>
-                    {user ? (
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Make sure, that you are logged in with the correct
-                          Account. The invitation code is bound to a specific
-                          E-Mail Address.
-                        </p>
-                        <p className="mt-4 text-sm text-muted-foreground">
-                          Currently logged in as:
-                        </p>
-                        <span className="mt-2 block rounded-lg border bg-background/70 p-2 px-2 text-sm">
-                          {user.traits.email}
-                        </span>
-                        <div className="mt-8 flex flex-row justify-end">
-                          <Button onClick={handleLogout}>Logout</Button>
-                        </div>
+                  {!user ? (
+                    <div>
+                      <p className="text-sm text-muted-foreground">
+                        You are not logged in. Please log in to accept the
+                        invitation.
+                      </p>
+                      <div className="mt-8 flex flex-row">
+                        <Link href="/login">
+                          <Button>Login</Button>
+                        </Link>
                       </div>
-                    ) : (
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          You are not logged in. Please log in to accept the
-                          invitation.
-                        </p>
-                        <div className="mt-8 flex flex-row">
-                          <Link href="/login">
-                            <Button>Login</Button>
-                          </Link>
-                        </div>
+                    </div>
+                  ) : (
+                    <div>
+                      {failed && (
+                        <Alert variant="destructive" className="mb-6">
+                          <AlertTitle>
+                            That invitation could not be accepted
+                          </AlertTitle>
+                          <AlertDescription>
+                            It may have expired, already been used, or belong to
+                            a different e-mail address.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                      <Form {...form}>
+                        <form
+                          onSubmit={form.handleSubmit(handleJoinOrganization)}
+                        >
+                          <InvitationForm
+                            title="Invitation"
+                            description="Enter the invitation link or code you received."
+                            inputVariant="onCard"
+                            className="pb-2"
+                          />
+                          <Button
+                            className="w-full"
+                            disabled={form.formState.isSubmitting}
+                            isSubmitting={form.formState.isSubmitting}
+                            type="submit"
+                          >
+                            Join Organization
+                          </Button>
+                        </form>
+                      </Form>
+                      <div className="mt-8 flex flex-row items-center justify-between gap-4">
+                        <LoggedInAs user={user} />
+                        <Button variant="secondary" onClick={handleLogout}>
+                          Logout
+                        </Button>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Right: container yard scene */}
