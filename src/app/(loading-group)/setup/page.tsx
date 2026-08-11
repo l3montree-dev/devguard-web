@@ -37,7 +37,7 @@ export default function SetupOrg() {
   }
 
   if (instanceSettings?.singleOrganizationMode) {
-    redirect("/join");
+    redirect("/accept-invitation");
   }
 
   return (

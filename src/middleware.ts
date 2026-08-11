@@ -1,7 +1,30 @@
+import { NextRequest, NextResponse } from "next/server";
 import { createOryMiddleware } from "@ory/nextjs/middleware";
 import oryConfig from "./ory.config";
+import { rewriteFlow } from "./types/auth";
 
-export const middleware = createOryMiddleware(oryConfig);
+const proxyToOry = createOryMiddleware(oryConfig);
+
+export async function middleware(request: NextRequest) {
+  const response = await proxyToOry(request);
+
+  if (!request.nextUrl.pathname.startsWith("/self-service/registration")) {
+    return response;
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    return response;
+  }
+
+  const body = await response.json();
+  const rewritten = body?.ui?.nodes ? rewriteFlow(body) : body;
+
+  return NextResponse.json(rewritten, { 
+    status: response.status,
+    headers: response.headers,
+  });
+}
 
 export const config = {
   matcher: [

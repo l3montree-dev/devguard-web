@@ -31,7 +31,9 @@ export async function fetchOrgs() {
   ]);
 
   if (!r.ok) {
-    throw new HttpError();
+    throw new HttpError("An unexpected error occurred", {
+      statusCode: r.status,
+    });
   }
   // parse the organization
   let organizations: OrganizationDTO[] = await r.json();

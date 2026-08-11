@@ -731,7 +731,10 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                           !field.value && "opacity-60",
                         )}
                       >
-                        <CollapsibleTrigger className="text-foreground flex w-full cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors">
+                        <CollapsibleTrigger
+                          data-testid="urls-collapsible"
+                          className="text-foreground flex w-full cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium hover:bg-muted/50 transition-colors"
+                        >
                           <span className="flex items-center gap-2">
                             Public SBOM/ VEX/ CSAF URLs
                             {!field.value && (

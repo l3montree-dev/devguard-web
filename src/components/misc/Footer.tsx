@@ -62,8 +62,8 @@ export default function Footer() {
         </Link>
       </div>
       <p className="text-balance">
-        Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
-        Contributors. All rights reserved.{" "}
+        Copyright © {process.env.NEXT_PUBLIC_BUILD_YEAR} L3montree GmbH and the
+        DevGuard Contributors. All rights reserved.{" "}
         <span className="block sm:inline">
           Version {process.env.NEXT_PUBLIC_VERSION}
         </span>
