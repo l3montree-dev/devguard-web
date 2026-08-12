@@ -98,17 +98,17 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
-import {
-  ArrowDownToLineIcon,
-  ArrowUpFromLineIcon,
-  ChevronRightIcon,
-  EqualIcon,
-  GitMergeIcon,
-} from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import useSWR from "swr";
 import FrameworkIcon from "./FrameworkIcon";
+import {
+  EquivalentToIcon,
+  IntersectsWithIcon,
+  SubsetOfIcon,
+  SupersetOfIcon,
+} from "./SetRelationshipIcons";
 
 import useDecodedParams from "@/hooks/useDecodedParams";
 import Callout from "../common/Callout";
@@ -138,16 +138,17 @@ function RelationshipIcon({
 }: {
   relationship: ControlRelationship;
 }) {
-  const className = "h-3 w-3";
+
+  const className = "h-4 w-4";
   switch (relationship) {
     case "equivalent-to":
-      return <EqualIcon className={className} />;
+      return <EquivalentToIcon className={className} />;
     case "intersects-with":
-      return <GitMergeIcon className={className} />;
+      return <IntersectsWithIcon className={className} />;
     case "subset-of":
-      return <ArrowDownToLineIcon className={className} />;
+      return <SubsetOfIcon className={className} />;
     case "superset-of":
-      return <ArrowUpFromLineIcon className={className} />;
+      return <SupersetOfIcon className={className} />;
   }
 }
 
