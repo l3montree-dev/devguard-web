@@ -10,6 +10,7 @@ import type {
 import { useEffect, useState, useRef } from "react";
 import { EventEmitter } from "events";
 import { uniqBy, isEqual, findLast } from "lodash";
+import useScopedAccessToken from "./useScopedAccessToken";
 
 const hasPrivKey = (
   pat:
@@ -22,8 +23,9 @@ const hasPrivKey = (
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
   existingPats?: Array<PersonalAccessTokenDTO>,
-  baseUrl: string = "/pats/",
 ) {
+  const baseUrl = useScopedAccessToken();
+  const scopedAT = `pat:${baseUrl}`;
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
     Array<
       | AsymmetricPersonalAccessTokenDTO
@@ -49,26 +51,33 @@ export default function usePersonalAccessToken(
   }, [existingPats]);
 
   useEffect(() => {
-    const pat = sessionStorage.getItem("pat");
-    if (pat) {
-      const parsed = JSON.parse(pat) as
+    const stored = sessionStorage.getItem(scopedAT);
+    if (stored) {
+      const parsed = JSON.parse(stored) as
         SeeOncePatWithPrivKey | SeeOncePatWithBearerToken;
-
-      setPersonalAccessTokens((prev) => [...prev, parsed]);
+      setPersonalAccessTokens((prev) =>
+        uniqBy([...prev, parsed], "fingerprint"),
+      );
     }
-    newPatEventEmitter.on("pat", (pat) => {
+
+    const handleNewPat = (pat) => {
       setPersonalAccessTokens((prev) => uniqBy([...prev, pat], "fingerprint"));
-    });
-  }, []);
+    };
+
+    newPatEventEmitter.on(scopedAT, handleNewPat);
+    return () => {
+      newPatEventEmitter.off(scopedAT, handleNewPat);
+    };
+  }, [scopedAT]);
 
   const handleDeletePat = async (pat: PersonalAccessTokenDTO) => {
     await browserApiClient(`${baseUrl}${pat.id}/`, {
       method: "DELETE",
     });
     setPersonalAccessTokens((prev) => prev.filter((p) => p.id !== pat.id));
-    const storedPat = sessionStorage.getItem("pat");
+    const storedPat = sessionStorage.getItem(scopedAT);
     if (storedPat && JSON.parse(storedPat).id === pat.id) {
-      sessionStorage.removeItem("pat");
+      sessionStorage.removeItem(scopedAT);
     }
   };
 
@@ -99,8 +108,8 @@ export default function usePersonalAccessToken(
     const pat = await createPat(data, baseUrl);
 
     setPersonalAccessTokens((prev) => [...prev, pat]);
-    sessionStorage.setItem("pat", JSON.stringify(pat));
-    newPatEventEmitter.emit("pat", pat);
+    sessionStorage.setItem(scopedAT, JSON.stringify(pat));
+    newPatEventEmitter.emit(scopedAT, pat);
     return pat;
   }
 

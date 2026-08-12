@@ -5,7 +5,6 @@ import Page from "@/components/Page";
 import type { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import type { FunctionComponent } from "react";
 import Markdown from "@/components/common/Markdown";
 
 import AssetTitle from "@/components/common/AssetTitle";

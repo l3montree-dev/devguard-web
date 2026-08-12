@@ -98,6 +98,12 @@ export function useAutosetup(
         scopes: "scan",
         expiryDateUnix: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
       });
+
+      if (!("privKey" in pat) || !pat.privKey) {
+        toast("Failed to setup GitLab integration: no private key returned");
+        return;
+      }
+
       const privKey = pat.privKey;
 
       // set the progress to pending
