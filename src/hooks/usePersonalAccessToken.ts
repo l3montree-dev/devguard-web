@@ -7,19 +7,21 @@ import type {
   SeeOncePatWithPrivKey,
   SymmetricPersonalAccessTokenDTO,
 } from "@/types/api/api";
-import { useEffect, useState, useRef } from "react";
 import { EventEmitter } from "events";
-import { uniqBy, isEqual, findLast } from "lodash";
+import { findLast, uniqBy } from "lodash";
+import { useEffect, useState } from "react";
 import useScopedAccessToken from "./useScopedAccessToken";
 
-const hasPrivKey = (
-  pat:
-    | AsymmetricPersonalAccessTokenDTO
-    | SymmetricPersonalAccessTokenDTO
-    | SeeOncePatWithPrivKey
-    | SeeOncePatWithBearerToken,
-): pat is SeeOncePatWithPrivKey => "privKey" in pat && Boolean(pat.privKey);
+const hasPrivKey = (pat: Token): pat is SeeOncePatWithPrivKey =>
+  "privKey" in pat && Boolean(pat.privKey);
 
+type Token =
+  | AsymmetricPersonalAccessTokenDTO
+  | SymmetricPersonalAccessTokenDTO
+  | SeeOncePatWithPrivKey
+  | SeeOncePatWithBearerToken;
+// this is needed if the usePersonalAccessToken hook is used in multiple components, so that they can all listen to the same event emitter for new PATs
+// otherwise the second usePersonalAccessToken hook would not be aware of the new PAT created in the first hook, and would not update its state accordingly
 const newPatEventEmitter = new EventEmitter();
 export default function usePersonalAccessToken(
   existingPats?: Array<PersonalAccessTokenDTO>,
@@ -27,42 +29,25 @@ export default function usePersonalAccessToken(
   const baseUrl = useScopedAccessToken();
   const scopedAT = `pat:${baseUrl}`;
   const [personalAccessTokens, setPersonalAccessTokens] = useState<
-    Array<
-      | AsymmetricPersonalAccessTokenDTO
-      | SymmetricPersonalAccessTokenDTO
-      | SeeOncePatWithPrivKey
-      | SeeOncePatWithBearerToken
-    >
-  >(existingPats ?? []);
-  const prevExistingPatsRef = useRef<Array<PersonalAccessTokenDTO> | undefined>(
-    undefined,
-  );
-
-  // ync with existingPats when SWR data loads or changes
-  useEffect(() => {
-    if (existingPats && !isEqual(prevExistingPatsRef.current, existingPats)) {
-      prevExistingPatsRef.current = existingPats;
-      setPersonalAccessTokens((prev) => {
-        // merge existing pats with newly created ones (privKey)
-        const newlyCreated = prev.filter((p) => "privKey" in p);
-        return uniqBy([...existingPats, ...newlyCreated], "fingerprint");
-      });
-    }
-  }, [existingPats]);
+    Array<Token>
+  >(() => {
+    let pats = existingPats ?? [];
+    // merge existing pats with newly created ones (privKey)
+    const newlyCreated = pats.filter((p) => "privKey" in p);
+    return uniqBy([...pats, ...newlyCreated], "fingerprint");
+  });
 
   useEffect(() => {
+    const handleNewPat = (pat: Token) => {
+      setPersonalAccessTokens((prev) => uniqBy([...prev, pat], "fingerprint"));
+    };
+
     const stored = sessionStorage.getItem(scopedAT);
     if (stored) {
       const parsed = JSON.parse(stored) as
         SeeOncePatWithPrivKey | SeeOncePatWithBearerToken;
-      setPersonalAccessTokens((prev) =>
-        uniqBy([...prev, parsed], "fingerprint"),
-      );
+      handleNewPat(parsed);
     }
-
-    const handleNewPat = (pat) => {
-      setPersonalAccessTokens((prev) => uniqBy([...prev, pat], "fingerprint"));
-    };
 
     newPatEventEmitter.on(scopedAT, handleNewPat);
     return () => {
