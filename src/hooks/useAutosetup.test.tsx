@@ -40,7 +40,8 @@ const onCreateAccessToken = jest.fn();
 jest.mock("./useAccessToken", () => ({
   __esModule: true,
   default: () => ({
-    AccessTokens: [],
+    AccessToken: [],
+    accessToken: undefined,
     onCreateAccessToken: onCreateAccessToken,
   }),
 }));

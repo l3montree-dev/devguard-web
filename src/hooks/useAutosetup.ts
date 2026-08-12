@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 
 import { browserApiClient } from "@/services/devGuardApi";
-import type { SeeOncePatWithPrivKey as SeeOnceAccessTokenWithPrivKey } from "@/types/api/api";
 import { once } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "@/lib/toast";
@@ -30,18 +29,10 @@ export function useAutosetup(
     "full" | "sca" | "container-scanning" | "secret-scanning" | "iac" | "sast",
 ) {
   const { waitFor, isLoading, Loader } = useLoader();
-  const {
-    AccessToken: accessTokens,
-    onCreateAccessToken: onCreateAccessToken,
-  } = useAccessToken();
+  const { accessToken, onCreateAccessToken } = useAccessToken();
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const asset = useActiveAsset();
-
-  const accessToken =
-    accessTokens.length > 0
-      ? (accessTokens[0] as SeeOnceAccessTokenWithPrivKey)
-      : undefined;
 
   const [progress, setProgress] = useState<{
     [key: string]: {
