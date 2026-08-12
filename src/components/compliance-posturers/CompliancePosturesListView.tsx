@@ -326,6 +326,11 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         operators: [{ value: "ilike", label: "is" }],
       },
       {
+        label: "Mapped Framework",
+        value: "mapped_framework",
+        operators: [{ value: "ilike", label: "contains" }],
+      },
+      {
         label: "Solvable by Component",
         value: "has_component_coverage",
         operators: [{ value: "is" }],
