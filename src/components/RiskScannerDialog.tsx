@@ -56,6 +56,7 @@ interface RiskScannerDialogProps {
   artifacts?: Array<ArtifactDTO>;
   devguardWebLatestScannerImage: string;
   initialSlide?: number;
+  defaultCliTab?: "sca" | "sast";
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -68,6 +69,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   artifacts,
   devguardWebLatestScannerImage,
   initialSlide,
+  defaultCliTab,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -700,6 +702,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               prevIndex={prevIndex}
               scannerImage={devguardWebLatestScannerImage}
+              defaultTab={defaultCliTab}
             />
           </CarouselContent>
         </Carousel>

@@ -12,7 +12,7 @@ import Section from "./common/Section";
 import { Button } from "./ui/button";
 
 const AccessTokenSection = ({ description }: { description: string }) => {
-  const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
+  const THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
 
   const org = useActiveOrg();
   const project = useActiveProject();
@@ -28,8 +28,8 @@ const AccessTokenSection = ({ description }: { description: string }) => {
   return (
     <Section
       className="mb-0 mt-0 pb-0 pt-0"
-      description="To use the Devguard-Scanner, you need to create an Repository Access Token. You can create such a token by clicking the button below."
-      title="Create an Repository Access Token"
+      description="To use the Devguard-Scanner, you need to create a Repository Access Token. You can create such a token by clicking the button below. It will be added automatically to the CLI command below and is necessary."
+      title="Create a Repository Access Token"
       forceVertical
     >
       {pat ? (
@@ -53,21 +53,16 @@ const AccessTokenSection = ({ description }: { description: string }) => {
         </div>
       ) : (
         <div>
-          <div className="flex flex-wrap gap-2 justify-between items-end">
-            <DatePicker
-              date={expiryDate}
-              onDateChange={setExpiryDate}
-              label="Expiry date"
-            />
+          <div className="flex flex-col gap-2 justify-between items-start">
             <Button
               variant="outline"
-              disabled={!expiryDate}
+              className="cursor-pointer"
               onClick={() =>
-                expiryDate &&
                 onCreatePat({
                   description,
                   scopes: "scan",
-                  expiryDateUnix: Math.floor(expiryDate.getTime() / 1000),
+                  expiryDateUnix:
+                    Math.floor(Date.now() / 1000) + THIRTY_DAYS_IN_SECONDS,
                 })
               }
             >
