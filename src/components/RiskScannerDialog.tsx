@@ -643,6 +643,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               cliSlideIndex={12}
               fileUploadSlideIndex={13}
+              prevIndex={prevIndex}
             />
             <AutomatedIntegrationSlide
               apiUrl={apiUrl}
