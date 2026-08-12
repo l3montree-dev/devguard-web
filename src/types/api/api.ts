@@ -734,6 +734,7 @@ export interface CompliancePostureWithControlDTO {
   createdAt: string; // ISO (Go time.Time)
   additional: Record<string, any>;
   importance: string;
+  securityLevel: string;
   mappedControls: {
     relatedFramework: string;
     relatedControlId: string;
