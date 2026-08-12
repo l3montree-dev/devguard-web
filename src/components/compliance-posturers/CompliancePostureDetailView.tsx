@@ -25,6 +25,7 @@ import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
@@ -158,6 +159,8 @@ function MappedControlsGroup({
   controls: { relatedControlId: string; relationship: ControlRelationship }[];
 }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname() ?? "";
+  const basePath = pathname.substring(0, pathname.lastIndexOf("/"));
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="mb-2 w-full">
       <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
@@ -174,13 +177,15 @@ function MappedControlsGroup({
         {controls.map(({ relatedControlId, relationship }) => (
           <Tooltip key={relatedControlId}>
             <TooltipTrigger asChild>
-              <Badge
-                variant="secondary"
-                className="mr-2 mb-2 flex cursor-default items-center gap-1"
-              >
-                <RelationshipIcon relationship={relationship} />
-                {relatedControlId}
-              </Badge>
+              <Link href={`${basePath}/${framework}:${relatedControlId}`}>
+                <Badge
+                  variant="secondary"
+                  className="mr-2 mb-2 flex cursor-default items-center gap-1"
+                >
+                  <RelationshipIcon relationship={relationship} />
+                  {relatedControlId}
+                </Badge>
+              </Link>
             </TooltipTrigger>
             <TooltipContent>
               {relationshipDescription[relationship]}
