@@ -3,17 +3,19 @@ import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 
 const useScopedAccessToken = () => {
-  const activeOrg = useActiveOrg();
+  const org = useActiveOrg();
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
 
-  if (activeOrg && activeProject && activeAsset) {
+  const activeOrg = org?.id && org.slug !== "/" ? org : undefined;
+
+  if (activeOrg?.slug && activeProject?.slug && activeAsset?.slug) {
     return `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${activeAsset.slug}/pats/`;
   }
-  if (activeOrg && activeProject) {
+  if (activeOrg?.slug && activeProject?.slug) {
     return `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/pats/`;
   }
-  if (activeOrg) {
+  if (activeOrg?.slug) {
     return `/organizations/${activeOrg.slug}/pats/`;
   }
   return `/pats/`;

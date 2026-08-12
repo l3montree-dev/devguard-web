@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import useAccessToken from "@/hooks/useAccessToken";
 import { toast } from "@/lib/toast";
 import { addYears } from "date-fns";
 import { KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
@@ -96,8 +96,11 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
     Array<SymmetricPersonalAccessTokenDTO | AsymmetricPersonalAccessTokenDTO>
   >(url, fetcher, { fallbackData: [] });
 
-  const { personalAccessTokens, onDeletePat, onCreatePat } =
-    usePersonalAccessToken(pats, url);
+  const {
+    AccessToken: personalAccessTokens,
+    onDeleteAccessToken: onDeletePat,
+    onCreateAccessToken: onCreatePat,
+  } = useAccessToken(pats);
 
   const handleCreatePat = async (data: {
     description: string;

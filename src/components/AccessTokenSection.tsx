@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
+import useAccessToken from "../hooks/useAccessToken";
 import { DatePicker } from "./DatePicker";
 import CopyCode from "./common/CopyCode";
 import Section from "./common/Section";
@@ -18,10 +18,8 @@ const AccessTokenSection = ({ description }: { description: string }) => {
   const project = useActiveProject();
   const asset = useActiveAsset();
 
-  const { pat, onCreatePat } = usePersonalAccessToken(
-    undefined,
-    `/organizations/${org.slug}/projects/${project.slug}/assets/${asset.slug}/pats/`,
-  );
+  const { accessToken: pat, onCreateAccessToken: onCreatePat } =
+    useAccessToken();
 
   const manageTokensHref = `/${org.slug}/projects/${project.slug}/assets/${asset.slug}/settings#access-tokens`;
 

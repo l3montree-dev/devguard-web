@@ -1,4 +1,4 @@
-import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
+import useAccessToken from "../hooks/useAccessToken";
 import CopyCode from "./common/CopyCode";
 import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 import { InputWithButton } from "./ui/input-with-button";
@@ -8,7 +8,8 @@ const DevguardTokenCard = ({
 }: {
   title?: string;
 }) => {
-  const { pat, onCreatePat } = usePersonalAccessToken();
+  const { accessToken: pat, onCreateAccessToken: onCreatePat } =
+    useAccessToken();
   return (
     <Card>
       <CardHeader>

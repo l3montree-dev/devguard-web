@@ -11,7 +11,7 @@ import { useConfig } from "../../../context/ConfigContext";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../hooks/useActiveProject";
-import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
+import useAccessToken from "../../../hooks/useAccessToken";
 import { generateDockerSnippet } from "../../../integrationSnippets";
 import CopyCode from "../../common/CopyCode";
 import Section from "../../common/Section";
@@ -42,7 +42,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
   onClose,
   scannerImage,
 }) => {
-  const pat = usePersonalAccessToken();
+  const accessToken = useAccessToken();
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
@@ -107,7 +107,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, accessToken.accessToken?.privKey)}
 `}
                 />
               </CardContent>
@@ -128,7 +128,7 @@ ${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug,
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, accessToken.accessToken?.privKey)}
 `}
                 />
               </CardContent>
