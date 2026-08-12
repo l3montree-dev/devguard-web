@@ -5,14 +5,13 @@ import Page from "@/components/Page";
 import type { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import type { FunctionComponent } from "react";
 import Markdown from "@/components/common/Markdown";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { TriangleAlert, XIcon } from "lucide-react";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import useAccessToken from "@/hooks/useAccessToken";
 import {
   Collapsible,
   CollapsibleContent,
@@ -64,7 +63,7 @@ const Index = () => {
   );
 
   const assetMenu = useAssetMenu();
-  const pat = usePersonalAccessToken();
+  const accessToken = useAccessToken();
 
   // Show loading skeleton if data is loading
   if (isLoading || !policyDetails) {
@@ -169,7 +168,7 @@ const Index = () => {
                       an attestation and upload it to the container-registry as
                       well as to DevGuard{" "}
                       <CopyCodeFragment
-                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${policyDetails.predicateType}" <json file>`}
+                        codeString={`devguard-scanner attest --token ${accessToken.accessToken ? accessToken.accessToken.privKey : "<Personal access token>"} --predicateType "${policyDetails.predicateType}" <json file>`}
                       ></CopyCodeFragment>
                     </div>
                   </div>
@@ -210,7 +209,7 @@ const Index = () => {
                     </span>
                     <div className="mt-2">
                       <CopyCodeFragment
-                        codeString={`devguard-scanner attest --token ${pat.pat ? pat.pat.privKey : "<Personal access token>"} --predicateType "${policyDetails.predicateType}" <json file>`}
+                        codeString={`devguard-scanner attest --token ${accessToken.accessToken ? accessToken.accessToken.privKey : "<Personal access token>"} --predicateType "${policyDetails.predicateType}" <json file>`}
                       ></CopyCodeFragment>
                     </div>
                     <div className="mt-10">

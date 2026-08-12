@@ -16,7 +16,6 @@ import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
 import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
 import { SearchCode, Code, Blocks, Upload, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
