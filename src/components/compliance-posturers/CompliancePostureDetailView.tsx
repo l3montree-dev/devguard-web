@@ -119,11 +119,8 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
-type ControlRelationship =
-  | "equivalent-to"
-  | "intersects-with"
-  | "subset-of"
-  | "superset-of";
+type ControlRelationship = DetailedComplianceRiskDTO["mappedControls"][number]["relationship"];
+
 
 const relationshipDescription: Record<ControlRelationship, string> = {
   "equivalent-to": "This control is equivalent to the related control.",
@@ -149,6 +146,8 @@ function RelationshipIcon({
       return <SubsetOfIcon className={className} />;
     case "superset-of":
       return <SupersetOfIcon className={className} />;
+    default:
+      return null;
   }
 }
 
