@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 
 import { browserApiClient } from "@/services/devGuardApi";
-import type { SeeOncePatWithPrivKey } from "@/types/api/api";
 import { once } from "lodash";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "@/lib/toast";
@@ -20,7 +19,7 @@ import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 import { useLoader } from "./useLoader";
-import usePersonalAccessToken from "./usePersonalAccessToken";
+import useAccessToken from "./useAccessToken";
 
 // limitations under the License.
 export function useAutosetup(
@@ -30,15 +29,10 @@ export function useAutosetup(
     "full" | "sca" | "container-scanning" | "secret-scanning" | "iac" | "sast",
 ) {
   const { waitFor, isLoading, Loader } = useLoader();
-  const { personalAccessTokens, onCreatePat } = usePersonalAccessToken();
+  const { accessToken, onCreateAccessToken } = useAccessToken();
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const asset = useActiveAsset();
-
-  const pat =
-    personalAccessTokens.length > 0
-      ? (personalAccessTokens[0] as SeeOncePatWithPrivKey)
-      : undefined;
 
   const [progress, setProgress] = useState<{
     [key: string]: {
@@ -93,12 +87,18 @@ export function useAutosetup(
       }
 
       // create a new one for autosetup
-      const pat = await onCreatePat({
+      const accessToken = await onCreateAccessToken({
         description: "DevGuard Autosetup (used inside GitLab Pipeline)",
         scopes: "scan",
         expiryDateUnix: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
       });
-      const privKey = pat.privKey;
+
+      if (!("privKey" in accessToken) || !accessToken.privKey) {
+        toast("Failed to setup GitLab integration: no private key returned");
+        return;
+      }
+
+      const privKey = accessToken.privKey;
 
       // set the progress to pending
       setProgress((prev) => {
@@ -185,7 +185,7 @@ export function useAutosetup(
     progress,
     isLoading,
     Loader,
-    pat,
-    onCreatePat,
+    pat: accessToken,
+    onCreatePat: onCreateAccessToken,
   };
 }
