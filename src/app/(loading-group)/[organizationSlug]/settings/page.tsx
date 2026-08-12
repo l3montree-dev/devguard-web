@@ -148,7 +148,7 @@ const Home = () => {
       ...orgCtx,
       organization: {
         ...activeOrg,
-        webhooks: activeOrg.webhooks.concat(integration),
+        webhooks: (activeOrg.webhooks ?? []).concat(integration),
       },
     });
   };
@@ -158,7 +158,7 @@ const Home = () => {
       ...orgCtx,
       organization: {
         ...activeOrg,
-        webhooks: activeOrg.webhooks.map((w) =>
+        webhooks: (activeOrg.webhooks ?? []).map((w) =>
           w.id === integration.id ? integration : w,
         ),
       },
@@ -269,7 +269,7 @@ const Home = () => {
         ...orgCtx,
         organization: {
           ...activeOrg,
-          webhooks: activeOrg.webhooks.filter((w) => w.id !== id),
+          webhooks: (activeOrg.webhooks ?? []).filter((w) => w.id !== id),
         },
       });
     } else {

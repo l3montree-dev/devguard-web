@@ -322,8 +322,8 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
               <div className="flex flex-col items-end justify-end gap-2">
                 <div className="flex flex-row gap-2">
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Button variant={"secondary"}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant={"secondary"} type="button">
                         {testLoading && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}

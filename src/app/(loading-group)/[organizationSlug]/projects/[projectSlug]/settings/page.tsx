@@ -60,7 +60,7 @@ const Index: FunctionComponent = () => {
     }
     updateProject({
       ...project,
-      webhooks: project.webhooks.concat(integration),
+      webhooks: (project.webhooks ?? []).concat(integration),
     });
   };
 
@@ -71,7 +71,7 @@ const Index: FunctionComponent = () => {
 
     updateProject({
       ...project,
-      webhooks: project.webhooks.map((w) =>
+      webhooks: (project.webhooks ?? []).map((w) =>
         w.id === integration.id ? integration : w,
       ),
     });
@@ -96,7 +96,7 @@ const Index: FunctionComponent = () => {
       toast.success("Webhook deleted successfully");
       updateProject({
         ...project,
-        webhooks: project.webhooks.filter((w) => w.id !== id),
+        webhooks: (project.webhooks ?? []).filter((w) => w.id !== id),
       });
     } else {
       toast.error("Failed to delete webhook");
@@ -303,7 +303,7 @@ These identifiers are managed by the external system and are treated as immutabl
               />
             ))}
 
-            {project.webhooks?.length > 0 && <hr />}
+            {(project.webhooks?.length ?? 0) > 0 && <hr />}
             <ListItem
               Title={
                 <div className="flex flex-row items-center">Add a Webhook</div>
