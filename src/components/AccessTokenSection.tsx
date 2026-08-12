@@ -56,7 +56,6 @@ const AccessTokenSection = ({ description }: { description: string }) => {
           <div className="flex flex-col gap-2 justify-between items-start">
             <Button
               variant="outline"
-              className="cursor-pointer"
               onClick={() =>
                 onCreatePat({
                   description,
