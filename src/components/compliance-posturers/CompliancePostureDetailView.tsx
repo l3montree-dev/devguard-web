@@ -1031,6 +1031,32 @@ const CompliancePostureDetailView = ({
                       >
                         {vuln.framework} (CC-BY-4.0)
                       </Link>
+                    ) : vuln.framework && vuln.framework === "ISO27001" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/ISO27001/ISO27001-AnnexA-catalog.json"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
+                    ) : vuln.framework &&
+                      vuln.framework === "BSI-Anforderungen-zum-Risikomanagement" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Risikomanagement/BSI-Anforderungen-zum-Risikomanagement-catalog.json"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
+                    ) : vuln.framework &&
+                      vuln.framework === "Lieferkettensicherheit" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Lieferkettensicherheit/Lieferkettensicherheit-resolved_catalog.json"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
                     ) : (
                       <p className="text-xs text-muted-foreground">
                         {vuln.framework}
