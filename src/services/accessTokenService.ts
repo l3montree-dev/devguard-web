@@ -1,11 +1,11 @@
 import type {
-  SeeOncePatWithBearerToken,
-  SeeOncePatWithPrivKey,
+  SeeOncePatWithBearerToken as SeeOnceAccessTokenWithBearerToken,
+  SeeOncePatWithPrivKey as SeeOnceAccessTokenWithPrivKey,
 } from "@/types/api/api";
 import { browserApiClient } from "./devGuardApi";
 import { generateKeyPair } from "./keyService";
 
-async function createPat(
+async function createAccessToken(
   data: {
     description: string;
     scopes: string;
@@ -13,8 +13,8 @@ async function createPat(
     symmetric: true;
   },
   url?: string,
-): Promise<SeeOncePatWithBearerToken>;
-async function createPat(
+): Promise<SeeOnceAccessTokenWithBearerToken>;
+async function createAccessToken(
   data: {
     description: string;
     scopes: string;
@@ -22,8 +22,8 @@ async function createPat(
     symmetric?: false;
   },
   url?: string,
-): Promise<SeeOncePatWithPrivKey>;
-async function createPat(
+): Promise<SeeOnceAccessTokenWithPrivKey>;
+async function createAccessToken(
   data: {
     description: string;
     scopes: string;
@@ -31,8 +31,8 @@ async function createPat(
     symmetric?: boolean;
   },
   url?: string,
-): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken>;
-async function createPat(
+): Promise<SeeOnceAccessTokenWithPrivKey | SeeOnceAccessTokenWithBearerToken>;
+async function createAccessToken(
   data: {
     description: string;
     scopes: string;
@@ -40,7 +40,7 @@ async function createPat(
     symmetric?: boolean;
   },
   url: string = "/pats/",
-): Promise<SeeOncePatWithPrivKey | SeeOncePatWithBearerToken> {
+): Promise<SeeOnceAccessTokenWithPrivKey | SeeOnceAccessTokenWithBearerToken> {
   if (data.symmetric) {
     const resp = await browserApiClient(url, {
       method: "POST",
@@ -50,8 +50,8 @@ async function createPat(
       throw new Error("Failed to create PAT");
     }
 
-    const pat: SeeOncePatWithBearerToken = await resp.json();
-    return pat;
+    const accessToken: SeeOnceAccessTokenWithBearerToken = await resp.json();
+    return accessToken;
   }
 
   // generate public private key pair
@@ -67,12 +67,12 @@ async function createPat(
   if (!resp.ok) {
     throw new Error("Failed to create PAT");
   }
-  const pat = await resp.json();
+  const accessToken = await resp.json();
 
   return {
-    ...pat,
+    ...accessToken,
     privKey: privateKey,
-  } as SeeOncePatWithPrivKey;
+  } as SeeOnceAccessTokenWithPrivKey;
 }
 
-export { createPat };
+export { createAccessToken as createAccessToken };

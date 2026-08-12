@@ -41,6 +41,11 @@ wait_for() {
 echo "==> Starting backend services (postgresql, kratos, devguard-api)"
 (cd "$COMPOSE_DIR" && docker compose up -d)
 
+echo "==> Waiting for kratos..."
+wait_for http://localhost:4434/admin/health/alive 120
+echo "Kratos ready."
+
+
 echo "==> Waiting for devguard-api..."
 wait_for http://localhost:8080/api/v1/health/ 120
 echo "Backend ready."

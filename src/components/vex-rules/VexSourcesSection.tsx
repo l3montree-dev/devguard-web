@@ -84,6 +84,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
           {sources.map((source, index) => (
             <li
               key={source.url}
+              data-testid="vex-source-row"
               className={classNames(
                 "flex flex-row items-center justify-between gap-3 p-3",
                 index % 2 !== 0 && "bg-card/50",
@@ -101,6 +102,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
+                  data-testid="vex-source-remove-button"
                   aria-label={`Remove ${source.url}`}
                   disabled={deletingUrl === source.url}
                   onClick={() => handleDelete(source)}
@@ -120,7 +122,12 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
       {/* Adding works without sources, syncing does not. */}
       <AuthGuard require="member">
         <div className="flex flex-row justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onAddSource}>
+          <Button
+            variant="secondary"
+            size="sm"
+            data-testid="vex-sources-add-button"
+            onClick={onAddSource}
+          >
             <Plus className="mr-2 h-4 w-4" />
             Add source
           </Button>
@@ -128,6 +135,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
             <Button
               variant="secondary"
               size="sm"
+              data-testid="vex-sources-sync-all-button"
               disabled={isSyncing}
               onClick={handleSyncAll}
             >

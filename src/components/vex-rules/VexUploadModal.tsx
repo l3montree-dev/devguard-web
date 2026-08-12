@@ -233,7 +233,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                     }}
                     className="cursor-pointer hover:border-primary border"
                   >
-                    <CardHeader>
+                    <CardHeader data-testid="supply-vex-source-url">
                       <CardTitle className="text-lg flex items-center gap-2 leading-tight">
                         <LinkIcon className="w-5 h-5" />
                         Supply a source URL
@@ -337,6 +337,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                                 <div className="mt-2">
                                   <Input
                                     id="vex-url"
+                                    data-testid="vex-source-url-input"
                                     placeholder="https://supplier.example.com/vex.json"
                                     value={newVexUrl}
                                     onChange={(e) =>
@@ -365,6 +366,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                                 <div className="mt-2">
                                   <Input
                                     id="csaf-url"
+                                    data-testid="csaf-source-url-input"
                                     placeholder="https://supplier.example.com/csaf.json"
                                     value={newCsafUrl}
                                     onChange={(e) =>
@@ -397,7 +399,11 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
                   >
                     Back
                   </Button>
-                  <Button onClick={handleAddSource} disabled={!canAddSource}>
+                  <Button
+                    data-testid="add-vex-source-submit-button"
+                    onClick={handleAddSource}
+                    disabled={!canAddSource}
+                  >
                     {isAdding && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}

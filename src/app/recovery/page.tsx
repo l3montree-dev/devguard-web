@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import Head from "next/head";
+import { Suspense } from "react";
 import { Recovery } from "@ory/elements-react/theme";
 import { getRecoveryFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
@@ -9,17 +10,28 @@ import Image from "next/image";
 import { Card, CardContent } from "../../components/ui/card";
 import oryConfig from "../../ory.config";
 import { oryComponentOverrides } from "../../components/ory/overrides";
+import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
 import Footer from "@/components/misc/Footer";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 
-const RecoveryPage = async (props: OryPageParams) => {
-  const flow = await getRecoveryFlow(oryConfig, props.searchParams);
+const RecoveryForm = async ({ searchParams }: OryPageParams) => {
+  const flow = await getRecoveryFlow(oryConfig, searchParams);
 
   if (!flow) {
     return null;
   }
 
+  return (
+    <Recovery
+      flow={flow}
+      config={oryConfig}
+      components={oryComponentOverrides}
+    />
+  );
+};
+
+const RecoveryPage = (props: OryPageParams) => {
   return (
     <>
       <Head>
@@ -50,11 +62,9 @@ const RecoveryPage = async (props: OryPageParams) => {
                     />
                   </div>
 
-                  <Recovery
-                    flow={flow}
-                    config={oryConfig}
-                    components={oryComponentOverrides}
-                  />
+                  <Suspense fallback={<FlowSkeleton />}>
+                    <RecoveryForm searchParams={props.searchParams} />
+                  </Suspense>
                 </div>
 
                 {/* Right: container yard scene */}

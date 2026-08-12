@@ -35,20 +35,21 @@ jest.mock("./useActiveProject", () => ({
   }),
 }));
 
-const onCreatePat = jest.fn();
+const onCreateAccessToken = jest.fn();
 
-jest.mock("./usePersonalAccessToken", () => ({
+jest.mock("./useAccessToken", () => ({
   __esModule: true,
   default: () => ({
-    personalAccessTokens: [],
-    onCreatePat,
+    AccessToken: [],
+    accessToken: undefined,
+    onCreateAccessToken: onCreateAccessToken,
   }),
 }));
 
 describe("useAutosetup", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    onCreatePat.mockResolvedValue({ privKey: "secret" });
+    onCreateAccessToken.mockResolvedValue({ privKey: "secret" });
     (browserApiClient as jest.Mock).mockResolvedValue({ ok: false });
   });
 

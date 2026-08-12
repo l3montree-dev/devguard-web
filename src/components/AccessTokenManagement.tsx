@@ -10,7 +10,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import useHashScroll from "@/hooks/useHashScroll";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import useAccessToken from "@/hooks/useAccessToken";
 import { toast } from "@/lib/toast";
 import { addYears } from "date-fns";
 import { KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
@@ -21,10 +21,10 @@ import useSWR from "swr";
 import Section from "@/components/common/Section";
 import { fetcher } from "@/data-fetcher/fetcher";
 import type {
-  AsymmetricPersonalAccessTokenDTO,
+  AsymmetricAccessTokenDTO,
   SeeOncePatWithBearerToken,
   SeeOncePatWithPrivKey,
-  SymmetricPersonalAccessTokenDTO,
+  SymmetricAccessTokenDTO,
 } from "@/types/api/api";
 
 const TOKEN_TYPES = [
@@ -96,11 +96,14 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
   const symmetric = watch("symmetric");
 
   const { data: pats } = useSWR<
-    Array<SymmetricPersonalAccessTokenDTO | AsymmetricPersonalAccessTokenDTO>
+    Array<SymmetricAccessTokenDTO | AsymmetricAccessTokenDTO>
   >(url, fetcher, { fallbackData: [] });
 
-  const { personalAccessTokens, onDeletePat, onCreatePat } =
-    usePersonalAccessToken(pats, url);
+  const {
+    AccessToken: accessTokens,
+    onDeleteAccessToken: onDeletePat,
+    onCreateAccessToken: onCreatePat,
+  } = useAccessToken(pats);
 
   const handleCreatePat = async (data: {
     description: string;
@@ -245,16 +248,16 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
             </CardContent>
             <CardFooter className="flex justify-between">
               <ManagePatsDialog
-                personalAccessTokens={personalAccessTokens}
+                accessTokens={accessTokens}
                 onDeletePat={onDeletePat}
               >
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={personalAccessTokens.length === 0}
+                  disabled={accessTokens.length === 0}
                   className="disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  Manage Existing Tokens ({personalAccessTokens.length})
+                  Manage Existing Tokens ({accessTokens.length})
                 </Button>
               </ManagePatsDialog>
               <Button type="submit">Create Token</Button>

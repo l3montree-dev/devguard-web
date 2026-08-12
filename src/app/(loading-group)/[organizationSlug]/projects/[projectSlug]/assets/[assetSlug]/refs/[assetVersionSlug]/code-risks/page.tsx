@@ -604,6 +604,7 @@ const Index: FunctionComponent = () => {
         devguardWebLatestScannerImage={latestScannerImage}
         open={isOpen}
         onOpenChange={setIsOpen}
+        defaultCliTab="sast"
       />
 
       <AcceptRiskDialog

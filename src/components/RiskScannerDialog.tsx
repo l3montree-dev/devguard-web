@@ -18,7 +18,7 @@ import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
+import useAccessToken from "../hooks/useAccessToken";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
 import {
   browserApiClient,
@@ -56,6 +56,7 @@ interface RiskScannerDialogProps {
   artifacts?: Array<ArtifactDTO>;
   devguardWebLatestScannerImage: string;
   initialSlide?: number;
+  defaultCliTab?: "sca" | "sast";
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -68,6 +69,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   artifacts,
   devguardWebLatestScannerImage,
   initialSlide,
+  defaultCliTab,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -433,7 +435,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const activeOrg = useActiveOrg()!;
   const activeProject = useActiveProject()!;
 
-  const pat = usePersonalAccessToken();
+  const accessToken = useAccessToken();
   const [timedOut, setTimedOut] = React.useState(false);
 
   const autosetup = useAutosetup(open, apiUrl, "full");
@@ -458,7 +460,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   useEffect(() => {
     api?.reInit();
-  }, [selectedScanner, pat.pat, api, config]);
+  }, [selectedScanner, accessToken.accessToken, api, config]);
 
   const getStartIndex = () => {
     // display the update repository provider slide if asset is not connected already
@@ -609,7 +611,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
             />
             <GithubTokenSlide
-              pat={pat.pat?.privKey}
+              pat={accessToken.accessToken?.privKey}
               api={api}
               apiUrl={apiUrl}
               orgSlug={activeOrg.slug}
@@ -620,7 +622,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
             />
             <GitlabTokenSlide
-              pat={pat.pat?.privKey}
+              pat={accessToken.accessToken?.privKey}
               api={api}
               apiUrl={apiUrl}
               orgSlug={activeOrg.slug}
@@ -700,6 +702,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               prevIndex={prevIndex}
               scannerImage={devguardWebLatestScannerImage}
+              defaultTab={defaultCliTab}
             />
           </CarouselContent>
         </Carousel>

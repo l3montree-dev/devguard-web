@@ -4,6 +4,23 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.12.3] — 2026-08-10
+
+### Added
+
+- **Copy button on purl tooltip** — the package purl tooltip now includes a button to copy the raw purl directly
+
+### Fixed
+
+- **Invitation flow for single-organization mode** — reworked the accept-invitation, login, registration, recovery, and verification pages to handle single-organization setups correctly, fixed 404s being shown as generic error pages, fixed invalid `<div>` nesting inside `<p>` tags, and unified Suspense loading state across Ory components
+- **Hydration mismatch** — fixed a hydration mismatch caused by runtime environment values in the prerendered shell
+
+### Changed
+
+- **js-yaml** — updated to a newer patch version
+
+---
+
 ## [v1.12.2] — 2026-08-05
 
 ### Added
