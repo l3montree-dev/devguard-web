@@ -133,29 +133,8 @@ export const useAssetMenu = () => {
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/controls/`,
         ) ||
         pathname ===
-          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events` ||
-        pathname ===
-          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs` ||
-        pathname.includes("compliance-postures"),
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events`,
       testId: "nav-asset-overview",
-      children: [
-        {
-          title: "Compliance Postures",
-          href:
-            "/" +
-            orgSlug +
-            "/projects/" +
-            projectSlug +
-            "/assets/" +
-            assetSlug +
-            "/refs/" +
-            assetVersionSlug +
-            "/compliance-postures",
-          Icon: ShieldCheck,
-          isActive: pathname.includes("compliance-postures"),
-          testId: "nav-asset-overview-compliance-postures",
-        },
-      ],
     });
 
     menu = menu.concat([
