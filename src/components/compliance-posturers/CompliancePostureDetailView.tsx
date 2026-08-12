@@ -1098,7 +1098,8 @@ const CompliancePostureDetailView = ({
                             vuln.additional.security_level.value,
                           )}
                         >
-                          {vuln.additional.security_level.ns ? (
+                          {/* Currently the links in the Grundschutz++ catalog are wrong, so we don't want to link them here — we can remove this condition once the report gets updated */}
+                          {vuln.additional.security_level.ns && vuln.framework !== "Grundschutz++"  ? (
                             <Link
                               href={vuln.additional.security_level.ns}
                               target="_blank"
@@ -1140,7 +1141,7 @@ const CompliancePostureDetailView = ({
                             vuln.additional.importance.value,
                           )}
                         >
-                          {vuln.additional.importance.ns ? (
+                          {vuln.additional.importance.ns && vuln.framework !== "Grundschutz++"  ? (
                             <Link
                               href={vuln.additional.importance.ns}
                               target="_blank"
@@ -1179,7 +1180,7 @@ const CompliancePostureDetailView = ({
                             vuln.additional.effort_level.value,
                           )}
                         >
-                          {vuln.additional.effort_level.ns ? (
+                          {vuln.additional.effort_level.ns && vuln.framework !== "Grundschutz++"  ? (
                             <Link
                               href={vuln.additional.effort_level.ns}
                               target="_blank"
@@ -1211,7 +1212,7 @@ const CompliancePostureDetailView = ({
                     <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Tags</dt>
                       <dd className="font-medium">
-                        {vuln.additional.tags.ns
+                        {vuln.additional.tags.ns && vuln.framework !== "Grundschutz++" 
                           ? vuln.additional.tags.value
                               .split(",")
                               .map((tag: string) => (
@@ -1262,7 +1263,7 @@ const CompliancePostureDetailView = ({
                         Documentation
                       </dt>
                       <dd className="font-medium">
-                        {vuln.additional.documentation.ns ? (
+                        {vuln.additional.documentation.ns && vuln.framework !== "Grundschutz++" ? (
                           <Link
                             href={vuln.additional.documentation.ns}
                             target="_blank"
@@ -1290,7 +1291,7 @@ const CompliancePostureDetailView = ({
                     <div className="flex flex-col items-start justify-betweens border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Result</dt>
                       <dd className="font-medium">
-                        {vuln.additional.result.ns ? (
+                        {vuln.additional.result.ns && vuln.framework !== "Grundschutz++" ? (
                           <Link
                             href={vuln.additional.result.ns}
                             target="_blank"
@@ -1316,7 +1317,7 @@ const CompliancePostureDetailView = ({
                         Result Specification
                       </dt>
                       <dd className="font-medium">
-                        {vuln.additional.result_specification.ns ? (
+                        {vuln.additional.result_specification.ns && vuln.framework !== "Grundschutz++" ? (
                           <Link
                             href={vuln.additional.result_specification.ns}
                             target="_blank"
