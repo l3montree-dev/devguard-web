@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import type { PersonalAccessTokenDTO } from "@/types/api/api";
+import type { AccessTokenDTO } from "@/types/api/api";
 import { Button } from "./ui/button";
 import DateString, { parseDateOnly } from "./common/DateString";
 import ConfirmTokenDeletion from "./common/ConfirmTokenDeletion";
@@ -20,8 +20,8 @@ import { AlertTriangleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
-  personalAccessTokens: PersonalAccessTokenDTO[];
-  onDeletePat: (pat: PersonalAccessTokenDTO) => Promise<void>;
+  accessTokens: AccessTokenDTO[];
+  onDeletePat: (pat: AccessTokenDTO) => Promise<void>;
 }
 
 const getExpiryState = (expiryDateUnix: number | undefined) => {
@@ -33,7 +33,7 @@ const getExpiryState = (expiryDateUnix: number | undefined) => {
 };
 
 const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
-  personalAccessTokens,
+  accessTokens: accessTokens,
   onDeletePat,
   children,
 }) => {
@@ -50,13 +50,13 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
           </DialogDescription>
         </DialogHeader>
         <div>
-          {personalAccessTokens.length === 0 ? (
+          {accessTokens.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
               <p>No personal access tokens found.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {personalAccessTokens.map((pat) => {
+              {accessTokens.map((pat) => {
                 const isAsymmetric = "fingerprint" in pat && !!pat.fingerprint;
                 const expiryState = getExpiryState(pat.expiryDateUnix);
 

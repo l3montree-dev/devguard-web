@@ -31,7 +31,7 @@ export function useAutosetup(
 ) {
   const { waitFor, isLoading, Loader } = useLoader();
   const {
-    AccessToken: personalAccessTokens,
+    AccessToken: accessTokens,
     onCreateAccessToken: onCreateAccessToken,
   } = useAccessToken();
   const activeOrg = useActiveOrg();
@@ -39,8 +39,8 @@ export function useAutosetup(
   const asset = useActiveAsset();
 
   const accessToken =
-    personalAccessTokens.length > 0
-      ? (personalAccessTokens[0] as SeeOnceAccessTokenWithPrivKey)
+    accessTokens.length > 0
+      ? (accessTokens[0] as SeeOnceAccessTokenWithPrivKey)
       : undefined;
 
   const [progress, setProgress] = useState<{

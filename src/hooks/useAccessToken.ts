@@ -1,11 +1,11 @@
 import { browserApiClient } from "@/services/devGuardApi";
 import { createAccessToken as createAccessToken } from "@/services/accessTokenService";
 import type {
-  AsymmetricPersonalAccessTokenDTO as AsymmetricAccessTokenDTO,
-  PersonalAccessTokenDTO as AccessTokenDTO,
+  AsymmetricAccessTokenDTO as AsymmetricAccessTokenDTO,
+  AccessTokenDTO as AccessTokenDTO,
   SeeOncePatWithBearerToken as SeeOnceATWithBearerToken,
   SeeOncePatWithPrivKey as SeeOnceATWithPrivKey,
-  SymmetricPersonalAccessTokenDTO as SymmetricAccessTokenDTO,
+  SymmetricAccessTokenDTO as SymmetricAccessTokenDTO,
 } from "@/types/api/api";
 import { EventEmitter } from "events";
 import { findLast, uniqBy } from "lodash";

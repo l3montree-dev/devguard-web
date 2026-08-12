@@ -137,10 +137,9 @@ export interface OrganizationDetailsDTO extends OrganizationDTO {
   }>;
 }
 
-export type PersonalAccessTokenDTO =
-  AsymmetricPersonalAccessTokenDTO | SymmetricPersonalAccessTokenDTO;
+export type AccessTokenDTO = AsymmetricAccessTokenDTO | SymmetricAccessTokenDTO;
 
-interface PersonalAccessTokenBase {
+interface AccessTokenBase {
   description: string;
   scopes: string;
   userId: string;
@@ -150,18 +149,18 @@ interface PersonalAccessTokenBase {
   lastUsedAt: string | null;
 }
 
-export interface AsymmetricPersonalAccessTokenDTO extends PersonalAccessTokenBase {
+export interface AsymmetricAccessTokenDTO extends AccessTokenBase {
   pubKey: string;
   fingerprint: string;
 }
 
-export interface SymmetricPersonalAccessTokenDTO extends PersonalAccessTokenBase {}
+export interface SymmetricAccessTokenDTO extends AccessTokenBase {}
 
-export interface SeeOncePatWithPrivKey extends PersonalAccessTokenBase {
+export interface SeeOncePatWithPrivKey extends AccessTokenBase {
   privKey: string;
 }
 
-export interface SeeOncePatWithBearerToken extends PersonalAccessTokenBase {
+export interface SeeOncePatWithBearerToken extends AccessTokenBase {
   bearerToken: string;
 }
 
