@@ -18,9 +18,16 @@ export class GroupFlow {
   }
 
   async createGroup(name: string, description: string) {
-    await this.page
-      .getByTestId("create-group-button")
-      .click({ timeout: 10_000 });
+    const inlineForm = this.page.getByTestId("create-group-form");
+    await inlineForm
+      .or(this.page.getByTestId("create-group-button"))
+      .first()
+      .waitFor({ state: "visible", timeout: 15_000 });
+    if (!(await inlineForm.isVisible())) {
+      await this.page
+        .getByTestId("create-group-button")
+        .click({ timeout: 10_000 });
+    }
     await this.page.getByTestId("group-name").waitFor({ state: "visible" });
     await this.page.getByTestId("group-name").click();
     await this.page.getByTestId("group-name").fill(name);

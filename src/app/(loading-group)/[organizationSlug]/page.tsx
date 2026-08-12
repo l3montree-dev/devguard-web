@@ -44,6 +44,13 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
 import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
 import { ProjectForm } from "@/components/project/ProjectForm";
@@ -280,6 +287,35 @@ const OrganizationHomePage: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const showInlineCreateForm =
+    !isLoading &&
+    !error &&
+    projects?.data.length === 0 &&
+    !isSearchActive &&
+    searchParams?.get("state") !== "inactive" &&
+    !activeOrg.externalEntityProviderId &&
+    isAdmin(currentUserRole);
+
+  const createGroupForm = (
+    <FormProvider {...form}>
+      <form
+        className="space-y-8"
+        onSubmit={form.handleSubmit(handleCreateProject)}
+      >
+        <ProjectForm forceVerticalSections form={form} hideDangerZone />
+        <DialogFooter>
+          <Button
+            data-testid="create-group-submit-button"
+            type="submit"
+            isSubmitting={form.formState.isSubmitting}
+          >
+            Create
+          </Button>
+        </DialogFooter>
+      </form>
+    </FormProvider>
+  );
+
   return (
     <>
       <WelcomeModal
@@ -288,35 +324,20 @@ const OrganizationHomePage: FunctionComponent = () => {
         onSkip={handleSkip}
       />
       <Page Title={null} title={""} Menu={orgMenu}>
-        <Dialog open={open}>
-          <DialogContent setOpen={setOpen}>
-            <DialogHeader>
-              <DialogTitle>Create new Group</DialogTitle>
-              <DialogDescription>
-                A project groups multiple software projects (repositories)
-                inside a single entity. Something like: frontend and backend
-              </DialogDescription>
-            </DialogHeader>
-            <hr />
-            <FormProvider {...form}>
-              <form
-                className="space-y-8"
-                onSubmit={form.handleSubmit(handleCreateProject)}
-              >
-                <ProjectForm forceVerticalSections form={form} hideDangerZone />
-                <DialogFooter>
-                  <Button
-                    data-testid="create-group-submit-button"
-                    type="submit"
-                    isSubmitting={form.formState.isSubmitting}
-                  >
-                    Create
-                  </Button>
-                </DialogFooter>
-              </form>
-            </FormProvider>
-          </DialogContent>
-        </Dialog>
+        {!showInlineCreateForm && (
+          <Dialog open={open}>
+            <DialogContent setOpen={setOpen}>
+              <DialogHeader>
+                <DialogTitle>Create new Group</DialogTitle>
+                <DialogDescription>
+                  Groups help to organize your software projects. For example, you can make a group per software project, and then split the frontend and backend into individual subgroups.
+                </DialogDescription>
+              </DialogHeader>
+              <hr />
+              {createGroupForm}
+            </DialogContent>
+          </Dialog>
+        )}
 
         <div>
           {activeOrg.externalEntityProviderId && (
@@ -343,7 +364,8 @@ const OrganizationHomePage: FunctionComponent = () => {
           <Section
             primaryHeadline
             Button={
-              !activeOrg.externalEntityProviderId && (
+              !activeOrg.externalEntityProviderId &&
+              !showInlineCreateForm && (
                 <AuthGuard require="admin">
                   <Button
                     data-testid="create-group-button"
@@ -359,73 +381,91 @@ const OrganizationHomePage: FunctionComponent = () => {
             forceVertical
             title="Groups"
           >
-            <div className="flex items-center gap-4">
-              <Tabs
-                defaultValue="all"
-                value={viewedProject}
-                onValueChange={handleSetTabValue}
-                className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+            {showInlineCreateForm ? (
+              <Card
+                className="w-full max-w-3xl"
+                data-testid="create-group-form"
+                data-tour="create-group-button"
               >
-                <TabsList>
-                  <TabsTrigger value="all">Groups</TabsTrigger>
-                  <TabsTrigger value="inactive">Inactive</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              {isSearchActive && (
-                <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
-                  Filter and sorting options are disabled while searching
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Sort
-                sortOptions={[
-                  { label: "Name", value: "name" },
-                  { label: "Created at", value: "created_at" },
-                  { label: "Updated at", value: "updated_at" },
-                ]}
-              />
+                <CardHeader>
+                  <CardTitle className="text-lg">Create new Group</CardTitle>
+                  <CardDescription>
+                  Groups help to organize your software projects. For example, you can make a group per software project, and then split the frontend and backend into individual subgroups.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>{createGroupForm}</CardContent>
+              </Card>
+            ) : (
+              <>
+                <div className="flex items-center gap-4">
+                  <Tabs
+                    defaultValue="all"
+                    value={viewedProject}
+                    onValueChange={handleSetTabValue}
+                    className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+                  >
+                    <TabsList>
+                      <TabsTrigger value="all">Groups</TabsTrigger>
+                      <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  {isSearchActive && (
+                    <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
+                      Filter and sorting options are disabled while searching
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Sort
+                    sortOptions={[
+                      { label: "Name", value: "name" },
+                      { label: "Created at", value: "created_at" },
+                      { label: "Updated at", value: "updated_at" },
+                    ]}
+                  />
 
-              <Input
-                className="h-11"
-                onChange={debouncedHandleSearch}
-                defaultValue={searchParams?.get("search") || ""}
-                placeholder="Search for projects (min. 3 characters)..."
-              />
-            </div>
-            <div id="group-and-project-list">
-              <ListRenderer
-                isLoading={isLoading}
-                skeletonVariant="project"
-                error={error}
-                data={projects?.data}
+                  <Input
+                    className="h-11"
+                    onChange={debouncedHandleSearch}
+                    defaultValue={searchParams?.get("search") || ""}
+                    placeholder="Search for projects (min. 3 characters)..."
+                  />
+                </div>
+                <div id="group-and-project-list">
+                  <ListRenderer
+                    isLoading={isLoading}
+                    skeletonVariant="project"
+                    error={error}
+                    data={projects?.data}
                 Empty={<EmptyParty title={"No groups found"} description="" />}
-                renderItem={(project) => {
-                  return (
-                    <div key={project.id} className="flex flex-col">
-                      <div className="flex flex-col gap-2">
-                        <SubgroupsAndAssetsList
-                          project={
+                    renderItem={(project) => {
+                      return (
+                        <div key={project.id} className="flex flex-col">
+                          <div className="flex flex-col gap-2">
+                            <SubgroupsAndAssetsList
+                              project={
                             project as ProjectDTO & { resourceType: "project" }
-                          }
-                          onFetchData={handleLazyDataFetching}
-                          subgroupsWithAssets={
-                            (
+                              }
+                              onFetchData={handleLazyDataFetching}
+                              subgroupsWithAssets={
+                                (
                               project as ProjectDTO & {
                                 resourceType: "project";
                               }
-                            ).subGroupsAndAsset
-                          }
-                          projectSlug={project.slug}
-                        />
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-            </div>
+                                ).subGroupsAndAsset
+                              }
+                              projectSlug={project.slug}
+                            />
+                          </div>
+                        </div>
+                      );
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </Section>
-          {projects && (
+          {projects && !showInlineCreateForm && (
             <div className="mt-4">
               <CustomPagination {...projects} />
             </div>
