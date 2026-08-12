@@ -34,6 +34,7 @@ interface DevGuardCliSlideProps {
   onClose: () => void;
   prevIndex: number;
   scannerImage: string;
+  defaultTab?: "sca" | "sast";
 }
 
 export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
@@ -41,6 +42,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
   prevIndex,
   onClose,
   scannerImage,
+  defaultTab = "sca",
 }) => {
   const accessToken = useAccessToken();
   const org = useActiveOrg();
@@ -48,7 +50,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
   const asset = useActiveAsset();
   const config = useConfig();
 
-  const [tab, setTab] = useState<"sca" | "sast">("sca");
+  const [tab, setTab] = useState<"sca" | "sast">(defaultTab);
   return (
     <CarouselItem>
       <DialogHeader>
@@ -80,7 +82,6 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
         <Tabs
           value={tab}
           onValueChange={(v) => setTab(v as "sca" | "sast")}
-          defaultValue="sca"
           className="w-full"
         >
           <div className="flex">
