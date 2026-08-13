@@ -46,7 +46,7 @@ function SsoProviderIcon({ provider }: { provider: string }) {
         aria-hidden
         width={20}
         height={20}
-        className="mr-2 dark:hidden"
+        className="mr-2 h-5 w-5 shrink-0 dark:hidden"
       />
       <Image
         src={entry.dark}
@@ -54,7 +54,7 @@ function SsoProviderIcon({ provider }: { provider: string }) {
         aria-hidden
         width={20}
         height={20}
-        className="mr-2 hidden dark:block"
+        className="mr-2 hidden h-5 w-5 shrink-0 dark:block"
       />
     </>
   );
