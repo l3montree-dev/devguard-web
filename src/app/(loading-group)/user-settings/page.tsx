@@ -13,14 +13,20 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import { fetchSession } from "@/data-fetcher/fetchSession";
 import oryConfig from "@/ory.config";
 import { getSettingsFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
+import { redirect } from "next/navigation";
 import Page from "../../../components/Page";
 import UserSettings from "../../../components/UserSettings";
 import PatManagementSection from "./PatManagementSection";
 
 const SettingsPage = async (props: OryPageParams) => {
+  if (!(await fetchSession())) {
+    redirect("/login?return_to=/user-settings");
+  }
+
   const flow = await getSettingsFlow(oryConfig, props.searchParams);
 
   if (!flow) {
