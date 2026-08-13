@@ -20,8 +20,7 @@ import { SearchCode, Code, Blocks, Upload, Link2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
 import { Button } from "@/components/ui/button";
-import { InputWithButton } from "@/components/ui/input-with-button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Collapsible,
   CollapsibleContent,
@@ -108,8 +107,8 @@ const Index: FunctionComponent = () => {
             <>
               <div className="mb-8">
                 {asset?.externalEntityId || asset?.repositoryId ? (
-                  // Asset is connected to an actual repository — autosetup is usable
-                  activeOrg.gitLabIntegrations.length > 0 ? (
+                  activeOrg.gitLabIntegrations.length > 0 ||
+                  asset.externalEntityProviderId ? (
                     <Autosetup {...autosetup} />
                   ) : (
                     <div className="flex flex-col gap-4 rounded-lg border bg-card p-8">
