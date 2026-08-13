@@ -1,5 +1,6 @@
-import type { Page } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
+import { docShot } from "../../doc-shot";
 
 export class GroupFlow {
   constructor(private page: Page) {}
@@ -27,6 +28,8 @@ export class GroupFlow {
     await this.page.getByTestId("group-description").click();
     await this.page.getByTestId("group-description").fill(description);
     await this.page.getByTestId("create-group-submit-button").click();
+    await this.page.waitForTimeout(3_000);
+    await docShot(this.page, test.info(), "repo-creation-screen");
   }
 
   async openSubgroupsAndRepositories() {

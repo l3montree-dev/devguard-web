@@ -2,8 +2,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
+import { docShot } from "./doc-shot";
 
-test.use({ viewport: { width: 1440, height: 900 } });
+test.use({ viewport: { width: 1440, height: 1000 } });
 
 test.describe("DevGuard repo flows", () => {
   let devguardPOM: DevGuardPOM;
@@ -13,7 +14,14 @@ test.describe("DevGuard repo flows", () => {
     await devguardPOM.loadDevGuard();
     await devguardPOM.createTestOrganizationGroupAndRepo();
   });
-  
+
+  test("test devguard cli for screenshot", async ({ page }, testInfo) => {
+    await page.getByTestId("devguard-cli-card").click();
+    await page.setViewportSize({ width: 1440, height: 1200 });
+    await page.waitForTimeout(3_000);
+    await docShot(page, testInfo, "devguard-cli-screen");
+  });
+
   test("test create, settings and delete (through settings) of repo", async ({
     page,
   }) => {

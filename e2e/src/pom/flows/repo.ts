@@ -11,6 +11,7 @@ export class RepoFlow {
     await this.page
       .getByTestId("repository-name")
       .waitFor({ state: "visible" });
+    await docShot(this.page, test.info(), "repo-creation-dialog");
     await this.page.getByTestId("repository-name").click();
     await this.page.getByTestId("repository-name").fill(name);
     await this.page.getByTestId("repository-description").click();

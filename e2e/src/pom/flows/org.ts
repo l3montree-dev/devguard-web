@@ -1,13 +1,17 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
 import { ModalHelper } from "./modal-helper";
 import { envConfig } from "../../utils";
+import { docShot } from "../../doc-shot";
 
 export class OrgFlow {
   constructor(private page: Page) {}
 
   async createOrganization(name: string) {
     await this.page.goto(`${envConfig.devGuard.domain}/setup`);
+    await this.page.waitForTimeout(3_000);
+    await this.page.setViewportSize({ width: 1440, height: 900 });
+    await docShot(this.page, test.info(), "org-creation-screen");
     await this.page.getByTestId("org-name-label").click();
     await this.page
       .getByRole("textbox", { name: "Organization name*" })
@@ -21,6 +25,8 @@ export class OrgFlow {
     await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
     await this.page.waitForTimeout(5_000);
     await new ModalHelper(this.page).dismissToastIfPresent();
+    await this.page.waitForLoadState("networkidle");
+    await docShot(this.page, test.info(), "group-creation-screen");
   }
 
   async openGroups() {
