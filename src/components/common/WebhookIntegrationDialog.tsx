@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useLoader } from "@/hooks/useLoader";
@@ -43,11 +46,13 @@ import { Loader2 } from "lucide-react";
 import { generateNewSecret } from "../../utils/view";
 
 interface Props {
-  Button: ReactNode;
+  Button?: ReactNode;
   onNewIntegration: (integration: WebhookDTO) => void;
   initialValues?: WebhookDTO;
-  onDeleteWebhook?: (id?: string) => Promise<void>;
+  onDeleteWebhook?: (id: string) => Promise<void>;
   projectWebhook: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   onNewIntegration,
@@ -55,6 +60,8 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   initialValues,
   onDeleteWebhook,
   projectWebhook,
+  open: controlledOpen,
+  onOpenChange,
 }) => {
   const form = useForm<WebhookDTO>({
     defaultValues: initialValues || {
@@ -86,7 +93,9 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
-  const [open, setOpen] = React.useState(false);
+  const [internalOpen, setInternalOpen] = React.useState(false);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = onOpenChange ?? setInternalOpen;
   const [testLoading, setTestLoading] = React.useState(false);
 
   const method = initialValues ? "PUT" : "POST";
@@ -177,10 +186,12 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      <DialogTrigger asChild>{Trigger}</DialogTrigger>
+      {Trigger && <DialogTrigger asChild>{Trigger}</DialogTrigger>}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add a Webhook</DialogTitle>
+          <DialogTitle>
+            {initialValues ? "Edit Webhook" : "Add a Webhook"}
+          </DialogTitle>
           <DialogDescription>
             DevGuard uses webhooks to send notifications to your applications.
             You can use webhooks to receive notifications about events in
@@ -321,6 +332,19 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
             <div className="flex flex-row justify-end">
               <div className="flex flex-col items-end justify-end gap-2">
                 <div className="flex flex-row gap-2">
+                  {initialValues && (
+                    <AsyncButton
+                      variant={"destructiveOutline"}
+                      onClick={async () => {
+                        if (onDeleteWebhook) {
+                          await onDeleteWebhook(initialValues.id);
+                        }
+                      }}
+                    >
+                      Delete
+                    </AsyncButton>
+                  )}
+
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant={"secondary"} type="button">
@@ -358,18 +382,6 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                     <Loader />
                     {initialValues ? "Update Webhook" : "Save"}
                   </Button>
-                  {initialValues && (
-                    <AsyncButton
-                      variant={"destructiveOutline"}
-                      onClick={async () => {
-                        if (onDeleteWebhook) {
-                          await onDeleteWebhook(initialValues?.id);
-                        }
-                      }}
-                    >
-                      Delete
-                    </AsyncButton>
-                  )}
                 </div>
               </div>
             </div>

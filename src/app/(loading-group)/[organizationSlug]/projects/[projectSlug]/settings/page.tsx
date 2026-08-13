@@ -1,8 +1,11 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
+
 import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import Page from "../../../../../../components/Page";
-
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
@@ -13,14 +16,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
-
-import ListItem from "@/components/common/ListItem";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
+import { fetcher } from "@/data-fetcher/fetcher";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
+import useSWR from "swr";
 import { toast } from "@/lib/toast";
 import MembersTable from "../../../../../../components/MembersTable";
+import WebhooksTable from "../../../../../../components/WebhooksTable";
 import ProjectMemberDialog from "../../../../../../components/ProjectMemberDialog";
 import CopyInput from "../../../../../../components/common/CopyInput";
 import ProjectTitle from "../../../../../../components/common/ProjectTitle";
@@ -54,53 +58,38 @@ const Index: FunctionComponent = () => {
     projectSlug +
     "/pats/";
 
+  const {
+    data: webhooks,
+    isLoading: webhooksLoading,
+    mutate: mutateWebhooks,
+  } = useSWR<Array<WebhookDTO>>(
+    "/organizations/" + organizationSlug + "/projects/" + projectSlug + "/",
+    async (projectUrl: string) => {
+      const details = await fetcher<{ webhooks: Array<WebhookDTO> | null }>(
+        projectUrl,
+      );
+      return details.webhooks ?? [];
+    },
+  );
+
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
-    if (!project) {
-      return;
-    }
-    updateProject({
-      ...project,
-      webhooks: (project.webhooks ?? []).concat(integration),
+    mutateWebhooks((prev) => (prev ?? []).concat(integration), {
+      revalidate: false,
     });
   };
 
   const handleUpdateWebhookIntegration = (integration: WebhookDTO) => {
-    if (!project) {
-      return;
-    }
-
-    updateProject({
-      ...project,
-      webhooks: (project.webhooks ?? []).map((w) =>
-        w.id === integration.id ? integration : w,
-      ),
-    });
+    mutateWebhooks(
+      (prev) =>
+        (prev ?? []).map((w) => (w.id === integration.id ? integration : w)),
+      { revalidate: false },
+    );
   };
 
-  const handleDeleteWebhook = async (id?: string) => {
-    if (!id) return;
-    if (!project) return;
-
-    const res = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project.slug +
-        "/integrations/webhook/" +
-        id,
-      {
-        method: "DELETE",
-      },
-    );
-    if (res.ok) {
-      toast.success("Webhook deleted successfully");
-      updateProject({
-        ...project,
-        webhooks: (project.webhooks ?? []).filter((w) => w.id !== id),
-      });
-    } else {
-      toast.error("Failed to delete webhook");
-    }
+  const handleWebhookDeleted = (id: string) => {
+    mutateWebhooks((prev) => (prev ?? []).filter((w) => w.id !== id), {
+      revalidate: false,
+    });
   };
 
   const handleChangeMemberRole = async (
@@ -286,37 +275,27 @@ These identifiers are managed by the external system and are treated as immutabl
             }
             title="Webhooks"
           >
-            {project.webhooks?.map((installation) => (
-              <ListItem
-                key={installation.id}
-                Title={installation.name}
-                Description={installation.description}
-                Button={
-                  <WebhookIntegrationDialog
-                    onNewIntegration={handleUpdateWebhookIntegration}
-                    Button={<Button variant={"secondary"}>Edit Webhook</Button>}
-                    initialValues={installation}
-                    onDeleteWebhook={handleDeleteWebhook}
-                    projectWebhook={true}
-                  ></WebhookIntegrationDialog>
-                }
-              />
-            ))}
-
-            {(project.webhooks?.length ?? 0) > 0 && <hr />}
-            <ListItem
-              Title={
-                <div className="flex flex-row items-center">Add a Webhook</div>
+            <WebhooksTable
+              webhooks={webhooks ?? []}
+              urlBase={
+                "/organizations/" +
+                organizationSlug +
+                "/projects/" +
+                projectSlug +
+                "/integrations/webhook"
               }
-              Description="DevGuard uses webhooks to send notifications to your applications. You can use webhooks to receive notifications about events in DevGuard, such as new vulnerabilities, or SBOMs."
-              Button={
-                <WebhookIntegrationDialog
-                  onNewIntegration={handleNewWebhookIntegration}
-                  Button={<Button variant={"secondary"}>Add a Webhook</Button>}
-                  projectWebhook={true}
-                ></WebhookIntegrationDialog>
-              }
+              onUpdateWebhook={handleUpdateWebhookIntegration}
+              onDeleted={handleWebhookDeleted}
+              projectWebhook={true}
+              isLoading={webhooksLoading}
             />
+            <div className="flex flex-row justify-end">
+              <WebhookIntegrationDialog
+                onNewIntegration={handleNewWebhookIntegration}
+                Button={<Button>Add Webhook</Button>}
+                projectWebhook={true}
+              ></WebhookIntegrationDialog>
+            </div>
           </Section>
         </div>
         <hr />
