@@ -32,10 +32,7 @@ test.describe("DevGuard handle vuln flows", () => {
 
   test("test sbom upload to overview", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
-    await page.getByTestId("nav-asset-overview-chevron").click();
-    await page
-      .getByRole("menuitem", { name: "Overview" })
-      .click({ timeout: 20_000 });
+    await page.getByTestId("nav-asset-overview").click();
     await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "asset-overview");
     await page.mouse.wheel(0, 1000);
