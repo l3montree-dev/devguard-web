@@ -115,7 +115,8 @@ export interface OrganizationDTO extends AppModelDTO {
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
   jiraIntegrations: Array<JiraIntegrationDTO>;
 
-  webhooks: Array<WebhookDTO>;
+  // omitted by the API when there are none
+  webhooks?: Array<WebhookDTO>;
 
   isPublic: boolean;
 
@@ -185,7 +186,8 @@ export interface ProjectDTO {
   repositoryId?: string;
   repositoryName?: string;
 
-  webhooks: Array<WebhookDTO>;
+  // omitted by the API when there are none
+  webhooks?: Array<WebhookDTO>;
 
   members: Array<{
     id: string;
