@@ -11,7 +11,7 @@ import { useConfig } from "../../../context/ConfigContext";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
 import { useActiveProject } from "../../../hooks/useActiveProject";
-import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
+import useAccessToken from "../../../hooks/useAccessToken";
 import { generateDockerSnippet } from "../../../integrationSnippets";
 import CopyCode from "../../common/CopyCode";
 import Section from "../../common/Section";
@@ -34,6 +34,7 @@ interface DevGuardCliSlideProps {
   onClose: () => void;
   prevIndex: number;
   scannerImage: string;
+  defaultTab?: "sca" | "sast";
 }
 
 export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
@@ -41,14 +42,15 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
   prevIndex,
   onClose,
   scannerImage,
+  defaultTab = "sca",
 }) => {
-  const pat = usePersonalAccessToken();
+  const accessToken = useAccessToken();
   const org = useActiveOrg();
   const project = useActiveProject();
   const asset = useActiveAsset();
   const config = useConfig();
 
-  const [tab, setTab] = useState<"sca" | "sast">("sca");
+  const [tab, setTab] = useState<"sca" | "sast">(defaultTab);
   return (
     <CarouselItem>
       <DialogHeader>
@@ -80,7 +82,6 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
         <Tabs
           value={tab}
           onValueChange={(v) => setTab(v as "sca" | "sast")}
-          defaultValue="sca"
           className="w-full"
         >
           <div className="flex">
@@ -107,7 +108,7 @@ export const DevGuardCliSlide: FunctionComponent<DevGuardCliSlideProps> = ({
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, accessToken.accessToken?.privKey)}
 `}
                 />
               </CardContent>
@@ -128,7 +129,7 @@ ${generateDockerSnippet(scannerImage, "sca", org.slug, project.slug, asset.slug,
                 <CopyCode
                   language="shell"
                   codeString={`# Using docker
-${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, pat.pat?.privKey)}
+${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug, config.devguardApiUrlPublicInternet, config.frontendUrl, accessToken.accessToken?.privKey)}
 `}
                 />
               </CardContent>
@@ -137,6 +138,13 @@ ${generateDockerSnippet(scannerImage, "sast", org.slug, project.slug, asset.slug
         </Tabs>
 
         <div className="mt-0 flex flex-wrap flex-row gap-2 justify-end">
+          <Button
+            variant={"secondary"}
+            id="devguard-cli-scan-back-to-selection"
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
+            Back
+          </Button>
           <Button id="install-devguard-cli-finish" onClick={onClose}>
             Finish
           </Button>

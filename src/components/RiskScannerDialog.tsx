@@ -18,7 +18,7 @@ import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
-import usePersonalAccessToken from "../hooks/usePersonalAccessToken";
+import useAccessToken from "../hooks/useAccessToken";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
 import {
   browserApiClient,
@@ -56,6 +56,7 @@ interface RiskScannerDialogProps {
   artifacts?: Array<ArtifactDTO>;
   devguardWebLatestScannerImage: string;
   initialSlide?: number;
+  defaultCliTab?: "sca" | "sast";
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -68,6 +69,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   artifacts,
   devguardWebLatestScannerImage,
   initialSlide,
+  defaultCliTab,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -82,14 +84,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const router = useRouter();
 
   const asset = useActiveAsset()!;
-
-  const [selectedSetup, setSelectedSetup] = React.useState<
-    | "devguard-tools"
-    | "devguard-cli"
-    | "own-setup"
-    | "information-source"
-    | undefined
-  >();
 
   const [selectedScanner, setSelectedScanner] = React.useState<
     "custom-setup" | "auto-setup" | "information-source" | undefined
@@ -218,18 +212,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
-  const refreshAssetData = async () => {
-    // fetch the asset again
-    const updatedAsset = await browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}`,
-      { method: "GET" },
-    );
-    if (updatedAsset.ok) {
-      const assetData = await updatedAsset.json();
-      updateAsset(assetData);
-    }
-  };
-
   const updateAsset = useUpdateAsset();
   const uploadSBOM = async (params: {
     branchOrTagName: string;
@@ -262,7 +244,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     );
 
     if (resp.ok) {
-      await refreshAssetData();
       // This was a total upfuck...
       // When you are reading this farytail of a shit show your will be enlightet...
       // When you have a fresh repository (asset) next catches a 404 and seems to store that in their beautiful cache, a very beautiful cache.
@@ -305,7 +286,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
 
     if (resp.ok) {
-      await refreshAssetData();
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/code-risks/`;
       onOpenChange(false);
       toast.success("SARIF report has successfully been sent!");
@@ -340,7 +320,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
 
     if (resp.ok) {
-      await refreshAssetData();
       onOpenChange(false);
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/vex-rules/`;
       toast.success("VEX has successfully been sent!");
@@ -393,11 +372,8 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
         },
       );
       if (artifactResp.ok) {
-        toast.success("Information source setup successfully created!");
-        router.push(
-          `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`,
-        );
         onOpenChange(false);
+        window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`;
       } else {
         // read the body, we get external reference error dtos here, we can show the user which urls were invalid and why
         const errorBody = await artifactResp.json();
@@ -433,7 +409,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   const activeOrg = useActiveOrg()!;
   const activeProject = useActiveProject()!;
 
-  const pat = usePersonalAccessToken();
+  const accessToken = useAccessToken();
   const [timedOut, setTimedOut] = React.useState(false);
 
   const autosetup = useAutosetup(open, apiUrl, "full");
@@ -458,7 +434,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   useEffect(() => {
     api?.reInit();
-  }, [selectedScanner, pat.pat, api, config]);
+  }, [selectedScanner, accessToken.accessToken, api, config]);
 
   const getStartIndex = () => {
     // display the update repository provider slide if asset is not connected already
@@ -593,9 +569,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
             />
             <ScannerSelectionSlide
               api={api}
-              selectedSetup={selectedSetup}
-              setSelectedSetup={setSelectedSetup}
-              prevIndex={prevIndex}
               informationSourceSlideIndex={15}
               devguardCliSlideIndex={16}
               devguardToolsSlideIndex={7}
@@ -609,7 +582,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
             />
             <GithubTokenSlide
-              pat={pat.pat?.privKey}
+              pat={accessToken.accessToken?.privKey}
               api={api}
               apiUrl={apiUrl}
               orgSlug={activeOrg.slug}
@@ -620,7 +593,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
             />
             <GitlabTokenSlide
-              pat={pat.pat?.privKey}
+              pat={accessToken.accessToken?.privKey}
               api={api}
               apiUrl={apiUrl}
               orgSlug={activeOrg.slug}
@@ -654,6 +627,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               cliSlideIndex={12}
               fileUploadSlideIndex={13}
+              prevIndex={prevIndex}
             />
             <AutomatedIntegrationSlide
               apiUrl={apiUrl}
@@ -700,6 +674,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               prevIndex={prevIndex}
               scannerImage={devguardWebLatestScannerImage}
+              defaultTab={defaultCliTab}
             />
           </CarouselContent>
         </Carousel>

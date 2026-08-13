@@ -12,9 +12,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent, ReactNode } from "react";
-
 import { classNames } from "@/utils/common";
-
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
@@ -39,7 +37,6 @@ import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import OscalDownloadModal from "./OscalDownloadModal";
 import { useState } from "react";
 import { FlatBadge } from "../common/Severity";
@@ -287,14 +284,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     data: vulns?.data || [],
   });
 
-  const removeFilterAndClearStorage = (f: any) => {
-    localStorage.removeItem("compliance-framework-filter");
-    removeFilter(f);
-  };
-  const clearAllFiltersAndClearStorage = () => {
-    localStorage.removeItem("compliance-framework-filter");
-    clearAllFilters();
-  };
   const handleSearch = useDebouncedQuerySearch();
 
   const { branches, tags } = useAssetBranchesAndTags();
@@ -434,8 +423,8 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
               <Filter
                 options={filterOptions}
                 onFilter={handleFilter}
-                onRemoveFilter={removeFilterAndClearStorage}
-                onClearAllFilters={clearAllFiltersAndClearStorage}
+                onRemoveFilter={removeFilter}
+                onClearAllFilters={clearAllFilters}
                 search={{
                   onChange: handleSearch,
                   defaultValue: params?.get("search") ?? "",

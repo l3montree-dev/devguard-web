@@ -14,7 +14,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { InputWithButton } from "@/components/ui/input-with-button";
-import usePersonalAccessToken from "@/hooks/usePersonalAccessToken";
+import useAccessToken from "@/hooks/useAccessToken";
 import Link from "next/link";
 import CopyCode from "./CopyCode";
 
@@ -31,10 +31,8 @@ export function EssentialProjectConfigContent({
   assetSlug,
   repositoryProvider,
 }: ContentProps) {
-  const { pat, onCreatePat } = usePersonalAccessToken(
-    undefined,
-    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/pats/`,
-  );
+  const { accessToken: pat, onCreateAccessToken: onCreatePat } =
+    useAccessToken();
 
   return (
     <Card>

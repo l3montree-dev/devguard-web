@@ -12,7 +12,7 @@
 // limitations under the License.
 
 import type { FunctionComponent } from "react";
-import usePersonalAccessToken from "../../../hooks/usePersonalAccessToken";
+import useAccessToken from "../../../hooks/useAccessToken";
 import CopyCode from "../../common/CopyCode";
 import AccessTokenSection from "../../AccessTokenSection";
 import { Button } from "../../ui/button";
@@ -36,7 +36,7 @@ interface AutomatedIntegrationSlideProps {
 const AutomatedIntegrationSlide: FunctionComponent<
   AutomatedIntegrationSlideProps
 > = ({ api, apiUrl, orgSlug, projectSlug, assetSlug, prevIndex, onClose }) => {
-  const pat = usePersonalAccessToken();
+  const accessToken = useAccessToken();
   return (
     <CarouselItem>
       <DialogHeader>
@@ -70,7 +70,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
             <div className="p-6 pt-0">
               <CopyCode
                 language="shell"
-                codeString={`devguard-scanner sarif --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/report.sarif`}
+                codeString={`devguard-scanner sarif --token ${accessToken.accessToken?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/report.sarif`}
               />
             </div>
           </Card>
@@ -88,7 +88,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
             <div className="p-6 pt-0">
               <CopyCode
                 language="shell"
-                codeString={`devguard-scanner sbom --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/sbom.json`}
+                codeString={`devguard-scanner sbom --token ${accessToken.accessToken?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/sbom.json`}
               />
             </div>
           </Card>
@@ -106,7 +106,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
             <div className="p-6 pt-0">
               <CopyCode
                 language="shell"
-                codeString={`devguard-scanner vex --token ${pat.pat?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/vex.json`}
+                codeString={`devguard-scanner vex --token ${accessToken.accessToken?.privKey ?? "YOU_NEED_TO_GENERATE_A_TOKEN"} --apiUrl "${apiUrl}" --assetName ${orgSlug}/${projectSlug}/${assetSlug} /path/to/vex.json`}
               />
             </div>
           </Card>
@@ -117,6 +117,13 @@ const AutomatedIntegrationSlide: FunctionComponent<
         <AccessTokenSection description="Risk Identification using CLI Setup" />
       </div>
       <div className="mt-10 flex flex-row gap-2 justify-end">
+        <Button
+          variant={"secondary"}
+          id="automated-integration-back-to-selection"
+          onClick={() => api?.scrollTo(prevIndex)}
+          >
+          Back
+        </Button>
         <Button id="automated-integration-continue" onClick={onClose}>
           Finish Setup
         </Button>

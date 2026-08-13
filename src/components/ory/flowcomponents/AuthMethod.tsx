@@ -57,6 +57,7 @@ export function OryAuthMethodListItem({
 
   return (
     <Button
+      type="button"
       variant={meta?.recommended ? "default" : "secondary"}
       className="h-auto w-full justify-start gap-3 p-3 text-left"
       onClick={onClick}
