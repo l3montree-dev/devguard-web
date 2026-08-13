@@ -85,14 +85,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const asset = useActiveAsset()!;
 
-  const [selectedSetup, setSelectedSetup] = React.useState<
-    | "devguard-tools"
-    | "devguard-cli"
-    | "own-setup"
-    | "information-source"
-    | undefined
-  >();
-
   const [selectedScanner, setSelectedScanner] = React.useState<
     "custom-setup" | "auto-setup" | "information-source" | undefined
   >();
@@ -595,9 +587,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
             />
             <ScannerSelectionSlide
               api={api}
-              selectedSetup={selectedSetup}
-              setSelectedSetup={setSelectedSetup}
-              prevIndex={prevIndex}
               informationSourceSlideIndex={15}
               devguardCliSlideIndex={16}
               devguardToolsSlideIndex={7}
@@ -656,6 +645,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               cliSlideIndex={12}
               fileUploadSlideIndex={13}
+              prevIndex={prevIndex}
             />
             <AutomatedIntegrationSlide
               apiUrl={apiUrl}

@@ -509,7 +509,14 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
         </div>
       </div>
 
-      <div className="mt-10 flex flex-row gap-2 justify-end">
+      <div className="mt-4 flex flex-row gap-2 justify-end">
+        <Button
+            variant={"secondary"}
+            id="scanner-options-back-to-selection"
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
+            Back
+        </Button>
         <Button
           disabled={Object.values(config).every((v) => v === false)}
           id="scanner-options-selection-continue"
