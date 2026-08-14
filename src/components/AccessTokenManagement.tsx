@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import useHashScroll from "@/hooks/useHashScroll";
 import useAccessToken from "@/hooks/useAccessToken";
 import { toast } from "@/lib/toast";
 import { addYears } from "date-fns";
@@ -58,8 +57,6 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
   url,
   section,
 }) => {
-  useHashScroll("access-tokens");
-
   const [newToken, setNewToken] = useState<
     SeeOncePatWithPrivKey | SeeOncePatWithBearerToken | null
   >(null);

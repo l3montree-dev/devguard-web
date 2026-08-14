@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 
-export default function useHashScroll(id: string) {
+export default function useHashScroll() {
   useEffect(() => {
     const scrollToHash = () => {
-      if (window.location.hash !== `#${id}`) return;
+      const anchor = window.location.hash.replace(/^#/, "");
+      if (!anchor) return;
 
-      document.getElementById(id)?.scrollIntoView();
+      document.getElementById(anchor)?.scrollIntoView();
     };
 
     scrollToHash();
     window.addEventListener("hashchange", scrollToHash);
 
     return () => window.removeEventListener("hashchange", scrollToHash);
-  }, [id]);
+  }, []);
 }

@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import { connection } from "next/server";
 import React, { Suspense } from "react";
+import HashScroll from "@/components/HashScroll";
 import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
@@ -55,6 +56,7 @@ export default function RootLayout({
           "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
         }
       >
+        <HashScroll />
         {/* Restores CSS variable overrides before first paint — dev only */}
         {/*process.env.NODE_ENV === "development" && (
           // eslint-disable-next-line @next/next/no-sync-scripts
