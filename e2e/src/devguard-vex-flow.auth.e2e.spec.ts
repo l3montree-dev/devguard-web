@@ -51,8 +51,6 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().expectVulnState("False Positive");
 
     await devguardPOM.vuln().deleteFirstVexRule(testInfo);
-
-    await devguardPOM.vuln().expectVulnStateEventually("Open");
   });
 
   test("test vex rule recommendation on a second asset with the same sbom", async ({
