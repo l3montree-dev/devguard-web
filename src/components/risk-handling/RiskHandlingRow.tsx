@@ -459,7 +459,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     {pathExplosionOrOnlySinglePath ? (
                       <Link
                         href={vulnDetailHref}
-                        className="font-medium text-foreground hover:underline"
+                        className="font-medium !text-foreground hover:underline"
                       >
                         {cveID}
                       </Link>
