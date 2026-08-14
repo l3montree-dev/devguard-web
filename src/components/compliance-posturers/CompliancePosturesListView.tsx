@@ -157,6 +157,19 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
             </div>
           ),
       }),
+
+      columnHelper.accessor("securityLevel", {
+        header: "Security Level",
+        id: "security_level",
+        cell: (info) =>
+          info.getValue() === "" ? null : (
+            <div className="flex">
+              <FlatBadge variant={importanceVariant(info.getValue())}>
+                {info.getValue()}
+              </FlatBadge>
+            </div>
+          ),
+      }),
       columnHelper.accessor("frameworkControlId", {
         header: "Component",
         id: "component",
@@ -256,6 +269,8 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     Paged<CompliancePostureWithControlDTO> & { frameworks: string[] }
   >(apiBaseUrl + "?" + query.toString(), fetcher, { keepPreviousData: false });
 
+  console.log("data", vulns);
+
   const { data: stats, isLoading: statsLoading } = useSWR<{
     open: number;
     implemented: number;
@@ -313,6 +328,11 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         label: "Importance",
         value: "importance",
         operators: [{ value: "ilike", label: "is" }],
+      },
+      {
+        label: "Mapped Framework",
+        value: "mapped_framework",
+        operators: [{ value: "ilike", label: "contains" }],
       },
       {
         label: "Solvable by Component",
