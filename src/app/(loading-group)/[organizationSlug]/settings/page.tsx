@@ -1,22 +1,10 @@
-// Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Page from "../../../../components/Page";
-
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
@@ -24,9 +12,9 @@ import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
-
 import MemberDialog from "@/components/MemberDialog";
 import MembersTable from "@/components/MembersTable";
+import WebhooksTable from "@/components/WebhooksTable";
 import { OrgForm } from "@/components/OrgForm";
 import DangerZone from "@/components/common/DangerZone";
 import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
@@ -40,6 +28,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { fetcher } from "@/data-fetcher/fetcher";
 import { browserApiClient } from "@/services/devGuardApi";
 import { UserRole } from "@/types/api/api";
 import type {
@@ -50,8 +39,9 @@ import type {
 } from "@/types/api/api";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
+import useSWR from "swr";
 import { toast } from "@/lib/toast";
 import { useConfig } from "../../../../context/ConfigContext";
 import {
@@ -143,25 +133,37 @@ const Home = () => {
     });
   };
 
+  const {
+    data: webhooks,
+    isLoading: webhooksLoading,
+    mutate: mutateWebhooks,
+  } = useSWR<Array<WebhookDTO>>(
+    "/organizations/" + organizationSlug + "/settings/",
+    async (settingsUrl: string) => {
+      const settings = await fetcher<{ webhooks: Array<WebhookDTO> | null }>(
+        settingsUrl,
+      );
+      return settings.webhooks ?? [];
+    },
+  );
+
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
-    updateOrgCtx({
-      ...orgCtx,
-      organization: {
-        ...activeOrg,
-        webhooks: activeOrg.webhooks.concat(integration),
-      },
+    mutateWebhooks((prev) => (prev ?? []).concat(integration), {
+      revalidate: false,
     });
   };
 
   const handleUpdateWebhookIntegration = (integration: WebhookDTO) => {
-    updateOrgCtx({
-      ...orgCtx,
-      organization: {
-        ...activeOrg,
-        webhooks: activeOrg.webhooks.map((w) =>
-          w.id === integration.id ? integration : w,
-        ),
-      },
+    mutateWebhooks(
+      (prev) =>
+        (prev ?? []).map((w) => (w.id === integration.id ? integration : w)),
+      { revalidate: false },
+    );
+  };
+
+  const handleWebhookDeleted = (id: string) => {
+    mutateWebhooks((prev) => (prev ?? []).filter((w) => w.id !== id), {
+      revalidate: false,
     });
   };
 
@@ -252,28 +254,6 @@ const Home = () => {
           ),
         },
       });
-    }
-  };
-
-  const handleDeleteWebhook = async (id?: string) => {
-    if (!id) return;
-    const res = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/webhook/" + id,
-      {
-        method: "DELETE",
-      },
-    );
-    if (res.ok) {
-      toast.success("Webhook deleted successfully");
-      updateOrgCtx({
-        ...orgCtx,
-        organization: {
-          ...activeOrg,
-          webhooks: activeOrg.webhooks.filter((w) => w.id !== id),
-        },
-      });
-    } else {
-      toast.error("Failed to delete webhook");
     }
   };
 
@@ -515,36 +495,23 @@ const Home = () => {
           }
           title="Webhooks"
         >
-          {activeOrg.webhooks?.map((installation) => (
-            <ListItem
-              key={installation.id}
-              Title={installation.name}
-              Description={installation.description}
-              Button={
-                <WebhookIntegrationDialog
-                  onNewIntegration={handleUpdateWebhookIntegration}
-                  Button={<Button variant={"secondary"}>Edit Webhook</Button>}
-                  initialValues={installation}
-                  onDeleteWebhook={handleDeleteWebhook}
-                  projectWebhook={false}
-                ></WebhookIntegrationDialog>
-              }
-            />
-          ))}
-
-          <ListItem
-            Title={
-              <div className="flex flex-row items-center">Add a Webhook</div>
+          <WebhooksTable
+            webhooks={webhooks ?? []}
+            urlBase={
+              "/organizations/" + activeOrg.slug + "/integrations/webhook"
             }
-            Description="DevGuard uses webhooks to send notifications to your applications. You can use webhooks to receive notifications about events in DevGuard, such as new vulnerabilities, or SBOMs."
-            Button={
-              <WebhookIntegrationDialog
-                onNewIntegration={handleNewWebhookIntegration}
-                Button={<Button variant={"secondary"}>Add a Webhook</Button>}
-                projectWebhook={false}
-              />
-            }
+            onUpdateWebhook={handleUpdateWebhookIntegration}
+            onDeleted={handleWebhookDeleted}
+            projectWebhook={false}
+            isLoading={webhooksLoading}
           />
+          <div className="flex flex-row justify-end">
+            <WebhookIntegrationDialog
+              onNewIntegration={handleNewWebhookIntegration}
+              Button={<Button>Add Webhook</Button>}
+              projectWebhook={false}
+            />
+          </div>
         </Section>
       </div>
       <hr />
@@ -681,8 +648,8 @@ const Home = () => {
       <hr />
       <Section
         id="request-org-deletion"
-        title="Request Organization Deletion"
-        description="If you want to delete your organization, please click the button below and send a request to our support team to delete your organization."
+        title="Delete your Organization"
+        description="Delete your whole organization including all projects and repositories."
       >
         <Card className="p-6">
           <div className="flex justify-end">

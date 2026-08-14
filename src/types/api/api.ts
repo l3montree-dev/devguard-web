@@ -115,7 +115,8 @@ export interface OrganizationDTO extends AppModelDTO {
   gitLabIntegrations: Array<GitLabIntegrationDTO>;
   jiraIntegrations: Array<JiraIntegrationDTO>;
 
-  webhooks: Array<WebhookDTO>;
+  // omitted by the API when there are none
+  webhooks?: Array<WebhookDTO>;
 
   isPublic: boolean;
 
@@ -185,7 +186,8 @@ export interface ProjectDTO {
   repositoryId?: string;
   repositoryName?: string;
 
-  webhooks: Array<WebhookDTO>;
+  // omitted by the API when there are none
+  webhooks?: Array<WebhookDTO>;
 
   members: Array<{
     id: string;
@@ -733,9 +735,12 @@ export interface CompliancePostureWithControlDTO {
   createdAt: string; // ISO (Go time.Time)
   additional: Record<string, any>;
   importance: string;
+  securityLevel: string;
   mappedControls: {
     relatedFramework: string;
     relatedControlId: string;
+    relationship:
+      "equivalent-to" | "intersects-with" | "subset-of" | "superset-of";
   }[];
 }
 

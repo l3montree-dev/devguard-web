@@ -5,10 +5,6 @@ import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";
 
-// Playwright is launched from the repository root (`npm run e2e`), so a bare
-// dotenv.config() picks up the Next.js `.env` there and never sees the e2e
-// secrets. Load `e2e/.env` first and let the root `.env` fill in whatever it
-// does not define — with dotenv the first file to define a key wins.
 dotenv.config({
   path: [
     path.resolve(__dirname, "../.env"),
@@ -105,20 +101,65 @@ function loadEnvVariables() {
   return config;
 }
 
+const IGNORED_BROWSER_MESSAGES: RegExp[] = [
+  /Download the React DevTools/,
+  /^\[HMR\]/,
+  /^\[Fast Refresh\]/,
+  /THREE\.Clock: This module has been deprecated/,
+  /using deprecated parameters for the initialization function/,
+  /The Ory SDK is missing a required function/,
+  /The relying party ID is not a registrable domain suffix/,
+  /GL Driver Message/,
+];
+
+const analyzers = new WeakMap<Page, LoggingAnalyzer>();
+
 export class LoggingAnalyzer {
   public readonly logs: string[] = [];
 
-  constructor(page: Page) {
-    // Listen for all console logs
-    page.on("console", (msg: { text: () => any }) => console.log(msg.text()));
+  private readonly alreadyPrinted = new Set<string>();
 
-    // Listen for all console events and handle errors
-    page.on("console", (msg: { type: () => string; text: () => string }) => {
-      if (msg.type() === "error") {
-        console.log(`Error text: "${msg.text()}"`);
-        this.logs.push(msg.text());
+  static attach(page: Page): LoggingAnalyzer {
+    let analyzer = analyzers.get(page);
+    if (!analyzer) {
+      analyzer = new LoggingAnalyzer(page);
+      analyzers.set(page, analyzer);
+    }
+    return analyzer;
+  }
+
+  private constructor(page: Page) {
+    const verbose = !!process.env.E2E_VERBOSE_CONSOLE;
+
+    page.on("console", (msg) => {
+      const type = msg.type();
+      const text = msg.text();
+      const url = msg.location().url;
+      const detail = url && !text.includes(url) ? `${text} (${url})` : text;
+      const ignored = IGNORED_BROWSER_MESSAGES.some((re) => re.test(detail));
+
+      if (type === "error" && !ignored) {
+        this.logs.push(detail);
+      }
+
+      if (verbose) {
+        console.log(`[browser:${type}] ${detail}`);
+      } else if (!ignored && (type === "error" || type === "warning")) {
+        this.print(type, detail);
       }
     });
+    page.on("pageerror", (error) => {
+      this.logs.push(error.message);
+      this.print("pageerror", error.message);
+    });
+  }
+  private print(type: string, text: string) {
+    const key = `${type}:${text}`;
+    if (this.alreadyPrinted.has(key)) {
+      return;
+    }
+    this.alreadyPrinted.add(key);
+    console.log(`[browser:${type}] ${text}`);
   }
 }
 

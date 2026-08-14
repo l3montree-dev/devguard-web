@@ -21,6 +21,7 @@ import { Badge } from "../../ui/badge";
 import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogHeader, DialogTitle } from "../../ui/dialog";
+import { Button } from "../../ui/button";
 
 interface IntegrationMethodSelectionSlideProps {
   api?: {
@@ -29,11 +30,12 @@ interface IntegrationMethodSelectionSlideProps {
   setVariant: (variant: "manual" | "auto") => void;
   cliSlideIndex: number;
   fileUploadSlideIndex: number;
+  prevIndex: number;
 }
 
 const IntegrationMethodSelectionSlide: FunctionComponent<
   IntegrationMethodSelectionSlideProps
-> = ({ api, setVariant, cliSlideIndex, fileUploadSlideIndex }) => {
+> = ({ api, setVariant, cliSlideIndex, fileUploadSlideIndex, prevIndex }) => {
   return (
     <CarouselItem>
       <div className="">
@@ -42,7 +44,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
         </DialogHeader>
         <div className="mt-10">
           <Card
-            className="cursor-pointer"
+            className="cursor-pointer hover:border-primary"
             onClick={() => {
               setVariant("auto");
               api?.scrollTo(cliSlideIndex);
@@ -63,7 +65,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
             </CardHeader>
           </Card>
           <Card
-            className="cursor-pointer mt-2"
+            className="cursor-pointer mt-2 hover:border-primary"
             data-testid="upload-manually"
             onClick={() => {
               setVariant("manual");
@@ -84,6 +86,15 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               </CardDescription>
             </CardHeader>
           </Card>
+          <div className="mt-4 flex flex-row gap-2 justify-end">
+            <Button
+              variant={"secondary"}
+              id="integration-method-back-to-selection"
+              onClick={() => api?.scrollTo(prevIndex)}
+            >
+              Back
+            </Button>
+          </div>
         </div>
       </div>
     </CarouselItem>
