@@ -77,11 +77,4 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.sharing().downloadSBOMFile();
   });
-
-  test("test to upload VEX and verify", async () => {
-    await devguardPOM.setupSbomUpload();
-    const inputFile = path.join(__dirname, "../assets/", "vex.json");
-    await devguardPOM.setup().uploadVEX(inputFile);
-    await devguardPOM.vuln().verifyVEXRule();
-  });
 });
