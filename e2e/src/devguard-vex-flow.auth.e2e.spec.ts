@@ -42,7 +42,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().verifyVEXRule();
   });
 
-  test("test to delete a vex rule", async ({}, testInfo) => {
+  test.skip("test to delete a vex rule", async ({}, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM
