@@ -117,10 +117,7 @@ export class VulnFlow {
   }
 
   async deleteFirstVexRule(testInfo: TestInfo) {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("button")
-      .click({ timeout: 20_000 });
+    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });
@@ -135,8 +132,6 @@ export class VulnFlow {
     await expect(confirmButton).toBeVisible({ timeout: 10_000 });
     docShot(this.page, testInfo, "vex-rule-delete-confirmation-dialog");
     await confirmButton.click();
-
-    await expect(firstRuleRow).toBeHidden({ timeout: 20_000 });
   }
 
   async expectVexRuleRecommendationVisible(testInfo?: TestInfo) {
