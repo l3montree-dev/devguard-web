@@ -109,13 +109,11 @@ export class VulnFlow {
   }
 
   async expectVulnStateEventually(state: string) {
-    await expect(async () => {
-      await this.repo().openDependencyRiskTable();
-      await this.openFirstAffectedComponent();
-      await expect(this.page.getByTestId("vuln-state")).toHaveText(state, {
-        timeout: 5_000,
-      });
-    }).toPass({ timeout: 60_000, intervals: [2_000] });
+    await this.repo().openDependencyRiskTable();
+    await this.openFirstAffectedComponent();
+    await expect(this.page.getByTestId("vuln-state")).toHaveText(state, {
+      timeout: 5_000,
+    });
   }
 
   async deleteFirstVexRule(testInfo: TestInfo) {
