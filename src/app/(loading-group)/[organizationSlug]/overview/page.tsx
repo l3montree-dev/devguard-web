@@ -13,8 +13,9 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { useViewMode } from "@/hooks/useViewMode";
+import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import type { OrgOverview } from "@/types/api/api";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
 import useSWR from "swr";
@@ -33,6 +34,11 @@ const OrganizationOverview: FunctionComponent = () => {
   const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
   useAutoTour("org-overview", orgOverviewTourSteps);
+
+  // The dependency proxy settings are only available to organization admins,
+  // so only surface the shortcut to users who can actually access it.
+  const currentUserRole = useCurrentUserRole();
+  const canManageDependencyProxy = isAdmin(currentUserRole);
 
   const {
     data: orgStatistics,
@@ -114,6 +120,38 @@ const OrganizationOverview: FunctionComponent = () => {
           </div>
         )}
       </div>
+      {canManageDependencyProxy && (
+        <Card className="mb-8" data-tour="dependency-proxy-cta">
+          <CardContent className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-full bg-primary/10 p-3 text-primary">
+                <ShieldCheckIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold">
+                  Protect your supply chain with the Dependency Proxy
+                </h2>
+                <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                  Route npm, Go, PyPI and OCI package downloads through
+                  DevGuard&apos;s Dependency Firewall to block malicious
+                  packages before they enter your codebase. Configure it once
+                  and enforce it across your entire organization.
+                </p>
+              </div>
+            </div>
+            <Button
+              asChild
+              variant="outline"
+              className="shrink-0"
+              data-testid="configure-dependency-proxy"
+            >
+              <Link href={`/${orgSlug}/settings/dependency-proxy`}>
+                Configure Dependency Proxy
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
       {isError ? (
         <Card className="mt-8">
           <CardContent className="flex flex-col items-center justify-center py-16">
