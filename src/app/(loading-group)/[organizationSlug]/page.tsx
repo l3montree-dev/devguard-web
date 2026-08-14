@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import Page from "../../../components/Page";
 
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
@@ -32,28 +31,13 @@ import type {
 import type { CreateProjectReq } from "../../../types/api/req";
 
 import Section from "@/components/common/Section";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
 import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
-import { ProjectForm } from "@/components/project/ProjectForm";
+import { CreateGroupForm } from "@/components/project/CreateGroupForm";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
@@ -87,10 +71,6 @@ const OrganizationHomePage: FunctionComponent = () => {
   const updateOrganization = useUpdateOrganization();
 
   const currentUserRole = useCurrentUserRole();
-
-  const form = useForm<ProjectDTO>({
-    mode: "onBlur",
-  });
 
   const searchQuery = searchParams?.get("search") ?? "";
   const isSearchActive = searchQuery.length >= 3;
@@ -296,26 +276,6 @@ const OrganizationHomePage: FunctionComponent = () => {
     !activeOrg.externalEntityProviderId &&
     isAdmin(currentUserRole);
 
-  const createGroupForm = (
-    <FormProvider {...form}>
-      <form
-        className="space-y-8"
-        onSubmit={form.handleSubmit(handleCreateProject)}
-      >
-        <ProjectForm forceVerticalSections form={form} hideDangerZone />
-        <DialogFooter>
-          <Button
-            data-testid="create-group-submit-button"
-            type="submit"
-            isSubmitting={form.formState.isSubmitting}
-          >
-            Create
-          </Button>
-        </DialogFooter>
-      </form>
-    </FormProvider>
-  );
-
   return (
     <>
       <WelcomeModal
@@ -325,18 +285,12 @@ const OrganizationHomePage: FunctionComponent = () => {
       />
       <Page Title={null} title={""} Menu={orgMenu}>
         {!showInlineCreateForm && (
-          <Dialog open={open}>
-            <DialogContent setOpen={setOpen}>
-              <DialogHeader>
-                <DialogTitle>Create new Group</DialogTitle>
-                <DialogDescription>
-                  Groups help to organize your software projects. For example, you can make a group per software project, and then split the frontend and backend into individual subgroups.
-                </DialogDescription>
-              </DialogHeader>
-              <hr />
-              {createGroupForm}
-            </DialogContent>
-          </Dialog>
+          <CreateGroupForm
+            variant="dialog"
+            open={open}
+            setOpen={setOpen}
+            onSubmit={handleCreateProject}
+          />
         )}
 
         <div>
@@ -382,19 +336,10 @@ const OrganizationHomePage: FunctionComponent = () => {
             title="Groups"
           >
             {showInlineCreateForm ? (
-              <Card
-                className="w-full max-w-3xl"
-                data-testid="create-group-form"
-                data-tour="create-group-button"
-              >
-                <CardHeader>
-                  <CardTitle className="text-lg">Create new Group</CardTitle>
-                  <CardDescription>
-                  Groups help to organize your software projects. For example, you can make a group per software project, and then split the frontend and backend into individual subgroups.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>{createGroupForm}</CardContent>
-              </Card>
+              <CreateGroupForm
+                variant="inline"
+                onSubmit={handleCreateProject}
+              />
             ) : (
               <>
                 <div className="flex items-center gap-4">
@@ -437,21 +382,25 @@ const OrganizationHomePage: FunctionComponent = () => {
                     skeletonVariant="project"
                     error={error}
                     data={projects?.data}
-                Empty={<EmptyParty title={"No groups found"} description="" />}
+                    Empty={
+                      <EmptyParty title={"No groups found"} description="" />
+                    }
                     renderItem={(project) => {
                       return (
                         <div key={project.id} className="flex flex-col">
                           <div className="flex flex-col gap-2">
                             <SubgroupsAndAssetsList
                               project={
-                            project as ProjectDTO & { resourceType: "project" }
+                                project as ProjectDTO & {
+                                  resourceType: "project";
+                                }
                               }
                               onFetchData={handleLazyDataFetching}
                               subgroupsWithAssets={
                                 (
-                              project as ProjectDTO & {
-                                resourceType: "project";
-                              }
+                                  project as ProjectDTO & {
+                                    resourceType: "project";
+                                  }
                                 ).subGroupsAndAsset
                               }
                               projectSlug={project.slug}
