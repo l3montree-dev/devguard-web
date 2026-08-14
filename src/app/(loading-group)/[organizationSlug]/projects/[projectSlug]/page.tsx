@@ -2,32 +2,27 @@
 
 import CustomPagination from "@/components/common/CustomPagination";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import useSWR from "swr";
-import AssetForm, {
-  type AssetFormValues,
-} from "../../../../../components/asset/AssetForm";
+import type { AssetFormValues } from "../../../../../components/asset/AssetForm";
+import { CreateRepositoryForm } from "../../../../../components/asset/CreateRepositoryForm";
 import AuthGuard from "../../../../../components/AuthGuard";
 import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import Page from "../../../../../components/Page";
-import { ProjectForm } from "../../../../../components/project/ProjectForm";
+import { CreateGroupForm } from "../../../../../components/project/CreateGroupForm";
 import { Button } from "../../../../../components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../../../../../components/ui/dialog";
 import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
 import { fetcher } from "../../../../../data-fetcher/fetcher";
@@ -42,7 +37,7 @@ import type {
   ProjectDTO,
   SubGroupsAndAsset,
 } from "../../../../../types/api/api";
-import { RequirementsLevel } from "../../../../../types/api/api";
+import type { CreateProjectReq } from "../../../../../types/api/req";
 
 import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
 import Sort from "@/components/Sort";
@@ -89,6 +84,7 @@ export default function RepositoriesPage() {
   })();
 
   const {
+    isLoading,
     data: subgroupsWithAssets,
     error,
     mutate,
@@ -107,31 +103,29 @@ export default function RepositoriesPage() {
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const form = useForm<AssetFormValues>({
-    defaultValues: {
-      repositoryProvider: "github",
-      confidentialityRequirement: RequirementsLevel.Medium,
-      integrityRequirement: RequirementsLevel.Medium,
-      availabilityRequirement: RequirementsLevel.Medium,
-      cvssAutomaticTicketThreshold: [], //here are the values, when enabled I enable reproting range
-      riskAutomaticTicketThreshold: [],
-    },
-  });
-
-  const projectForm = useForm<ProjectDTO>({
-    defaultValues: {
-      parentId: project.id,
-    },
-  });
 
   const currentUserRole = useCurrentUserRole();
   const [showProjectModal, setShowProjectModal] = useState(false);
+  // which form the inline create tabs show as long as the group is empty
+  const [inlineCreateTab, setInlineCreateTab] = useState<
+    "repository" | "subgroup"
+  >("repository");
 
   const projectMenu = useProjectMenu();
 
+  // as long as the group is empty, we show the create form right away instead of an empty list
+  const showInlineCreateForm =
+    !isLoading &&
+    !error &&
+    subgroupsWithAssets?.data.length === 0 &&
+    !isSearchActive &&
+    searchParams?.get("state") !== "inactive" &&
+    !project.externalEntityProviderId &&
+    isAdmin(currentUserRole);
+
   const tourSteps = useMemo(
-    () => groupHomeTourSteps(isAdmin(currentUserRole)),
-    [currentUserRole],
+    () => groupHomeTourSteps(isAdmin(currentUserRole), !showInlineCreateForm),
+    [currentUserRole, showInlineCreateForm],
   );
   useAutoTour("group-home", tourSteps);
 
@@ -154,12 +148,12 @@ export default function RepositoriesPage() {
     }
   };
 
-  const handleCreateProject = async (data: ProjectDTO) => {
+  const handleCreateProject = async (data: CreateProjectReq) => {
     const resp = await browserApiClient(
       "/organizations/" + activeOrg.slug + "/projects/",
       {
         method: "POST",
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, parentId: project.id }),
       },
     );
     if (resp.ok) {
@@ -199,7 +193,6 @@ export default function RepositoriesPage() {
         env: Array<EnvDTO>;
       } = await resp.json();
       setShowModal(false);
-      form.reset();
       // navigate to the new application
       router.push(
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
@@ -263,14 +256,19 @@ export default function RepositoriesPage() {
   return (
     <>
       <Page
-        Button={<Button onClick={() => setShowModal(true)}>New Asset</Button>}
+        Button={
+          !showInlineCreateForm && (
+            <Button onClick={() => setShowModal(true)}>New Asset</Button>
+          )
+        }
         title={project.name}
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
         <Section
           Button={
-            !project.externalEntityProviderId && (
+            !project.externalEntityProviderId &&
+            !showInlineCreateForm && (
               <AuthGuard require="admin">
                 <div className="flex flex-row gap-2">
                   <Button
@@ -297,129 +295,119 @@ export default function RepositoriesPage() {
           forceVertical
           title={project.name}
         >
-          <div className="flex items-center gap-4">
+          {showInlineCreateForm ? (
             <Tabs
-              defaultValue="active"
-              value={viewedProject}
-              onValueChange={handleSetTabValue}
-              className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+              className="w-full max-w-6xl"
+              value={inlineCreateTab}
+              onValueChange={(value) =>
+                setInlineCreateTab(value as "repository" | "subgroup")
+              }
             >
               <TabsList>
-                <TabsTrigger value="active">
-                  {project.externalEntityProviderId
-                    ? "Repositories"
-                    : "Subgroups & Repositories"}
+                <TabsTrigger
+                  value="repository"
+                  data-testid="create-repository-tab"
+                >
+                  Create new Repository
                 </TabsTrigger>
-                <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                <TabsTrigger
+                  value="subgroup"
+                  data-testid="create-subgroup-tab"
+                  data-tour="create-subgroup-button"
+                >
+                  Create new Subgroup
+                </TabsTrigger>
               </TabsList>
+              <TabsContent value="repository">
+                <CreateRepositoryForm
+                  variant="inline"
+                  onSubmit={handleCreateAsset}
+                />
+              </TabsContent>
+              <TabsContent value="subgroup">
+                <CreateGroupForm
+                  variant="inline"
+                  onSubmit={handleCreateProject}
+                  title="Create new Subgroup"
+                  description="Subgroups can help to organize your bigger software projects. You can separate your backend, frontend and website repositories for example."
+                />
+              </TabsContent>
             </Tabs>
-            {isSearchActive && (
-              <span className="text-xs text-warning bg-warning-muted border border-warning-border rounded px-2 py-1">
-                Filter and sorting options are disabled while searching
-              </span>
-            )}
-          </div>
-          <div data-tour="group-filter" className="flex gap-2">
-            <Sort
-              sortOptions={[
-                { label: "Name", value: "name" },
-                { label: "Created at", value: "created_at" },
-                { label: "Updated at", value: "updated_at" },
-              ]}
-            />
+          ) : (
+            <>
+              <div className="flex items-center gap-4">
+                <Tabs
+                  defaultValue="active"
+                  value={viewedProject}
+                  onValueChange={handleSetTabValue}
+                  className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+                >
+                  <TabsList>
+                    <TabsTrigger value="active">
+                      {project.externalEntityProviderId
+                        ? "Repositories"
+                        : "Subgroups & Repositories"}
+                    </TabsTrigger>
+                    <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                {isSearchActive && (
+                  <span className="text-xs text-warning bg-warning-muted border border-warning-border rounded px-2 py-1">
+                    Filter and sorting options are disabled while searching
+                  </span>
+                )}
+              </div>
+              <div data-tour="group-filter" className="flex gap-2">
+                <Sort
+                  sortOptions={[
+                    { label: "Name", value: "name" },
+                    { label: "Created at", value: "created_at" },
+                    { label: "Updated at", value: "updated_at" },
+                  ]}
+                />
 
-            <Input
-              className="h-11"
-              onChange={debouncedHandleSearch}
-              defaultValue={searchParams?.get("search") || ""}
-              placeholder="Search for projects and repositories (min. 3 characters)..."
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <SubgroupsAndAssetsList
-              error={error}
-              subgroupsWithAssets={subgroupsWithAssets?.data}
-              projectSlug={project.slug}
-              onFetchData={handleLazyDataFetching}
-            />
-          </div>
-          <div className="mt-4">
-            {subgroupsWithAssets && (
-              <CustomPagination {...subgroupsWithAssets} />
-            )}
-          </div>
+                <Input
+                  className="h-11"
+                  onChange={debouncedHandleSearch}
+                  defaultValue={searchParams?.get("search") || ""}
+                  placeholder="Search for projects and repositories (min. 3 characters)..."
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <SubgroupsAndAssetsList
+                  error={error}
+                  subgroupsWithAssets={subgroupsWithAssets?.data}
+                  projectSlug={project.slug}
+                  onFetchData={handleLazyDataFetching}
+                />
+              </div>
+              <div className="mt-4">
+                {subgroupsWithAssets && (
+                  <CustomPagination {...subgroupsWithAssets} />
+                )}
+              </div>
+            </>
+          )}
         </Section>
       </Page>
 
-      <Dialog open={showProjectModal}>
-        <DialogContent setOpen={setShowProjectModal}>
-          <DialogHeader>
-            <DialogTitle>Create new Group</DialogTitle>
-            <DialogDescription>
-              A project groups multiple software projects (repositories) inside
-              a single enitity. Something like: frontend and backend
-            </DialogDescription>
-          </DialogHeader>
-          <hr />
-          <FormProvider {...projectForm}>
-            <form
-              className="space-y-8"
-              onSubmit={projectForm.handleSubmit(handleCreateProject)}
-            >
-              <ProjectForm
-                forceVerticalSections
-                form={projectForm}
-                hideDangerZone
-              />
-              <DialogFooter>
-                <Button
-                  isSubmitting={projectForm.formState.isSubmitting}
-                  type="submit"
-                  variant="default"
-                >
-                  Create
-                </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+      <CreateGroupForm
+        variant="dialog"
+        open={showProjectModal}
+        setOpen={setShowProjectModal}
+        onSubmit={handleCreateProject}
+        title="Create new Subgroup"
+        description="Subgroups can help to organize your bigger software projects. You can separate your backend, frontend and website repositories for example."
+      />
 
-      <Dialog open={showModal}>
-        <DialogContent setOpen={setShowModal}>
-          <DialogHeader>
-            <DialogTitle>Create new repository</DialogTitle>
-            <DialogDescription>
-              An repository is a software project you would like to manage the
-              risks of.
-            </DialogDescription>
-          </DialogHeader>
-          <hr />
-          <FormProvider {...form}>
-            <form
-              className="flex flex-col"
-              onSubmit={form.handleSubmit(handleCreateAsset)}
-            >
-              <AssetForm
-                forceVerticalSections
-                form={form}
-                showVulnsManagement={false}
-                showSecurityRequirements={false}
-              />
-              <DialogFooter>
-                <Button
-                  data-testid="create-repository-submit-button"
-                  isSubmitting={form.formState.isSubmitting}
-                  type="submit"
-                  variant="default"
-                >
-                  Create
-                </Button>
-              </DialogFooter>
-            </form>
-          </FormProvider>
-        </DialogContent>
-      </Dialog>
+      {!showInlineCreateForm && (
+        <CreateRepositoryForm
+          variant="dialog"
+          open={showModal}
+          setOpen={setShowModal}
+          onSubmit={handleCreateAsset}
+        />
+      )}
     </>
   );
 }

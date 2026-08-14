@@ -43,7 +43,12 @@ const FlowchartNode: FunctionComponent<Step> = ({
   description,
   state,
 }) => (
-  <div className={cn("rounded-lg border bg-card p-3", stepStyles[state].card)}>
+  <div
+    className={cn(
+      "shrink-0 rounded-lg border bg-card p-3",
+      stepStyles[state].card,
+    )}
+  >
     <div className="flex flex-row items-center gap-2">
       <Icon className={cn("h-4 w-4 shrink-0", stepStyles[state].icon)} />
       <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -62,34 +67,47 @@ const FlowchartNode: FunctionComponent<Step> = ({
   </div>
 );
 
+// grows to fill whatever height the form next to the flowchart has
 const Connector: FunctionComponent = () => (
-  <div className="flex flex-col items-center" aria-hidden="true">
-    <div className="h-3 w-px bg-border" />
-    <ChevronDown className="-my-1 h-3 w-3 text-border" />
-    <div className="h-3 w-px bg-border" />
+  <div className="flex flex-1 flex-col items-center" aria-hidden="true">
+    <div className="w-px min-h-3 flex-1 bg-border" />
+    <ChevronDown className="-my-1 h-3 w-3 shrink-0 text-border" />
+    <div className="w-px min-h-3 flex-1 bg-border" />
   </div>
 );
 
 interface Props {
   organizationName: string;
   groupName?: string;
+  repositoryName?: string;
+  // the step the user is currently filling out, the other ones are just context
+  highlight?: "group" | "repository";
   className?: string;
 }
+
+const Placeholder: FunctionComponent<{ children: ReactNode }> = ({
+  children,
+}) => <span className="font-normal text-muted-foreground">{children}</span>;
 
 export const GroupStructureFlowchart: FunctionComponent<Props> = ({
   organizationName,
   groupName,
+  repositoryName,
+  highlight = "group",
   className,
 }) => {
   const trimmedGroupName = groupName?.trim();
+  const trimmedRepositoryName = repositoryName?.trim();
+  const creatingGroup = highlight === "group";
 
   const steps: Step[] = [
     {
       Icon: Building2,
       label: "Organization",
       value: truncateMiddle(organizationName, maxNameLength),
-      description:
-        "The organization you just created. It holds all of your groups and projects.",
+      description: creatingGroup
+        ? "The organization you just created. It holds all of your groups and projects."
+        : "The organization this repository belongs to.",
       state: "existing",
     },
     {
@@ -98,29 +116,44 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
       value: trimmedGroupName ? (
         truncateMiddle(trimmedGroupName, maxNameLength)
       ) : (
-        <span className="font-normal text-muted-foreground">
-          Your new group
-        </span>
+        <Placeholder>Your new group</Placeholder>
       ),
-      description:
-      <>
-        "What you are creating now - for example one per software product. <strong>You can create sub-groups as well to split frontend and backend repositories for example.</strong> "
-        </>,
-      state: "pending",
+      description: creatingGroup ? (
+        <>
+          What you are creating now - for example one per software product.{" "}
+          <strong>
+            You can create sub-groups as well to split frontend and backend
+            repositories for example.
+          </strong>
+        </>
+      ) : (
+        "The group you are adding the repository to."
+      ),
+      state: creatingGroup ? "pending" : "existing",
     },
     {
       Icon: Package,
-      label: "Repositories",
-      value: "Frontend, Backend, ...",
-      description:
-        "The repositories DevGuard scans. You add them once the group exists.",
-      state: "next",
+      label: creatingGroup ? "Repositories" : "Repository",
+      value: creatingGroup ? (
+        "Frontend, Backend, ..."
+      ) : trimmedRepositoryName ? (
+        truncateMiddle(trimmedRepositoryName, maxNameLength)
+      ) : (
+        <Placeholder>Your new repository</Placeholder>
+      ),
+      description: creatingGroup ? (
+        "The repositories you will manage and scan with DevGuard. You add them inside groups."
+      ) : (
+        
+          "What you are creating now. Your actual code you want to scan and manage with DevGuard."
+      ),
+      state: creatingGroup ? "next" : "pending",
     },
   ];
 
   return (
     <div
-      className={cn("flex flex-col", className)}
+      className={cn("flex h-full flex-col", className)}
       data-testid="group-structure-flowchart"
     >
       {steps.map((step, index) => (

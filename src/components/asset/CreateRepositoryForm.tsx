@@ -12,35 +12,36 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useProject } from "@/context/ProjectContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import type { ProjectDTO } from "@/types/api/api";
-import type { CreateProjectReq } from "@/types/api/req";
+import { RequirementsLevel } from "@/types/api/api";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { GroupStructureFlowchart } from "../project/GroupStructureFlowchart";
 import { Button } from "../ui/button";
-import { GroupStructureFlowchart } from "./GroupStructureFlowchart";
-import { ProjectForm } from "./ProjectForm";
+import AssetForm, { type AssetFormValues } from "./AssetForm";
 
-const defaultTitle = "Create new Group";
+const defaultTitle = "Create new repository";
 const defaultDescription =
-  "Groups help to organize your software projects. For example, you can make a group per software project, and then split the frontend and backend into individual subgroups.";
+  "A repository is a software project you would like to manage the risks of.";
 
 interface Props {
-  onSubmit: (req: CreateProjectReq) => Promise<void>;
+  onSubmit: (req: AssetFormValues) => Promise<void>;
   // "dialog" renders the form inside a modal controlled by open/setOpen
-  // "inline" renders it inside a card, used when there is no group yet
+  // "inline" renders it inside a card, used when there is no repository yet
   variant: "dialog" | "inline";
   open?: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  // override the copy, e.g. when creating a subgroup inside an existing group
+  // override the copy, e.g. when the group already contains subgroups
   title?: string;
   description?: string;
 }
 
-export const CreateGroupForm: FunctionComponent<Props> = ({
+export const CreateRepositoryForm: FunctionComponent<Props> = ({
   onSubmit,
   variant,
   open,
@@ -49,31 +50,48 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
   description = defaultDescription,
 }) => {
   const activeOrg = useActiveOrg();
-  const form = useForm<ProjectDTO>({
-    mode: "onBlur",
+  const project = useProject();
+  const form = useForm<AssetFormValues>({
+    defaultValues: {
+      repositoryProvider: "github",
+      confidentialityRequirement: RequirementsLevel.Medium,
+      integrityRequirement: RequirementsLevel.Medium,
+      availabilityRequirement: RequirementsLevel.Medium,
+      // the thresholds are only set once the reporting range is enabled
+      cvssAutomaticTicketThreshold: [],
+      riskAutomaticTicketThreshold: [],
+    },
   });
 
   // subscribe to the name field so the flowchart can mirror it while typing
-  const groupName = useWatch({ control: form.control, name: "name" });
+  const repositoryName = useWatch({ control: form.control, name: "name" });
+
+  const submitButton = (
+    <Button
+      data-testid="create-repository-submit-button"
+      isSubmitting={form.formState.isSubmitting}
+      type="submit"
+      variant="default"
+    >
+      Create
+    </Button>
+  );
 
   const formElement = (
     <FormProvider {...form}>
-      <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
-        <ProjectForm
+      <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
+        <AssetForm
           forceVerticalSections
           form={form}
-          hideDangerZone
+          showVulnsManagement={false}
+          showSecurityRequirements={false}
           inputVariant={variant === "inline" ? "onCard" : "default"}
         />
-        <div className="flex justify-end">
-          <Button
-            data-testid="create-group-submit-button"
-            type="submit"
-            isSubmitting={form.formState.isSubmitting}
-          >
-            Create
-          </Button>
-        </div>
+        {variant === "dialog" ? (
+          <DialogFooter>{submitButton}</DialogFooter>
+        ) : (
+          <div className="flex justify-end">{submitButton}</div>
+        )}
       </form>
     </FormProvider>
   );
@@ -81,7 +99,10 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
   if (variant === "inline") {
     return (
       <div className="grid w-full max-w-6xl gap-6 lg:grid-cols-[2fr_1fr]">
-        <Card data-testid="create-group-form" data-tour="create-group-button">
+        <Card
+          data-testid="create-repository-form"
+          data-tour="create-repository-button"
+        >
           <CardHeader>
             <CardTitle className="text-lg">{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
@@ -89,8 +110,10 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
           <CardContent>{formElement}</CardContent>
         </Card>
         <GroupStructureFlowchart
+          highlight="repository"
           organizationName={activeOrg?.name ?? "Your organization"}
-          groupName={groupName}
+          groupName={project?.name ?? "Your group"}
+          repositoryName={repositoryName}
         />
       </div>
     );
@@ -110,4 +133,4 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
   );
 };
 
-export default CreateGroupForm;
+export default CreateRepositoryForm;

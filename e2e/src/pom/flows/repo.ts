@@ -4,10 +4,23 @@ import { docShot } from "../../doc-shot";
 export class RepoFlow {
   constructor(private page: Page) {}
 
+  // the create form is rendered inline as long as the group is still empty,
+  // otherwise it only opens after clicking the create button
+  private async openCreateRepoForm() {
+    const inlineForm = this.page.getByTestId("create-repository-form");
+    await inlineForm
+      .or(this.page.getByTestId("create-repository-button"))
+      .first()
+      .waitFor({ state: "visible", timeout: 30_000 });
+    if (!(await inlineForm.isVisible())) {
+      await this.page
+        .getByTestId("create-repository-button")
+        .click({ timeout: 30_000 });
+    }
+  }
+
   async createGitHubRepo(name: string, description: string) {
-    await this.page
-      .getByTestId("create-repository-button")
-      .click({ timeout: 30_000 });
+    await this.openCreateRepoForm();
     await this.page
       .getByTestId("repository-name")
       .waitFor({ state: "visible" });
@@ -19,9 +32,7 @@ export class RepoFlow {
   }
 
   async createGitLabRepo(name: string, description: string) {
-    await this.page
-      .getByTestId("create-repository-button")
-      .click({ timeout: 30_000 });
+    await this.openCreateRepoForm();
     await this.page
       .getByTestId("repository-name")
       .waitFor({ state: "visible" });

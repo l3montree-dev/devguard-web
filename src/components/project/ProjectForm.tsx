@@ -9,7 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "../ui/input";
+import { Input, type InputProps } from "../ui/input";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import Section from "../common/Section";
 import ListItem from "../common/ListItem";
@@ -26,6 +26,7 @@ interface Props {
   disabled?: boolean;
   onConfirmDelete?: () => Promise<void>;
   hideDangerZone?: boolean;
+  inputVariant?: InputProps["variant"];
 }
 
 export const ProjectForm: FunctionComponent<Props> = ({
@@ -34,6 +35,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
   forceVerticalSections,
   onConfirmDelete,
   hideDangerZone = false,
+  inputVariant,
 }) => {
   const org = useActiveOrg();
   return (
@@ -54,6 +56,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                   data-testid="group-name"
                   disabled={disabled}
                   required={true}
+                  variant={inputVariant}
                   {...field}
                 />
               </FormControl>
@@ -72,6 +75,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                 <Input
                   data-testid="group-description"
                   disabled={disabled}
+                  variant={inputVariant}
                   {...field}
                 />
               </FormControl>
