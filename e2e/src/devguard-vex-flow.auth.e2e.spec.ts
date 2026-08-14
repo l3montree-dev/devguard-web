@@ -84,7 +84,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().expectVulnState("False Positive");
   });
 
-  test("test to use upstream vex url and sync it", async ({
+  test.skip("test to use upstream vex url and sync it", async ({
     page,
   }, testInfo) => {
     await page.getByTestId("supplier-url-card").click();

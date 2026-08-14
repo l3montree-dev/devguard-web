@@ -182,6 +182,7 @@ export class VulnFlow {
 
   async filterDependencyRisksTable() {
     await this.repo().openDependencyRiskTable();
+    await this.page.waitForTimeout(1_000);
     await this.page.getByTestId("filter-open-button").click();
     await this.page.getByTestId("filter-field-select").click();
     await this.page.getByRole("option", { name: "CVSS" }).click();
