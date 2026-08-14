@@ -1,6 +1,5 @@
 import type { SVGProps } from "react";
 
-
 const base: SVGProps<SVGSVGElement> = {
   xmlns: "http://www.w3.org/2000/svg",
   viewBox: "0 0 24 24",
@@ -11,9 +10,7 @@ const base: SVGProps<SVGSVGElement> = {
   strokeLinejoin: "round",
 };
 
-
 const FILL_OPACITY = 1;
-
 
 export function EquivalentToIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -23,7 +20,6 @@ export function EquivalentToIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 
 export function IntersectsWithIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -40,7 +36,6 @@ export function IntersectsWithIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-
 export function SubsetOfIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...base} {...props}>
@@ -48,7 +43,6 @@ export function SubsetOfIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 
 export function SupersetOfIcon(props: SVGProps<SVGSVGElement>) {
   return (

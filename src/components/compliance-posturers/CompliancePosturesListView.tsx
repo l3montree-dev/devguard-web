@@ -269,7 +269,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     Paged<CompliancePostureWithControlDTO> & { frameworks: string[] }
   >(apiBaseUrl + "?" + query.toString(), fetcher, { keepPreviousData: false });
 
-    console.log("data", vulns);
+  console.log("data", vulns);
 
   const { data: stats, isLoading: statsLoading } = useSWR<{
     open: number;
@@ -358,7 +358,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         : []),
     ];
   }, [isClosed, frameworks]);
-
 
   return (
     <Page Menu={Menu} title={"Compliance Postures"} Title={Title}>
