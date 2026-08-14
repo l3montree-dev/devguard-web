@@ -11,6 +11,5 @@ test.describe.skip("DevGuard pre-Release Test flow", () => {
     await devguardPOM.repo().deleteRepo();
     await devguardPOM.group().checkHeaderGroup();
     await devguardPOM.group().createNewSubgroup();
-    await page.waitForTimeout(5_000);
   });
 });

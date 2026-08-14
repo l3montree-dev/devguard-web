@@ -99,10 +99,7 @@ test.describe("DevGuard handle vuln flows", () => {
       );
     await page.getByTestId("setup-information-sources-create").click();
     await page.reload();
-    await page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("button")
-      .click({ timeout: 20_000 });
+    await devguardPOM.repo().openDependencyRiskTable();
     await page.getByTestId("nav-asset-vex-rules").click({ timeout: 20_000 });
     await page.getByTestId("upstream-vex-sources-trigger").click();
     await page.getByTestId("vex-sources-add-button").click();
@@ -118,8 +115,6 @@ test.describe("DevGuard handle vuln flows", () => {
     await page.getByTestId("upstream-vex-sources-trigger").click();
     await page.getByTestId("vex-sources-sync-all-button").click();
     await page.reload();
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "upstream-vex-rules");
-    await page.waitForTimeout(5_000);
   });
 });

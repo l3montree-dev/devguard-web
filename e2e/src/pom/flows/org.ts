@@ -1,6 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
-import { ModalHelper } from "./modal-helper";
 import { envConfig } from "../../utils";
 import { docShot } from "../../doc-shot";
 
@@ -9,7 +8,8 @@ export class OrgFlow {
 
   async createOrganization(name: string) {
     await this.page.goto(`${envConfig.devGuard.domain}/setup`);
-    await this.page.waitForTimeout(3_000);
+    // Necessary timeout so the 3D interactive DevGuard card is centered
+    await this.page.waitForTimeout(1_000);
     await this.page.setViewportSize({ width: 1440, height: 900 });
     await docShot(this.page, test.info(), "org-creation-screen");
     await this.page.getByTestId("org-name-label").click();
@@ -22,10 +22,9 @@ export class OrgFlow {
     await this.page
       .getByRole("button", { name: "Create Organization" })
       .click();
-    await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
-    await this.page.waitForTimeout(5_000);
-    await new ModalHelper(this.page).dismissToastIfPresent();
-    await this.page.waitForLoadState("networkidle");
+    await this.page
+      .getByTestId("create-group-button")
+      .waitFor({ state: "visible", timeout: 30_000 });
     await docShot(this.page, test.info(), "group-creation-screen");
   }
 
@@ -110,7 +109,6 @@ export class OrgFlow {
     await this.page
       .getByRole("button", { name: "Create Organization" })
       .click();
-    await new ModalHelper(this.page).dismissWelcomeModalIfPresent();
   }
 
   async redirectToNewOrg(level: DevGuardNavigationLevel) {

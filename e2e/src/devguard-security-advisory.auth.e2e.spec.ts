@@ -40,7 +40,6 @@ test.describe("DevGuard create security Advisory flows", () => {
     await page.getByTestId("nav-asset-advisory").click();
     await page.setViewportSize({ width: 1440, height: 1800 });
     await page.getByTestId("create-security-advisory").click();
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "security-advisory-creation");
     await devguardPOM
       .advisory()
@@ -54,10 +53,8 @@ test.describe("DevGuard create security Advisory flows", () => {
         SASemverEnd,
       );
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "security-advisory-overview");
     await page.getByRole("cell", { name: "Unauthenticated identity" }).click();
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "security-advisory-detailed");
   });
 });

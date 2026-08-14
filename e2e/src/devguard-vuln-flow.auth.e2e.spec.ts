@@ -18,7 +18,6 @@ test.describe("DevGuard handle vuln flows", () => {
 
   test("test sbom upload to false positive", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "dependency-risk-table");
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM.vuln().markVulnAsFalsePositive();
@@ -36,10 +35,8 @@ test.describe("DevGuard handle vuln flows", () => {
     await page
       .getByRole("menuitem", { name: "Overview" })
       .click({ timeout: 20_000 });
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "asset-overview");
     await page.mouse.wheel(0, 1000);
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "asset-overview-v2");
   });
 

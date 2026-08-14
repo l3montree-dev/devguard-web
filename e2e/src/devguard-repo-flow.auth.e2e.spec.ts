@@ -18,25 +18,21 @@ test.describe("DevGuard repo flows", () => {
   test("test devguard cli for screenshot", async ({ page }, testInfo) => {
     await page.getByTestId("devguard-cli-card").click();
     await page.setViewportSize({ width: 1440, height: 1200 });
-    await page.waitForTimeout(3_000);
     await docShot(page, testInfo, "devguard-cli-screen");
   });
 
   test("test create, settings and delete (through settings) of repo", async ({
     page,
   }) => {
-    await page.waitForTimeout(500);
     await devguardPOM.repo().settingClickthroughRepo();
     await devguardPOM.repo().deleteRepo();
   });
 
   test("test manual sbom upload", async ({ page }) => {
     await devguardPOM.setupSbomUpload();
-    await page.waitForTimeout(2_000);
   });
 
   test("test if we can add artifact manually", async ({ page }) => {
-    await page.waitForTimeout(500);
     await devguardPOM.setupSbomUpload();
     await devguardPOM
       .artifacts()
@@ -44,9 +40,7 @@ test.describe("DevGuard repo flows", () => {
         "pkg:test/artifact",
         "http://github.com/user-attachments/files/23216827/vex_l3montree_web_reopened.json",
       );
-    await page.waitForTimeout(1_000);
     await devguardPOM.artifacts().deleteFirstArtifact();
-    await page.waitForTimeout(1_000);
     await devguardPOM.artifacts().deleteFirstArtifact();
     await page
       .getByRole("heading", { name: "No Artifacts Available" })

@@ -1,15 +1,17 @@
 import { expect } from "@playwright/test";
 import { test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
+import { RepoFlow } from "./repo";
 
 export class ShareFlow {
   constructor(private page: Page) {}
 
+  private repo(): RepoFlow {
+    return new RepoFlow(this.page);
+  }
+
   async downloadSBOMFile() {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 5_000 });
+    await this.repo().openDependencyRiskTable();
     await this.page.getByTestId("share-sbom-button").click();
     await this.page
       .getByTestId("download-sbom-json-format")
@@ -23,10 +25,7 @@ export class ShareFlow {
   }
 
   async downloadVEXFile() {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 5_000 });
+    await this.repo().openDependencyRiskTable();
     await this.page.getByTestId("share-vex-button").click();
     await this.page
       .getByTestId("download-vex-json-format")
