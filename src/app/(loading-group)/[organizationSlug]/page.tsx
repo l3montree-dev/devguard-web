@@ -331,7 +331,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                 </AuthGuard>
               )
             }
-            description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+            description={"Groups managed by the " + activeOrg.name + " organization."}
             forceVertical
             title="Groups"
           >

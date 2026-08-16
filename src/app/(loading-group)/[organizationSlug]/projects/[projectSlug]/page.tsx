@@ -291,7 +291,7 @@ export default function RepositoriesPage() {
             )
           }
           primaryHeadline
-          description={"Repositories managed by the " + project.name + " group"}
+          description={"Repositories managed by the " + project.name + " group."}
           forceVertical
           title={project.name}
         >

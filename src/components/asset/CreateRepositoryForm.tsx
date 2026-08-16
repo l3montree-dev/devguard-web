@@ -1,5 +1,3 @@
-// Copyright 2025 L3montree GmbH and the DevGuard Contributors.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import {
   Card,
@@ -36,7 +34,6 @@ interface Props {
   variant: "dialog" | "inline";
   open?: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
-  // override the copy, e.g. when the group already contains subgroups
   title?: string;
   description?: string;
 }
@@ -57,7 +54,6 @@ export const CreateRepositoryForm: FunctionComponent<Props> = ({
       confidentialityRequirement: RequirementsLevel.Medium,
       integrityRequirement: RequirementsLevel.Medium,
       availabilityRequirement: RequirementsLevel.Medium,
-      // the thresholds are only set once the reporting range is enabled
       cvssAutomaticTicketThreshold: [],
       riskAutomaticTicketThreshold: [],
     },

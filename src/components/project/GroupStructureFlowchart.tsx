@@ -1,5 +1,3 @@
-// Copyright 2025 L3montree GmbH and the DevGuard Contributors.
-// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { cn } from "@/lib/utils";
 import { truncateMiddle } from "@/utils/common";
@@ -71,7 +69,7 @@ const FlowchartNode: FunctionComponent<Step> = ({
 const Connector: FunctionComponent = () => (
   <div className="flex flex-1 flex-col items-center" aria-hidden="true">
     <div className="w-px min-h-3 flex-1 bg-border" />
-    <ChevronDown className="-my-1 h-3 w-3 shrink-0 text-border" />
+    <ChevronDown className="-my-1 h-6 w-6 shrink-0 text-border" />
     <div className="w-px min-h-3 flex-1 bg-border" />
   </div>
 );
@@ -80,7 +78,6 @@ interface Props {
   organizationName: string;
   groupName?: string;
   repositoryName?: string;
-  // the step the user is currently filling out, the other ones are just context
   highlight?: "group" | "repository";
   className?: string;
 }
@@ -105,9 +102,7 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
       Icon: Building2,
       label: "Organization",
       value: truncateMiddle(organizationName, maxNameLength),
-      description: creatingGroup
-        ? "The organization you just created. It holds all of your groups and projects."
-        : "The organization this repository belongs to.",
+      description: "The organization you just created. It holds all of your groups and projects.",
       state: "existing",
     },
     {
@@ -127,7 +122,7 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
           </strong>
         </>
       ) : (
-        "The group you are adding the repository to."
+        "The group you just created. Add a repository to it or add another subgroup."
       ),
       state: creatingGroup ? "pending" : "existing",
     },
