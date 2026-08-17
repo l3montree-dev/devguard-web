@@ -70,7 +70,7 @@ test.describe("DevGuard multi-user: test flows", () => {
     await user2POM.loadAndRegister();
 
     await page2.goto(
-      "localhost:3000/publicorg-5/projects/publicgroup/assets/publicrepo",
+      "localhost:3000/publicorg/projects/publicgroup/assets/publicrepo",
     );
     await page2
       .getByTestId("download-pdf-report")
