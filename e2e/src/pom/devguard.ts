@@ -13,6 +13,7 @@ import { ShareFlow } from "./flows/sharing";
 import { suppressOverlays } from "./flows/modal-helper";
 import { AdvisoryHelper } from "./flows/advisory";
 import { ComplianceFlow } from "./flows/compliance";
+import { WebhookFlow } from "./flows/webhook";
 
 export enum DevGuardNavigationLevel {
   Root = ".level-root",
@@ -67,6 +68,10 @@ export class DevGuardPOM {
 
   compliance(): ComplianceFlow {
     return new ComplianceFlow(this.page);
+  }
+
+  webhook(): WebhookFlow {
+    return new WebhookFlow(this.page);
   }
 
   async loadDevGuard() {
