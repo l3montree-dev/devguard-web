@@ -139,7 +139,9 @@ const VulnWithCveTableRow = ({
       onClick={(e) => {
         // Don't navigate if clicking on checkbox
         if (
-          (e.target as HTMLElement).closest('button, input, [role="checkbox"]')
+          (e.target as HTMLElement).closest(
+            'a, button, input, [role="checkbox"]',
+          )
         )
           return;
         router.push(href);
@@ -407,7 +409,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   // Don't act if clicking on checkbox or button
                   if (
                     (e.target as HTMLElement).closest(
-                      'button, input, [role="checkbox"]',
+                      'a, button, input, [role="checkbox"]',
                     )
                   )
                     return;
@@ -454,7 +456,18 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                       disabled={!isMemberRole}
                       ariaLabel={`Select all paths of ${cveID}`}
                     />
-                    <span className="font-medium text-foreground">{cveID}</span>
+                    {pathExplosionOrOnlySinglePath ? (
+                      <Link
+                        href={vulnDetailHref}
+                        className="font-medium !text-foreground hover:underline"
+                      >
+                        {cveID}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-foreground">
+                        {cveID}
+                      </span>
+                    )}
                     {isPathExplosion ? (
                       <Tooltip>
                         <TooltipTrigger>

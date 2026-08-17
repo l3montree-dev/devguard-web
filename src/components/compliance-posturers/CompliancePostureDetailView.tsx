@@ -8,34 +8,27 @@ import type {
   AssetVersionDTO,
   ComplianceComponentDetailsDTO,
   DetailedComplianceRiskDTO,
-  OrganizationDetailsDTO,
   ProjectDTO,
   VulnEventDTO,
 } from "@/types/api/api";
 import Image from "next/image";
 
 import AuthGuard from "@/components/AuthGuard";
+import ListItem from "@/components/common/ListItem";
 import AddComplianceComponentStatementDialog from "@/components/compliance-posturers/AddComplianceComponentStatementDialog";
 import ComplianceComponentIcon from "@/components/compliance-posturers/ComplianceComponentIcon";
 import { TokenizedText } from "@/components/compliance-posturers/TokenizedText";
-import ListItem from "@/components/common/ListItem";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 type BadgeVariant = "CRITICAL" | "MEDIUM" | "LOW" | "HIGH";
 
@@ -102,6 +95,12 @@ import dynamic from "next/dynamic";
 import { toast } from "sonner";
 import useSWR from "swr";
 import FrameworkIcon from "./FrameworkIcon";
+import {
+  EquivalentToIcon,
+  IntersectsWithIcon,
+  SubsetOfIcon,
+  SupersetOfIcon,
+} from "./SetRelationshipIcons";
 
 import useDecodedParams from "@/hooks/useDecodedParams";
 import Callout from "../common/Callout";
@@ -112,14 +111,47 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
+type ControlRelationship =
+  DetailedComplianceRiskDTO["mappedControls"][number]["relationship"];
+
+const relationshipDescription: Record<ControlRelationship, string> = {
+  "equivalent-to": "This control is equivalent to the related control.",
+  "intersects-with":
+    "This control partially overlaps with the related control.",
+  "subset-of": "This control is a subset of the related control.",
+  "superset-of": "This control is a superset of the related control.",
+};
+
+function RelationshipIcon({
+  relationship,
+}: {
+  relationship: ControlRelationship;
+}) {
+  const className = "h-4 w-4";
+  switch (relationship) {
+    case "equivalent-to":
+      return <EquivalentToIcon className={className} />;
+    case "intersects-with":
+      return <IntersectsWithIcon className={className} />;
+    case "subset-of":
+      return <SubsetOfIcon className={className} />;
+    case "superset-of":
+      return <SupersetOfIcon className={className} />;
+    default:
+      return null;
+  }
+}
+
 function MappedControlsGroup({
   framework,
-  controlIds,
+  controls,
 }: {
   framework: string;
-  controlIds: string[];
+  controls: { relatedControlId: string; relationship: ControlRelationship }[];
 }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname() ?? "";
+  const basePath = pathname.substring(0, pathname.lastIndexOf("/"));
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="mb-2 w-full">
       <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
@@ -129,14 +161,37 @@ function MappedControlsGroup({
 
         <span className="text-start">{framework}</span>
         <span className="ml-1 text-xs text-muted-foreground whitespace-nowrap">
-          ({controlIds.length})
+          ({controls.length})
         </span>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1 flex flex-wrap">
-        {controlIds.map((id) => (
-          <Badge key={id} variant="secondary" className="mr-2 mb-2">
-            {id}
-          </Badge>
+        {controls.map(({ relatedControlId, relationship }) => (
+          <Tooltip key={relatedControlId}>
+            <TooltipTrigger asChild>
+              {framework === "Grundschutz" ? (
+                <Badge
+                  variant="secondary"
+                  className="mr-2 mb-2 flex cursor-default items-center gap-1"
+                >
+                  <RelationshipIcon relationship={relationship} />
+                  {relatedControlId}
+                </Badge>
+              ) : (
+                <Link href={`${basePath}/${framework}:${relatedControlId}`}>
+                  <Badge
+                    variant="secondary"
+                    className="mr-2 mb-2 flex cursor-default items-center gap-1"
+                  >
+                    <RelationshipIcon relationship={relationship} />
+                    {relatedControlId}
+                  </Badge>
+                </Link>
+              )}
+            </TooltipTrigger>
+            <TooltipContent>
+              {relationshipDescription[relationship]}
+            </TooltipContent>
+          </Tooltip>
         ))}
       </CollapsibleContent>
     </Collapsible>
@@ -724,235 +779,218 @@ const CompliancePostureDetailView = ({
                 </div>
               )}
               <AuthGuard require="member">
-                <div>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {vuln.state === "open"
-                          ? "Add a comment"
-                          : "Mark as not implemented"}
-                      </CardTitle>
-                      <CardDescription></CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {vuln.state === "open" ? (
-                        <form
-                          className="flex flex-col gap-4"
-                          onSubmit={(e) => e.preventDefault()}
-                        >
-                          <div>
-                            <label className="mb-2 block text-sm font-semibold">
-                              Comment
-                            </label>
-                            <MarkdownEditor
-                              placeholder="Add your comment here..."
-                              value={justification ?? ""}
-                              setValue={setJustification}
-                            />
-                          </div>
-
-                          <div className="flex flex-row justify-end gap-1">
-                            <div className="flex flex-row items-start gap-2">
-                              {asset && (
-                                <>
-                                  {/* we need to implement the endpoint in the backend to create a ticket for this case */}
-                                  {vuln.ticketId === null &&
-                                    integrationName === undefined &&
-                                    false && (
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <span>
-                                            <Button
-                                              variant={"ghost"}
-                                              disabled
-                                              className=""
-                                            >
-                                              <span className="ml-1 text-muted-foreground">
-                                                Create Ticket
-                                              </span>
-                                            </Button>
-                                          </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          No repository is linked. To create a
-                                          ticket, please integrate your issue
-                                          tracker in the{` `}
-                                          <Link
-                                            href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                            className="underline"
-                                          >
-                                            settings
-                                          </Link>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    )}
-                                  {vuln.ticketId === null &&
-                                    integrationName === "gitlab" && (
-                                      <AsyncButton
-                                        variant={"secondary"}
-                                        onClick={() =>
-                                          handleSubmit({
-                                            status: "mitigate",
-                                            justification,
-                                          })
-                                        }
-                                      >
-                                        <div className="flex flex-col">
-                                          <div className="flex">
-                                            <GitProviderIcon
-                                              externalEntityProviderIdOrRepositoryId={
-                                                asset.externalEntityProviderId ??
-                                                "gitlab"
-                                              }
-                                            />
-                                            Create Ticket
-                                          </div>
-                                        </div>
-                                      </AsyncButton>
-                                    )}
-                                  {vuln.ticketId === null &&
-                                    integrationName === "github" && (
-                                      <AsyncButton
-                                        variant={"secondary"}
-                                        onClick={() =>
-                                          handleSubmit({
-                                            status: "mitigate",
-                                            justification,
-                                          })
-                                        }
-                                      >
-                                        <div className="flex flex-col">
-                                          <div className="flex">
-                                            <Image
-                                              alt="GitHub Logo"
-                                              width={15}
-                                              height={15}
-                                              className="mr-2 dark:invert"
-                                              src={"/assets/github.svg"}
-                                            />
-                                            Create GitHub Ticket
-                                          </div>
-                                        </div>
-                                      </AsyncButton>
-                                    )}
-                                  {vuln.ticketId === null &&
-                                    integrationName === "jira" && (
-                                      <AsyncButton
-                                        variant={"secondary"}
-                                        onClick={() =>
-                                          handleSubmit({
-                                            status: "mitigate",
-                                            justification,
-                                          })
-                                        }
-                                      >
-                                        <div className="flex flex-col">
-                                          <div className="flex">
-                                            <Image
-                                              alt="Jira Logo"
-                                              width={15}
-                                              height={15}
-                                              className="mr-2"
-                                              src={
-                                                "/assets/jira-svgrepo-com.svg"
-                                              }
-                                            />
-                                            Create Jira Ticket
-                                          </div>
-                                        </div>
-                                      </AsyncButton>
-                                    )}
-                                </>
-                              )}
-                              <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "implemented",
-                                    justification,
-                                  })
-                                }
-                                variant={"secondary"}
-                              >
-                                Implemented
-                              </AsyncButton>
-                              <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "notApplicable",
-                                    justification,
-                                  })
-                                }
-                                variant={"secondary"}
-                              >
-                                Not Applicable
-                              </AsyncButton>
-                              <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "comment",
-                                    justification,
-                                  })
-                                }
-                                variant={"default"}
-                              >
-                                Comment
-                              </AsyncButton>
-                            </div>
-                          </div>
-                        </form>
-                      ) : (
-                        <form
-                          className="flex flex-col gap-4"
-                          onSubmit={(e) => e.preventDefault()}
-                        >
-                          <div>
-                            <label className="mb-2 block text-sm font-semibold">
-                              Comment
-                            </label>
-                            <MarkdownEditor
-                              value={justification ?? ""}
-                              setValue={setJustification}
-                              placeholder="Add your comment here..."
-                            />
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            You can mark this compliance posture as not
-                            implemented if you made a mistake.
-                          </p>
-                          <div className="flex flex-row justify-end">
-                            <AsyncButton
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "reopened",
-                                  justification,
-                                })
-                              }
-                              variant={"secondary"}
-                              type="submit"
-                            >
-                              Reopen
-                            </AsyncButton>
-                          </div>
-                        </form>
-                      )}
-                      {vuln.ticketUrl && (
-                        <small className="mt-2 block w-full text-right text-muted-foreground">
-                          Comment will be synced with{" "}
-                          <Link href={vuln.ticketUrl} target="_blank">
-                            {vuln.ticketUrl}
-                          </Link>
-                        </small>
-                      )}
+                <div className="mt-10">
+                  {vuln.state === "open" ? (
+                    <form
+                      className="flex flex-col gap-4"
+                      onSubmit={(e) => e.preventDefault()}
+                    >
                       <div>
-                        {InheritedHandlingWarning(
-                          vuln,
-                          assetVersion,
-                          asset,
-                          project,
-                        )}
+                        <MarkdownEditor
+                          placeholder="Add your comment here..."
+                          value={justification ?? ""}
+                          setValue={setJustification}
+                        />
                       </div>
-                    </CardContent>
-                  </Card>
+
+                      <div className="flex flex-row justify-end gap-1">
+                        <div className="flex flex-row items-start gap-2">
+                          {asset && (
+                            <>
+                              {/* we need to implement the endpoint in the backend to create a ticket for this case */}
+                              {vuln.ticketId === null &&
+                                integrationName === undefined &&
+                                false && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span>
+                                        <Button
+                                          variant={"ghost"}
+                                          disabled
+                                          className=""
+                                        >
+                                          <span className="ml-1 text-muted-foreground">
+                                            Create Ticket
+                                          </span>
+                                        </Button>
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      No repository is linked. To create a
+                                      ticket, please integrate your issue
+                                      tracker in the{` `}
+                                      <Link
+                                        href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                        className="underline"
+                                      >
+                                        settings
+                                      </Link>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              {vuln.ticketId === null &&
+                                integrationName === "gitlab" && (
+                                  <AsyncButton
+                                    variant={"secondary"}
+                                    onClick={() =>
+                                      handleSubmit({
+                                        status: "mitigate",
+                                        justification,
+                                      })
+                                    }
+                                  >
+                                    <div className="flex flex-col">
+                                      <div className="flex">
+                                        <GitProviderIcon
+                                          externalEntityProviderIdOrRepositoryId={
+                                            asset.externalEntityProviderId ??
+                                            "gitlab"
+                                          }
+                                        />
+                                        Create Ticket
+                                      </div>
+                                    </div>
+                                  </AsyncButton>
+                                )}
+                              {vuln.ticketId === null &&
+                                integrationName === "github" && (
+                                  <AsyncButton
+                                    variant={"secondary"}
+                                    onClick={() =>
+                                      handleSubmit({
+                                        status: "mitigate",
+                                        justification,
+                                      })
+                                    }
+                                  >
+                                    <div className="flex flex-col">
+                                      <div className="flex">
+                                        <Image
+                                          alt="GitHub Logo"
+                                          width={15}
+                                          height={15}
+                                          className="mr-2 dark:invert"
+                                          src={"/assets/github.svg"}
+                                        />
+                                        Create GitHub Ticket
+                                      </div>
+                                    </div>
+                                  </AsyncButton>
+                                )}
+                              {vuln.ticketId === null &&
+                                integrationName === "jira" && (
+                                  <AsyncButton
+                                    variant={"secondary"}
+                                    onClick={() =>
+                                      handleSubmit({
+                                        status: "mitigate",
+                                        justification,
+                                      })
+                                    }
+                                  >
+                                    <div className="flex flex-col">
+                                      <div className="flex">
+                                        <Image
+                                          alt="Jira Logo"
+                                          width={15}
+                                          height={15}
+                                          className="mr-2"
+                                          src={"/assets/jira-svgrepo-com.svg"}
+                                        />
+                                        Create Jira Ticket
+                                      </div>
+                                    </div>
+                                  </AsyncButton>
+                                )}
+                            </>
+                          )}
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "implemented",
+                                justification,
+                              })
+                            }
+                            variant={"secondary"}
+                          >
+                            Implemented
+                          </AsyncButton>
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "notApplicable",
+                                justification,
+                              })
+                            }
+                            variant={"secondary"}
+                          >
+                            Not Applicable
+                          </AsyncButton>
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "comment",
+                                justification,
+                              })
+                            }
+                            variant={"default"}
+                          >
+                            Comment
+                          </AsyncButton>
+                        </div>
+                      </div>
+                    </form>
+                  ) : (
+                    <form
+                      className="flex flex-col gap-4"
+                      onSubmit={(e) => e.preventDefault()}
+                    >
+                      <div>
+                        <label className="mb-2 block text-sm font-semibold">
+                          Comment
+                        </label>
+                        <MarkdownEditor
+                          value={justification ?? ""}
+                          setValue={setJustification}
+                          placeholder="Add your comment here..."
+                        />
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        You can mark this compliance posture as not implemented
+                        if you made a mistake.
+                      </p>
+                      <div className="flex flex-row justify-end">
+                        <AsyncButton
+                          onClick={() =>
+                            handleSubmit({
+                              status: "reopened",
+                              justification,
+                            })
+                          }
+                          variant={"secondary"}
+                          type="submit"
+                        >
+                          Reopen
+                        </AsyncButton>
+                      </div>
+                    </form>
+                  )}
+                  {vuln.ticketUrl && (
+                    <small className="mt-2 block w-full text-right text-muted-foreground">
+                      Comment will be synced with{" "}
+                      <Link href={vuln.ticketUrl} target="_blank">
+                        {vuln.ticketUrl}
+                      </Link>
+                    </small>
+                  )}
+                  <div>
+                    {InheritedHandlingWarning(
+                      vuln,
+                      assetVersion,
+                      asset,
+                      project,
+                    )}
+                  </div>
                 </div>
               </AuthGuard>
             </div>
@@ -978,6 +1016,33 @@ const CompliancePostureDetailView = ({
                       <Link
                         className="text-xs text-muted-foreground"
                         href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/tree/main/Anwenderkataloge/Grundschutz%2B%2B"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
+                    ) : vuln.framework && vuln.framework === "ISO27001" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/ISO27001/ISO27001-AnnexA-catalog.json"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
+                    ) : vuln.framework &&
+                      vuln.framework ===
+                        "BSI-Anforderungen-zum-Risikomanagement" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Risikomanagement/BSI-Anforderungen-zum-Risikomanagement-catalog.json"
+                        target="_blank"
+                      >
+                        {vuln.framework} (CC-BY-4.0)
+                      </Link>
+                    ) : vuln.framework &&
+                      vuln.framework === "Lieferkettensicherheit" ? (
+                      <Link
+                        className="text-xs text-muted-foreground"
+                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Lieferkettensicherheit/Lieferkettensicherheit-resolved_catalog.json"
                         target="_blank"
                       >
                         {vuln.framework} (CC-BY-4.0)
@@ -1017,7 +1082,9 @@ const CompliancePostureDetailView = ({
                             vuln.additional.security_level.value,
                           )}
                         >
-                          {vuln.additional.security_level.ns ? (
+                          {/* Currently the links in the Grundschutz++ catalog are wrong, so we don't want to link them here — we can remove this condition once the report gets updated */}
+                          {vuln.additional.security_level.ns &&
+                          vuln.framework !== "Grundschutz++" ? (
                             <Link
                               href={vuln.additional.security_level.ns}
                               target="_blank"
@@ -1059,7 +1126,8 @@ const CompliancePostureDetailView = ({
                             vuln.additional.importance.value,
                           )}
                         >
-                          {vuln.additional.importance.ns ? (
+                          {vuln.additional.importance.ns &&
+                          vuln.framework !== "Grundschutz++" ? (
                             <Link
                               href={vuln.additional.importance.ns}
                               target="_blank"
@@ -1098,7 +1166,8 @@ const CompliancePostureDetailView = ({
                             vuln.additional.effort_level.value,
                           )}
                         >
-                          {vuln.additional.effort_level.ns ? (
+                          {vuln.additional.effort_level.ns &&
+                          vuln.framework !== "Grundschutz++" ? (
                             <Link
                               href={vuln.additional.effort_level.ns}
                               target="_blank"
@@ -1130,7 +1199,8 @@ const CompliancePostureDetailView = ({
                     <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Tags</dt>
                       <dd className="font-medium">
-                        {vuln.additional.tags.ns
+                        {vuln.additional.tags.ns &&
+                        vuln.framework !== "Grundschutz++"
                           ? vuln.additional.tags.value
                               .split(",")
                               .map((tag: string) => (
@@ -1181,7 +1251,8 @@ const CompliancePostureDetailView = ({
                         Documentation
                       </dt>
                       <dd className="font-medium">
-                        {vuln.additional.documentation.ns ? (
+                        {vuln.additional.documentation.ns &&
+                        vuln.framework !== "Grundschutz++" ? (
                           <Link
                             href={vuln.additional.documentation.ns}
                             target="_blank"
@@ -1209,7 +1280,8 @@ const CompliancePostureDetailView = ({
                     <div className="flex flex-col items-start justify-betweens border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Result</dt>
                       <dd className="font-medium">
-                        {vuln.additional.result.ns ? (
+                        {vuln.additional.result.ns &&
+                        vuln.framework !== "Grundschutz++" ? (
                           <Link
                             href={vuln.additional.result.ns}
                             target="_blank"
@@ -1235,7 +1307,8 @@ const CompliancePostureDetailView = ({
                         Result Specification
                       </dt>
                       <dd className="font-medium">
-                        {vuln.additional.result_specification.ns ? (
+                        {vuln.additional.result_specification.ns &&
+                        vuln.framework !== "Grundschutz++" ? (
                           <Link
                             href={vuln.additional.result_specification.ns}
                             target="_blank"
@@ -1270,18 +1343,28 @@ const CompliancePostureDetailView = ({
                             vuln.mappedControls as {
                               relatedFramework: string;
                               relatedControlId: string;
+                              relationship: ControlRelationship;
                             }[]
-                          ).reduce<Record<string, string[]>>((acc, control) => {
-                            (acc[control.relatedFramework] ??= []).push(
-                              control.relatedControlId,
-                            );
+                          ).reduce<
+                            Record<
+                              string,
+                              {
+                                relatedControlId: string;
+                                relationship: ControlRelationship;
+                              }[]
+                            >
+                          >((acc, control) => {
+                            (acc[control.relatedFramework] ??= []).push({
+                              relatedControlId: control.relatedControlId,
+                              relationship: control.relationship,
+                            });
                             return acc;
                           }, {}),
-                        ).map(([framework, controlIds]) => (
+                        ).map(([framework, controls]) => (
                           <MappedControlsGroup
                             key={framework}
                             framework={framework}
-                            controlIds={controlIds}
+                            controls={controls}
                           />
                         ))}
                       </dd>

@@ -46,10 +46,10 @@ const buildCsp = () => {
       analyticsOrigin,
     ],
     // Radix, Tailwind and next-themes apply inline styles at runtime.
-    "style-src": ["'self'", "'unsafe-inline'", themeCssOrigin],
+    "style-src": ["'self'", "'unsafe-inline'", themeCssOrigin, themeJsOrigin],
     // Avatars/logos are served from arbitrary git-provider hosts.
     "img-src": ["'self'", "data:", "blob:", "https:"],
-    "font-src": ["'self'", "data:"],
+    "font-src": ["'self'", "data:", themeCssOrigin, themeJsOrigin],
     // Most API/Sentry/Ory traffic is proxied same-origin. Direct browser calls:
     // - blob: — Three.js/GLTF lanyard fetches its bundled model + textures.
     // - api.github.com — client-side version check (admin instance info).
@@ -63,6 +63,8 @@ const buildCsp = () => {
       analyticsOrigin,
       publicApiOrigin,
       oryOrigin,
+      themeJsOrigin,
+      themeCssOrigin
     ],
     "worker-src": ["'self'", "blob:"],
     "manifest-src": ["'self'"],

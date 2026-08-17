@@ -22,12 +22,14 @@ import { TourContextProvider } from "@/context/TourContext";
 export const lexend = localFont({
   src: "../../public/fonts/Lexend/Lexend-VariableFont_wght.ttf",
   display: "swap",
+  preload: false,
   variable: "--font-lexend",
 });
 
 export const inter = localFont({
   src: "../../public/fonts/Inter-VariableFont_opsz,wght.ttf",
   display: "swap",
+  preload: false,
   variable: "--font-inter",
 });
 
