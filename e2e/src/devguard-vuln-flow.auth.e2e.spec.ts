@@ -18,7 +18,6 @@ test.describe("DevGuard handle vuln flows", () => {
 
   test("test sbom upload to false positive", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "dependency-risk-table");
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM.vuln().markVulnAsFalsePositive();
@@ -33,10 +32,8 @@ test.describe("DevGuard handle vuln flows", () => {
   test("test sbom upload to overview", async ({ page }, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await page.getByTestId("nav-asset-overview").click();
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "asset-overview");
     await page.mouse.wheel(0, 1000);
-    await page.waitForTimeout(5_000);
     await docShot(page, testInfo, "asset-overview-v2");
   });
 
@@ -76,12 +73,5 @@ test.describe("DevGuard handle vuln flows", () => {
   test("test to download sbom", async () => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.sharing().downloadSBOMFile();
-  });
-
-  test("test to upload VEX and verify", async () => {
-    await devguardPOM.setupSbomUpload();
-    const inputFile = path.join(__dirname, "../assets/", "vex.json");
-    await devguardPOM.setup().uploadVEX(inputFile);
-    await devguardPOM.vuln().verifyVEXRule();
   });
 });

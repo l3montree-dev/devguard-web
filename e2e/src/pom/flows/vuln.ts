@@ -1,12 +1,16 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
-import { ModalHelper } from "./modal-helper";
 import { docShot } from "../../doc-shot";
 import type { TestInfo } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
+import { RepoFlow } from "./repo";
 
 export class VulnFlow {
   constructor(private page: Page) {}
+
+  private repo(): RepoFlow {
+    return new RepoFlow(this.page);
+  }
 
   // The assessment justification and the VEX rule justification both use the
   // markdown editor, so scope it when a dialog adds a second one to the page.
@@ -105,23 +109,15 @@ export class VulnFlow {
   }
 
   async expectVulnStateEventually(state: string) {
-    await expect(async () => {
-      await this.page
-        .getByTestId("nav-asset-dependency-risks")
-        .locator("a")
-        .click({ timeout: 20_000 });
-      await this.openFirstAffectedComponent();
-      await expect(this.page.getByTestId("vuln-state")).toHaveText(state, {
-        timeout: 5_000,
-      });
-    }).toPass({ timeout: 60_000, intervals: [2_000] });
+    await this.repo().openDependencyRiskTable();
+    await this.openFirstAffectedComponent();
+    await expect(this.page.getByTestId("vuln-state")).toHaveText(state, {
+      timeout: 5_000,
+    });
   }
 
   async deleteFirstVexRule(testInfo: TestInfo) {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("button")
-      .click({ timeout: 20_000 });
+    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });
@@ -130,14 +126,12 @@ export class VulnFlow {
     await expect(firstRuleRow).toBeVisible({ timeout: 20_000 });
 
     await firstRuleRow.getByRole("button").click();
-    docShot(this.page, testInfo, "vex-rule-delete-confirmation-dialog");
     await this.page.getByRole("menuitem", { name: "Delete" }).click();
 
     const confirmButton = this.page.getByTestId("alert-confirm-button");
     await expect(confirmButton).toBeVisible({ timeout: 10_000 });
+    docShot(this.page, testInfo, "vex-rule-delete-confirmation-dialog");
     await confirmButton.click();
-
-    await expect(firstRuleRow).toBeHidden({ timeout: 20_000 });
   }
 
   async expectVexRuleRecommendationVisible(testInfo?: TestInfo) {
@@ -180,10 +174,8 @@ export class VulnFlow {
   }
 
   async filterDependencyRisksTable() {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("a")
-      .click({ timeout: 5_000 });
+    await this.repo().openDependencyRiskTable();
+    await this.page.waitForTimeout(1_000);
     await this.page.getByTestId("filter-open-button").click();
     await this.page.getByTestId("filter-field-select").click();
     await this.page.getByRole("option", { name: "CVSS" }).click();

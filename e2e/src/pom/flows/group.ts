@@ -1,21 +1,9 @@
-import type { Page } from "@playwright/test";
+import { test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
+import { docShot } from "../../doc-shot";
 
 export class GroupFlow {
   constructor(private page: Page) {}
-
-  private async dismissAnyOverlay() {
-    const exploreButton = this.page.getByTestId("explore-button");
-    try {
-      await exploreButton.waitFor({ state: "visible", timeout: 10_000 });
-      await exploreButton.click();
-      await this.page
-        .locator(".DialogOverlay")
-        .waitFor({ state: "hidden", timeout: 10_000 });
-    } catch {
-      // no modal present
-    }
-  }
 
   async createGroup(name: string, description: string) {
     await this.page
@@ -27,6 +15,7 @@ export class GroupFlow {
     await this.page.getByTestId("group-description").click();
     await this.page.getByTestId("group-description").fill(description);
     await this.page.getByTestId("create-group-submit-button").click();
+    await docShot(this.page, test.info(), "repo-creation-screen");
   }
 
   async openSubgroupsAndRepositories() {
@@ -50,7 +39,6 @@ export class GroupFlow {
   }
 
   async checkHeaderGroup() {
-    await this.dismissAnyOverlay();
     await this.page
       .getByRole("link", { name: "Test Group" })
       .first()

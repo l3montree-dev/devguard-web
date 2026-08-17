@@ -16,7 +16,6 @@ test.describe("DevGuard compliance posture flows", () => {
   test("test compliance postures on organization, group and repository level", async () => {
     // organization level
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-    await devguardPOM.modal().dismissWelcomeModalIfPresent();
     await devguardPOM.compliance().openOrgCompliancePostures();
 
     // group level

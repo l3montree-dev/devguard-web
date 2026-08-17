@@ -38,13 +38,11 @@ export class ComplianceFlow {
   ) {
     const navItem = this.page.locator(`${level} [data-testid="${testId}"]`);
     await navItem.waitFor({ state: "visible", timeout: 30_000 });
-    await navItem.click({ timeout: 30_000 });
+    await navItem.click({ timeout: 10_000 });
 
     await expect(this.page).toHaveURL(/\/compliance-postures/, {
-      timeout: 30_000,
+      timeout: 10_000,
     });
-
-    await this.page.waitForTimeout(5_000);
     await docShot(this.page, test.info(), screenshotName);
   }
 }

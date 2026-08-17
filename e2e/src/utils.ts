@@ -43,10 +43,8 @@ export async function TEMPORARY_WORKAROUND(
 ) {
   // race-condition sometimes where token is not updated properly.. therefore update first
   // remove this block once Tim has fixed this race condition
-  await page.waitForTimeout(5_000);
   if (await page.getByRole("link", { name: "Reauthorize" }).isVisible()) {
     await page.getByRole("link", { name: "Reauthorize" }).click();
-    await page.waitForTimeout(5_000); // wait for token to be updated
     await devguardPOM.verifyOnDevGuardURL();
   }
 }
