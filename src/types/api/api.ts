@@ -1072,7 +1072,7 @@ export type MechanicalJustificationType =
   | "vulnerable_code_cannot_be_controlled_by_adversary"
   | "inline_mitigations_already_exist";
 
-export type VexRuleEventType = "accepted" | "falsePositive";
+export type VexRuleEventType = "accepted" | "falsePositive" | "reopened";
 
 export type CreateVexRuleRequest = {
   title: string;

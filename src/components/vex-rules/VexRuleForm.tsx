@@ -24,6 +24,7 @@ import {
   type VexRuleEffect,
   type VexRuleVulnContext,
 } from "./vexRuleParser";
+import type { VexRuleEventType } from "@/types/api/api";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -97,6 +98,10 @@ interface VexRuleFormProps {
   // "reduced": focuses the effect on the current vulnerability; the generated CEL
   // expression is collapsed and read-only (still copyable), the title is inherited.
   variant?: "full" | "reduced";
+  // The action the rule would take if created now; sent to the test endpoint
+  // so the match count reflects the right vulnerability scope (e.g. reopen
+  // rules match against already-closed vulnerabilities).
+  eventType?: VexRuleEventType;
 }
 
 const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
@@ -109,9 +114,11 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
   onJustificationChange,
   currentVuln,
   variant = "full",
+  eventType,
 }) => {
   const isReduced = variant === "reduced";
-  const matchStatus = useVexRuleMatchCount(baseUrl, celExpression);
+  const matchScope = eventType === "reopened" ? "closed" : "open";
+  const matchStatus = useVexRuleMatchCount(baseUrl, celExpression, eventType);
   const { hasSyntaxError } = matchStatus;
 
   // What to render for this rule/vuln combination — the parser decides the kind
@@ -260,7 +267,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
             </Collapsible>
             <VexRuleMatchStatus
               status={matchStatus}
-              scope="open"
+              scope={matchScope}
               className="mt-1.5"
             />
           </div>
@@ -277,7 +284,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
             />
             <VexRuleMatchStatus
               status={matchStatus}
-              scope="open"
+              scope={matchScope}
               className="mt-1.5"
             />
           </div>

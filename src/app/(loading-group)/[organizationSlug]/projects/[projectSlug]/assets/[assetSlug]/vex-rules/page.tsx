@@ -132,7 +132,7 @@ const VexRulesPage: FunctionComponent = () => {
         primaryHeadline
         forceVertical
         title="VEX rules"
-        description="VEX rules decide how vulnerabilities of this repository are handled - dismissed as a false positive or accepted as a known risk. Rules are either written here or synced from an upstream supplier."
+        description="VEX rules decide how vulnerabilities of this repository are handled - dismissed as a false positive, accepted as a known risk, or reopened. Rules are either written here or synced from an upstream supplier."
         className="mb-6 mt-4"
         Button={
           <div className="flex flex-row gap-2">
