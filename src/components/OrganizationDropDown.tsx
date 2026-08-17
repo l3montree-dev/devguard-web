@@ -36,6 +36,7 @@ import {
 import { useSession, useUpdateSession } from "../context/SessionContext";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useInstanceSettings } from "../hooks/useInstanceSettings";
+import { truncateMiddle } from "@/utils/common";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -126,7 +127,9 @@ const OrganizationDropDown = () => {
             <div className="flex flex-col gap-0 ">
               <Link href={`/${activeOrg?.slug}`}>
                 <span className="line-clamp-1 gap-1 inline-flex items-center  truncate text-ellipsis text-left text-lg font-display font-semibold text-header-foreground">
-                  {activeOrgName(activeOrg.name, activeOrg.slug)}{" "}
+                  {truncateMiddle(
+                    activeOrgName(activeOrg.name, activeOrg.slug),
+                  )}{" "}
                   {!activeOrg.externalEntityProviderId && (
                     <Badge
                       className="!text-header-foreground ml-2"
