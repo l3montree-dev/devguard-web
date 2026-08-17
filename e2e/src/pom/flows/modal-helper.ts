@@ -1,28 +1,25 @@
 import type { Page } from "@playwright/test";
 
-export class ModalHelper {
-  constructor(private page: Page) {}
+const TOUR_KEYS = [
+  "org-home",
+  "org-settings",
+  "org-overview",
+  "group-home",
+  "repo-home",
+  "repo-settings",
+  "dependency-risk",
+  "dependency-insights",
+];
 
-  async dismissToastIfPresent() {
-    const closeToast = this.page
-      .getByRole("button", { name: "Close toast" })
-      .first();
-    try {
-      await closeToast.waitFor({ state: "visible", timeout: 5_000 });
-      await closeToast.click({ timeout: 2_000 });
-    } catch {
-      // no Toast visible
-    }
-  }
-
-  async dismissWelcomeModalIfPresent() {
-    const exploreButton = this.page.getByTestId("explore-button");
-    try {
-      await exploreButton.waitFor({ state: "visible", timeout: 3_000 });
-      await exploreButton.click({ timeout: 2_000 });
-      await this.page.waitForTimeout(5_000);
-    } catch {
-      // welcome modal not shown, continuing
-    }
-  }
+export async function suppressOverlays(page: Page) {
+  await page.addInitScript((tourKeys: string[]) => {
+    tourKeys.forEach((key) =>
+      localStorage.setItem(`devguard:tourSeen:${key}`, "true"),
+    );
+    document.addEventListener("DOMContentLoaded", () => {
+      const style = document.createElement("style");
+      style.textContent = "[data-sonner-toaster]{display:none !important}";
+      document.head.append(style);
+    });
+  }, TOUR_KEYS);
 }

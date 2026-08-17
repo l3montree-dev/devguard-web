@@ -1,5 +1,5 @@
-import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { docShot } from "../../doc-shot";
 
 export class AuthFlow {
   constructor(
@@ -31,6 +31,8 @@ export class AuthFlow {
     password: string,
   ) {
     await this.page.getByTestId("ory/screen/login/action/register").click();
+    await this.page.waitForLoadState("networkidle");
+    await docShot(this.page, test.info(), "sign-up-screen");
     await this.page.getByTestId("traits.name").click();
     await this.page.getByTestId("traits.name").fill(username);
     await this.page.getByTestId("traits.email").click();

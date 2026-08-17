@@ -8,7 +8,6 @@ test.describe("DevGuard invite a user to your organization", () => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
     await devguardPOM.org().createOrganization("TestOrg");
-    await devguardPOM.modal().dismissWelcomeModalIfPresent();
     await devguardPOM.org().inviteUserOrg("testuser@example.com");
   });
 });
