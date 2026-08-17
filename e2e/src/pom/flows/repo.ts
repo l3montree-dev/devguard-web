@@ -74,4 +74,9 @@ export class RepoFlow {
     await this.page.waitForTimeout(5_000);
     await docShot(this.page, test.info(), "dependency-insights-graph");
   }
+
+  async publishRepo() {
+    await this.page.getByTestId("repository-settings").click();
+    await this.page.getByTestId("publish-repo-switch").click();
+  }
 }

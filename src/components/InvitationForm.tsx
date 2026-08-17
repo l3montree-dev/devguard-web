@@ -42,7 +42,11 @@ export const InvitationForm: FunctionComponent<OrgFormProps> = ({
           <FormItem>
             <FormLabel>Organization invitation url/code*</FormLabel>
             <FormControl>
-              <Input variant={inputVariant} {...field} />
+              <Input
+                data-testid="join-org-url"
+                variant={inputVariant}
+                {...field}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

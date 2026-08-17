@@ -16,7 +16,7 @@ import { useAutoTour } from "@/hooks/useAutoTour";
 import { convertRepos } from "@/hooks/useRepositorySearch";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import { isNumber } from "@/utils/common";
+import { classNames, isNumber } from "@/utils/common";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
@@ -473,23 +473,26 @@ const Index: FunctionComponent = () => {
             description="These settings are for advanced users only. Please be careful when changing these settings."
           >
             <div data-tour="repo-settings-public">
-              <ListItem
-                Description={
-                  "Setting this to true will make the repository visible to the public."
-                }
-                Title="Public Repository"
-                Button={
-                  <Switch
-                    disabled={!project.isPublic}
-                    checked={asset.isPublic}
-                    onCheckedChange={(checked) =>
-                      handleUpdate({
-                        isPublic: checked,
-                      })
-                    }
-                  />
-                }
-              />
+              <div className={classNames(!project.isPublic && "opacity-50")}>
+                <ListItem
+                  Description={
+                    "Setting this to true will make the repository visible to the public."
+                  }
+                  Title="Public Repository"
+                  Button={
+                    <Switch
+                      data-testid="publish-repo-switch"
+                      disabled={!project.isPublic}
+                      checked={asset.isPublic}
+                      onCheckedChange={(checked) =>
+                        handleUpdate({
+                          isPublic: checked,
+                        })
+                      }
+                    />
+                  }
+                />
+              </div>
             </div>
             {!project.isPublic && (
               <small>

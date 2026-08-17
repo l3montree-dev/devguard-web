@@ -81,6 +81,7 @@ export default function AcceptInvitationDialog({
 
             <div className="-mt-6 flex items-center justify-end gap-x-6">
               <Button
+                data-testid="join-organization-dialog"
                 disabled={form.formState.isSubmitting}
                 isSubmitting={form.formState.isSubmitting}
                 type="submit"

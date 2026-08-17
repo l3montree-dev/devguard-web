@@ -225,7 +225,7 @@ const Index: FunctionComponent = () => {
                 form={form}
               />
               <div className="mt-4 flex flex-row justify-end">
-                <Button>Update</Button>
+                <Button data-testid="public-group-save">Update</Button>
               </div>
             </form>
           </FormProvider>

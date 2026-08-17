@@ -105,6 +105,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                         Button={
                           <FormControl>
                             <Switch
+                              data-testid="public-group-switch"
                               disabled={!org.isPublic}
                               checked={field.value}
                               onCheckedChange={field.onChange}

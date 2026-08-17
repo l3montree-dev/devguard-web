@@ -13,7 +13,7 @@ test.describe("DevGuard repo flows", () => {
     await devguardPOM.loadDevGuard();
     await devguardPOM.createTestOrganizationGroupAndRepo();
   });
-  
+
   test("test create, settings and delete (through settings) of repo", async ({
     page,
   }) => {

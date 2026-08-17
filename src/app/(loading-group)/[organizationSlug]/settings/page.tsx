@@ -621,6 +621,7 @@ const Home = () => {
                         Button={
                           <FormControl>
                             <Switch
+                              data-testid="public-org-switch"
                               checked={field.value}
                               onCheckedChange={field.onChange}
                             />
@@ -636,6 +637,7 @@ const Home = () => {
                     isSubmitting={form.formState.isSubmitting}
                     variant="destructive"
                     type="submit"
+                    data-testid="public-org-save"
                   >
                     Save
                   </Button>

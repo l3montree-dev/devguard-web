@@ -79,6 +79,7 @@ export default function OrgRegisterForm() {
 
         <div className="mt-6 flex items-center justify-end gap-x-3">
           <Button
+            data-testid="join-organization"
             type="button"
             variant="secondary"
             onClick={() => setAcceptInvitationOpen(true)}

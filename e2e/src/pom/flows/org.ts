@@ -120,4 +120,10 @@ export class OrgFlow {
       .click();
     await this.page.getByTestId("create-new-organization-button").click();
   }
+
+  async publishOrg() {
+    await this.page.getByTestId("nav-org-settings").click();
+    await this.page.getByTestId("public-org-switch").click();
+    await this.page.getByTestId("public-org-save").click();
+  }
 }
