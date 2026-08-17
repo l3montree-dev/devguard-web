@@ -12,7 +12,13 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+/* eslint-disable local/require-loading-boundary -- client page with no server
+   await; it renders its own "finishing installation" state while the GitHub
+   callback runs, so a route-level skeleton would never show. */
+
 "use client";
+
 import { browserApiClient } from "@/services/devGuardApi";
 import { decodeObjectBase64 } from "@/services/encodeService";
 import Image from "next/image";

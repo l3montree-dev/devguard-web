@@ -1,34 +1,38 @@
+/* eslint-disable local/require-loading-boundary -- this page only redirects and
+   renders PageSkeleton itself; a loading.tsx here is the root one and would
+   become the fallback for every route in the app. */
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useSession } from "../context/SessionContext";
 import { useEffect } from "react";
+import PageSkeleton from "../components/PageSkeleton";
 
 const Index = () => {
-  const { organizations } = useSession();
+  const { session, organizations } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (organizations.length > 0) {
-      const lastActiveOrg = localStorage.getItem("lastActiveOrg");
-      if (lastActiveOrg) {
-        const orgExists = organizations.some(
-          (org) => org.slug === lastActiveOrg,
-        );
-        if (orgExists) {
-          router.replace(`/${lastActiveOrg}`);
-        } else {
-          router.replace(`/${organizations[0].slug}`);
-        }
-      } else {
-        router.replace(`/${organizations[0].slug}`);
-      }
-    } else {
-      router.replace("/setup");
+    if (!session) {
+      router.replace("/login");
+      return;
     }
-  }, [organizations, router]);
 
-  return null;
+    if (organizations.length === 0) {
+      router.replace("/setup");
+      return;
+    }
+
+    const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+    const target =
+      lastActiveOrg && organizations.some((org) => org.slug === lastActiveOrg)
+        ? lastActiveOrg
+        : organizations[0].slug;
+
+    router.replace(`/${target}`);
+  }, [session, organizations, router]);
+
+  return <PageSkeleton />;
 };
 
 export default Index;

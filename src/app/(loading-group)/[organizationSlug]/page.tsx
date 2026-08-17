@@ -112,27 +112,31 @@ const OrganizationHomePage: FunctionComponent = () => {
     data: projects,
     error,
     mutate,
-  } = useSWR<Paged<SubGroupsAndAsset>>(swrUrl, async (url: string) => {
-    const data = await fetcher<Paged<ProjectDTO>>(url);
-    // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
-    return {
-      ...data,
-      data: data.data.map((item) => ({
-        ...item,
-        resourceType: "project",
-      })),
-    } as Paged<SubGroupsAndAsset>;
-  });
+  } = useSWR<Paged<SubGroupsAndAsset>>(
+    swrUrl,
+    async (url: string) => {
+      const data = await fetcher<Paged<ProjectDTO>>(url);
+      // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
+      return {
+        ...data,
+        data: data.data.map((item) => ({
+          ...item,
+          resourceType: "project",
+        })),
+      } as Paged<SubGroupsAndAsset>;
+    },
+    { keepPreviousData: true },
+  );
 
-  const debouncedHandleSearch = useCallback(
-    debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      if (value === "") {
-        pushQuery({ search: undefined, page: 1 });
-      } else if (value.length >= 3) {
-        pushQuery({ search: value, page: 1 });
-      }
-    }, 500),
+  const debouncedHandleSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        if (value === "") {
+          pushQuery({ search: undefined, page: 1 });
+        } else if (value.length >= 3) {
+          pushQuery({ search: value, page: 1 });
+        }
+      }, 500),
     [pushQuery],
   );
 
@@ -264,6 +268,8 @@ const OrganizationHomePage: FunctionComponent = () => {
     };
   }, [activeOrg.externalEntityProviderId, activeOrg.slug, handleTriggerSync]);
 
+  const importingIntoEmptyList = syncRunning && projects?.data.length === 0;
+
   const orgMenu = useOrganizationMenu();
 
   const tourSteps = useMemo(
@@ -388,14 +394,14 @@ const OrganizationHomePage: FunctionComponent = () => {
 
               <Input
                 className="h-11"
-                onChange={debouncedHandleSearch}
+                onChange={(e) => debouncedHandleSearch(e.target.value)}
                 defaultValue={searchParams?.get("search") || ""}
                 placeholder="Search for projects (min. 3 characters)..."
               />
             </div>
             <div id="group-and-project-list">
               <ListRenderer
-                isLoading={isLoading}
+                isLoading={isLoading || importingIntoEmptyList}
                 skeletonVariant="project"
                 error={error}
                 data={projects?.data}

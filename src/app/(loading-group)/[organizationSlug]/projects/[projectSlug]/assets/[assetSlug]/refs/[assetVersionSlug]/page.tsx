@@ -57,7 +57,6 @@ import type {
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
-import { Button } from "@/components/ui/button";
 
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
