@@ -5,7 +5,7 @@ import { rewriteFlow } from "./types/auth";
 
 const proxyToOry = createOryMiddleware(oryConfig);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = await proxyToOry(request);
 
   if (!request.nextUrl.pathname.startsWith("/self-service/registration")) {
@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   const body = await response.json();
   const rewritten = body?.ui?.nodes ? rewriteFlow(body) : body;
 
-  return NextResponse.json(rewritten, { 
+  return NextResponse.json(rewritten, {
     status: response.status,
     headers: response.headers,
   });

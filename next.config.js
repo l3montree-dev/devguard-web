@@ -155,10 +155,10 @@ const nextConfig = {
   experimental: {
     turbopackModuleIds: "deterministic",
     turbopackFileSystemCacheForDev: true,
-    useCache: true,
   },
   productionBrowserSourceMaps: true,
   cacheComponents: true,
+  partialPrefetching: true,
   output: "standalone",
 };
 
