@@ -56,7 +56,6 @@ export default function RootLayout({
           "flex min-h-full flex-col " + inter.variable + " " + lexend.variable
         }
       >
-        <HashScroll />
         {/* Restores CSS variable overrides before first paint — dev only */}
         {/*process.env.NODE_ENV === "development" && (
           // eslint-disable-next-line @next/next/no-sync-scripts
@@ -144,6 +143,7 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
         organizations: orgs,
       }}
     >
+      <HashScroll />
       <TourContextProvider>
         <MobileGate>{children}</MobileGate>
         <Toaster />
