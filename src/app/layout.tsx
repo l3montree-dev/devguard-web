@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import localFont from "next/font/local";
 import { connection } from "next/server";
 import React, { Suspense } from "react";
+import HashScroll from "@/components/HashScroll";
 import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
@@ -144,6 +145,7 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
         organizations: orgs,
       }}
     >
+      <HashScroll />
       <TourContextProvider>
         <MobileGate>{children}</MobileGate>
         <Toaster />
