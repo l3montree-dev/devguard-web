@@ -1,4 +1,5 @@
 import { classNames } from "../utils/common";
+import SkeletonListItems from "./common/SkeletonListItems";
 import { Skeleton } from "./ui/skeleton";
 
 const PageSkeleton = () => {
@@ -6,18 +7,24 @@ const PageSkeleton = () => {
     <main className="flex-1 font-body">
       <div
         className={classNames(
-          "mx-auto h-screen max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
+          "mx-auto min-h-screen max-w-screen-xl gap-4 px-6 pb-8 pt-6 lg:px-8",
         )}
-      />
+      >
+        <Skeleton className="mb-2 h-8 w-64" />
+        <Skeleton className="mb-6 h-5 w-96" />
+        <div className="flex flex-col gap-4">
+          <SkeletonListItems />
+        </div>
+      </div>
 
       <div className="bg-footer">
         <footer className="mx-auto max-w-screen-xl px-6 py-8 text-sm text-footer-foreground lg:px-8">
           <div className="mb-2 flex flex-row gap-5">
-            {Array.from(Array(5).keys()).map((el) => (
-              <Skeleton key={el} />
+            {["w-28", "w-16", "w-16", "w-24", "w-14"].map((width, el) => (
+              <Skeleton key={el} className={`h-5 ${width}`} />
             ))}
           </div>
-          <Skeleton />
+          <Skeleton className="h-5 w-full max-w-lg" />
         </footer>
       </div>
     </main>

@@ -3,6 +3,7 @@ import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 import Page from "@/components/Page";
+import PageSkeleton from "@/components/PageSkeleton";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import "@xyflow/react/dist/style.css";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -82,12 +83,11 @@ const Index: FunctionComponent = () => {
   ]);
 
   if (!asset) {
-    return null;
+    return <PageSkeleton />;
   }
 
-  // Show loading state while redirecting
   if (asset.refs.length > 0) {
-    return null;
+    return <PageSkeleton />;
   }
 
   return (

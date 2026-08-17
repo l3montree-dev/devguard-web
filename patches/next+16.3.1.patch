@@ -1,5 +1,5 @@
 diff --git a/node_modules/next/dist/lib/typescript/runTypeScriptCli.js b/node_modules/next/dist/lib/typescript/runTypeScriptCli.js
-index 0000000..0000000 100644
+index 8f281d8..081f078 100644
 --- a/node_modules/next/dist/lib/typescript/runTypeScriptCli.js
 +++ b/node_modules/next/dist/lib/typescript/runTypeScriptCli.js
 @@ -47,9 +47,17 @@ function getTypeScriptPackageInfo(baseDir) {
@@ -23,10 +23,10 @@ index 0000000..0000000 100644
      const packageJson = JSON.parse((0, _nodefs.readFileSync)(packageJsonPath, 'utf8'));
      const packageDir = _nodepath.default.dirname(packageJsonPath);
 diff --git a/node_modules/next/dist/lib/verify-typescript-setup.js b/node_modules/next/dist/lib/verify-typescript-setup.js
-index 0000000..0000000 100644
+index b1150a9..1e2bd49 100644
 --- a/node_modules/next/dist/lib/verify-typescript-setup.js
 +++ b/node_modules/next/dist/lib/verify-typescript-setup.js
-@@ -133,6 +133,15 @@ async function verifyAndRunTypeScript({ dir, distDir, cacheDir, strictRouteTyp
+@@ -133,6 +133,15 @@ async function verifyAndRunTypeScript({ dir, distDir, cacheDir, strictRouteTypes
          ];
          // Ensure TypeScript and necessary `@types/*` are installed:
          let deps = (0, _hasnecessarydependencies.hasNecessaryDependencies)(dir, requiredPackages);

@@ -19,7 +19,7 @@ function ListRenderer<T>({
   Empty,
   skeletonVariant,
 }: Props<T>) {
-  if (isLoading) {
+  if (isLoading && !data) {
     return <SkeletonListItems variant={skeletonVariant} />;
   }
   if (error) {

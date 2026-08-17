@@ -11,6 +11,7 @@ interface Props {
   subgroupsWithAssets?: SubGroupsAndAsset[];
   onFetchData: (projectSlug: string, projectId: string) => any;
   error?: Error;
+  isLoading?: boolean;
   projectSlug: string;
 }
 
@@ -19,6 +20,7 @@ export default function SubgroupsAndAssetsList({
   subgroupsWithAssets,
   onFetchData,
   error,
+  isLoading,
   projectSlug,
 }: Props) {
   if (project) {
@@ -38,6 +40,7 @@ export default function SubgroupsAndAssetsList({
       items={subgroupsWithAssets}
       onFetchData={onFetchData}
       error={error}
+      isLoading={isLoading}
       parentProjectSlug={projectSlug}
     />
   );
