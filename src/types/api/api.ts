@@ -1077,9 +1077,6 @@ export type VexRule = {
   createdById: string;
   createdAt: string;
   updatedAt: string;
-
-  // Metrics - indicates how many dependency vulns this rule applies to
-  appliesToAmountOfDependencyVulns: number;
 };
 
 export type VexRulesDTO = Paged<VexRule>;
@@ -1123,8 +1120,6 @@ export type VexRuleRecommendation = {
   eventType: VexRuleEventType;
   confidence: number;
   title: string;
-  // Metrics - indicates how many dependency vulns this rule applies to
-  appliesToAmountOfDependencyVulns: number;
 
   type: "crowdsourced" | "session" | "upstream";
   source: string;

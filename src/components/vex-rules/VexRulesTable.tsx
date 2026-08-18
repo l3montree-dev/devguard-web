@@ -21,7 +21,7 @@ interface VexRulesTableProps {
   onMutate: () => void;
 }
 
-const COLUMNS = ["Rule", "Source", "Result", "Effect", ""];
+const COLUMNS = ["Rule", "Source", "Result", ""];
 
 /** One flat row per rule; the source is a badge, not a grouping level. */
 const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
@@ -96,13 +96,6 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
                         <VexRuleResult
                           eventType={rule.eventType}
                           mechanicalJustification={rule.mechanicalJustification}
-                        />
-                      </td>
-                      <td className="p-4">
-                        <VexRuleMatchStatus
-                          status={{
-                            matchCount: rule.appliesToAmountOfDependencyVulns,
-                          }}
                         />
                       </td>
                       {/* The row itself opens the dialog, so the menu keeps its

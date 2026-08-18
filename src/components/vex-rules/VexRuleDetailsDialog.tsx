@@ -4,6 +4,7 @@
 "use client";
 
 import Alert from "@/components/common/Alert";
+import { checkCelSyntax } from "@/components/common/celLinter";
 import { AsyncButton, Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,11 +20,9 @@ import { browserApiClient } from "@/services/devGuardApi";
 import type { CreateVexRuleRequest, VexRule } from "@/types/api/api";
 import { CircleAlert } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
-import { checkCelSyntax } from "@/components/common/celLinter";
 import VexRuleForm from "./VexRuleForm";
 import VexRuleResult from "./VexRuleResult";
 import VexRuleSourceBadge, { isManualVexRule } from "./VexRuleSourceBadge";
-import VexRuleMatchStatus from "./VexRuleMatchStatus";
 
 interface VexRuleDetailsDialogProps {
   vexRule: VexRule | null;
@@ -175,10 +174,6 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
           <VexRuleResult
             eventType={vexRule.eventType}
             mechanicalJustification={vexRule.mechanicalJustification}
-          />
-          <VexRuleMatchStatus
-            status={{ matchCount: vexRule.appliesToAmountOfDependencyVulns }}
-            scope={vexRule.eventType === "reopened" ? "closed" : "open"}
           />
           <VexRuleSourceBadge vexSource={vexRule.vexSource} />
         </div>

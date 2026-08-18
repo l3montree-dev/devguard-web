@@ -8,15 +8,11 @@ import type { VexRuleRecommendation } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { VerifiedIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
-import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import VexRuleResult from "./VexRuleResult";
 
 export interface RecommendationEntry {
   vulnID: string;
-  recommendation: Omit<
-    VexRuleRecommendation,
-    "appliesToAmountOfDependencyVulns"
-  >;
+  recommendation: VexRuleRecommendation;
 }
 
 interface VexRuleRecommendationListProps {
