@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FieldDescription } from "@/components/ui/field";
 import { ChevronDown, CircleAlert } from "lucide-react";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
@@ -69,6 +70,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   const [justification, setJustification] = useState("");
   const [selectedOption, setSelectedOption] =
     useState<MechanicalJustificationType>(DEFAULT_MECHANICAL_JUSTIFICATION);
+  const [eventType, setEventType] = useState<VexRuleEventType>("falsePositive");
 
   // Seed from the prefill whenever the dialog opens (adjusting state during
   // render, React's alternative to an effect).
@@ -102,6 +104,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
     setJustification("");
     setTitle("");
     setSelectedOption(DEFAULT_MECHANICAL_JUSTIFICATION);
+    setEventType("falsePositive");
   };
 
   const handleSubmit = async (eventType: VexRuleEventType) => {
@@ -158,76 +161,112 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
           className="flex flex-col gap-4"
           onSubmit={(e) => e.preventDefault()}
         >
-          <VexRuleForm
-            baseUrl={baseUrl}
-            title={title}
-            onTitleChange={setTitle}
-            celExpression={celExpression}
-            onCelExpressionChange={setCelExpression}
-            justification={justification}
-            onJustificationChange={setJustification}
-            currentVuln={currentVuln}
-            variant={variant}
-          />
-          {missingFields.length > 0 && (
-            <FieldDescription className="flex flex-row items-center gap-1.5 text-xs self-end">
-              <CircleAlert aria-hidden className="h-3.5 w-3.5 shrink-0" />
-              <span>
-                Add {missingFields.join(" and ")} to create this rule.
-              </span>
-            </FieldDescription>
-          )}
+          <Tabs
+            value={eventType}
+            onValueChange={(value) => setEventType(value as VexRuleEventType)}
+          >
+            <TabsList>
+              <TabsTrigger
+                data-testid="vex-rule-tab-false-positive"
+                value="falsePositive"
+              >
+                False positive
+              </TabsTrigger>
+              <TabsTrigger data-testid="vex-rule-tab-accepted" value="accepted">
+                Accept risk
+              </TabsTrigger>
+              <TabsTrigger data-testid="vex-rule-tab-reopened" value="reopened">
+                Reopen
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value={eventType} className="flex flex-col gap-4">
+              <VexRuleForm
+                baseUrl={baseUrl}
+                title={title}
+                onTitleChange={setTitle}
+                celExpression={celExpression}
+                onCelExpressionChange={setCelExpression}
+                justification={justification}
+                onJustificationChange={setJustification}
+                currentVuln={currentVuln}
+                variant={variant}
+                eventType={eventType}
+              />
+              {eventType === "reopened" && (
+                <FieldDescription className="text-xs">
+                  Reopen rules only apply to vulnerabilities currently accepted
+                  as a known risk. They are evaluated twice a day, so matching
+                  vulnerabilities may take up to 12 hours to reopen.
+                </FieldDescription>
+              )}
+              {missingFields.length > 0 && (
+                <FieldDescription className="flex flex-row items-center gap-1.5 text-xs self-end">
+                  <CircleAlert aria-hidden className="h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    Add {missingFields.join(" and ")} to create this rule.
+                  </span>
+                </FieldDescription>
+              )}
+            </TabsContent>
+          </Tabs>
           <DialogFooter className="mt-2">
             <Button variant="secondary" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <AsyncButton
-              data-testid="vex-rule-mark-accepted-risk"
-              onClick={() => handleSubmit("accepted")}
-              disabled={!canSubmit}
-              variant="secondary"
-            >
-              Accept risk
-            </AsyncButton>
-            <div className="flex flex-row items-center">
-              <AsyncButton
-                data-testid="vex-rule-mark-false-positive"
-                variant="default"
-                className="mr-0 rounded-r-none pr-0 capitalize"
-                onClick={() => handleSubmit("falsePositive")}
-                disabled={!canSubmit}
-              >
-                {removeUnderscores(selectedOption)}
-              </AsyncButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="default"
-                    className="flex items-center rounded-l-none pl-1 pr-2"
-                    disabled={!canSubmit}
-                  >
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {MECHANICAL_JUSTIFICATIONS.map((option) => (
-                    <DropdownMenuItem
-                      key={option}
-                      onClick={() => setSelectedOption(option)}
+            {eventType === "falsePositive" ? (
+              <div className="flex flex-row items-center">
+                <AsyncButton
+                  data-testid="vex-rule-mark-false-positive"
+                  variant="default"
+                  className="mr-0 rounded-r-none pr-0 capitalize"
+                  onClick={() => handleSubmit("falsePositive")}
+                  disabled={!canSubmit}
+                >
+                  {removeUnderscores(selectedOption)}
+                </AsyncButton>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="default"
+                      className="flex items-center rounded-l-none pl-1 pr-2"
+                      disabled={!canSubmit}
                     >
-                      <div className="flex flex-col">
-                        <span className="capitalize">
-                          {removeUnderscores(option)}{" "}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {vexOptionMessages[option]}
-                        </span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {MECHANICAL_JUSTIFICATIONS.map((option) => (
+                      <DropdownMenuItem
+                        key={option}
+                        onClick={() => setSelectedOption(option)}
+                      >
+                        <div className="flex flex-col">
+                          <span className="capitalize">
+                            {removeUnderscores(option)}{" "}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {vexOptionMessages[option]}
+                          </span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ) : (
+              <AsyncButton
+                data-testid={
+                  eventType === "accepted"
+                    ? "vex-rule-mark-accepted-risk"
+                    : "vex-rule-mark-reopened"
+                }
+                onClick={() => handleSubmit(eventType)}
+                disabled={!canSubmit}
+                variant="default"
+              >
+                {eventType === "accepted" ? "Accept risk" : "Reopen"}
+              </AsyncButton>
+            )}
           </DialogFooter>
         </form>
       </DialogContent>

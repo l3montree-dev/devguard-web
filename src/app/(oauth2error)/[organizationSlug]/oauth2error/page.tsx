@@ -1,3 +1,5 @@
+/* eslint-disable local/require-loading-boundary -- terminal 403 page; it only
+   unwraps params via use() and has no data to wait for. */
 "use client";
 
 import { Button } from "@/components/ui/button";

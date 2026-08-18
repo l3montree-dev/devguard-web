@@ -4,7 +4,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SpeakerXMarkIcon, StopIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowPathIcon,
+  SpeakerXMarkIcon,
+  StopIcon,
+} from "@heroicons/react/24/outline";
 import type {
   MechanicalJustificationType,
   VexRuleEventType,
@@ -20,12 +24,25 @@ const VexRuleResult: FunctionComponent<VexRuleResultProps> = ({
   eventType,
   mechanicalJustification,
 }) => {
-  // Accepted leaves the vulnerability open; a false positive closes it out.
+  // Accepted leaves the vulnerability open; a false positive closes it out;
+  // reopen brings a previously closed vulnerability back to open.
   if (eventType === "accepted") {
     return (
       <Badge variant="yellow" className="w-fit whitespace-nowrap gap-1 py-1">
         <SpeakerXMarkIcon className="h-4 w-4" />
         Accepted
+      </Badge>
+    );
+  }
+
+  if (eventType === "reopened") {
+    return (
+      <Badge
+        variant="destructive"
+        className="w-fit whitespace-nowrap gap-1 py-1"
+      >
+        <ArrowPathIcon className="h-4 w-4" />
+        Reopened
       </Badge>
     );
   }
