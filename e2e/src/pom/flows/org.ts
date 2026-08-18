@@ -36,6 +36,8 @@ export class OrgFlow {
       .click({ timeout: 15_000 });
     await this.page
       .getByTestId("create-group-button")
+      .or(this.page.getByTestId("create-group-form"))
+      .first()
       .waitFor({ state: "visible", timeout: 15_000 });
   }
 

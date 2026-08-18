@@ -13,6 +13,7 @@ interface Props {
   error?: Error;
   isLoading?: boolean;
   projectSlug: string;
+  Empty?: React.ReactNode;
 }
 
 export default function SubgroupsAndAssetsList({
@@ -22,6 +23,7 @@ export default function SubgroupsAndAssetsList({
   error,
   isLoading,
   projectSlug,
+  Empty,
 }: Props) {
   if (project) {
     return (
@@ -42,6 +44,7 @@ export default function SubgroupsAndAssetsList({
       error={error}
       isLoading={isLoading}
       parentProjectSlug={projectSlug}
+      Empty={Empty}
     />
   );
 }

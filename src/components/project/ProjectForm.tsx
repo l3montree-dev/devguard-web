@@ -9,7 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
-import { Input } from "../ui/input";
+import { Input, type InputProps } from "../ui/input";
 import Section from "../common/Section";
 import { Button } from "../ui/button";
 
@@ -18,6 +18,7 @@ interface Props {
   forceVerticalSections: boolean;
   disabled?: boolean;
   onUpdate?: (data: Partial<ProjectDTO>) => Promise<boolean>;
+  inputVariant?: InputProps["variant"];
 }
 
 export const ProjectForm: FunctionComponent<Props> = ({
@@ -25,6 +26,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
   disabled,
   forceVerticalSections,
   onUpdate,
+  inputVariant,
 }) => {
   return (
     <>
@@ -44,6 +46,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                   data-testid="group-name"
                   disabled={disabled}
                   required={true}
+                  variant={inputVariant}
                   {...field}
                 />
               </FormControl>
@@ -62,6 +65,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                 <Input
                   data-testid="group-description"
                   disabled={disabled}
+                  variant={inputVariant}
                   {...field}
                 />
               </FormControl>

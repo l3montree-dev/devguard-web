@@ -6,9 +6,16 @@ export class GroupFlow {
   constructor(private page: Page) {}
 
   async createGroup(name: string, description: string) {
-    await this.page
-      .getByTestId("create-group-button")
-      .click({ timeout: 10_000 });
+    const inlineForm = this.page.getByTestId("create-group-form");
+    await inlineForm
+      .or(this.page.getByTestId("create-group-button"))
+      .first()
+      .waitFor({ state: "visible", timeout: 15_000 });
+    if (!(await inlineForm.isVisible())) {
+      await this.page
+        .getByTestId("create-group-button")
+        .click({ timeout: 10_000 });
+    }
     await this.page.getByTestId("group-name").waitFor({ state: "visible" });
     await this.page.getByTestId("group-name").click();
     await this.page.getByTestId("group-name").fill(name);
@@ -26,16 +33,29 @@ export class GroupFlow {
       .click({ timeout: 10_000 });
     await this.page
       .getByTestId("create-repository-button")
+      .or(this.page.getByTestId("create-repository-form"))
+      .first()
       .waitFor({ state: "visible", timeout: 10_000 });
   }
 
   async createNewSubgroup() {
     await this.page.getByTestId("nav-group-subgroups-repositories").click();
-    await this.page.getByTestId("create-subgroup-button").click();
+    // an empty group shows the create forms inline behind tabs instead of a button
+    const inlineTab = this.page.getByTestId("create-subgroup-tab");
+    await inlineTab
+      .or(this.page.getByTestId("create-subgroup-button"))
+      .first()
+      .waitFor({ state: "visible", timeout: 10_000 });
+    if (await inlineTab.isVisible()) {
+      await inlineTab.click();
+    } else {
+      await this.page.getByTestId("create-subgroup-button").click();
+    }
+    await this.page.getByTestId("group-name").waitFor({ state: "visible" });
     await this.page.getByTestId("group-name").fill("Test");
     await this.page.getByTestId("group-description").click();
     await this.page.getByTestId("group-description").fill("Test");
-    await this.page.getByRole("button", { name: "Create" }).click();
+    await this.page.getByTestId("create-group-submit-button").click();
   }
 
   async checkHeaderGroup() {

@@ -10,7 +10,7 @@ import {
   FormDescription,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Input, type InputProps } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { classNames } from "@/utils/common";
 import Image from "next/image";
@@ -23,12 +23,14 @@ interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
   disable?: boolean;
   onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
+  inputVariant?: InputProps["variant"];
 }
 
 export const AssetFormGeneral: FunctionComponent<Props> = ({
   form,
   disable,
   onUpdate: handleUpdate,
+  inputVariant,
 }) => {
   const gitInstance = form.watch("repositoryProvider");
   const externalEntityProviderId = form.watch("externalEntityProviderId");
@@ -45,6 +47,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 data-testid="repository-name"
                 disabled={disable}
                 required={true}
+                variant={inputVariant}
                 {...field}
               />
             </FormControl>
@@ -63,6 +66,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
               <Input
                 data-testid="repository-description"
                 disabled={disable}
+                variant={inputVariant}
                 {...field}
               />
             </FormControl>
