@@ -11,17 +11,23 @@ import type { VexRuleMatchCount } from "./useVexRuleMatchCount";
  * The one-line verdict under a CEL editor — error, in-flight, or match count —
  * styled like inline field validation.
  */
+const SCOPE_LABEL: Record<"open" | "closed", string> = {
+  open: "open ",
+  closed: "closed ",
+};
+
 const VexRuleMatchStatus: FunctionComponent<{
   status: VexRuleMatchCount;
   className?: string;
-  scope?: "open" | "all";
-}> = ({ status, className, scope = "all" }) => {
+  scope?: "open" | "closed";
+}> = ({ status, className, scope = "open" }) => {
   const { syntaxError, hasSyntaxError, isTesting, testingError, matchCount } =
     status;
   const error = syntaxError?.message ?? testingError;
 
   const base = cn("flex flex-row items-center gap-1.5 text-xs", className);
   const icon = "h-3.5 w-3.5 shrink-0";
+  const scopeLabel = SCOPE_LABEL[scope];
 
   if (error) {
     return (
@@ -40,7 +46,9 @@ const VexRuleMatchStatus: FunctionComponent<{
     return (
       <FieldDescription className={base}>
         <Loader2 aria-hidden className={cn(icon, "animate-spin")} />
-        <span>Checking how many open vulnerabilities this would affect...</span>
+        <span>
+          Checking how many {scopeLabel}vulnerabilities this would affect...
+        </span>
       </FieldDescription>
     );
   }
@@ -57,7 +65,7 @@ const VexRuleMatchStatus: FunctionComponent<{
       <span>
         Matches{" "}
         <span className="font-medium text-foreground">{matchCount}</span>{" "}
-        {scope === "open" ? "open " : ""}vulnerabilit
+        {scopeLabel}vulnerabilit
         {matchCount === 1 ? "y" : "ies"}
       </span>
     </FieldDescription>

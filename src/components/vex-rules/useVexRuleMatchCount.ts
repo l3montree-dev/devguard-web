@@ -5,6 +5,7 @@
 
 import { checkCelSyntax } from "@/components/common/celLinter";
 import { browserApiClient } from "@/services/devGuardApi";
+import type { VexRuleEventType } from "@/types/api/api";
 import { useEffect, useRef, useState } from "react";
 
 export interface VexRuleMatchCount {
@@ -28,6 +29,9 @@ export interface VexRuleMatchCount {
 export function useVexRuleMatchCount(
   baseUrl: string,
   celExpression: string,
+  // The backend requires an event type to know which vulnerability scope to
+  // match against; default to falsePositive when the caller has none to offer.
+  eventType: VexRuleEventType = "falsePositive",
 ): VexRuleMatchCount {
   const [isTesting, setIsTesting] = useState(false);
   const [testingError, setTestingError] = useState<string | null>(null);
@@ -58,7 +62,10 @@ export function useVexRuleMatchCount(
         const resp = await browserApiClient(baseUrl + "/test", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ celExpression: [expression] }),
+          body: JSON.stringify({
+            celExpression: [expression],
+            eventType,
+          }),
         });
 
         if (!resp.ok) {
@@ -77,7 +84,7 @@ export function useVexRuleMatchCount(
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [celExpression, hasSyntaxError, baseUrl]);
+  }, [celExpression, hasSyntaxError, baseUrl, eventType]);
 
   return {
     syntaxError,

@@ -10,7 +10,7 @@ import { SetupFlow } from "./flows/setup";
 import { VulnFlow } from "./flows/vuln";
 import { ArtifactFlow } from "./flows/artifact";
 import { ShareFlow } from "./flows/sharing";
-import { ModalHelper } from "./flows/modal-helper";
+import { suppressOverlays } from "./flows/modal-helper";
 import { AdvisoryHelper } from "./flows/advisory";
 import { ComplianceFlow } from "./flows/compliance";
 
@@ -61,10 +61,6 @@ export class DevGuardPOM {
     return new ShareFlow(this.page);
   }
 
-  modal(): ModalHelper {
-    return new ModalHelper(this.page);
-  }
-
   advisory(): AdvisoryHelper {
     return new AdvisoryHelper(this.page);
   }
@@ -74,6 +70,7 @@ export class DevGuardPOM {
   }
 
   async loadDevGuard() {
+    await suppressOverlays(this.page);
     await this.page.goto(this.devGuardDomain);
     await this.verifyOnDevGuardURL();
   }

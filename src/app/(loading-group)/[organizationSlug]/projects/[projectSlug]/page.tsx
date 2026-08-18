@@ -2,12 +2,7 @@
 
 import CustomPagination from "@/components/common/CustomPagination";
 import { Input } from "@/components/ui/input";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
@@ -88,18 +83,22 @@ export default function RepositoriesPage() {
     data: subgroupsWithAssets,
     error,
     mutate,
-  } = useSWR<Paged<SubGroupsAndAsset>>(swrUrl, async (url: string) => {
-    if (isSearchActive) {
-      const raw = (await fetcher(url)) as Paged<
-        ProjectDTO & { subGroupsAndAsset: SubGroupsAndAsset[] | null }
-      >;
-      return {
-        ...raw,
-        data: raw.data.flatMap((item) => item.subGroupsAndAsset ?? []),
-      };
-    }
-    return fetcher<Paged<SubGroupsAndAsset>>(url);
-  });
+  } = useSWR<Paged<SubGroupsAndAsset>>(
+    swrUrl,
+    async (url: string) => {
+      if (isSearchActive) {
+        const raw = (await fetcher(url)) as Paged<
+          ProjectDTO & { subGroupsAndAsset: SubGroupsAndAsset[] | null }
+        >;
+        return {
+          ...raw,
+          data: raw.data.flatMap((item) => item.subGroupsAndAsset ?? []),
+        };
+      }
+      return fetcher<Paged<SubGroupsAndAsset>>(url);
+    },
+    { keepPreviousData: true },
+  );
 
   const router = useRouter();
   const activeOrg = useActiveOrg();
@@ -129,15 +128,15 @@ export default function RepositoriesPage() {
   );
   useAutoTour("group-home", tourSteps);
 
-  const debouncedHandleSearch = useCallback(
-    debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      if (value === "") {
-        pushQuery({ search: undefined, page: 1 });
-      } else if (value.length >= 3) {
-        pushQuery({ search: value, page: 1 });
-      }
-    }, 500),
+  const debouncedHandleSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        if (value === "") {
+          pushQuery({ search: undefined, page: 1 });
+        } else if (value.length >= 3) {
+          pushQuery({ search: value, page: 1 });
+        }
+      }, 500),
     [pushQuery],
   );
 
@@ -291,7 +290,9 @@ export default function RepositoriesPage() {
             )
           }
           primaryHeadline
-          description={"Repositories managed by the " + project.name + " group."}
+          description={
+            "Repositories managed by the " + project.name + " group."
+          }
           forceVertical
           title={project.name}
         >
@@ -368,7 +369,7 @@ export default function RepositoriesPage() {
 
                 <Input
                   className="h-11"
-                  onChange={debouncedHandleSearch}
+                  onChange={(e) => debouncedHandleSearch(e.target.value)}
                   defaultValue={searchParams?.get("search") || ""}
                   placeholder="Search for projects and repositories (min. 3 characters)..."
                 />
@@ -376,6 +377,7 @@ export default function RepositoriesPage() {
               <div className="flex flex-col gap-1">
                 <SubgroupsAndAssetsList
                   error={error}
+                  isLoading={isLoading}
                   subgroupsWithAssets={subgroupsWithAssets?.data}
                   projectSlug={project.slug}
                   onFetchData={handleLazyDataFetching}

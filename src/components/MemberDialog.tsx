@@ -19,6 +19,7 @@ import { Form, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import InlineCopy from "./common/InlineCopy";
+import { truncateMiddle } from "@/utils/common";
 
 interface Props {
   isOpen: boolean;
@@ -41,6 +42,10 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
     );
 
     if (!resp.ok) {
+      if (resp.status == 409) {
+        toast.error("User is already member of the organization");
+        return;
+      }
       toast.error("Failed to invite member");
       return;
     }
@@ -58,8 +63,8 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
           <DialogTitle>Invite member</DialogTitle>
           <DialogDescription>
             Invite a new member to your organization{" "}
-            <span className="font-semibold text-foreground">
-              {activeOrg.name}
+            <span className="font-semibold truncate text-foreground">
+              {truncateMiddle(activeOrg.name)}
             </span>{" "}
             by entering their email address.
           </DialogDescription>

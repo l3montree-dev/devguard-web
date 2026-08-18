@@ -1,16 +1,19 @@
 import type { Page } from "@playwright/test";
+import { RepoFlow } from "./repo";
 
 export class SetupFlow {
   constructor(private page: Page) {}
 
+  private repo(): RepoFlow {
+    return new RepoFlow(this.page);
+  }
+
   async setupOwnRiskScanning() {
     await this.page.getByTestId("manual-upload-card").click();
-    await this.page.waitForTimeout(500);
     await this.page.getByTestId("upload-manually").click();
   }
 
   async uploadSbomFile(inputFile: string) {
-    await this.page.waitForTimeout(500);
     await this.page.getByTestId("sbom-tab").click();
     await this.page
       .getByTestId("file-upload-input-file-upload-sbom")
@@ -19,7 +22,6 @@ export class SetupFlow {
   }
 
   async setupAutoRiskScanning() {
-    await this.page.waitForTimeout(500);
     await this.page.getByTestId("gitlab-connect-repository").click();
   }
 
@@ -38,7 +40,6 @@ export class SetupFlow {
     await this.page.getByTestId("repo-selector-option").first().click();
     await this.page.getByTestId("connect-repository-button").click();
     await this.page.getByTestId("continue-connect-repository-button").click();
-    await this.page.waitForTimeout(1000);
   }
 
   async startAutoSetupGitLab() {
@@ -49,10 +50,7 @@ export class SetupFlow {
   }
 
   async uploadVEX(inputFile: string) {
-    await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("button")
-      .click({ timeout: 20_000 });
+    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });

@@ -178,6 +178,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
           />
           <VexRuleMatchStatus
             status={{ matchCount: vexRule.appliesToAmountOfDependencyVulns }}
+            scope={vexRule.eventType === "reopened" ? "closed" : "open"}
           />
           <VexRuleSourceBadge vexSource={vexRule.vexSource} />
         </div>
@@ -198,6 +199,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
             onJustificationChange={(justification) =>
               setDraft((d) => ({ ...d, justification }))
             }
+            eventType={vexRule.eventType}
           />
           {missingFields.length > 0 && (
             <FieldDescription className="flex flex-row items-center gap-1.5 self-end text-xs">

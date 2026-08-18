@@ -1,8 +1,6 @@
 import type { FunctionComponent } from "react";
 import type { SubGroupsAndAsset } from "../../types/api/api";
 import Err from "../common/Err";
-import EmptyParty from "../common/EmptyParty";
-import SkeletonListItems from "../common/SkeletonListItems";
 import { Skeleton } from "../ui/skeleton";
 import AssetRow from "./AssetRow";
 import ProjectRow from "./ProjectRow";
@@ -34,7 +32,7 @@ const NestedList: FunctionComponent<Props> = ({
   isLoading = false,
   parentProjectSlug,
 }) => {
-  if (isLoading) {
+  if (isLoading && !items) {
     return (
       <>
         <NestedRowSkeleton />
