@@ -31,7 +31,9 @@ export class AuthFlow {
     password: string,
   ) {
     await this.page.getByTestId("ory/screen/login/action/register").click();
-    await this.page.waitForLoadState("networkidle");
+    await expect(this.page.getByTestId("traits.email")).toBeVisible({
+      timeout: 10_000,
+    });
     await docShot(this.page, test.info(), "sign-up-screen");
     await this.page.getByTestId("traits.name").click();
     await this.page.getByTestId("traits.name").fill(username);

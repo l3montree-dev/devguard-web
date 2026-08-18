@@ -47,19 +47,21 @@ test.describe("DevGuard multi-user: test flows", () => {
     page,
     browser,
   }) => {
+    const orgName = `publicorg-${Date.now()}`;
+    const projectName = `publicproject-${Date.now()}`;
+    const assetName = `publicasset-${Date.now()}`;
     const user1POM = new DevGuardPOM(page);
+    const devGuardDomain: string = await user1POM.getCurrentDevGuardURL();
+    const withoutPrefix = devGuardDomain.replace("http://", "");
+
     await user1POM.loadAndRegister();
-    await user1POM.org().createOrganization("PublicOrg");
+    await user1POM.org().createOrganization(orgName);
     await user1POM.org().publishOrg();
     await user1POM.org().openGroups();
-    await user1POM
-      .group()
-      .createGroup("PublicGroup", "This is a public group.");
+    await user1POM.group().createGroup(projectName, "This is a public group.");
     await user1POM.group().publishGroup();
     await user1POM.group().openSubgroupsAndRepositories();
-    await user1POM
-      .repo()
-      .createGitHubRepo("PublicRepo", "This is a public repo.");
+    await user1POM.repo().createGitHubRepo(assetName, "This is a public repo.");
     await user1POM.setupSbomUpload();
     await user1POM.repo().publishRepo();
 
@@ -70,7 +72,7 @@ test.describe("DevGuard multi-user: test flows", () => {
     await user2POM.loadAndRegister();
 
     await page2.goto(
-      "localhost:3000/publicorg/projects/publicgroup/assets/publicrepo",
+      `${withoutPrefix}/${orgName}/projects/${projectName}/assets/${assetName}`,
     );
     await page2
       .getByTestId("download-pdf-report")
