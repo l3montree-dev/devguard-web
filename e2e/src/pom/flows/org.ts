@@ -23,7 +23,7 @@ export class OrgFlow {
       .getByRole("button", { name: "Create Organization" })
       .click();
     await this.page
-      .getByTestId("create-group-button")
+      .getByTestId("create-group-submit-button")
       .waitFor({ state: "visible", timeout: 30_000 });
     await docShot(this.page, test.info(), "group-creation-screen");
   }
@@ -125,5 +125,10 @@ export class OrgFlow {
       .locator(`${level} [data-testid="org-switcher-dropdown"]`)
       .click();
     await this.page.getByTestId("create-new-organization-button").click();
+  }
+
+  async publishOrg() {
+    await this.page.getByTestId("nav-org-settings").click();
+    await this.page.getByTestId("public-org-switch").click();
   }
 }

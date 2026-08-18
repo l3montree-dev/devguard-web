@@ -69,4 +69,9 @@ export class GroupFlow {
     await this.page.getByTestId("nav-group-package-search").click();
     await this.page.getByTestId("nav-group-settings").click();
   }
+
+  async publishGroup() {
+    await this.page.getByTestId("nav-group-settings").click();
+    await this.page.getByTestId("public-group-switch").click();
+  }
 }

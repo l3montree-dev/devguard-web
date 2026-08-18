@@ -88,4 +88,9 @@ export class RepoFlow {
     await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
     await this.page.getByRole("menuitem", { name: "Dependency Risks" }).click();
   }
+
+  async publishRepo() {
+    await this.page.getByTestId("repository-settings").click();
+    await this.page.getByTestId("publish-repo-switch").click();
+  }
 }

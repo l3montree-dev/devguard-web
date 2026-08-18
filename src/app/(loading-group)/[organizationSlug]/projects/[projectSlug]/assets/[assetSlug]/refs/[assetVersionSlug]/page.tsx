@@ -195,6 +195,7 @@ const Index: FunctionComponent = () => {
             disabled={selectedArtifact === undefined}
             onClick={downloadPdfReport}
             variant={"secondary"}
+            data-testid="download-pdf-report"
           >
             Download PDF-Report
           </AsyncButton>

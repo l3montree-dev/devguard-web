@@ -625,6 +625,7 @@ const Home = () => {
                       Button={
                         <FormControl>
                           <Switch
+                            data-testid="public-org-switch"
                             disabled={isSavingVisibility}
                             checked={field.value}
                             onCheckedChange={async (checked) => {

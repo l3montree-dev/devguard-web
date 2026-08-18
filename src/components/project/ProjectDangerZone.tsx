@@ -49,6 +49,7 @@ export const ProjectDangerZone: FunctionComponent<Props> = ({
                   Button={
                     <FormControl>
                       <Switch
+                        data-testid="public-group-switch"
                         disabled={!org.isPublic || isSaving}
                         checked={field.value}
                         onCheckedChange={async (checked) => {

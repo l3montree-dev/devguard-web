@@ -81,6 +81,10 @@ export class DevGuardPOM {
     });
   }
 
+  async getCurrentDevGuardURL() {
+    return this.devGuardDomain;
+  }
+
   async verifyOnDevGuardLoginURL() {
     await expect(this.page).toHaveURL(
       new RegExp(`^${this.devGuardDomain}/login`),
