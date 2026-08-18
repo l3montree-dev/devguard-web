@@ -273,10 +273,9 @@ const OrganizationHomePage: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // a filtered list that comes back empty means "no matches", not "nothing created yet"
   const showInlineCreateForm =
-    !isLoading &&
-    !error &&
-    projects?.data.length === 0 &&
+    projects?.total === 0 &&
     !isSearchActive &&
     searchParams?.get("state") !== "inactive" &&
     !activeOrg.externalEntityProviderId &&
@@ -290,14 +289,12 @@ const OrganizationHomePage: FunctionComponent = () => {
         onSkip={handleSkip}
       />
       <Page Title={null} title={""} Menu={orgMenu}>
-        {!showInlineCreateForm && (
-          <CreateGroupForm
-            variant="dialog"
-            open={open}
-            setOpen={setOpen}
-            onSubmit={handleCreateProject}
-          />
-        )}
+        <CreateGroupForm
+          variant="dialog"
+          open={open}
+          setOpen={setOpen}
+          onSubmit={handleCreateProject}
+        />
 
         <div>
           {activeOrg.externalEntityProviderId && (
@@ -343,12 +340,7 @@ const OrganizationHomePage: FunctionComponent = () => {
             forceVertical
             title="Groups"
           >
-            {showInlineCreateForm ? (
-              <CreateGroupForm
-                variant="inline"
-                onSubmit={handleCreateProject}
-              />
-            ) : (
+            {!showInlineCreateForm && (
               <>
                 <div className="flex items-center gap-4">
                   <Tabs
@@ -384,45 +376,52 @@ const OrganizationHomePage: FunctionComponent = () => {
                     placeholder="Search for projects (min. 3 characters)..."
                   />
                 </div>
-                <div id="group-and-project-list">
-                  <ListRenderer
-                    isLoading={isLoading || importingIntoEmptyList}
-                    skeletonVariant="project"
-                    error={error}
-                    data={projects?.data}
-                    Empty={
-                      <EmptyParty title={"No groups found"} description="" />
-                    }
-                    renderItem={(project) => {
-                      return (
-                        <div key={project.id} className="flex flex-col">
-                          <div className="flex flex-col gap-2">
-                            <SubgroupsAndAssetsList
-                              project={
-                                project as ProjectDTO & {
-                                  resourceType: "project";
-                                }
-                              }
-                              onFetchData={handleLazyDataFetching}
-                              subgroupsWithAssets={
-                                (
-                                  project as ProjectDTO & {
-                                    resourceType: "project";
-                                  }
-                                ).subGroupsAndAsset
-                              }
-                              projectSlug={project.slug}
-                            />
-                          </div>
-                        </div>
-                      );
-                    }}
-                  />
-                </div>
               </>
             )}
+            <div id="group-and-project-list">
+              <ListRenderer
+                isLoading={isLoading || importingIntoEmptyList}
+                skeletonVariant="project"
+                error={error}
+                data={projects?.data}
+                Empty={
+                  showInlineCreateForm ? (
+                    <CreateGroupForm
+                      variant="inline"
+                      onSubmit={handleCreateProject}
+                    />
+                  ) : (
+                    <EmptyParty title={"No groups found"} description="" />
+                  )
+                }
+                renderItem={(project) => {
+                  return (
+                    <div key={project.id} className="flex flex-col">
+                      <div className="flex flex-col gap-2">
+                        <SubgroupsAndAssetsList
+                          project={
+                            project as ProjectDTO & {
+                              resourceType: "project";
+                            }
+                          }
+                          onFetchData={handleLazyDataFetching}
+                          subgroupsWithAssets={
+                            (
+                              project as ProjectDTO & {
+                                resourceType: "project";
+                              }
+                            ).subGroupsAndAsset
+                          }
+                          projectSlug={project.slug}
+                        />
+                      </div>
+                    </div>
+                  );
+                }}
+              />
+            </div>
           </Section>
-          {projects && !showInlineCreateForm && (
+          {projects && (
             <div className="mt-4">
               <CustomPagination {...projects} />
             </div>

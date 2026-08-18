@@ -1,3 +1,5 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { cn } from "@/lib/utils";
 import { truncateMiddle } from "@/utils/common";
@@ -102,7 +104,8 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
       Icon: Building2,
       label: "Organization",
       value: truncateMiddle(organizationName, maxNameLength),
-      description: "The organization you just created. It holds all of your groups and projects.",
+      description:
+        "The organization you just created. It holds all of your groups and projects.",
       state: "existing",
     },
     {
@@ -136,12 +139,9 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
       ) : (
         <Placeholder>Your new repository</Placeholder>
       ),
-      description: creatingGroup ? (
-        "The repositories you will manage and scan with DevGuard. You add them inside groups."
-      ) : (
-        
-          "What you are creating now. Your actual code you want to scan and manage with DevGuard."
-      ),
+      description: creatingGroup
+        ? "The repositories you will manage and scan with DevGuard. You add them inside groups."
+        : "What you are creating now. Your actual code you want to scan and manage with DevGuard.",
       state: creatingGroup ? "next" : "pending",
     },
   ];

@@ -13,6 +13,7 @@ interface Props {
   isLoading?: boolean;
   parentProjectSlug: string;
   compact?: boolean;
+  Empty?: React.ReactNode;
 }
 
 const NestedRowSkeleton: FunctionComponent = () => (
@@ -31,6 +32,7 @@ const NestedList: FunctionComponent<Props> = ({
   error,
   isLoading = false,
   parentProjectSlug,
+  Empty = null,
 }) => {
   if (isLoading && !items) {
     return (
@@ -47,7 +49,7 @@ const NestedList: FunctionComponent<Props> = ({
   }
 
   if (!items || items.length === 0) {
-    return null;
+    return Empty;
   }
 
   return (

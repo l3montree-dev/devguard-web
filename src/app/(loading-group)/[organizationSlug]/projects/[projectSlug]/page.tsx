@@ -1,8 +1,9 @@
 "use client";
 
 import CustomPagination from "@/components/common/CustomPagination";
+import EmptyParty from "@/components/common/EmptyParty";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
@@ -17,6 +18,7 @@ import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import Page from "../../../../../components/Page";
 import { CreateGroupForm } from "../../../../../components/project/CreateGroupForm";
+import { CreateSubgroupOrRepoForm } from "../../../../../components/project/CreateSubgroupOrRepoForm";
 import { Button } from "../../../../../components/ui/button";
 import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
@@ -105,18 +107,13 @@ export default function RepositoriesPage() {
 
   const currentUserRole = useCurrentUserRole();
   const [showProjectModal, setShowProjectModal] = useState(false);
-  // which form the inline create tabs show as long as the group is empty
-  const [inlineCreateTab, setInlineCreateTab] = useState<
-    "repository" | "subgroup"
-  >("repository");
 
   const projectMenu = useProjectMenu();
 
-  // as long as the group is empty, we show the create form right away instead of an empty list
+  // a filtered list that comes back empty means "no matches", not "nothing created yet",
+  // so the inline create form is only offered on the unfiltered, genuinely empty group
   const showInlineCreateForm =
-    !isLoading &&
-    !error &&
-    subgroupsWithAssets?.data.length === 0 &&
+    subgroupsWithAssets?.total === 0 &&
     !isSearchActive &&
     searchParams?.get("state") !== "inactive" &&
     !project.externalEntityProviderId &&
@@ -296,45 +293,7 @@ export default function RepositoriesPage() {
           forceVertical
           title={project.name}
         >
-          {showInlineCreateForm ? (
-            <Tabs
-              className="w-full max-w-6xl"
-              value={inlineCreateTab}
-              onValueChange={(value) =>
-                setInlineCreateTab(value as "repository" | "subgroup")
-              }
-            >
-              <TabsList>
-                <TabsTrigger
-                  value="repository"
-                  data-testid="create-repository-tab"
-                >
-                  Create new Repository
-                </TabsTrigger>
-                <TabsTrigger
-                  value="subgroup"
-                  data-testid="create-subgroup-tab"
-                  data-tour="create-subgroup-button"
-                >
-                  Create new Subgroup
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="repository">
-                <CreateRepositoryForm
-                  variant="inline"
-                  onSubmit={handleCreateAsset}
-                />
-              </TabsContent>
-              <TabsContent value="subgroup">
-                <CreateGroupForm
-                  variant="inline"
-                  onSubmit={handleCreateProject}
-                  title="Create new Subgroup"
-                  description="Subgroups can help to organize your bigger software projects. You can separate your backend, frontend and website repositories for example."
-                />
-              </TabsContent>
-            </Tabs>
-          ) : (
+          {!showInlineCreateForm && (
             <>
               <div className="flex items-center gap-4">
                 <Tabs
@@ -374,22 +333,32 @@ export default function RepositoriesPage() {
                   placeholder="Search for projects and repositories (min. 3 characters)..."
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <SubgroupsAndAssetsList
-                  error={error}
-                  isLoading={isLoading}
-                  subgroupsWithAssets={subgroupsWithAssets?.data}
-                  projectSlug={project.slug}
-                  onFetchData={handleLazyDataFetching}
-                />
-              </div>
-              <div className="mt-4">
-                {subgroupsWithAssets && (
-                  <CustomPagination {...subgroupsWithAssets} />
-                )}
-              </div>
             </>
           )}
+          <div className="flex flex-col gap-1">
+            <SubgroupsAndAssetsList
+              error={error}
+              isLoading={isLoading}
+              subgroupsWithAssets={subgroupsWithAssets?.data}
+              projectSlug={project.slug}
+              onFetchData={handleLazyDataFetching}
+              Empty={
+                showInlineCreateForm ? (
+                  <CreateSubgroupOrRepoForm
+                    onCreateRepository={handleCreateAsset}
+                    onCreateSubgroup={handleCreateProject}
+                  />
+                ) : (
+                  <EmptyParty title="No repositories found" description="" />
+                )
+              }
+            />
+          </div>
+          <div className="mt-4">
+            {subgroupsWithAssets && (
+              <CustomPagination {...subgroupsWithAssets} />
+            )}
+          </div>
         </Section>
       </Page>
 
@@ -402,14 +371,12 @@ export default function RepositoriesPage() {
         description="Subgroups can help to organize your bigger software projects. You can separate your backend, frontend and website repositories for example."
       />
 
-      {!showInlineCreateForm && (
-        <CreateRepositoryForm
-          variant="dialog"
-          open={showModal}
-          setOpen={setShowModal}
-          onSubmit={handleCreateAsset}
-        />
-      )}
+      <CreateRepositoryForm
+        variant="dialog"
+        open={showModal}
+        setOpen={setShowModal}
+        onSubmit={handleCreateAsset}
+      />
     </>
   );
 }
