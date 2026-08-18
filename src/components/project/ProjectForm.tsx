@@ -10,22 +10,14 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input, type InputProps } from "../ui/input";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 import Section from "../common/Section";
-import ListItem from "../common/ListItem";
-import { Switch } from "../ui/switch";
-import { classNames } from "@/utils/common";
-import DangerZone from "../common/DangerZone";
-
-import Alert from "../common/Alert";
 import { Button } from "../ui/button";
 
 interface Props {
   form: UseFormReturn<ProjectDTO, any, ProjectDTO>;
   forceVerticalSections: boolean;
   disabled?: boolean;
-  onConfirmDelete?: () => Promise<void>;
-  hideDangerZone?: boolean;
+  onUpdate?: (data: Partial<ProjectDTO>) => Promise<boolean>;
   inputVariant?: InputProps["variant"];
 }
 
@@ -33,11 +25,9 @@ export const ProjectForm: FunctionComponent<Props> = ({
   form,
   disabled,
   forceVerticalSections,
-  onConfirmDelete,
-  hideDangerZone = false,
+  onUpdate,
   inputVariant,
 }) => {
-  const org = useActiveOrg();
   return (
     <>
       <Section
@@ -84,70 +74,14 @@ export const ProjectForm: FunctionComponent<Props> = ({
             </FormItem>
           )}
         />
+        {onUpdate && (
+          <div className="mt-4 flex flex-row justify-end">
+            <Button isSubmitting={form.formState.isSubmitting} type="submit">
+              Update
+            </Button>
+          </div>
+        )}
       </Section>
-      {!hideDangerZone && (
-        <>
-          <hr />
-          <DangerZone>
-            <Section
-              className="pb-0"
-              forceVertical={forceVerticalSections}
-              title="Advanced"
-              description="These settings are for advanced users only. Please be careful when changing these settings."
-            >
-              <FormField
-                control={form.control}
-                name="isPublic"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className={classNames(!org.isPublic && "opacity-50")}>
-                      <ListItem
-                        Description={
-                          "Setting this to true will make the group visible to the public. It allows creating public and private assets."
-                        }
-                        Title="Public Group"
-                        Button={
-                          <FormControl>
-                            <Switch
-                              disabled={!org.isPublic}
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        }
-                      />
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              {!org.isPublic && (
-                <small>
-                  The organization is not public. You can not make the group
-                  public.
-                </small>
-              )}
-              {onConfirmDelete && (
-                <ListItem
-                  Title="Delete Group"
-                  Description={
-                    "This will delete the group and all of its data. This action cannot be undone."
-                  }
-                  Button={
-                    <Alert
-                      title="Are you sure to delete this group?"
-                      description="This action cannot be undone. All data associated with this repository will be deleted."
-                      onConfirm={onConfirmDelete}
-                    >
-                      <Button variant={"destructive"}>Delete</Button>
-                    </Alert>
-                  }
-                />
-              )}
-            </Section>
-          </DangerZone>
-        </>
-      )}
     </>
   );
 };

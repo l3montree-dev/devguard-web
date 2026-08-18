@@ -62,7 +62,6 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
         <ProjectForm
           forceVerticalSections
           form={form}
-          hideDangerZone
           inputVariant={variant === "inline" ? "onCard" : "default"}
         />
         <div className="flex justify-end">

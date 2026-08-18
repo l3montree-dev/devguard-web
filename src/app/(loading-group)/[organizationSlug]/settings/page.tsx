@@ -72,6 +72,7 @@ const Home = () => {
   const router = useRouter();
   const pathName = usePathname();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
+  const [isSavingVisibility, setIsSavingVisibility] = useState(false);
 
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
@@ -89,28 +90,30 @@ const Home = () => {
     });
 
     if (!resp.ok) {
-      console.error("Failed to update organization");
-    } else if (resp.ok) {
-      const newOrg = await resp.json();
-
-      if (newOrg.slug !== activeOrg.slug) {
-        toast("Success", {
-          description: "Organization updated - redirecting to new page...",
-        });
-
-        setTimeout(() => {
-          router.push("/" + newOrg.slug + "/settings");
-        }, 2000);
-      } else {
-        toast("Success", {
-          description: "Organization updated",
-        });
-        updateOrgCtx({
-          ...orgCtx,
-          organization: newOrg,
-        });
-      }
+      toast.error("Could not update organization");
+      return false;
     }
+
+    const newOrg = await resp.json();
+
+    if (newOrg.slug !== activeOrg.slug) {
+      toast("Success", {
+        description: "Organization updated - redirecting to new page...",
+      });
+
+      setTimeout(() => {
+        router.push("/" + newOrg.slug + "/settings");
+      }, 2000);
+    } else {
+      toast("Success", {
+        description: "Organization updated",
+      });
+      updateOrgCtx({
+        ...orgCtx,
+        organization: newOrg,
+      });
+    }
+    return true;
   };
 
   const handleNewGitLabIntegration = (integration: GitLabIntegrationDTO) => {
@@ -602,67 +605,67 @@ const Home = () => {
       </div>
       <hr />
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(handleUpdate)}>
-          <div data-tour="visibility">
+        <div data-tour="visibility">
+          <DangerZone>
             <Section
-              title="Visibility"
-              description="Control the visibility of your organization and its projects. If a Organization is public, only the projects that are public will be visible to the public. Private projects are only visible to members of the organization."
+              className="m-2"
+              id="request-org-deletion"
+              title="Advanced"
+              description="These settings are for advanced users only. Please be careful when changing these settings."
             >
-              <DangerZone displayTitle={false}>
-                <FormField
-                  name="isPublic"
-                  render={({ field }) => (
-                    <FormItem>
-                      <ListItem
-                        Description={
-                          "Setting this to true will make the organization visible to the public. It allows creating public and private projects."
-                        }
-                        Title="Public Organization"
-                        Button={
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        }
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="mt-6 flex items-center justify-end gap-x-6">
-                  <Button
-                    isSubmitting={form.formState.isSubmitting}
-                    variant="destructive"
-                    type="submit"
+              <FormField
+                name="isPublic"
+                render={({ field }) => (
+                  <FormItem>
+                    <ListItem
+                      Description={
+                        "Setting this to true will make the organization visible to the public. Only projects that are public become visible, private projects stay visible to members of the organization only."
+                      }
+                      Title="Public Organization"
+                      Button={
+                        <FormControl>
+                          <Switch
+                            disabled={isSavingVisibility}
+                            checked={field.value}
+                            onCheckedChange={async (checked) => {
+                              field.onChange(checked);
+                              setIsSavingVisibility(true);
+                              const ok = await handleUpdate({
+                                isPublic: checked,
+                              });
+                              // the save failed, so put the switch back where it was
+                              if (!ok) {
+                                field.onChange(!checked);
+                              }
+                              setIsSavingVisibility(false);
+                            }}
+                          />
+                        </FormControl>
+                      }
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <ListItem
+                Title="Delete Organization"
+                Description={
+                  "This will delete the organization including all projects and repositories. This action cannot be undone."
+                }
+                Button={
+                  <Alert
+                    title="Are you sure to delete this organization?"
+                    description="This action cannot be undone. All data associated with this organization will be deleted."
+                    onConfirm={handleDeleteOrganization}
                   >
-                    Save
-                  </Button>
-                </div>
-              </DangerZone>
+                    <Button variant="destructive">Delete</Button>
+                  </Alert>
+                }
+              />
             </Section>
-          </div>
-        </form>
+          </DangerZone>
+        </div>
       </FormProvider>
-      <hr />
-      <Section
-        id="request-org-deletion"
-        title="Delete your Organization"
-        description="Delete your whole organization including all projects and repositories."
-      >
-        <Card className="p-6">
-          <div className="flex justify-end">
-            <Alert
-              title="Are you sure to delete this organization?"
-              description="This action cannot be undone. All data associated with this organization will be deleted."
-              onConfirm={handleDeleteOrganization}
-            >
-              <Button variant="destructive">Delete Organization</Button>
-            </Alert>
-          </div>
-        </Card>
-      </Section>
     </Page>
   );
 };

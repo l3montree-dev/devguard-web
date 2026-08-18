@@ -11,6 +11,7 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import { browserApiClient } from "../../../../../../services/devGuardApi";
 import { UserRole } from "../../../../../../types/api/api";
 import type { ProjectDTO, WebhookDTO } from "../../../../../../types/api/api";
+import { ProjectDangerZone } from "@/components/project/ProjectDangerZone";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -177,7 +178,8 @@ const Index: FunctionComponent = () => {
     );
 
     if (!resp.ok) {
-      console.error("Failed to update project");
+      toast.error("Could not update group");
+      return false;
     }
 
     toast("Success", {
@@ -192,6 +194,7 @@ const Index: FunctionComponent = () => {
         "/" + activeOrg.slug + "/projects/" + newProject.slug + "/settings",
       );
     }
+    return true;
   };
 
   const params = useDecodedParams();
@@ -216,17 +219,10 @@ const Index: FunctionComponent = () => {
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(handleUpdate)}>
               <ProjectForm
-                onConfirmDelete={
-                  Boolean(project.externalEntityProviderId)
-                    ? undefined
-                    : handleDeleteProject
-                }
+                onUpdate={handleUpdate}
                 forceVerticalSections={false}
                 form={form}
               />
-              <div className="mt-4 flex flex-row justify-end">
-                <Button>Update</Button>
-              </div>
             </form>
           </FormProvider>
           <div className="my-4">
@@ -390,6 +386,21 @@ These identifiers are managed by the external system and are treated as immutabl
             </div>
           </Card>
         </Section>
+        <div className="my-4">
+          <hr />
+        </div>
+        <FormProvider {...form}>
+          <ProjectDangerZone
+            form={form}
+            forceVerticalSections={false}
+            onUpdate={handleUpdate}
+            onConfirmDelete={
+              Boolean(project.externalEntityProviderId)
+                ? undefined
+                : handleDeleteProject
+            }
+          />
+        </FormProvider>
       </div>
     </Page>
   );
