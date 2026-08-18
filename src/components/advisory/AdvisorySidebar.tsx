@@ -17,10 +17,6 @@ interface AdvisorySidebarProps {
   vectorString: string;
 }
 
-/**
- * Severity summary of an advisory: score, raw vector and the decoded base
- * metrics of whichever CVSS version the vector was written in.
- */
 const AdvisorySidebar: FunctionComponent<AdvisorySidebarProps> = ({
   severity,
   vectorString,
@@ -34,8 +30,6 @@ const AdvisorySidebar: FunctionComponent<AdvisorySidebarProps> = ({
         ? CVSS31_METRICS
         : null;
 
-  // Metrics arrive as a flat list carrying a group label; the label is rendered
-  // once, above the first metric that belongs to it.
   const seenGroups = new Set<string>();
 
   return (

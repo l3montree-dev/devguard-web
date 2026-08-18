@@ -16,7 +16,7 @@ export const useCsafAccess = () => {
 
   return {
     sharesInformation: asset?.sharesInformation ?? false,
-    settingsHref: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
+    settingsHref: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings#vulnerability-management`,
   };
 };
 
@@ -35,8 +35,9 @@ const CsafAccessNotice: FunctionComponent<{ className?: string }> = ({
     >
       <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
       <span>
-        This repository does not share information publicly, so its CSAF
-        documents cannot be accessed. Enable public access in the{" "}
+        This repository does not expose its vulnerability data publicly, so its
+        CSAF documents cannot be accessed. Turn on &ldquo;Enable public access
+        to vulnerability data&rdquo; in the{" "}
         <Link href={settingsHref} className="text-link">
           repository settings
         </Link>

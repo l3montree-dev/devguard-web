@@ -10,7 +10,7 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { CVSSBadge } from "@/components/common/Severity";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import useTable from "@/hooks/useTable";
-import type { Paged, SecurityAdvisory } from "@/types/api/api";
+import type { AdvisoryState, Paged, SecurityAdvisory } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { vectorStringToScore } from "@/utils/cvss";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -24,8 +24,6 @@ import { useMemo } from "react";
 
 const columnHelper = createColumnHelper<SecurityAdvisory>();
 
-// updatedAt means something different per tab, so the header is named after the
-// state whose advisories are currently listed.
 const updatedAtHeader: Record<string, string> = {
   draft: "Opened",
   public: "Published",
@@ -74,8 +72,6 @@ const buildColumnsDef = (
     },
   }),
 
-  // CSAF documents are only served while the repository shares information, so
-  // the column is dropped rather than linking into a 404.
   ...(sharesInformation
     ? [
         columnHelper.display({
@@ -106,9 +102,7 @@ const buildColumnsDef = (
 
 interface AdvisoryTableProps {
   advisories?: Paged<SecurityAdvisory>;
-  /** Advisory state being listed - drives the updatedAt header. */
-  state: string;
-  /** Asset-scoped API base the per-row CSAF document links are built from. */
+  state: AdvisoryState;
   csafBaseUrl: string;
   onRowClick: (advisory: SecurityAdvisory) => void;
 }

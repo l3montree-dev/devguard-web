@@ -10,6 +10,7 @@ import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import type {
+  AdvisoryState,
   DetailedSecurityAdvisoryDTO,
   Paged,
   SecurityAdvisory,
@@ -57,7 +58,7 @@ export const useAdvisoryList = () => {
   const baseURL = advisoryBaseURL(params);
 
   const stateParam = searchParams?.get("state");
-  const state =
+  const state: AdvisoryState =
     stateParam === "public" || stateParam === "withdrawn"
       ? stateParam
       : "draft";
