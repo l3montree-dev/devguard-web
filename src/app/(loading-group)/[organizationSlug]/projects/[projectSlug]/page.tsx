@@ -372,11 +372,7 @@ export default function RepositoriesPage() {
               className="space-y-8"
               onSubmit={projectForm.handleSubmit(handleCreateProject)}
             >
-              <ProjectForm
-                forceVerticalSections
-                form={projectForm}
-                hideDangerZone
-              />
+              <ProjectForm forceVerticalSections form={projectForm} />
               <DialogFooter>
                 <Button
                   isSubmitting={projectForm.formState.isSubmitting}

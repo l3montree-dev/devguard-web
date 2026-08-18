@@ -309,7 +309,7 @@ const OrganizationHomePage: FunctionComponent = () => {
                 className="space-y-8"
                 onSubmit={form.handleSubmit(handleCreateProject)}
               >
-                <ProjectForm forceVerticalSections form={form} hideDangerZone />
+                <ProjectForm forceVerticalSections form={form} />
                 <DialogFooter>
                   <Button
                     data-testid="create-group-submit-button"

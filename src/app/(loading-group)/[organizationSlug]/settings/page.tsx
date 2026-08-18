@@ -72,6 +72,7 @@ const Home = () => {
   const router = useRouter();
   const pathName = usePathname();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
+  const [isSavingVisibility, setIsSavingVisibility] = useState(false);
 
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
@@ -89,28 +90,30 @@ const Home = () => {
     });
 
     if (!resp.ok) {
-      console.error("Failed to update organization");
-    } else if (resp.ok) {
-      const newOrg = await resp.json();
-
-      if (newOrg.slug !== activeOrg.slug) {
-        toast("Success", {
-          description: "Organization updated - redirecting to new page...",
-        });
-
-        setTimeout(() => {
-          router.push("/" + newOrg.slug + "/settings");
-        }, 2000);
-      } else {
-        toast("Success", {
-          description: "Organization updated",
-        });
-        updateOrgCtx({
-          ...orgCtx,
-          organization: newOrg,
-        });
-      }
+      toast.error("Could not update organization");
+      return false;
     }
+
+    const newOrg = await resp.json();
+
+    if (newOrg.slug !== activeOrg.slug) {
+      toast("Success", {
+        description: "Organization updated - redirecting to new page...",
+      });
+
+      setTimeout(() => {
+        router.push("/" + newOrg.slug + "/settings");
+      }, 2000);
+    } else {
+      toast("Success", {
+        description: "Organization updated",
+      });
+      updateOrgCtx({
+        ...orgCtx,
+        organization: newOrg,
+      });
+    }
+    return true;
   };
 
   const handleNewGitLabIntegration = (integration: GitLabIntegrationDTO) => {
@@ -621,10 +624,19 @@ const Home = () => {
                         Button={
                           <FormControl>
                             <Switch
+                              disabled={isSavingVisibility}
                               checked={field.value}
-                              onCheckedChange={(checked) => {
+                              onCheckedChange={async (checked) => {
                                 field.onChange(checked);
-                                handleUpdate({ isPublic: checked });
+                                setIsSavingVisibility(true);
+                                const ok = await handleUpdate({
+                                  isPublic: checked,
+                                });
+                                // the save failed, so put the switch back where it was
+                                if (!ok) {
+                                  field.onChange(!checked);
+                                }
+                                setIsSavingVisibility(false);
                               }}
                             />
                           </FormControl>
