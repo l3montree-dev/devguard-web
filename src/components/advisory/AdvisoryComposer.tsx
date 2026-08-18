@@ -7,6 +7,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { toast } from "@/lib/toast";
+import type { AdvisoryState } from "@/types/api/api";
 import { Lightbulb } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { FunctionComponent } from "react";
@@ -20,9 +21,7 @@ const MarkdownEditor = dynamic(
 const MAX_LENGTH = 4000;
 
 interface AdvisoryComposerProps {
-  /** Advisory state ("draft" | "public" | "withdrawn") - drives the lifecycle actions. */
-  state: string;
-  /** Resolves to true once the comment was accepted, which clears the editor. */
+  state: AdvisoryState;
   onComment: (justification: string) => Promise<boolean>;
   onEdit: () => void;
   onDelete: () => void;
@@ -30,10 +29,6 @@ interface AdvisoryComposerProps {
   onWithdraw: () => void;
 }
 
-/**
- * Comment box plus lifecycle actions of a single advisory. Mirrors the layout of
- * VulnAssessmentComposer so both detail pages read the same.
- */
 const AdvisoryComposer: FunctionComponent<AdvisoryComposerProps> = ({
   state,
   onComment,
@@ -44,8 +39,6 @@ const AdvisoryComposer: FunctionComponent<AdvisoryComposerProps> = ({
 }) => {
   const [justification, setJustification] = useState("");
 
-  // The action stays enabled so an empty or over-long comment gets explicit
-  // feedback instead of a silently disabled button.
   const attemptComment = async () => {
     if (justification.trim().length === 0) {
       toast.warning("Comment can’t be empty", {

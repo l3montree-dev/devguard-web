@@ -1339,6 +1339,8 @@ export interface InstanceInfoDTO {
   database: InstanceDatabaseInfo;
 }
 
+export type AdvisoryState = "draft" | "public" | "withdrawn";
+
 export interface SecurityAdvisory {
   id: string;
   title: string;
@@ -1347,7 +1349,7 @@ export interface SecurityAdvisory {
   vectorString: string;
   assetID: string;
   affectedPackages: AdvisoryAffectedPackage[] | null;
-  state: string;
+  state: AdvisoryState;
   createdAt: string;
   updatedAt: string;
 }
