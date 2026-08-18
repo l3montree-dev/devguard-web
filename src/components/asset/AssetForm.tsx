@@ -16,6 +16,7 @@ import { AssetFormVulnsManagement } from "./asset-form/AssetFormVulnsManagement"
 import MembersTable from "../MembersTable";
 import AssetMemberDialog from "../AssetMemberDialog";
 import { Button } from "../ui/button";
+import type { InputProps } from "../ui/input";
 import { EssentialProjectConfigContent } from "../common/EssentialProjectConfigDrawer";
 
 interface Props {
@@ -93,6 +94,7 @@ export const AssetSettingsForm: FunctionComponent<
     projectSlug?: string;
     assetSlug?: string;
     repositoryProvider?: "github" | "gitlab";
+    inputVariant?: InputProps["variant"];
     members?: Array<{
       id: string;
       name: string;
@@ -122,6 +124,7 @@ export const AssetSettingsForm: FunctionComponent<
   projectSlug,
   assetSlug,
   repositoryProvider,
+  inputVariant,
   members,
   onRemoveMember,
   onChangeMemberRole,
@@ -134,7 +137,12 @@ export const AssetSettingsForm: FunctionComponent<
         title="General"
         description="General settings"
       >
-        <AssetFormGeneral disable={disable} form={form} onUpdate={onUpdate} />
+        <AssetFormGeneral
+          disable={disable}
+          form={form}
+          onUpdate={onUpdate}
+          inputVariant={inputVariant}
+        />
       </Section>
       {organizationSlug && projectSlug && assetSlug && (
         <>

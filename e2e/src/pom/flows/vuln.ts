@@ -170,6 +170,8 @@ export class VulnFlow {
       .click({ timeout: 30_000 });
     await this.page
       .getByTestId("create-group-button")
+      .or(this.page.getByTestId("create-group-form"))
+      .first()
       .waitFor({ state: "visible", timeout: 30_000 });
   }
 

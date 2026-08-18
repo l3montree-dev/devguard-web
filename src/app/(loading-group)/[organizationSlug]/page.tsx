@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
 import Page from "../../../components/Page";
 
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
@@ -32,21 +31,13 @@ import type {
 import type { CreateProjectReq } from "../../../types/api/req";
 
 import Section from "@/components/common/Section";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
 import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
-import { ProjectForm } from "@/components/project/ProjectForm";
+import { CreateGroupForm } from "@/components/project/CreateGroupForm";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
@@ -80,10 +71,6 @@ const OrganizationHomePage: FunctionComponent = () => {
   const updateOrganization = useUpdateOrganization();
 
   const currentUserRole = useCurrentUserRole();
-
-  const form = useForm<ProjectDTO>({
-    mode: "onBlur",
-  });
 
   const searchQuery = searchParams?.get("search") ?? "";
   const isSearchActive = searchQuery.length >= 3;
@@ -286,6 +273,14 @@ const OrganizationHomePage: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // a filtered list that comes back empty means "no matches", not "nothing created yet"
+  const showInlineCreateForm =
+    projects?.total === 0 &&
+    !isSearchActive &&
+    searchParams?.get("state") !== "inactive" &&
+    !activeOrg.externalEntityProviderId &&
+    isAdmin(currentUserRole);
+
   return (
     <>
       <WelcomeModal
@@ -294,35 +289,12 @@ const OrganizationHomePage: FunctionComponent = () => {
         onSkip={handleSkip}
       />
       <Page Title={null} title={""} Menu={orgMenu}>
-        <Dialog open={open}>
-          <DialogContent setOpen={setOpen}>
-            <DialogHeader>
-              <DialogTitle>Create new Group</DialogTitle>
-              <DialogDescription>
-                A project groups multiple software projects (repositories)
-                inside a single entity. Something like: frontend and backend
-              </DialogDescription>
-            </DialogHeader>
-            <hr />
-            <FormProvider {...form}>
-              <form
-                className="space-y-8"
-                onSubmit={form.handleSubmit(handleCreateProject)}
-              >
-                <ProjectForm forceVerticalSections form={form} hideDangerZone />
-                <DialogFooter>
-                  <Button
-                    data-testid="create-group-submit-button"
-                    type="submit"
-                    isSubmitting={form.formState.isSubmitting}
-                  >
-                    Create
-                  </Button>
-                </DialogFooter>
-              </form>
-            </FormProvider>
-          </DialogContent>
-        </Dialog>
+        <CreateGroupForm
+          variant="dialog"
+          open={open}
+          setOpen={setOpen}
+          onSubmit={handleCreateProject}
+        />
 
         <div>
           {activeOrg.externalEntityProviderId && (
@@ -349,7 +321,8 @@ const OrganizationHomePage: FunctionComponent = () => {
           <Section
             primaryHeadline
             Button={
-              !activeOrg.externalEntityProviderId && (
+              !activeOrg.externalEntityProviderId &&
+              !showInlineCreateForm && (
                 <AuthGuard require="admin">
                   <Button
                     data-testid="create-group-button"
@@ -361,58 +334,75 @@ const OrganizationHomePage: FunctionComponent = () => {
                 </AuthGuard>
               )
             }
-            description="Groups are a way to group multiple software projects (repositories) together. Something like: frontend and backend."
+            description={
+              "Groups managed by the " + activeOrg.name + " organization."
+            }
             forceVertical
             title="Groups"
           >
-            <div className="flex items-center gap-4">
-              <Tabs
-                defaultValue="all"
-                value={viewedProject}
-                onValueChange={handleSetTabValue}
-                className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
-              >
-                <TabsList>
-                  <TabsTrigger value="all">Groups</TabsTrigger>
-                  <TabsTrigger value="inactive">Inactive</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              {isSearchActive && (
-                <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
-                  Filter and sorting options are disabled while searching
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Sort
-                sortOptions={[
-                  { label: "Name", value: "name" },
-                  { label: "Created at", value: "created_at" },
-                  { label: "Updated at", value: "updated_at" },
-                ]}
-              />
+            {!showInlineCreateForm && (
+              <>
+                <div className="flex items-center gap-4">
+                  <Tabs
+                    defaultValue="all"
+                    value={viewedProject}
+                    onValueChange={handleSetTabValue}
+                    className={`${isSearchActive ? "pointer-events-none disabled" : ""}`}
+                  >
+                    <TabsList>
+                      <TabsTrigger value="all">Groups</TabsTrigger>
+                      <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  {isSearchActive && (
+                    <span className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded px-2 py-1">
+                      Filter and sorting options are disabled while searching
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Sort
+                    sortOptions={[
+                      { label: "Name", value: "name" },
+                      { label: "Created at", value: "created_at" },
+                      { label: "Updated at", value: "updated_at" },
+                    ]}
+                  />
 
-              <Input
-                className="h-11"
-                onChange={(e) => debouncedHandleSearch(e.target.value)}
-                defaultValue={searchParams?.get("search") || ""}
-                placeholder="Search for projects (min. 3 characters)..."
-              />
-            </div>
+                  <Input
+                    className="h-11"
+                    onChange={(e) => debouncedHandleSearch(e.target.value)}
+                    defaultValue={searchParams?.get("search") || ""}
+                    placeholder="Search for projects (min. 3 characters)..."
+                  />
+                </div>
+              </>
+            )}
             <div id="group-and-project-list">
               <ListRenderer
                 isLoading={isLoading || importingIntoEmptyList}
                 skeletonVariant="project"
                 error={error}
                 data={projects?.data}
-                Empty={<EmptyParty title={"No groups found"} description="" />}
+                Empty={
+                  showInlineCreateForm ? (
+                    <CreateGroupForm
+                      variant="inline"
+                      onSubmit={handleCreateProject}
+                    />
+                  ) : (
+                    <EmptyParty title={"No groups found"} description="" />
+                  )
+                }
                 renderItem={(project) => {
                   return (
                     <div key={project.id} className="flex flex-col">
                       <div className="flex flex-col gap-2">
                         <SubgroupsAndAssetsList
                           project={
-                            project as ProjectDTO & { resourceType: "project" }
+                            project as ProjectDTO & {
+                              resourceType: "project";
+                            }
                           }
                           onFetchData={handleLazyDataFetching}
                           subgroupsWithAssets={
