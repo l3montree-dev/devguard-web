@@ -156,6 +156,9 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
         state: "draft",
       });
       handleClose(false);
+    } catch {
+      // onSubmit reports the reason itself; swallowing keeps the dialog open
+      // with the entered values instead of rejecting out of the click handler.
     } finally {
       setIsSubmitting(false);
     }

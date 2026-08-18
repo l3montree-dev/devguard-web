@@ -1,192 +1,42 @@
 "use client";
 
+import AdvisoryDialog from "@/components/AdvisoryDialog";
+import AdvisoryTable from "@/components/advisory/AdvisoryTable";
+import AuthGuard from "@/components/AuthGuard";
 import AssetTitle from "@/components/common/AssetTitle";
+import Section from "@/components/common/Section";
 import Page from "@/components/Page";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useConfig } from "@/context/ConfigContext";
+import { useAdvisoryList } from "@/hooks/useAdvisory";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
-import Section from "@/components/common/Section";
-import { Button } from "@/components/ui/button";
-import AuthGuard from "@/components/AuthGuard";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
-import EmptyParty from "@/components/common/EmptyParty";
 import { Loader2 } from "lucide-react";
-import CustomPagination from "@/components/common/CustomPagination";
-import {
-  createColumnHelper,
-  flexRender,
-  getSortedRowModel,
-} from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
-import type { SecurityAdvisory, Paged } from "@/types/api/api";
-import useSWR, { mutate } from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
-import useTable from "@/hooks/useTable";
-import SortingCaret from "@/components/common/SortingCaret";
-import { classNames } from "@/utils/common";
-import { CVSSBadge } from "@/components/common/Severity";
-import FormatDate from "@/components/risk-assessment/FormatDate";
+import { usePathname, useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
-import { useMemo, useState } from "react";
-import { buildFilterSearchParams } from "@/utils/url";
-import { browserApiClient } from "@/services/devGuardApi";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import AdvisoryDialog, {
-  type AdvisoryFormData,
-} from "@/components/AdvisoryDialog";
-import { toast } from "@/lib/toast";
-import { vectorStringToScore } from "@/utils/cvss";
-import { useConfig } from "@/context/ConfigContext";
+import { useState } from "react";
 
-const columnHelper = createColumnHelper<SecurityAdvisory>();
-
-const updatedAtHeader: Record<string, string> = {
-  draft: "Opened",
-  public: "Published",
-  withdrawn: "Withdrawn",
-};
-
-const buildColumnsDef = (
-  visibility: string,
-  csafBaseUrl: string,
-): ColumnDef<SecurityAdvisory, any>[] => [
-  columnHelper.accessor("title", {
-    header: "Title",
-    enableSorting: true,
-    cell: (info) => {
-      return (
-        info.getValue() && (
-          <div className="w-full text-base text-muted-foreground">
-            {info.getValue()}
-          </div>
-        )
-      );
-    },
-  }),
-
-  columnHelper.accessor("severity", {
-    header: "Severity",
-    enableSorting: true,
-    meta: { className: "w-40 whitespace-nowrap" },
-    cell: (info) => {
-      const severity = info.getValue();
-      if (!severity) return null;
-      const score = vectorStringToScore(info.row.original.vectorString ?? "");
-      if (score === null) return null;
-      return <CVSSBadge cvss={score} />;
-    },
-  }),
-
-  columnHelper.accessor("updatedAt", {
-    header: updatedAtHeader[visibility] ?? "Updated",
-    enableSorting: true,
-    meta: { className: "w-40 whitespace-nowrap" },
-    cell: (info) => {
-      const value = info.getValue();
-      return value && <FormatDate dateString={value} />;
-    },
-  }),
-
-  columnHelper.display({
-    id: "csaf",
-    header: "CSAF",
-    meta: { className: "w-24 whitespace-nowrap" },
-    cell: (info) => {
-      const advisory = info.row.original;
-      if (advisory.state !== "public") return null;
-      const year = new Date(advisory.createdAt).getFullYear();
-      const href = `${csafBaseUrl}/csaf/white/${year}/dgsa-${advisory.id}.json`;
-      return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="text-sm text-link"
-          onClick={(e) => e.stopPropagation()}
-        >
-          View
-        </a>
-      );
-    },
-  }),
-];
+const TABS = [
+  { value: "draft", label: "Draft" },
+  { value: "public", label: "Public" },
+  { value: "withdrawn", label: "Withdrawn" },
+] as const;
 
 const Index: FunctionComponent = () => {
-  const asset = useActiveAsset();
-  const assetId = asset?.id;
   const router = useRouter();
   const pathname = usePathname();
   const config = useConfig();
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
-    useDecodedParams() as {
-      organizationSlug: string;
-      projectSlug: string;
-      assetSlug: string;
-      assetVersionSlug: string;
-    };
+  const assetMenu = useAssetMenu();
+  const push = useRouterQuery();
+  const { organizationSlug, projectSlug, assetSlug } = useDecodedParams();
 
-  const advisoryUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/advisory`;
+  const { advisories, isLoading, state, createAdvisory } = useAdvisoryList();
+
   const csafBaseUrl = `${config.devguardApiUrlPublicInternet}/api/v1/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}`;
 
-  const searchParams = useSearchParams();
-  const push = useRouterQuery();
-
-  const visibilityParam = searchParams?.get("visibility");
-  const visibility =
-    visibilityParam === "public" || visibilityParam === "withdrawn"
-      ? visibilityParam
-      : "draft";
-
-  const advisoryListUrl = useMemo(() => {
-    const p = buildFilterSearchParams(searchParams);
-    if (!searchParams?.has("pageSize")) p.set("pageSize", "10");
-    p.append("filterQuery[visibility][is]", visibility);
-    return `${advisoryUrl}?${p.toString()}`;
-  }, [searchParams, advisoryUrl, visibility]);
-
-  const {
-    data: advisories,
-    isLoading,
-    error,
-  } = useSWR<Paged<SecurityAdvisory>>(
-    advisoryListUrl,
-    (url: string) =>
-      fetcher(url).then((res: SecurityAdvisory[] | Paged<SecurityAdvisory>) =>
-        Array.isArray(res)
-          ? { data: res, total: res.length, page: 0, pageSize: res.length }
-          : res,
-      ),
-    { keepPreviousData: true },
-  );
-  const assetMenu = useAssetMenu();
-  const columnsDef = useMemo(
-    () => buildColumnsDef(visibility, csafBaseUrl),
-    [visibility, csafBaseUrl],
-  );
-  const { table } = useTable(
-    { columnsDef, data: advisories?.data || [] },
-    { getSortedRowModel: getSortedRowModel(), manualSorting: false },
-  );
-
   const [dialogOpen, setDialogOpen] = useState(false);
-
-  const handleCreateAdvisory = async (data: AdvisoryFormData) => {
-    const resp = await browserApiClient(advisoryUrl + "/", {
-      method: "POST",
-      body: JSON.stringify({ ...data, assetID: assetId }),
-    });
-    if (resp.ok) {
-      toast.success("Security Advisory created successfully!");
-      mutate(advisoryListUrl);
-    } else {
-      const msg = await resp.text();
-      toast.error("Failed to create advisory: " + msg);
-      throw new Error(msg);
-    }
-  };
-
-  if (error) return <div>Failed to load advisories</div>;
 
   return (
     <Page Menu={assetMenu} title={"Security Advisory"} Title={<AssetTitle />}>
@@ -194,7 +44,7 @@ const Index: FunctionComponent = () => {
         <AdvisoryDialog
           open={dialogOpen}
           onOpenChange={setDialogOpen}
-          onSubmit={handleCreateAdvisory}
+          onSubmit={createAdvisory}
         />
       )}
       <div className="flex flex-row items-center justify-end">
@@ -218,26 +68,17 @@ const Index: FunctionComponent = () => {
         className="mb-4 mt-4"
       >
         <div className="flex flex-1 flex-col gap-2">
-          <Tabs value={visibility}>
+          <Tabs value={state}>
             <TabsList>
-              <TabsTrigger
-                onClick={() => push({ visibility: "draft", page: 1 })}
-                value="draft"
-              >
-                Draft
-              </TabsTrigger>
-              <TabsTrigger
-                onClick={() => push({ visibility: "public", page: 1 })}
-                value="public"
-              >
-                Public
-              </TabsTrigger>
-              <TabsTrigger
-                onClick={() => push({ visibility: "withdrawn", page: 1 })}
-                value="withdrawn"
-              >
-                Withdrawn
-              </TabsTrigger>
+              {TABS.map((tab) => (
+                <TabsTrigger
+                  key={tab.value}
+                  onClick={() => push({ state: tab.value, page: 1 })}
+                  value={tab.value}
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </Tabs>
         </div>
@@ -247,91 +88,12 @@ const Index: FunctionComponent = () => {
           )}
         </div>
       </Section>
-      {!advisories?.data?.length ? (
-        <div>
-          <EmptyParty
-            title="No matching results."
-            description="Security advisories are intended to enable you to create and publish your own vulnerability reports. This process is done by identifying, creating, and publishing advisories."
-          />
-        </div>
-      ) : (
-        <div>
-          <div>
-            <div className="overflow-hidden rounded-lg border shadow-sm">
-              <div className="overflow-auto">
-                <table className="w-full overflow-x-auto text-sm">
-                  <thead className="border-b bg-card text-foreground">
-                    {table.getHeaderGroups().map((headerGroup) => (
-                      <tr key={headerGroup.id}>
-                        {headerGroup.headers.map((header) => (
-                          <th
-                            className={classNames(
-                              "cursor-pointer whitespace-nowrap break-normal p-4 text-left",
-                              (header.column.columnDef.meta as any)?.className,
-                            )}
-                            onClick={
-                              header.column.columnDef.enableSorting
-                                ? header.column.getToggleSortingHandler()
-                                : undefined
-                            }
-                            key={header.id}
-                          >
-                            <div className="flex flex-row items-center gap-2">
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
-                              <SortingCaret
-                                sortDirection={header.column.getIsSorted()}
-                              />
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    ))}
-                  </thead>
-                  <tbody className="text-sm text-foreground">
-                    {table.getRowModel().rows.map((row, i, arr) => (
-                      <tr
-                        onClick={() =>
-                          router?.push(pathname + "/" + row.original.id)
-                        }
-                        className={classNames(
-                          "relative cursor-pointer align-top transition-all",
-                          i === arr.length - 1 ? "" : "border-b",
-                          i % 2 != 0 && "bg-card/50",
-                          "hover:bg-muted",
-                        )}
-                        key={row.original.id}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <td
-                            className={classNames(
-                              "p-4",
-                              (cell.column.columnDef.meta as any)?.className,
-                            )}
-                            key={cell.id}
-                          >
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="mt-4">
-              {advisories && <CustomPagination {...advisories} />}
-            </div>
-          </div>
-        </div>
-      )}
+      <AdvisoryTable
+        advisories={advisories}
+        state={state}
+        csafBaseUrl={csafBaseUrl}
+        onRowClick={(advisory) => router?.push(pathname + "/" + advisory.id)}
+      />
     </Page>
   );
 };
