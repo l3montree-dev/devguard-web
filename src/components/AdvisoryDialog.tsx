@@ -46,7 +46,7 @@ export interface AdvisoryFormData {
   severity: string;
   vectorString: string;
   affectedPackages: (Omit<AdvisoryAffectedPackage, "id"> & { id?: string })[];
-  visibility: string;
+  state: string;
 }
 
 interface AdvisoryDialogProps {
@@ -61,11 +61,11 @@ type PackageRow = Omit<AdvisoryAffectedPackage, "id"> & { id?: string };
 const emptyPackage = (): PackageRow => ({
   ecosystem: "",
   packageName: "",
-  semverStart: "",
-  semverEnd: "",
+  versionStart: "",
+  versionEnd: "",
 });
 
-const SEMVER_RE = /^v?\d+\.\d+\.\d+$/;
+const Version_RE = /^v?\d+\.\d+\.\d+$/;
 
 const defaultValues = (initialValues?: AdvisoryFormData): AdvisoryFormData => ({
   title: initialValues?.title ?? "",
@@ -76,7 +76,7 @@ const defaultValues = (initialValues?: AdvisoryFormData): AdvisoryFormData => ({
     initialValues?.affectedPackages && initialValues.affectedPackages.length > 0
       ? initialValues.affectedPackages
       : [emptyPackage()],
-  visibility: initialValues?.visibility ?? "draft",
+  state: initialValues?.state ?? "draft",
 });
 
 const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
@@ -150,12 +150,15 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
         severity: vectorStringToSeverity(data.vectorString) ?? "",
         affectedPackages: data.affectedPackages.map((pkg) => ({
           ...pkg,
-          semverStart: pkg.semverStart || null,
-          semverEnd: pkg.semverEnd || null,
+          versionStart: pkg.versionStart || null,
+          versionEnd: pkg.versionEnd || null,
         })),
-        visibility: "draft",
+        state: "draft",
       });
       handleClose(false);
+    } catch {
+      // onSubmit reports the reason itself; swallowing keeps the dialog open
+      // with the entered values instead of rejecting out of the click handler.
     } finally {
       setIsSubmitting(false);
     }
@@ -365,17 +368,17 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                     />
                     <FormField
                       control={form.control}
-                      name={`affectedPackages.${index}.semverStart`}
+                      name={`affectedPackages.${index}.versionStart`}
                       rules={{
-                        required: "Semver Start is required",
+                        required: "Version Start is required",
                         pattern: {
-                          value: SEMVER_RE,
+                          value: Version_RE,
                           message: "Format: 1.2.3",
                         },
                       }}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Semver Start</FormLabel>
+                          <FormLabel>Version Start</FormLabel>
                           <FormControl>
                             <Input
                               data-testid="semverStart-security-advisory"
@@ -390,22 +393,22 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                     />
                     <FormField
                       control={form.control}
-                      name={`affectedPackages.${index}.semverEnd`}
+                      name={`affectedPackages.${index}.versionEnd`}
                       rules={{
-                        required: "Semver End is required",
+                        required: "Version End is required",
                         pattern: {
-                          value: SEMVER_RE,
+                          value: Version_RE,
                           message: "Format: 1.2.3",
                         },
                         validate: (value) => {
                           const start = form.getValues(
-                            `affectedPackages.${index}.semverStart`,
+                            `affectedPackages.${index}.versionStart`,
                           );
                           if (
                             !value ||
                             !start ||
-                            !SEMVER_RE.test(value) ||
-                            !SEMVER_RE.test(start)
+                            !Version_RE.test(value) ||
+                            !Version_RE.test(start)
                           ) {
                             return true;
                           }
@@ -417,7 +420,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                       }}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Semver End</FormLabel>
+                          <FormLabel>Version End</FormLabel>
                           <FormControl>
                             <Input
                               data-testid="semverEnd-security-advisory"

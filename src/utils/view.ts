@@ -12,7 +12,6 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 
-import { UpstreamState } from "@/types/api/api";
 import type {
   AssetDTO,
   ComponentRisk,
@@ -182,6 +181,18 @@ export const eventTypeMessages = (
       }
       break;
     }
+    case "published": {
+      message = "published " + flawName;
+      break;
+    }
+    case "withdrawn": {
+      message = "withdrew " + flawName;
+      break;
+    }
+    case "created": {
+      message = "created " + flawName;
+      break;
+    }
   }
   if (event.userAgent === "devguard-mcp-server") {
     message += " (applied by AI agent)";
@@ -206,6 +217,9 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   licenseDecision: "bg-warning text-warning-foreground!",
   attachedComplianceComponent: "bg-success text-success-foreground!",
   removedComplianceComponent: "bg-secondary text-secondary-foreground!",
+  published: "bg-info text-info-foreground!",
+  withdrawn: "bg-destructive text-destructive-foreground!",
+  created: "bg-success text-success-foreground!",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {

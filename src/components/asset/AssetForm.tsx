@@ -222,6 +222,7 @@ export const AssetSettingsForm: FunctionComponent<
             forceVertical={forceVerticalSections}
             title="Vulnerability Management"
             description="Settings related to vulnerability reporting and management."
+            id="vulnerability-management"
           >
             <AssetFormVulnsManagement
               assetId={assetId}
