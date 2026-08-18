@@ -221,12 +221,10 @@ const Index: FunctionComponent = () => {
                     ? undefined
                     : handleDeleteProject
                 }
+                onUpdate={handleUpdate}
                 forceVerticalSections={false}
                 form={form}
               />
-              <div className="mt-4 flex flex-row justify-end">
-                <Button>Update</Button>
-              </div>
             </form>
           </FormProvider>
           <div className="my-4">

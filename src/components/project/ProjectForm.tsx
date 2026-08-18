@@ -24,6 +24,7 @@ interface Props {
   form: UseFormReturn<ProjectDTO, any, ProjectDTO>;
   forceVerticalSections: boolean;
   disabled?: boolean;
+  onUpdate?: (data: Partial<ProjectDTO>) => Promise<void>;
   onConfirmDelete?: () => Promise<void>;
   hideDangerZone?: boolean;
 }
@@ -32,6 +33,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
   form,
   disabled,
   forceVerticalSections,
+  onUpdate,
   onConfirmDelete,
   hideDangerZone = false,
 }) => {
@@ -80,6 +82,13 @@ export const ProjectForm: FunctionComponent<Props> = ({
             </FormItem>
           )}
         />
+        {onUpdate && (
+          <div className="mt-4 flex flex-row justify-end">
+            <Button isSubmitting={form.formState.isSubmitting} type="submit">
+              Update
+            </Button>
+          </div>
+        )}
       </Section>
       {!hideDangerZone && (
         <>
@@ -107,7 +116,10 @@ export const ProjectForm: FunctionComponent<Props> = ({
                             <Switch
                               disabled={!org.isPublic}
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                onUpdate?.({ isPublic: checked });
+                              }}
                             />
                           </FormControl>
                         }

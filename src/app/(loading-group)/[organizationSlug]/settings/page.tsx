@@ -622,7 +622,10 @@ const Home = () => {
                           <FormControl>
                             <Switch
                               checked={field.value}
-                              onCheckedChange={field.onChange}
+                              onCheckedChange={(checked) => {
+                                field.onChange(checked);
+                                handleUpdate({ isPublic: checked });
+                              }}
                             />
                           </FormControl>
                         }
@@ -631,15 +634,6 @@ const Home = () => {
                     </FormItem>
                   )}
                 />
-                <div className="mt-6 flex items-center justify-end gap-x-6">
-                  <Button
-                    isSubmitting={form.formState.isSubmitting}
-                    variant="destructive"
-                    type="submit"
-                  >
-                    Save
-                  </Button>
-                </div>
               </DangerZone>
             </Section>
           </div>
