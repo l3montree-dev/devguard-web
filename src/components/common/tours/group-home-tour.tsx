@@ -1,6 +1,10 @@
 import type { ConditionalStep } from "@/hooks/usePageTour";
 
-export const groupHomeTourSteps = (isAdmin: boolean): ConditionalStep[] => [
+export const groupHomeTourSteps = (
+  isAdmin: boolean,
+  // the filter is hidden while the inline create form replaces the list
+  showsList = true,
+): ConditionalStep[] => [
   {
     selector: '[data-tour="menu"]',
     content: "Navigate between the menu items.",
@@ -25,6 +29,7 @@ export const groupHomeTourSteps = (isAdmin: boolean): ConditionalStep[] => [
     selector: '[data-tour="group-filter"]',
     content:
       "Use sorting and search to filter the list of subgroups and repositories.",
+    condition: showsList,
   },
   {
     selector: '[data-tour="help-center"]',

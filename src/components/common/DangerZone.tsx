@@ -11,21 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import React, { type FunctionComponent, type PropsWithChildren } from "react";
+import { type FunctionComponent, type PropsWithChildren } from "react";
 
-interface DangerZoneProps {
-  displayTitle?: boolean;
-}
-
-const DangerZone: FunctionComponent<PropsWithChildren<DangerZoneProps>> = ({
-  displayTitle = true,
-  children,
-}) => {
+const DangerZone: FunctionComponent<PropsWithChildren> = ({ children }) => {
   return (
     <div className="w-full">
-      {displayTitle && (
-        <span className="mb-2 mt-4 block text-xl font-medium">Danger Zone</span>
-      )}
+      <span className="mb-2 mt-4 block text-xl font-medium">Danger Zone</span>
       <div className="rounded-lg border border-destructive p-4 bg-destructive-muted">
         {children}
       </div>

@@ -297,7 +297,8 @@ const Index: FunctionComponent = () => {
     );
 
     if (!resp.ok) {
-      console.error("Could not update asset");
+      toast.error("Could not update asset");
+      console.error("Could not update asset", resp);
     }
 
     // check if the slug changed - if so, redirect to the new slug

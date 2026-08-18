@@ -23,7 +23,7 @@ export class OrgFlow {
       .getByRole("button", { name: "Create Organization" })
       .click();
     await this.page
-      .getByTestId("create-group-button")
+      .getByTestId("create-group-submit-button")
       .waitFor({ state: "visible", timeout: 30_000 });
     await docShot(this.page, test.info(), "group-creation-screen");
   }
@@ -36,6 +36,8 @@ export class OrgFlow {
       .click({ timeout: 15_000 });
     await this.page
       .getByTestId("create-group-button")
+      .or(this.page.getByTestId("create-group-form"))
+      .first()
       .waitFor({ state: "visible", timeout: 15_000 });
   }
 
@@ -128,6 +130,5 @@ export class OrgFlow {
   async publishOrg() {
     await this.page.getByTestId("nav-org-settings").click();
     await this.page.getByTestId("public-org-switch").click();
-    await this.page.getByTestId("public-org-save").click();
   }
 }
