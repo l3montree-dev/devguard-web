@@ -98,7 +98,9 @@ export class VulnFlow {
     ).toBeVisible({ timeout: 20_000 });
     // The rule is only meaningful if it actually resolves against findings.
     await expect(
-      dialog.getByText(/Matches \d+ vulnerabilit(y|ies)/).first(),
+      dialog
+        .getByText(/Matches \d+ (open |closed )?vulnerabilit(y|ies)/)
+        .first(),
     ).toBeVisible({ timeout: 20_000 });
   }
 
