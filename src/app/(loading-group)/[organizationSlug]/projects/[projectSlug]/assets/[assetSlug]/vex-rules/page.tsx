@@ -15,6 +15,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
+import Filter from "@/components/Filter";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
@@ -42,6 +43,50 @@ import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
+import useFilter from "@/hooks/useFilter";
+
+const filterOptions = [
+  {
+    label: "Rule",
+    value: "title",
+    operators: [
+      { value: "ilike", label: "contains" },
+      { value: "is" },
+      { value: "is not" },
+    ],
+  },
+  {
+    label: "CVE ID",
+    value: "cveId",
+    operators: [
+      { value: "ilike", label: "contains" },
+      { value: "is" },
+      { value: "is not" },
+    ],
+  },
+  {
+    label: "Justification",
+    value: "justification",
+    operators: [{ value: "ilike", label: "contains" }],
+    filterValues: [],
+  },
+  {
+    label: "Source",
+    value: "vex_source",
+    operators: [{ value: "ilike", label: "contains" }],
+    filterValues: [],
+  },
+  {
+    label: "Result",
+    value: "event_type",
+    operators: [{ value: "is" }, { value: "is not" }],
+    filterValues: [
+      { value: "accepted", label: "Accepted" },
+      { value: "falsePositive", label: "False Positive" },
+    ],
+  },
+];
 
 const VexRulesPage: FunctionComponent = () => {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
@@ -50,6 +95,8 @@ const VexRulesPage: FunctionComponent = () => {
   const [rulePrefill, setRulePrefill] = useState<VexRulePrefill>();
 
   const searchParams = useSearchParams();
+  const handleSearch = useDebouncedQuerySearch();
+  const { handleFilter, removeFilter, clearAllFilters } = useFilter();
   const assetMenu = useAssetMenu();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
@@ -178,6 +225,20 @@ const VexRulesPage: FunctionComponent = () => {
         description="Every rule currently applied to this repository - your own and the ones synced from upstream sources."
         className="mb-6 border-t pt-6"
       >
+        <div className="mb-4 flex flex-row gap-2">
+          <Filter
+            options={filterOptions}
+            onFilter={handleFilter}
+            onRemoveFilter={removeFilter}
+            onClearAllFilters={clearAllFilters}
+            search={{
+              onChange: handleSearch,
+              defaultValue: searchParams?.get("search") ?? "",
+              placeholder:
+                "Search VEX rules by title, justification, or CVE ID...",
+            }}
+          />
+        </div>
         {vexRules.length === 0 ? (
           <EmptyParty
             title="No VEX rules found."
@@ -185,7 +246,14 @@ const VexRulesPage: FunctionComponent = () => {
           />
         ) : (
           <VexRulesTable
-            rules={vexRules}
+            rules={
+              vexRulesResponse ?? {
+                data: [],
+                total: 0,
+                page: 1,
+                pageSize: 25,
+              }
+            }
             urlBase={vexRulesUrl}
             isLoading={isLoading}
             onMutate={() => mutate()}
