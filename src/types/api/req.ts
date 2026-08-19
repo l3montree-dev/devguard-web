@@ -6,8 +6,6 @@ export interface CreateAssetReq {
 
   importance: number;
 
-  reachableFromInternet: boolean;
-
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
   availabilityRequirement: RequirementsLevel;

@@ -612,7 +612,6 @@ export interface AssetDTO {
   repositoryId?: string;
   repositoryName?: string;
 
-  reachableFromInternet: boolean;
   paranoidMode: boolean;
 
   signingPubKey?: string;

@@ -102,7 +102,6 @@ const Index: FunctionComponent = () => {
   const form = useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
-      reachableFromInternet: asset.reachableFromInternet ?? false,
       vulnAutoReopenAfterDays: asset.vulnAutoReopenAfterDays ?? -1,
       cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]

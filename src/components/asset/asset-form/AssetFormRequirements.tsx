@@ -97,7 +97,6 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
   const confidentialityValue = form.watch("confidentialityRequirement");
   const integrityValue = form.watch("integrityRequirement");
   const availabilityValue = form.watch("availabilityRequirement");
-  const reachableFromInternet = form.watch("reachableFromInternet");
 
   const handleSaveRequirements = async () => {
     if (handleUpdate) {
@@ -107,7 +106,6 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
           "confidentialityRequirement",
           "integrityRequirement",
           "availabilityRequirement",
-          "reachableFromInternet",
         ],
         handleUpdate,
       )();
@@ -127,11 +125,6 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
           <span className="font-mono capitalize">{integrityValue}</span>,{" "}
           Availability:{" "}
           <span className="font-mono capitalize">{availabilityValue}</span>
-          {reachableFromInternet && (
-            <>
-              , Internet <span className="font-mono">reachable</span>
-            </>
-          )}
         </>
       }
       Button={
@@ -201,31 +194,6 @@ export const AssetFormRequirements: FunctionComponent<Props> = ({
                       onChange={field.onChange}
                       testId="availability-requirement"
                     />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <hr />
-              <FormField
-                control={form.control}
-                name="reachableFromInternet"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <FormLabel>Reachable from Internet</FormLabel>
-                        <p className="text-sm text-muted-foreground">
-                          Is this repository publicly available with a static IP
-                          or domain name?
-                        </p>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
