@@ -5,7 +5,11 @@ import type {
   DetailedDependencyVulnDTO,
   PURLInspectResponse,
 } from "@/types/api/api";
-import { beautifyPurl, extractVersion } from "@/utils/common";
+import {
+  beautifyPurl,
+  extractVersion,
+  getVulnerabilitySourceUrl,
+} from "@/utils/common";
 import { useMemo, type FunctionComponent } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
@@ -127,7 +131,7 @@ const AffectedComponentDetails: FunctionComponent<{
                       .map((cve, index) => (
                         <Link
                           key={`${cve.cveID}-${index}`}
-                          href={`https://osv.dev/vulnerability/${cve.cve}`}
+                          href={getVulnerabilitySourceUrl(cve.cve)}
                           target="_blank"
                           className="!text-xs"
                         >
@@ -148,7 +152,7 @@ const AffectedComponentDetails: FunctionComponent<{
                               className="flex flex-row gap-2"
                             >
                               <Link
-                                href={`https://osv.dev/vulnerability/${rel.targetCve}`}
+                                href={getVulnerabilitySourceUrl(rel.targetCve)}
                                 target="_blank"
                                 className="!text-xs"
                               >
