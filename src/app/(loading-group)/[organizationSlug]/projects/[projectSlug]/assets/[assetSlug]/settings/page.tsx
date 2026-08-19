@@ -114,6 +114,12 @@ const Index: FunctionComponent = () => {
         isNumber(asset.riskAutomaticTicketThreshold) ||
         isNumber(asset.cvssAutomaticTicketThreshold),
       ),
+      enableExposureMetrics: [
+        asset.modifiedAttackVector,
+        asset.modifiedAttackComplexity,
+        asset.modifiedPrivilegesRequired,
+        asset.modifiedScope,
+      ].some((v) => v && v !== "X"),
     },
   });
 

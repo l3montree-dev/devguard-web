@@ -1,5 +1,6 @@
 export type CvssMetric = {
   key: string;
+  field?: string;
   label: string;
   group?: string;
   options: { v: string; l: string }[];
@@ -223,6 +224,46 @@ export const CVSS40_METRICS: CvssMetric[] = [
       "This metric measures the impact to the availability of the SUBSEQUENT SYSTEM resulting from a successfully exploited vulnerability. While the Confidentiality and Integrity impact metrics apply to the loss of confidentiality or integrity of data (e.g., information, files) used by the system, this metric refers to the loss of availability of the impacted system itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of a system.",
   },
 ];
+
+const MODIFIED_METRIC_FIELDS: Record<string, string> = {
+  AV: "modifiedAttackVector",
+  AC: "modifiedAttackComplexity",
+  PR: "modifiedPrivilegesRequired",
+  S: "modifiedScope",
+};
+
+function modifiedMetricsForAsset(
+  metrics: CvssMetric[],
+  keys: string[],
+): CvssMetric[] {
+  return keys.map((key) => {
+    const base = metrics.find((m) => m.key === key);
+    if (!base) throw new Error(`unknown cvss metric: ${key}`);
+    return {
+      ...base,
+      key: `M${base.key}`,
+      field: MODIFIED_METRIC_FIELDS[key],
+      label: `Modified ${base.label}`,
+      options: [
+        { v: "X", l: "Not Defined" },
+        ...base.options.map((o) => ({ ...o, v: o.l.toLowerCase() })),
+      ],
+    };
+  });
+}
+
+export const CVSS31_MODIFIED_METRICS = modifiedMetricsForAsset(CVSS31_METRICS, [
+  "AV",
+  "AC",
+  "PR",
+  "S",
+]);
+
+export const CVSS40_MODIFIED_METRICS = modifiedMetricsForAsset(CVSS40_METRICS, [
+  "AV",
+  "AC",
+  "PR",
+]);
 
 export function scoreToSeverity(score: number): string {
   if (score === 0) return "None";
