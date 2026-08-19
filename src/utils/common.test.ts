@@ -2,6 +2,7 @@ import {
   beautifyPurl,
   extractPurlQualifiers,
   formatPurlQualifiers,
+  getVulnerabilitySourceUrl,
 } from "./common";
 
 describe("beautifyPurl", () => {
@@ -38,5 +39,19 @@ describe("formatPurlQualifiers", () => {
     expect(formatted.length).toBeLessThanOrEqual(48);
     expect(formatted).toContain("...");
     expect(formatted.startsWith("download_url=")).toBe(true);
+  });
+});
+
+describe("getVulnerabilitySourceUrl", () => {
+  it("links EUVD identifiers to the ENISA vulnerability record", () => {
+    expect(getVulnerabilitySourceUrl("EUVD-2026-61112")).toBe(
+      "https://euvd.enisa.europa.eu/enisa/EUVD-2026-61112",
+    );
+  });
+
+  it("keeps other vulnerability identifiers linked to OSV", () => {
+    expect(getVulnerabilitySourceUrl("CVE-2026-12345")).toBe(
+      "https://osv.dev/vulnerability/CVE-2026-12345",
+    );
   });
 });
