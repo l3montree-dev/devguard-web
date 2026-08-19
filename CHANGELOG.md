@@ -4,6 +4,52 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.12.4] — 2026-08-19
+
+### Added
+
+- **Event feed for advisories** — advisory pages now show a combined event feed alongside risk assessment history
+- **VEX rule dialog tabs** — the create-VEX-rule dialog is now split into tabs for a clearer creation flow
+- **Group/project structure flowchart** — new empty-state screens for organizations and projects show an interactive flowchart explaining the group/subgroup/repository structure, with an inline create form shown only when a list is genuinely empty (not just filtered)
+- **BSI Grundschutz framework support** — compliance postures list gained a mapped-framework filter (remembered and reflected in the URL), a security level column, additional BSI framework links, and control relationship icons/tooltips with links to mapped control detail pages
+- **Direct scanner selection** — the scanner selection flow was reworked so choosing a scanner takes you directly through instead of an extra click
+- **Quickstart documentation screenshots** — added the screenshots used in the quickstart docs (org/group/repo creation, sign-up, CLI setup)
+
+### Fixed
+
+- **Access tokens** — personal access tokens (PATs) were renamed to "access tokens" throughout the UI; fixed a bug where access-token hash-based scrolling/navigation to the token section didn't work, and access tokens are now shown correctly in the DevGuard CLI dialog
+- **Webhook integrations** — the integrations table now fetches via SWR and uses one consistent table view; fixed a bug where an omitted webhooks array from the API broke the settings page, and unnested the webhook dialog's dropdown button
+- **Danger zone placement** — the danger zone (delete/visibility settings) for groups and projects now lives at the bottom of the settings page, and failed visibility saves are now handled/surfaced instead of failing silently
+- **Organization invitations** — fixed an issue with the invited-user checkup during org invitation
+- **Organization title truncation** — long organization names in the org dropdown are now truncated instead of overflowing
+- **Compliance posture links** — disabled broken Grundschutz++ links and links pointing to the Grundschutz compliance posture page where they shouldn't render
+- **Dependency risk table navigation** — opening a dependency risk row in a new tab is preserved instead of always navigating in the current tab
+- **Semver comparison** — fixed an incorrect semver comparator used for dependency/version checks
+- **Sign-up flow** — fixed field ordering in the sign-up form
+- **CSAF notice** — corrected the CSAF access notice text shown on advisory pages
+- **User settings redirect** — user settings now redirect to login when the Kratos session is invalid, instead of showing a broken page
+- **Supplier URL reload** — fixed a page reload issue after a supplier-provided URL is entered
+- **DevGuard logo/favicons** — refreshed and fixed the app icons and favicons
+- **Publishing UI alignment** — aligned the publishing UI elements consistently
+- **Advisory pages refactor** — advisory detail and listing pages were refactored around a new `useAdvisory` hook, fixing several inconsistencies in advisory state handling along the way
+
+### Changed
+
+- **Advisory sidebar and dialog** — advisory pages and the underlying components were reorganized for consistency as part of the advisory refactor
+- **VEX rule recommendations** — removed the "applies to amount of dependency vulnerabilities" hint from VEX rule details/recommendations, simplifying the rule UI
+- **Vulnerability event model** — removed the unused `arbitraryJSONData` field from the vulnerability event model
+- **Compliance postures nav** — removed the redundant compliance postures submenu from the asset overview navigation
+- **Framework select** — simplified the compliance framework select to be driven purely by the query parameter
+
+### First-time contributors
+
+Thanks to our first-time contributors this release!
+
+- **[@alloutflo](https://github.com/alloutflo)** — fixed access token hash-scroll navigation
+- **[@fzlzjerry](https://github.com/fzlzjerry)** — fixed dependency risk row tabs not opening correctly
+
+---
+
 ## [v1.12.3] — 2026-08-10
 
 ### Added
