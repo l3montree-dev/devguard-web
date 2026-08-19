@@ -20,21 +20,12 @@ import {
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipPortal,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { CVSS31_MODIFIED_METRICS, CVSS40_MODIFIED_METRICS } from "@/utils/cvss";
 import { useConfig } from "@/context/ConfigContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
-import { AlertTriangle, ChevronDown, CircleHelp } from "lucide-react";
+import { AlertTriangle, ChevronDown } from "lucide-react";
 import React, { type FunctionComponent, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
@@ -442,126 +433,6 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
   );
 };
 
-const EnableExposureMetrics: FunctionComponent<Props> = ({ form }) => {
-  const enableExposureMetrics = form.watch("enableExposureMetrics");
-  const [cvssVersion, setCvssVersion] = useState<"3.1" | "4.0">("3.1");
-
-  const cvssMetrics =
-    cvssVersion === "3.1" ? CVSS31_MODIFIED_METRICS : CVSS40_MODIFIED_METRICS;
-
-  return (
-    <FormField
-      control={form.control}
-      name="enableExposureMetrics"
-      render={({ field }) => (
-        <FormItem>
-          <ListItem
-            Description={
-              <>
-                Enables more detailed exposure metrics to risk formula for
-                vulnerabilities. Be aware that this will change your current
-                risk score and affect this asset, which may result in different
-                results in different assets.
-                {enableExposureMetrics && (
-                  <div className="mt-6 space-y-6">
-                    <div className="flex flex-col gap-3 rounded-lg border p-4">
-                      <Tabs
-                        value={cvssVersion}
-                        onValueChange={(v) =>
-                          setCvssVersion(v as "3.1" | "4.0")
-                        }
-                      >
-                        <TabsList>
-                          <TabsTrigger value="3.1">CVSS 3.1</TabsTrigger>
-                          <TabsTrigger value="4.0">CVSS 4.0</TabsTrigger>
-                        </TabsList>
-                      </Tabs>
-
-                      <div className="flex flex-col gap-3">
-                        {cvssMetrics.map((metric) => (
-                          <div
-                            key={metric.key}
-                            className="flex flex-col gap-1.5"
-                          >
-                            <Label className="text-xs text-muted-foreground">
-                              {metric.label}{" "}
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <CircleHelp className="h-3 w-3 cursor-help text-muted-foreground" />
-                                </TooltipTrigger>
-                                <TooltipPortal>
-                                  <TooltipContent>
-                                    <div className="relative font-normal">
-                                      {metric.description}{" "}
-                                      <a
-                                        target="_blank"
-                                        rel="noreferrer noopener"
-                                        href={`https://www.first.org/cvss/calculator/${cvssVersion}`}
-                                      >
-                                        More information.
-                                      </a>
-                                    </div>
-                                  </TooltipContent>
-                                </TooltipPortal>
-                              </Tooltip>
-                            </Label>
-
-                            <div className="flex flex-wrap gap-1.5">
-                              {metric.options.map((opt) => (
-                                <Button
-                                  key={opt.v}
-                                  variant="outline"
-                                  type="button"
-                                  size="sm"
-                                  onClick={() =>
-                                    form.setValue(
-                                      metric.field as keyof AssetFormValues,
-                                      opt.v as any,
-                                      {
-                                        shouldDirty: true,
-                                      },
-                                    )
-                                  }
-                                  className={cn(
-                                    form.watch(
-                                      metric.field as keyof AssetFormValues,
-                                    ) === opt.v &&
-                                      "bg-secondary text-secondary-foreground",
-                                  )}
-                                >
-                                  {opt.l}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </>
-            }
-            Title="Exposure metrics"
-            Button={
-              <FormControl>
-                <Switch
-                  data-testid="exposure-metrics"
-                  checked={field.value}
-                  onCheckedChange={(v) => {
-                    form.setValue("enableExposureMetrics", v, {
-                      shouldDirty: true,
-                    });
-                  }}
-                />
-              </FormControl>
-            }
-          />
-        </FormItem>
-      )}
-    />
-  );
-};
-
 const CVSSBadgePreview: FunctionComponent<{
   badgePreviewUrl: string;
   publicBadgeUrl?: string;
@@ -911,8 +782,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
       <VulnAutoReopenAfterDays form={form} />
 
-      <EnableExposureMetrics form={form} />
-
       {handleUpdate && (
         <div className="mt-4 flex flex-row justify-end">
           <AsyncButton
@@ -926,12 +795,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.enableTicketRange ||
                 form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
                 form.formState.dirtyFields?.riskAutomaticTicketThreshold ||
-                form.formState.dirtyFields?.keepOriginalSbomRootComponent ||
-                form.formState.dirtyFields?.enableExposureMetrics ||
-                form.formState.dirtyFields?.modifiedAttackVector ||
-                form.formState.dirtyFields?.modifiedAttackComplexity ||
-                form.formState.dirtyFields?.modifiedPrivilegesRequired ||
-                form.formState.dirtyFields?.modifiedScope
+                form.formState.dirtyFields?.keepOriginalSbomRootComponent
               )
             }
             onClick={createUpdateHandler(
@@ -944,11 +808,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 "cvssAutomaticTicketThreshold",
                 "riskAutomaticTicketThreshold",
                 "keepOriginalSbomRootComponent",
-                "enableExposureMetrics",
-                "modifiedAttackVector",
-                "modifiedAttackComplexity",
-                "modifiedPrivilegesRequired",
-                "modifiedScope",
               ],
               handleUpdate,
             )}
