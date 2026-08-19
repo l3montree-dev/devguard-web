@@ -63,7 +63,10 @@ const WebhooksTable: FunctionComponent<Props> = ({
 
   return (
     <>
-      <div className="overflow-hidden rounded-lg border shadow-sm">
+      <div
+        className="overflow-hidden rounded-lg border shadow-sm"
+        data-testid="webhooks-section"
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="border-b bg-card text-foreground">
@@ -142,7 +145,10 @@ const WebhooksTable: FunctionComponent<Props> = ({
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setEditing(webhook)}>
+                          <DropdownMenuItem
+                            data-testid="edit-webhook-button"
+                            onClick={() => setEditing(webhook)}
+                          >
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
