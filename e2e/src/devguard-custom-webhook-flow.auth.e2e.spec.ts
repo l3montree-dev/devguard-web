@@ -1,5 +1,6 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
+import { docShot } from "./doc-shot";
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
@@ -8,283 +9,157 @@ test.describe("DevGuard custom webhook test", () => {
 
   test.beforeEach(async ({ page }) => {
     devguardPOM = new DevGuardPOM(page);
-    await devguardPOM.loadDevGuard();
+    await devguardPOM.loadDevGuardNoSuppress();
   });
 
-  test("test custom webhook creation for org", async () => {
-    //Create test organization
+  test("test custom webhook creation for org", async ({ page }, testInfo) => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openOrgWebhookSettings();
-
-    //wait and take screenshot of webhook section to show location of webhook setting
-    await devguardPOM.webhook().screenshotViewPort("webhook-section-org");
-
-    //Click on Webhook creation button
+    await docShot(page, testInfo, "webhook-section-org");
     await devguardPOM.webhook().openCreateWebhookDialog();
-
-    //Fill in the webhook creation form
     await devguardPOM.webhook().fillWebhookForm({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //wait and take screenshot of form
-    await devguardPOM
-      .webhook()
-      .screenshotWebhookDialog("webhook-creation-form-org");
-
-    //Click on create button
+    await docShot(page, testInfo, "webhook-creation-form-org", {
+      locator: page.getByRole("dialog"),
+    });
     await devguardPOM.webhook().submitWebhookForm();
-
-    //wait and take screenshot of the newly created webhook
-    await devguardPOM.webhook().screenshotViewPort("webhook-created-org");
+    await docShot(page, testInfo, "webhook-created-org");
   });
 
   test("test custom webhook creation for group", async () => {
-    //Create test group
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-    await devguardPOM.org().openGroups();
     await devguardPOM
       .group()
       .createGroup(
         `Test Group ${Date.now()}`,
         "Test Group that contains very important projects!",
       );
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openGroupWebhookSettings();
-
-    //Click on Webhook creation button
     await devguardPOM.webhook().openCreateWebhookDialog();
-
-    //Fill in the webhook creation form
     await devguardPOM.webhook().fillWebhookForm({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //Click on create button
     await devguardPOM.webhook().submitWebhookForm();
   });
 
-  test("test custom webhook update for org", async () => {
-    //Create test organization
+  test("test custom webhook update for org", async ({ page }, testInfo) => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openOrgWebhookSettings();
-
-    //Create a webhook
     await devguardPOM.webhook().createWebhook({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //wait and take screenshot of the newly created webhook to show state before update
-    await devguardPOM.webhook().screenshotViewPort("webhook-before-update-org");
-
-    //Click on the edit button of the newly created webhook
+    await docShot(page, testInfo, "webhook-before-update-org");
     await devguardPOM.webhook().openEditWebhookDialog(true);
-
-    //Fill in the webhook update form
     await devguardPOM.webhook().fillWebhookForm({
       name: "My Updated Webhook",
       description: "Webhook updated during e2e testing",
       url: "https://example.com/updated-webhook",
     });
-
-    //wait and take screenshot of the edit form
-    await devguardPOM
-      .webhook()
-      .screenshotWebhookDialog("webhook-edit-form-org");
-
-    //Click on update button
+    await docShot(page, testInfo, "webhook-edit-form-org", {
+      locator: page.getByRole("dialog"),
+    });
     await devguardPOM.webhook().submitWebhookForm();
-
-    //wait and take screenshot of the updated webhook to show state after update
-    await devguardPOM.webhook().screenshotViewPort("webhook-after-update-org");
+    await docShot(page, testInfo, "webhook-after-update-org");
   });
 
   test("test custom webhook update for group", async () => {
-    //Create test group
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-    await devguardPOM.org().openGroups();
     await devguardPOM
       .group()
       .createGroup(
         `Test Group ${Date.now()}`,
         "Test Group that contains very important projects!",
       );
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openGroupWebhookSettings();
-
-    //Create a webhook
     await devguardPOM.webhook().createWebhook({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //Click on the edit button of the newly created webhook
     await devguardPOM.webhook().openEditWebhookDialog();
-
-    //Fill in the webhook update form
     await devguardPOM.webhook().fillWebhookForm({
       name: "My Updated Webhook",
       description: "Webhook updated during e2e testing",
       url: "https://example.com/updated-webhook",
     });
-
-    //Click on update button
     await devguardPOM.webhook().submitWebhookForm();
   });
 
-  test("test custom webhook deletion for org", async () => {
-    //Create test organization
+  test("test custom webhook deletion for org", async ({ page }, testInfo) => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openOrgWebhookSettings();
-
-    //Create a webhook
     await devguardPOM.webhook().createWebhook({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //Click on the edit button of the newly created webhook
     await devguardPOM.webhook().openEditWebhookDialog();
-
-    //wait and take screenshot of the newly created webhook to show state before deletion
-
-    await devguardPOM
-      .webhook()
-      .screenshotWebhookDialog("webhook-before-deletion-org");
-
-    await devguardPOM
-      .webhook()
-      .screenshotWebhookDialogButtons("webhook-before-deletion-confirm-org");
-
-    //Click on the delete button of the newly created webhook
-    // Note: deleting a webhook currently deletes immediately - there is no
-    // confirmation dialog in the UI, so the screenshot below captures the
-    // resulting state right after the delete request completes.
-    await devguardPOM.webhook().clickDeleteWebhook();
-
-    //wait short and take screenshot of the confirmation modal
-    await devguardPOM
-      .webhook()
-      .screenshotViewPort("webhook-after-deletion-org", 1_000);
+    await docShot(page, testInfo, "webhook-edit-buttons", {
+      locator: page.getByTestId("webhook-edit-buttons"),
+    });
+    await page.getByTestId("delete-webhook-button").click();
+    await docShot(page, testInfo, "webhook-after-deletion-org");
   });
 
-  test("test custom webhook deletion for group", async () => {
-    //Create test group
+  test("test custom webhook deletion for group", async ({ page }) => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-    await devguardPOM.org().openGroups();
     await devguardPOM
       .group()
       .createGroup(
         `Test Group ${Date.now()}`,
         "Test Group that contains very important projects!",
       );
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openGroupWebhookSettings();
-
-    //Create a webhook
     await devguardPOM.webhook().createWebhook({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //Click on the edit button of the newly created webhook
     await devguardPOM.webhook().openEditWebhookDialog();
-
-    //Click on the delete button of the newly created webhook
-    // Note: deleting a webhook currently deletes immediately - there is no
-    // confirmation dialog in the UI, so the screenshot below captures the
-    // resulting state right after the delete request completes.
-    await devguardPOM.webhook().clickDeleteWebhook();
+    await page.getByTestId("delete-webhook-button").click();
   });
 
-  test("test custom webhook test payload for org", async () => {
-    //Create test organization
+  test("test custom webhook test payload for org", async ({
+    page,
+  }, testInfo) => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openOrgWebhookSettings();
-
-    //Create a webhook
     await devguardPOM.webhook().createWebhook({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //Click on the edit button of the newly created webhook
     await devguardPOM.webhook().openEditWebhookDialog();
-
-    // Send Test Payload
-    await devguardPOM.webhook().openTestPayloadDropDown();
-
-    await devguardPOM
-      .webhook()
-      .screenshotViewPort("webhook-before-send-test-payload");
-
-    await devguardPOM
-      .webhook()
-      .screenshotWebhookDialogButtons("webhook-before-confirm-test-payload");
-
-    await devguardPOM.webhook().sendTestPayloadWebHook();
-
-    await devguardPOM
-      .webhook()
-      .screenshotViewPort("webhook-after-send-test-payload", 2_000);
+    await page.getByTestId("test-webhook-payload").click();
+    await docShot(page, testInfo, "webhook-before-send-test-payload");
+    await page.getByTestId("test-webhook-payload-sbom").click();
+    await docShot(page, testInfo, "webhook-after-send-test-payload");
   });
 
-  test("test custom webhook test payload for group", async () => {
+  test("test custom webhook test payload for group", async ({ page }) => {
     //Create test group
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
-    await devguardPOM.org().openGroups();
     await devguardPOM
       .group()
       .createGroup(
         `Test Group ${Date.now()}`,
         "Test Group that contains very important projects!",
       );
-
-    //Click on settings tab
-    //Scroll down to webhook section
     await devguardPOM.webhook().openGroupWebhookSettings();
-
-    //Create a webhook
     await devguardPOM.webhook().createWebhook({
       name: "My Test Webhook",
       description: "Webhook created for e2e testing",
       url: "https://example.com/webhook",
     });
-
-    //Click on the edit button of the newly created webhook
     await devguardPOM.webhook().openEditWebhookDialog();
-
-    // Send Test Payload
-    await devguardPOM.webhook().openTestPayloadDropDown();
-
-    await devguardPOM.webhook().sendTestPayloadWebHook();
+    await page.getByTestId("test-webhook-payload").click();
+    await page.getByTestId("test-webhook-payload-sbom").click();
   });
 });

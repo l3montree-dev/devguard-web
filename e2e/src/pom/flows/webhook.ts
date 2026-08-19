@@ -44,11 +44,6 @@ export class WebhookFlow {
     await this.page.mouse.wheel(0, 200);
   }
 
-  async screenshotViewPort(name: string, waitMs = 2_000) {
-    await this.page.waitForTimeout(waitMs);
-    await docShot(this.page, test.info(), name);
-  }
-
   async openCreateWebhookDialog() {
     await this.page.getByTestId("add-webhook-button").click();
     await this.page
@@ -59,7 +54,7 @@ export class WebhookFlow {
   async openEditWebhookDialog(screenshot: boolean = false) {
     await this.page.getByTestId("webhook-actions").click();
     if (screenshot) {
-      await this.screenshotViewPort("webhook-edit-action-org");
+      await docShot(this.page, test.info(), "webhook-edit-action-org");
     }
     await this.page.getByTestId("edit-webhook-button").click();
     await this.page
@@ -75,20 +70,6 @@ export class WebhookFlow {
     await this.page.getByTestId("webhook-url-input").fill(values.url);
   }
 
-  async screenshotWebhookDialog(name: string) {
-    await this.page.waitForTimeout(2_000);
-    await docShot(this.page, test.info(), name, {
-      locator: this.page.getByRole("dialog"),
-    });
-  }
-
-  async screenshotWebhookDialogButtons(name: string) {
-    await this.page.waitForTimeout(2_000);
-    await docShot(this.page, test.info(), name, {
-      locator: this.page.getByTestId("webhook-edit-buttons"),
-    });
-  }
-
   async submitWebhookForm() {
     await this.page.getByTestId("webhook-submit-button").click();
     await this.page
@@ -100,17 +81,5 @@ export class WebhookFlow {
     await this.openCreateWebhookDialog();
     await this.fillWebhookForm(values);
     await this.submitWebhookForm();
-  }
-
-  async clickDeleteWebhook() {
-    await this.page.getByTestId("delete-webhook-button").click();
-  }
-
-  async openTestPayloadDropDown() {
-    await this.page.getByTestId("test-webhook-payload").click();
-  }
-
-  async sendTestPayloadWebHook() {
-    await this.page.getByTestId("test-webhook-payload-sbom").click();
   }
 }

@@ -80,6 +80,11 @@ export class DevGuardPOM {
     await this.verifyOnDevGuardURL();
   }
 
+  async loadDevGuardNoSuppress() {
+    await this.page.goto(this.devGuardDomain);
+    await this.verifyOnDevGuardURL();
+  }
+
   async verifyOnDevGuardURL() {
     await expect(this.page).toHaveURL(new RegExp(`^${this.devGuardDomain}/`), {
       timeout: 15_000,
@@ -98,7 +103,7 @@ export class DevGuardPOM {
   }
 
   async loadAndRegister() {
-    await this.loadDevGuard();
+    await this.loadDevGuard(); 
     await this.registerNewUser();
   }
 
