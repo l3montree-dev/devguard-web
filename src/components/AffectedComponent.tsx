@@ -4,6 +4,7 @@
 import type {
   DetailedDependencyVulnDTO,
   PURLInspectResponse,
+  VulnWithCVE,
 } from "@/types/api/api";
 import {
   beautifyPurl,
@@ -14,10 +15,9 @@ import { useMemo, type FunctionComponent } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
 
+import { DocDrawer } from "@/components/common/DocDrawer";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { ChevronDown } from "lucide-react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
 import Link from "next/link";
 import useSWR from "swr";
 import {
@@ -25,7 +25,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "./ui/collapsible";
-import { DocDrawer } from "@/components/common/DocDrawer";
 
 const AffectedComponentDetails: FunctionComponent<{
   vuln: DetailedDependencyVulnDTO;
@@ -128,14 +127,18 @@ const AffectedComponentDetails: FunctionComponent<{
                   <div className="mt-1 flex flex-wrap justify-start gap-1">
                     {data.affectedComponents
                       .flatMap((component) => component.cves)
-                      .map((cve, index) => (
+                      .map((el) => {
+                        console.log("Vuln with CVE:", el);
+                        return el;
+                      })
+                      .map((vuln, index) => (
                         <Link
-                          key={`${cve.cveID}-${index}`}
-                          href={getVulnerabilitySourceUrl(cve.cve)}
+                          key={`${vuln.cve}-${index}`}
+                          href={getVulnerabilitySourceUrl(vuln.cve)}
                           target="_blank"
                           className="!text-xs"
                         >
-                          {String(cve.cve)}
+                          {String(vuln.cve)}
                         </Link>
                       ))}
                   </div>
