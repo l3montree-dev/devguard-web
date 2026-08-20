@@ -224,6 +224,10 @@ const EXPOSURE_METRICS_FIELDS = [
   "modifiedAttackComplexity",
   "modifiedPrivilegesRequired",
   "modifiedScope",
+  "modifiedUserInteraction",
+  "modifiedConfidentiality",
+  "modifiedIntegrity",
+  "modifiedAvailability",
 ] as const;
 
 export const AssetFormRequirements: FunctionComponent<Props> = ({

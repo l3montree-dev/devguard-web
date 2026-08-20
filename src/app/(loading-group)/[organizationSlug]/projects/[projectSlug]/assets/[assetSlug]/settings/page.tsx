@@ -118,6 +118,10 @@ const Index: FunctionComponent = () => {
         asset.modifiedAttackComplexity,
         asset.modifiedPrivilegesRequired,
         asset.modifiedScope,
+        asset.modifiedUserInteraction,
+        asset.modifiedConfidentiality,
+        asset.modifiedIntegrity,
+        asset.modifiedAvailability,
       ].some((v) => v && v !== "X"),
     },
   });

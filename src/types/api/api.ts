@@ -78,6 +78,19 @@ export enum ModifiedScope {
   Changed = "changed",
   NotDefined = "X",
 }
+
+export enum ModifiedUserInteraction {
+  NotDefined = "X",
+  None = "none",
+  Required = "required",
+}
+
+export enum ModifiedRequirementsLevel {
+  NotDefined = "X",
+  None = "none",
+  Low = "low",
+  High = "high",
+}
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 interface AppModelDTO {
   id: string;
@@ -608,6 +621,10 @@ export interface AssetDTO {
   modifiedAttackComplexity: ModifiedAttackComplexity;
   modifiedPrivilegesRequired: ModifiedPrivilegesRequired;
   modifiedScope: ModifiedScope;
+  modifiedUserInteraction: ModifiedUserInteraction;
+  modifiedConfidentiality: ModifiedRequirementsLevel;
+  modifiedIntegrity: ModifiedRequirementsLevel;
+  modifiedAvailability: ModifiedRequirementsLevel;
 
   repositoryId?: string;
   repositoryName?: string;

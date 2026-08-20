@@ -230,6 +230,10 @@ const MODIFIED_METRIC_FIELDS: Record<string, string> = {
   AC: "modifiedAttackComplexity",
   PR: "modifiedPrivilegesRequired",
   S: "modifiedScope",
+  UI: "modifiedUserInteraction",
+  C: "modifiedConfidentiality",
+  I: "modifiedIntegrity",
+  A: "modifiedAvailability",
 };
 
 function modifiedMetricsForAsset(
@@ -242,7 +246,7 @@ function modifiedMetricsForAsset(
     return {
       ...base,
       key: `M${base.key}`,
-      field: MODIFIED_METRIC_FIELDS[key],
+      field: MODIFIED_METRIC_FIELDS[key.replace(/^V/, "")],
       label: `Modified ${base.label}`,
       options: [
         { v: "X", l: "Not Defined" },
@@ -257,13 +261,18 @@ export const CVSS31_MODIFIED_METRICS = modifiedMetricsForAsset(CVSS31_METRICS, [
   "AC",
   "PR",
   "S",
+  "UI",
+  "C",
+  "I",
+  "A",
 ]);
 
-export const CVSS40_MODIFIED_METRICS = modifiedMetricsForAsset(CVSS40_METRICS, [
-  "AV",
-  "AC",
-  "PR",
-]);
+export const CVSS40_MODIFIED_METRICS = modifiedMetricsForAsset(
+  CVSS40_METRICS.map((m) =>
+    m.key === "UI" ? CVSS31_METRICS.find((x) => x.key === "UI")! : m,
+  ),
+  ["AV", "AC", "PR", "UI", "VC", "VI", "VA"],
+);
 
 export function scoreToSeverity(score: number): string {
   if (score === 0) return "None";
