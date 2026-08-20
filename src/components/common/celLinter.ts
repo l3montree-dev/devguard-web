@@ -493,32 +493,135 @@ export function celParseLinter() {
   };
 }
 
-// Mirrors dtos.CVE (devguard/dtos/cve_dto.go and the DB model behind it) as
-// seen through the CEL "vuln.cve" map - only the JSON-exposed fields.
+// Mirrors dtos.RiskMetrics as seen through the CEL "vuln.cve.risk" map.
+const RISK_FIELDS: Completion[] = [
+  { label: "baseScore", type: "property", detail: "number" },
+  { label: "withEnvironment", type: "property", detail: "number" },
+  { label: "withThreatIntelligence", type: "property", detail: "number" },
+  {
+    label: "withEnvironmentAndThreatIntelligence",
+    type: "property",
+    detail: "number",
+  },
+];
+
+// Mirrors models.CVE.ToCELMap() (devguard/database/models/cve_model.go) -
+// only the fields that map actually exposes.
 const CVE_FIELDS: Completion[] = [
+  { label: "id", type: "property", detail: "number" },
+  { label: "contentHash", type: "property", detail: "number" },
   {
     label: "cve",
     type: "property",
     detail: "string",
     info: "CVE identifier, e.g. CVE-2021-1234",
   },
+  { label: "datePublished", type: "property", detail: "string (RFC3339)" },
+  {
+    label: "dateLastModified",
+    type: "property",
+    detail: "string (RFC3339)",
+  },
+  { label: "description", type: "property", detail: "string" },
   { label: "cvss", type: "property", detail: "number" },
+  { label: "references", type: "property", detail: "string" },
   { label: "vector", type: "property", detail: "string" },
-  { label: "epss", type: "property", detail: "number" },
+  {
+    label: "risk",
+    type: "property",
+    detail: "map",
+    info: "Nested risk metrics - type . again for its fields",
+  },
+  {
+    label: "cisaRequiredAction",
+    type: "property",
+    detail: "string | null",
+  },
+  {
+    label: "cisaVulnerabilityName",
+    type: "property",
+    detail: "string | null",
+  },
+  { label: "epss", type: "property", detail: "number | null" },
+  { label: "percentile", type: "property", detail: "number | null" },
+  {
+    label: "cisaExploitAdd",
+    type: "property",
+    detail: "string (date) | null",
+  },
+  {
+    label: "cisaActionDue",
+    type: "property",
+    detail: "string (date) | null",
+  },
+  {
+    label: "euvdExploitAdd",
+    type: "property",
+    detail: "string (date) | null",
+  },
+  { label: "weaknesses", type: "property", detail: "list<map>" },
+  { label: "exploits", type: "property", detail: "list<map>" },
+  { label: "affectedComponents", type: "property", detail: "list" },
+  { label: "relationships", type: "property", detail: "list" },
 ];
 
+// Mirrors models.DependencyVuln.ToCELMap() plus the "artifactPurls" field
+// vexrules.vulnToCELMap adds on top of it - only the fields actually exposed
+// to the CEL environment used for VEX rule matching.
 const VULN_FIELDS: Completion[] = [
   { label: "id", type: "property", detail: "string" },
+  { label: "assetVersionName", type: "property", detail: "string" },
+  { label: "vulnAssetId", type: "property", detail: "string" },
+  { label: "state", type: "property", detail: "string" },
+  { label: "lastDetected", type: "property", detail: "string (RFC3339)" },
+  { label: "manualTicketCreation", type: "property", detail: "bool" },
+  { label: "createdAt", type: "property", detail: "string (RFC3339)" },
+  { label: "updatedAt", type: "property", detail: "string (RFC3339)" },
   { label: "cveId", type: "property", detail: "string" },
   {
     label: "cve",
     type: "property",
-    detail: "map",
+    detail: "map | null",
     info: "Nested CVE object - type . again for its fields",
   },
   { label: "componentPurl", type: "property", detail: "string" },
-  { label: "rawRiskAssessment", type: "property", detail: "number" },
-  { label: "assetVersionName", type: "property", detail: "string" },
+  {
+    label: "vulnerabilityPath",
+    type: "property",
+    detail: "list<string>",
+  },
+  {
+    label: "riskRecalculatedAt",
+    type: "property",
+    detail: "string (RFC3339)",
+  },
+  { label: "signature", type: "property", detail: "number" },
+  { label: "assetSignature", type: "property", detail: "number" },
+  { label: "message", type: "property", detail: "string | null" },
+  { label: "ticketId", type: "property", detail: "string | null" },
+  { label: "ticketUrl", type: "property", detail: "string | null" },
+  {
+    label: "componentFixedVersion",
+    type: "property",
+    detail: "string | null",
+    info: "The bare version of the vulnerable component itself that resolves this vuln, e.g. \"4.17.21\" - null while no fix has been published",
+  },
+  {
+    label: "directDependencyFixedVersion",
+    type: "property",
+    detail: "string | null",
+    info: 'A purl for the direct dependency to bump instead, e.g. "pkg:npm/web@1.2.0", resolved by walking the dependency path - null while unresolved, even if componentFixedVersion is set',
+  },
+  { label: "rawRiskAssessment", type: "property", detail: "number | null" },
+  { label: "effort", type: "property", detail: "number | null" },
+  { label: "riskAssessment", type: "property", detail: "number | null" },
+  { label: "priority", type: "property", detail: "number | null" },
+  {
+    label: "artifactPurls",
+    type: "property",
+    detail: "list<string>",
+    info: "The purls identifying this vuln's artifacts, used internally by matchesPattern()",
+  },
 ];
 
 const TOP_LEVEL_COMPLETIONS: Completion[] = [
@@ -577,6 +680,9 @@ export function celCompletionSource(
     }
     if (path.length === 2 && path[1] === "cve") {
       return { from, options: CVE_FIELDS, validFor: /^[a-zA-Z0-9_]*$/ };
+    }
+    if (path.length === 3 && path[1] === "cve" && path[2] === "risk") {
+      return { from, options: RISK_FIELDS, validFor: /^[a-zA-Z0-9_]*$/ };
     }
     return null;
   }
