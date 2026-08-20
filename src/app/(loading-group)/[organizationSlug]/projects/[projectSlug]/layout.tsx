@@ -1,13 +1,27 @@
 import ProjectHeader from "@/components/common/ProjectHeader";
-import React from "react";
+import React, { Suspense } from "react";
 import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 import { ProjectProvider } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
 import { handleHttpError } from "../../../../../data-fetcher/handle-http-error";
 
-export default async function RootLayout({
+export default function ProjectLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ organizationSlug: string; projectSlug: string }>;
+}) {
+  return (
+    <Suspense>
+      <ProjectShell params={params}>{children}</ProjectShell>
+    </Suspense>
+  );
+}
+
+async function ProjectShell({
   children,
   params,
 }: {
@@ -27,6 +41,6 @@ export default async function RootLayout({
       </ClientContextWrapper>
     );
   } catch (error) {
-    handleHttpError(error);
+    handleHttpError(error, organizationSlug);
   }
 }
