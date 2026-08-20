@@ -185,6 +185,10 @@ const Artifacts = () => {
     });
 
     if (!resp.ok) {
+      if (resp.status == 409) {
+        toast.error("Artifact name already used.");
+        return false;
+      }
       toast.error("Failed to create artifact: " + resp.statusText);
       return false;
     }
@@ -284,7 +288,10 @@ const Artifacts = () => {
       );
 
       // Only include artifacts that have sources being deleted
-      if (remainingSources.length !== artifactSources.length) {
+      if (
+        remainingSources.length !== artifactSources.length ||
+        urlsToDelete.includes(`artifact:${artifact.artifactName}`)
+      ) {
         artifactUpdates.push({
           artifactName: artifact.artifactName,
           remainingSources,
@@ -293,29 +300,37 @@ const Artifacts = () => {
     }
 
     if (artifactUpdates.length === 0) {
-      toast.info("No sources to delete");
+      toast.info("Nothing to delete");
       return;
     }
 
-    toast.info(`Deleting ${urlsToDelete.length} SBOM source(s)...`);
+    toast.info(`Deleting ${artifactUpdates.length} artifact(s)...`);
 
     let successCount = 0;
     let errorCount = 0;
+
+    const deletedArtifactNames: string[] = [];
 
     for (const { artifactName, remainingSources } of artifactUpdates) {
       const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}`;
 
       try {
-        const response = await browserApiClient(url, {
-          method: "PUT",
-          body: JSON.stringify({
-            artifactName,
-            informationSources: remainingSources,
-          }),
-        });
+        const response =
+          remainingSources.length === 0
+            ? await browserApiClient(url + "/", { method: "DELETE" })
+            : await browserApiClient(url, {
+                method: "PUT",
+                body: JSON.stringify({
+                  artifactName,
+                  informationSources: remainingSources,
+                }),
+              });
 
         if (response.ok) {
           successCount++;
+          if (remainingSources.length === 0) {
+            deletedArtifactNames.push(artifactName);
+          }
         } else {
           errorCount++;
           console.error(
@@ -330,9 +345,20 @@ const Artifacts = () => {
       }
     }
 
+    if (deletedArtifactNames.length > 0) {
+      updateAssetVersionState((prev) => ({
+        ...prev!,
+        artifacts: prev!.artifacts.filter(
+          (a) => !deletedArtifactNames.includes(a.artifactName),
+        ),
+      }));
+    }
+
     if (successCount > 0) {
       toast.success(
-        `Successfully removed sources from ${successCount} artifact(s)`,
+        deletedArtifactNames.length > 0
+          ? `Successfully deleted ${deletedArtifactNames.length} artifact(s)`
+          : `Successfully removed sources from ${successCount} artifact(s)`,
       );
       mutate();
     }
@@ -397,7 +423,7 @@ const Artifacts = () => {
                               <td colSpan={3} className="px-4 py-2">
                                 <div className="flex flex-row items-center justify-between">
                                   <span className="text-sm mr-2">
-                                    {selectedSourceUrls.size} SBOM source
+                                    {selectedSourceUrls.size} item
                                     {selectedSourceUrls.size !== 1
                                       ? "s"
                                       : ""}{" "}
