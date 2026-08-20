@@ -128,14 +128,15 @@ const AffectedComponentDetails: FunctionComponent<{
                   <div className="mt-1 flex flex-wrap justify-start gap-1">
                     {data.affectedComponents
                       .flatMap((component) => component.cves)
-                      .map((cve, index) => (
+                      .flatMap((vuln) => (vuln.cveID ? [vuln.cveID] : []))
+                      .map((cveID, index) => (
                         <Link
-                          key={`${cve.cveID}-${index}`}
-                          href={getVulnerabilitySourceUrl(cve.cve)}
+                          key={`${cveID}-${index}`}
+                          href={getVulnerabilitySourceUrl(cveID)}
                           target="_blank"
                           className="!text-xs"
                         >
-                          {String(cve.cve)}
+                          {cveID}
                         </Link>
                       ))}
                   </div>

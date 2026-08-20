@@ -58,13 +58,6 @@ interface AppModelDTO {
   updatedAt: string;
 }
 
-export interface AssetMetricsDTO {
-  enabledImageSigning: boolean;
-  verifiedSupplyChainsPercentage: number;
-  enabledContainerScanning: boolean;
-  enabledSCA: boolean;
-}
-
 export interface GitLabIntegrationDTO {
   id: string;
   obfuscatedToken: string;
@@ -203,8 +196,6 @@ export interface ProjectDTO {
 
   subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
-export type ExpandedVulnDTOState =
-  DependencyVuln["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -279,10 +270,6 @@ interface EventArbitraryJsonData {
   scannerIds: string;
 }
 
-export enum UpstreamState {
-  Internal = 0,
-  Upstream = 2,
-}
 interface BaseVulnEventDTO {
   userId: string;
   createdAt: string;
@@ -339,24 +326,6 @@ export interface FixedEventDTO extends BaseVulnEventDTO {
 export interface DetectedEventDTO extends BaseVulnEventDTO {
   type: "detected";
   arbitraryJSONData: EventArbitraryJsonData & RiskCalculationReport;
-}
-
-export interface AddedScannerEventDTO extends BaseVulnEventDTO {
-  type: "addedScanner";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    scannerIds: string;
-  };
-}
-
-export interface RemovedScannerEventDTO extends BaseVulnEventDTO {
-  type: "removedScanner";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    scannerIds: string;
-  };
-}
-
-export interface DetectedOnAnotherBranchEventDTO extends BaseVulnEventDTO {
-  type: "detectedOnAnotherBranch";
 }
 
 export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
@@ -621,15 +590,6 @@ export interface DependencyTreeNode {
   children: DependencyTreeNode[];
 }
 
-export interface AffectedPackage {
-  CVE: CVE;
-  CVEID: string;
-  FixedVersion: string;
-  IntroducedVersion: string;
-  PackageName: string;
-  PurlWithVersion: string;
-}
-
 export interface ComponentRisk {
   [component: string]: {
     low: number;
@@ -658,34 +618,6 @@ export interface License {
 export interface LicenseResponse {
   license: License;
   count: number;
-}
-
-export interface RiskDistribution {
-  assetId: string;
-  assetVersionName: string;
-  label: string;
-  low: number;
-  medium: number;
-  high: number;
-  critical: number;
-}
-export interface VulnCountByScanner {
-  [scannerId: string]: number;
-}
-
-export interface DependencyCountByscanner {
-  [scanner: string]: number;
-}
-
-export interface VulnAggregationStateAndChange {
-  was: {
-    open: number;
-    fixed: number;
-  };
-  now: {
-    open: number;
-    fixed: number;
-  };
 }
 
 export interface VulnByPackage {
@@ -726,11 +658,6 @@ export interface ArtifactDTO {
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
   events: VulnEventDTO[];
-}
-
-export interface PolicyFrameworks {
-  framework: string;
-  controls: string[];
 }
 
 export interface CompliancePostureWithControlDTO {
@@ -1077,8 +1004,6 @@ export type VexRule = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type VexRulesDTO = Paged<VexRule>;
 
 export type MechanicalJustificationType =
   | "component_not_present"

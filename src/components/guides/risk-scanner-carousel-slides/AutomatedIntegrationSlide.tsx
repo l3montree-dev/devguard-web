@@ -121,7 +121,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
           variant={"secondary"}
           id="automated-integration-back-to-selection"
           onClick={() => api?.scrollTo(prevIndex)}
-          >
+        >
           Back
         </Button>
         <Button id="automated-integration-continue" onClick={onClose}>

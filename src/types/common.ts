@@ -25,16 +25,6 @@ export type State =
   | "avoided"
   | "verifiedTransfered";
 
-export type ClosedState =
-  "verifiedFix" | "avoided" | "accepted" | "verifiedTransfered";
-
-export type PendingState = "pendingFix" | "pendingTransfered";
-
-export type GroupAndProjects = {
-  name: string;
-  projects: Project[];
-};
-
 export type Project = {
   name: string;
   environment: Environment;
@@ -44,29 +34,6 @@ export type Project = {
 };
 
 export type Environment = "prod" | "stage" | "dev";
-
-export interface IMember {
-  email: string;
-}
-
-export interface IUser {
-  name: string;
-  imageUrl: string;
-}
-
-export interface IActivityItem {
-  id: number;
-  user: IUser;
-  projectName: string;
-  cve: string;
-  newState: State;
-  date: string;
-  dateTime: string;
-}
-
-export interface IActivityItems {
-  items: IActivityItem[];
-}
 
 export type ZodConvert<T> = {
   [P in keyof T]: T[P] extends string
