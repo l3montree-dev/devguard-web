@@ -62,13 +62,11 @@ const ArtifactRow: FunctionComponent<Props> = ({
   const hasUpstreamUrls = rootNodes && rootNodes.length > 0;
 
   // Track selection state for this artifact's sources
-  const sourceUrls = rootNodes.map((node) => node.url);
-  const allSelected =
-    hasUpstreamUrls &&
-    sourceUrls.length > 0 &&
-    sourceUrls.every((url) => selectedSourceUrls.has(url));
-  const someSelected =
-    hasUpstreamUrls && sourceUrls.some((url) => selectedSourceUrls.has(url));
+  const sourceUrls = hasUpstreamUrls
+    ? rootNodes.map((node) => node.url)
+    : [`artifact:${artifact.artifactName}`];
+  const allSelected = sourceUrls.every((url) => selectedSourceUrls.has(url));
+  const someSelected = sourceUrls.some((url) => selectedSourceUrls.has(url));
 
   const valid = validateArtifactNameAgainstPurlSpec(artifact.artifactName);
 
@@ -102,7 +100,7 @@ const ArtifactRow: FunctionComponent<Props> = ({
             ) : (
               <div className="w-4 h-4 flex-shrink-0" />
             )}
-            {isAdmin(role) && hasUpstreamUrls && (
+            {isAdmin(role) && (
               <div onClick={(e) => e.stopPropagation()} className="pt-1">
                 <Checkbox
                   checked={
