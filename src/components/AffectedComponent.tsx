@@ -4,7 +4,6 @@
 import type {
   DetailedDependencyVulnDTO,
   PURLInspectResponse,
-  VulnWithCVE,
 } from "@/types/api/api";
 import {
   beautifyPurl,
@@ -127,18 +126,15 @@ const AffectedComponentDetails: FunctionComponent<{
                   <div className="mt-1 flex flex-wrap justify-start gap-1">
                     {data.affectedComponents
                       .flatMap((component) => component.cves)
-                      .map((el) => {
-                        console.log("Vuln with CVE:", el);
-                        return el;
-                      })
-                      .map((vuln, index) => (
+                      .flatMap((cve) => (cve.cve ? [cve.cve] : []))
+                      .map((cveID, index) => (
                         <Link
-                          key={`${vuln.cve}-${index}`}
-                          href={getVulnerabilitySourceUrl(vuln.cve)}
+                          key={`${cveID}-${index}`}
+                          href={getVulnerabilitySourceUrl(cveID)}
                           target="_blank"
                           className="!text-xs"
                         >
-                          {String(vuln.cve)}
+                          {cveID}
                         </Link>
                       ))}
                   </div>

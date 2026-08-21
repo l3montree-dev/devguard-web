@@ -600,31 +600,6 @@ export const propagateHighlighting = (
 };
 
 /**
- * Calculates percentile values from an array of numbers
- */
-export const getPercentile = (values: number[], p: number): number => {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.ceil((p / 100) * sorted.length) - 1;
-  return sorted[Math.max(0, index)];
-};
-
-/**
- * Classifies impact level based on percentile thresholds
- */
-export const classifyImpactLevel = (
-  value: number,
-  p90: number,
-  p75: number,
-  p50: number,
-): "critical" | "high" | "medium" | "low" => {
-  if (value >= p90) return "critical";
-  if (value >= p75) return "high";
-  if (value >= p50) return "medium";
-  return "low";
-};
-
-/**
  * Propagates risk upward through the dependency tree
  */
 const propagateRiskUpward = (

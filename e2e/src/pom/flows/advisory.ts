@@ -15,10 +15,10 @@ export class AdvisoryHelper {
     await this.page.getByTestId("title-security-advisory").click();
     await this.page.getByTestId("title-security-advisory").fill(title);
     await this.page
-      .getByRole('textbox', { name: '### Summary Short summary of' })
+      .getByRole("textbox", { name: "### Summary Short summary of" })
       .click();
     await this.page
-      .getByRole('textbox', { name: '### Summary Short summary of' })
+      .getByRole("textbox", { name: "### Summary Short summary of" })
       .fill(description);
     await this.page.getByTestId("vectorString-security-advisory").click();
     await this.page.getByTestId("vectorString-security-advisory").fill(vector);
