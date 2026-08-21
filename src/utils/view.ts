@@ -343,54 +343,6 @@ export const findUser = (
   };
 };
 
-// A simple hash function to convert the project ID to a consistent integer
-export const hashCode = (str: string) => {
-  return Array.from(str).reduce((acc, char) => {
-    return char.charCodeAt(0) + ((acc << 5) - acc);
-  }, 0);
-};
-
-const colors = [
-  "#fbbd25",
-  "#ffca5b",
-  "#ffd785",
-  "#ffe4ae",
-  "#fff1d6",
-  "#ffffff",
-  "#dfddfc",
-  "#bcbdf9",
-  "#979ef5",
-  "#6c7ff0",
-  "#2563eb",
-];
-
-// Generate HSL color
-export const generateColor = (str: string) => {
-  const hash = Math.abs(hashCode(str));
-
-  return colors[hash % colors.length];
-};
-
-export const withMockFixableRiskHistory = (
-  data: RiskHistory[],
-): RiskHistory[] => {
-  return data.map((entry) => ({
-    ...entry,
-    fixableLow: entry.fixableLow ?? 2,
-    fixableMedium: entry.fixableMedium ?? 7,
-    fixableHigh: entry.fixableHigh ?? entry.high * 9,
-    fixableCritical: entry.fixableCritical ?? entry.critical * 15,
-    cvePurlFixableLow:
-      entry.cvePurlFixableLow ?? Math.floor(entry.cvePurlLow / 2),
-    cvePurlFixableMedium:
-      entry.cvePurlFixableMedium ?? Math.floor(entry.cvePurlMedium / 4),
-    cvePurlFixableHigh:
-      entry.cvePurlFixableHigh ?? Math.floor(entry.cvePurlHigh / 3),
-    cvePurlFixableCritical:
-      entry.cvePurlFixableCritical ?? Math.floor(entry.cvePurlCritical / 2),
-  }));
-};
-
 export const reduceRiskHistories = (
   histories: RiskHistory[][],
 ): Array<ReleaseRiskHistory> => {
@@ -472,10 +424,6 @@ export const normalizeContentTree = (
 
   return assetMap;
 };
-
-export interface ThemeConfig {
-  config: typeof config;
-}
 
 export class RedirectorBuilder {
   private organizationSlug?: string;
