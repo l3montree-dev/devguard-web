@@ -5,7 +5,7 @@
 
 import { FetcherError } from "@/data-fetcher/fetcher";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { VexRuleRecommendation } from "@/types/api/api";
+import type { Paged, VexRuleRecommendation } from "@/types/api/api";
 import useSWR from "swr";
 
 export function vexRuleRecommendationsURL(params: {
@@ -41,18 +41,4 @@ export function useVexRuleRecommendation(
   );
 
   return { recommendation: data ?? null, error, isLoading };
-}
-
-/** Every open vulnerability of this reference that has a recommendation. */
-export function useVexRuleRecommendations(baseUrl: string | null) {
-  const { data, error, isLoading } = useSWR<Record<
-    string,
-    VexRuleRecommendation
-  > | null>(baseUrl ? `${baseUrl}/` : null, recommendationFetcher);
-
-  const recommendations = Object.entries(data ?? {}).map(
-    ([vulnID, recommendation]) => ({ vulnID, recommendation }),
-  );
-
-  return { recommendations, error, isLoading };
 }

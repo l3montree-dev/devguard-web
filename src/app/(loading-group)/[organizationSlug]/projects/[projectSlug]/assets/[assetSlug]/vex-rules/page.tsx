@@ -15,14 +15,9 @@ import Filter from "@/components/Filter";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
-import VexRuleRecommendationList, {
-  type RecommendationEntry,
-} from "@/components/vex-rules/VexRuleRecommendationList";
+import VexRuleRecommendationsTable from "@/components/vex-rules/VexRuleRecommendationsTable";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
-import {
-  vexRuleRecommendationsURL,
-  useVexRuleRecommendations,
-} from "@/components/vex-rules/useVexRuleRecommendations";
+import { vexRuleRecommendationsURL } from "@/components/vex-rules/useVexRuleRecommendations";
 import VexSourcesTable, {
   isVexSourceType,
   type VexSource,
@@ -39,6 +34,7 @@ import type {
   Paged,
   VexRule,
   VexRulePrefill,
+  VexRuleRecommendation,
 } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
 import { useSearchParams } from "next/navigation";
@@ -64,6 +60,33 @@ const sourcesFilterOptions = [
     value: "url",
     operators: [{ value: "ilike", label: "contains" }],
     filterValues: [],
+  },
+];
+
+const recommendationFilterOptions = [
+  {
+    label: "Recommendation",
+    value: "title",
+    operators: [
+      { value: "ilike", label: "contains" },
+      { value: "is" },
+      { value: "is not" },
+    ],
+  },
+  {
+    label: "Justification",
+    value: "justification",
+    operators: [{ value: "ilike", label: "contains" }],
+  },
+  {
+    label: "Result",
+    value: "event_type",
+    operators: [{ value: "is" }, { value: "is not" }],
+    filterValues: [
+      { value: "accepted", label: "Accepted" },
+      { value: "falsePositive", label: "False Positive" },
+      { value: "reopened", label: "Reopened" },
+    ],
   },
 ];
 
@@ -136,8 +159,11 @@ const VexRulesPage: FunctionComponent = () => {
     () => new URLSearchParams({ page: "1", pageSize: "25" }),
     [],
   );
+
   const rulesQuery = activeTab === "rules" ? query : defaultQuery;
   const sourcesQuery = activeTab === "sources" ? query : defaultQuery;
+  const recommendationsQuery =
+    activeTab === "recommendations" ? query : defaultQuery;
 
   const {
     data: vexRulesResponse,
@@ -189,15 +215,13 @@ const VexRulesPage: FunctionComponent = () => {
     () =>
       vexSourcesResponse && {
         ...vexSourcesResponse,
-        data: vexSourcesResponse.data.filter(
-          (ref): ref is VexSource => isVexSourceType(ref.type),
+        data: vexSourcesResponse.data.filter((ref): ref is VexSource =>
+          isVexSourceType(ref.type),
         ),
       },
     [vexSourcesResponse],
   );
 
-
-  // Switching tabs resets search/filter/sort/page, since both tabs share
   // those query params.
   const handleTabChange = (tab: string) => {
     const reset: Record<string, undefined> = {
@@ -211,9 +235,30 @@ const VexRulesPage: FunctionComponent = () => {
     pushQuery({ ...reset, tab });
   };
 
-  const { recommendations } = useVexRuleRecommendations(
-    vexRuleRecommendationsURL({ organizationSlug, projectSlug, assetSlug }),
-  );
+  const recommendationsUrl = vexRuleRecommendationsURL({
+    organizationSlug,
+    projectSlug,
+    assetSlug,
+  });
+  const { data: recommendationsResponse, isLoading: isRecommendationsLoading } =
+    useSWR<Paged<VexRuleRecommendation>>(
+      `${recommendationsUrl}/?${recommendationsQuery.toString()}`,
+      fetcher,
+    );
+  const recommendations = recommendationsResponse?.data ?? [];
+
+  const createRuleFromRecommendation = (
+    recommendation: VexRuleRecommendation,
+  ) => {
+    setRulePrefill({
+      celExpression: recommendation.celExpression,
+      justification: recommendation.justification,
+      mechanicalJustification: recommendation.mechanicalJustification,
+      wasRecommended: true,
+      title: recommendation.title,
+    });
+    setAddRuleDialogOpen(true);
+  };
 
   if (isLoading && !vexRulesResponse) {
     return (
@@ -306,9 +351,9 @@ const VexRulesPage: FunctionComponent = () => {
               value="recommendations"
             >
               Recommendations
-              {recommendations.length > 0 && (
+              {!!recommendationsResponse?.total && (
                 <Badge variant="secondary" className="ml-2 font-medium">
-                  {recommendations.length}
+                  {recommendationsResponse.total}
                 </Badge>
               )}
             </TabsTrigger>
@@ -380,26 +425,38 @@ const VexRulesPage: FunctionComponent = () => {
               </Link>
               .
             </p>
-            {recommendations.length === 0 ? (
+            <div className="mb-4 flex flex-row gap-2">
+              <Filter
+                options={recommendationFilterOptions}
+                onFilter={handleFilter}
+                onRemoveFilter={removeFilter}
+                onClearAllFilters={clearAllFilters}
+                search={{
+                  onChange: handleSearch,
+                  defaultValue: searchParams?.get("search") ?? "",
+                  placeholder:
+                    "Search recommendations by title, justification, or CVE ID...",
+                }}
+              />
+            </div>
+            {recommendations.length === 0 && !isRecommendationsLoading ? (
               <EmptyParty
                 title="No recommendations yet."
                 description="Recommendations appear once other DevGuard users or upstream sources have assessed vulnerabilities that also show up in this repository."
               />
             ) : (
               <AuthGuard require="member">
-                <VexRuleRecommendationList
-                  recommendations={recommendations}
-                  onCreateRule={(entry: RecommendationEntry) => {
-                    setRulePrefill({
-                      celExpression: entry.recommendation.celExpression,
-                      justification: entry.recommendation.justification,
-                      mechanicalJustification:
-                        entry.recommendation.mechanicalJustification,
-                      wasRecommended: true,
-                      title: entry.recommendation.title,
-                    });
-                    setAddRuleDialogOpen(true);
-                  }}
+                <VexRuleRecommendationsTable
+                  recommendations={
+                    recommendationsResponse ?? {
+                      data: [],
+                      total: 0,
+                      page: 1,
+                      pageSize: 25,
+                    }
+                  }
+                  isLoading={isRecommendationsLoading}
+                  onCreateRule={createRuleFromRecommendation}
                 />
               </AuthGuard>
             )}

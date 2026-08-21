@@ -31,7 +31,6 @@ export const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
   csaf: "CSAF",
 };
 
-
 interface VexSourcesTableProps {
   sources: Paged<VexSource>;
   // API base of this asset's external references, e.g. /organizations/o/.../external-references
