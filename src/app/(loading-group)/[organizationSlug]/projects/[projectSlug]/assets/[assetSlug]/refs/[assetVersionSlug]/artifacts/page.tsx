@@ -306,17 +306,13 @@ const Artifacts = () => {
 
     toast.info(`Deleting ${artifactUpdates.length} artifact(s)...`);
 
-    let successCount = 0;
-    let errorCount = 0;
+    const results = await Promise.all(
+      artifactUpdates.map(async ({ artifactName, remainingSources }) => {
+        const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}`;
+        const deleted = remainingSources.length === 0;
 
-    const deletedArtifactNames: string[] = [];
-
-    for (const { artifactName, remainingSources } of artifactUpdates) {
-      const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}`;
-
-      try {
-        const response =
-          remainingSources.length === 0
+        try {
+          const response = deleted
             ? await browserApiClient(url + "/", { method: "DELETE" })
             : await browserApiClient(url, {
                 method: "PUT",
@@ -326,24 +322,27 @@ const Artifacts = () => {
                 }),
               });
 
-        if (response.ok) {
-          successCount++;
-          if (remainingSources.length === 0) {
-            deletedArtifactNames.push(artifactName);
+          if (!response.ok) {
+            console.error(
+              "Failed to update artifact:",
+              artifactName,
+              response.statusText,
+            );
           }
-        } else {
-          errorCount++;
-          console.error(
-            "Failed to update artifact:",
-            artifactName,
-            response.statusText,
-          );
+
+          return { artifactName, ok: response.ok, deleted };
+        } catch (error) {
+          console.error("Error updating artifact:", artifactName, error);
+          return { artifactName, ok: false, deleted };
         }
-      } catch (error) {
-        errorCount++;
-        console.error("Error updating artifact:", artifactName, error);
-      }
-    }
+      }),
+    );
+
+    const successCount = results.filter((r) => r.ok).length;
+    const errorCount = results.length - successCount;
+    const deletedArtifactNames = results
+      .filter((r) => r.ok && r.deleted)
+      .map((r) => r.artifactName);
 
     if (deletedArtifactNames.length > 0) {
       updateAssetVersionState((prev) => ({
