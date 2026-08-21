@@ -246,6 +246,8 @@ export interface DependencyVuln extends BaseVulnDTO {
   directDependencyFixedVersion: string | null;
   componentPurl: string;
   vulnerabilityPath: string[];
+  signature: string;
+  assetSignature: string;
 }
 
 export interface Paged<T> {
@@ -1126,6 +1128,9 @@ export type VexRuleRecommendation = {
   // if the recommendation is from your own org, the API will return the asset slug and project slug to indicate that it is not a crowdsourced recommendation
   assetSlug?: string;
   projectSlug?: string;
+
+  assetSignature?: string;
+  dependencyVulnSignature?: string;
 };
 
 // Mirrors dtos.ExternalReferenceDTO. A reference is identified by asset + url —

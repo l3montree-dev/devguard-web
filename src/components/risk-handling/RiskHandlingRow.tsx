@@ -13,7 +13,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import { findRecommendationForVuln } from "@/components/vex-rules/useVexRuleRecommendations";
+import type {
+  VexRuleRecommendation,
+  VulnByPackage,
+  VulnWithCVE,
+} from "@/types/api/api";
 import { classNames, stateLabels } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Row } from "@tanstack/react-table";
@@ -47,7 +52,24 @@ interface Props {
     justification: string;
     mechanicalJustification?: string;
   }) => Promise<void>;
+  // Signature -> recommendation lookup, see indexVexRuleRecommendationsBySignature.
+  recommendationsBySignature: Map<string, VexRuleRecommendation>;
 }
+
+const VexableBadge = () => (
+  <Tooltip>
+    <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+      <Badge variant="secondary" className="text-xs gap-1">
+        Vexable
+      </Badge>
+    </TooltipTrigger>
+    <TooltipContent className="max-w-xs">
+      A matching VEX rule recommendation exists for this vulnerability - other
+      organizations, or your own asset&apos;s history, already vexed it the same
+      way. Open it to review and apply the recommendation.
+    </TooltipContent>
+  </Tooltip>
+);
 
 const SelectionCheckbox = ({
   checked,
@@ -123,12 +145,14 @@ const VulnWithCveTableRow = ({
   selectable,
   selected,
   onToggle,
+  hasRecommendation,
 }: {
   vuln: VulnWithCVE;
   href: string;
   selectable: boolean;
   selected: boolean;
   onToggle: () => void;
+  hasRecommendation: boolean;
 }) => {
   const isMemberRole = isMember(useCurrentUserRole());
   const router = useRouter();
@@ -236,7 +260,10 @@ const VulnWithCveTableRow = ({
         <CvssCell cvss={vuln.cve?.cvss} />
       </td>
       <td className="py-3 px-4">
-        <QuickfixWrench vuln={vuln} />
+        <div className="flex items-center gap-2">
+          <QuickfixWrench vuln={vuln} />
+          {hasRecommendation && <VexableBadge />}
+        </div>
       </td>
     </tr>
   );
@@ -248,6 +275,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
+  recommendationsBySignature,
 }) => {
   const isMemberRole = isMember(useCurrentUserRole());
   const [isPackageOpen, setIsPackageOpen] = useState(false);
@@ -261,6 +289,13 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   const packageHasQuickfix = useMemo(
     () => row.original.vulns.some(isQuickfixAvailable),
     [row.original.vulns],
+  );
+  const packageHasRecommendation = useMemo(
+    () =>
+      row.original.vulns.some((v) =>
+        findRecommendationForVuln(recommendationsBySignature, v),
+      ),
+    [row.original.vulns, recommendationsBySignature],
   );
   const isActivelyExploited = row.original.vulns.some(
     (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
@@ -368,6 +403,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             {packageHasQuickfix && (
               <WrenchIndicator message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
             )}
+            {packageHasRecommendation && <VexableBadge />}
           </div>
         </td>
       </tr>
@@ -395,6 +431,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             isPathExplosion || !hasMultiplePaths;
 
           const cveHasQuickfix = vulns.some(isQuickfixAvailable);
+          const cveHasRecommendation = vulns.some((v) =>
+            findRecommendationForVuln(recommendationsBySignature, v),
+          );
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
@@ -514,15 +553,18 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   <CvssCell cvss={sortedVulns[0]?.cve?.cvss} />
                 </td>
                 <td className="py-2 px-4">
-                  {cveHasQuickfix && (
-                    <WrenchIndicator
-                      message={
-                        pathExplosionOrOnlySinglePath
-                          ? "A quick fix is available for this vulnerability. Open it to see the exact upgrade command."
-                          : "A quick fix is available for one of this vulnerability's dependency paths. Expand it to find the affected path and the upgrade command."
-                      }
-                    />
-                  )}
+                  <div className="flex items-center gap-2">
+                    {cveHasQuickfix && (
+                      <WrenchIndicator
+                        message={
+                          pathExplosionOrOnlySinglePath
+                            ? "A quick fix is available for this vulnerability. Open it to see the exact upgrade command."
+                            : "A quick fix is available for one of this vulnerability's dependency paths. Expand it to find the affected path and the upgrade command."
+                        }
+                      />
+                    )}
+                    {cveHasRecommendation && <VexableBadge />}
+                  </div>
                 </td>
               </tr>
 
@@ -538,6 +580,12 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     selectable={vuln.state !== "fixed"}
                     selected={selectedVulnIds.has(vuln.id)}
                     onToggle={() => onToggleVuln(vuln.id)}
+                    hasRecommendation={Boolean(
+                      findRecommendationForVuln(
+                        recommendationsBySignature,
+                        vuln,
+                      ),
+                    )}
                   />
                 ))}
             </React.Fragment>

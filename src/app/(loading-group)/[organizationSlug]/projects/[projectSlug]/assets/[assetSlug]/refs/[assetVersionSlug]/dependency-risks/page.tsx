@@ -12,6 +12,11 @@ import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { AsyncButton, Button } from "@/components/ui/button";
+import {
+  indexVexRuleRecommendationsBySignature,
+  useAllVexRuleRecommendations,
+} from "@/components/vex-rules/useVexRuleRecommendations";
+import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Tooltip,
@@ -152,6 +157,17 @@ const Index: FunctionComponent = () => {
     };
 
   const searchParams = useSearchParams();
+
+  const currentUserRole = useCurrentUserRole();
+  const canSeeRecommendations = isMember(currentUserRole);
+  const { recommendations } = useAllVexRuleRecommendations(
+    canSeeRecommendations ? { organizationSlug, projectSlug, assetSlug } : null,
+  );
+
+  const recommendationsBySignature = useMemo(
+    () => indexVexRuleRecommendationsBySignature(recommendations),
+    [recommendations],
+  );
 
   const queryWithState = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
@@ -673,6 +689,7 @@ const Index: FunctionComponent = () => {
                       onToggleVuln={handleToggleVuln}
                       onToggleAll={handleToggleAll}
                       onBulkAction={handleBulkAction}
+                      recommendationsBySignature={recommendationsBySignature}
                     />
                   ))}
                 </tbody>
