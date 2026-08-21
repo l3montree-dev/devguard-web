@@ -35,7 +35,6 @@ import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import { groupBy } from "lodash";
 import Link from "next/link";
-import { WrenchIcon } from "lucide-react";
 import { isQuickfixAvailable } from "../Quickfix";
 import WarningWithDescription from "../common/WarningWithDescription";
 
@@ -121,10 +120,12 @@ const CvssCell = ({ cvss }: { cvss?: number | null }) => (
   </div>
 );
 
-const WrenchIndicator = ({ message }: { message: string }) => (
+const FixableBadge = ({ message }: { message: string }) => (
   <Tooltip>
-    <TooltipTrigger className="flex" onClick={(e) => e.stopPropagation()}>
-      <WrenchIcon className="h-4 w-4 text-muted-foreground" />
+    <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+      <Badge variant="secondary" className="text-xs gap-1">
+        Fixable
+      </Badge>
     </TooltipTrigger>
     <TooltipContent className="max-w-xs">{message}</TooltipContent>
   </Tooltip>
@@ -135,7 +136,7 @@ const QuickfixWrench = ({ vuln }: { vuln: VulnWithCVE }) => {
     return null;
   }
   return (
-    <WrenchIndicator message="A quick fix is available: this vulnerability can be resolved by a direct dependency update. Consider prioritizing it as it can be resolved faster. Open the vulnerability to see the exact upgrade command." />
+    <FixableBadge message="A quick fix is available: this vulnerability can be resolved by a direct dependency update. Consider prioritizing it as it can be resolved faster. Open the vulnerability to see the exact upgrade command." />
   );
 };
 
@@ -401,7 +402,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               {row.original.vulnCount}
             </Badge>
             {packageHasQuickfix && (
-              <WrenchIndicator message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
+              <FixableBadge message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
             )}
             {packageHasRecommendation && <VexableBadge />}
           </div>
@@ -555,7 +556,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 <td className="py-2 px-4">
                   <div className="flex items-center gap-2">
                     {cveHasQuickfix && (
-                      <WrenchIndicator
+                      <FixableBadge
                         message={
                           pathExplosionOrOnlySinglePath
                             ? "A quick fix is available for this vulnerability. Open it to see the exact upgrade command."
