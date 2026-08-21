@@ -44,6 +44,7 @@ import Link from "next/link";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useFilter from "@/hooks/useFilter";
 import useRouterQuery from "@/hooks/useRouterQuery";
+import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 
 const sourcesFilterOptions = [
   {
@@ -53,6 +54,7 @@ const sourcesFilterOptions = [
     filterValues: [
       { value: "cyclonedx", label: "CycloneDX VEX" },
       { value: "csaf", label: "CSAF" },
+      { value: "openvex", label: "OpenVEX" },
     ],
   },
   {
@@ -128,6 +130,7 @@ const filterOptions = [
     filterValues: [
       { value: "accepted", label: "Accepted" },
       { value: "falsePositive", label: "False Positive" },
+      { value: "reopened", label: "Reopened" },
     ],
   },
 ];
@@ -142,6 +145,8 @@ const VexRulesPage: FunctionComponent = () => {
   const handleSearch = useDebouncedQuerySearch();
   const { handleFilter, removeFilter, clearAllFilters } = useFilter();
   const pushQuery = useRouterQuery();
+  const currentUserRole = useCurrentUserRole();
+  const canSeeRecommendations = isMember(currentUserRole);
   const activeTab = searchParams?.get("tab") ?? "rules";
   const assetMenu = useAssetMenu();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
@@ -211,6 +216,9 @@ const VexRulesPage: FunctionComponent = () => {
     fetcher,
   );
 
+  // The API already excludes references of type "unknown", so every returned
+  // reference is a VEX source. This only narrows the type - it must not drop
+  // rows, or `total` would no longer match the tab badge and the pagination.
   const vexSources = useMemo(
     () =>
       vexSourcesResponse && {
@@ -222,7 +230,6 @@ const VexRulesPage: FunctionComponent = () => {
     [vexSourcesResponse],
   );
 
-  // those query params.
   const handleTabChange = (tab: string) => {
     const reset: Record<string, undefined> = {
       search: undefined,
@@ -242,7 +249,9 @@ const VexRulesPage: FunctionComponent = () => {
   });
   const { data: recommendationsResponse, isLoading: isRecommendationsLoading } =
     useSWR<Paged<VexRuleRecommendation>>(
-      `${recommendationsUrl}/?${recommendationsQuery.toString()}`,
+      canSeeRecommendations
+        ? `${recommendationsUrl}/?${recommendationsQuery.toString()}`
+        : null,
       fetcher,
     );
   const recommendations = recommendationsResponse?.data ?? [];
@@ -345,18 +354,20 @@ const VexRulesPage: FunctionComponent = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger
-              data-testid="vex-rules-tab-recommendations"
-              onClick={() => handleTabChange("recommendations")}
-              value="recommendations"
-            >
-              Recommendations
-              {!!recommendationsResponse?.total && (
-                <Badge variant="secondary" className="ml-2 font-medium">
-                  {recommendationsResponse.total}
-                </Badge>
-              )}
-            </TabsTrigger>
+            {canSeeRecommendations && (
+              <TabsTrigger
+                data-testid="vex-rules-tab-recommendations"
+                onClick={() => handleTabChange("recommendations")}
+                value="recommendations"
+              >
+                Recommendations
+                {!!recommendationsResponse?.total && (
+                  <Badge variant="secondary" className="ml-2 font-medium">
+                    {recommendationsResponse.total}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            )}
             <TabsTrigger
               data-testid="vex-rules-tab-sources"
               onClick={() => handleTabChange("sources")}
@@ -408,44 +419,44 @@ const VexRulesPage: FunctionComponent = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="recommendations" className="mt-4">
-            <p className="mb-4 text-sm leading-6 text-muted-foreground">
-              Other users of DevGuard assessed vulnerabilities that are found in
-              your repository already. Based on a majority vote, the following
-              VEX rules are recommended. Nothing is applied until you create the
-              rule. You can find the list of official upstream sources that
-              devguard syncs{" "}
-              <Link
-                href={
-                  "https://github.com/l3montree-dev/devguard/blob/main/vulndb/upstream_vex_service.go#L27"
-                }
-                target="_blank"
-              >
-                in the GitHub repository
-              </Link>
-              .
-            </p>
-            <div className="mb-4 flex flex-row gap-2">
-              <Filter
-                options={recommendationFilterOptions}
-                onFilter={handleFilter}
-                onRemoveFilter={removeFilter}
-                onClearAllFilters={clearAllFilters}
-                search={{
-                  onChange: handleSearch,
-                  defaultValue: searchParams?.get("search") ?? "",
-                  placeholder:
-                    "Search recommendations by title, justification, or CVE ID...",
-                }}
-              />
-            </div>
-            {recommendations.length === 0 && !isRecommendationsLoading ? (
-              <EmptyParty
-                title="No recommendations yet."
-                description="Recommendations appear once other DevGuard users or upstream sources have assessed vulnerabilities that also show up in this repository."
-              />
-            ) : (
-              <AuthGuard require="member">
+          {canSeeRecommendations && (
+            <TabsContent value="recommendations" className="mt-4">
+              <p className="mb-4 text-sm leading-6 text-muted-foreground">
+                Other users of DevGuard assessed vulnerabilities that are found
+                in your repository already. Based on a majority vote, the
+                following VEX rules are recommended. Nothing is applied until
+                you create the rule. You can find the list of official upstream
+                sources that devguard syncs{" "}
+                <Link
+                  href={
+                    "https://github.com/l3montree-dev/devguard/blob/main/vulndb/upstream_vex_service.go#L27"
+                  }
+                  target="_blank"
+                >
+                  in the GitHub repository
+                </Link>
+                .
+              </p>
+              <div className="mb-4 flex flex-row gap-2">
+                <Filter
+                  options={recommendationFilterOptions}
+                  onFilter={handleFilter}
+                  onRemoveFilter={removeFilter}
+                  onClearAllFilters={clearAllFilters}
+                  search={{
+                    onChange: handleSearch,
+                    defaultValue: searchParams?.get("search") ?? "",
+                    placeholder:
+                      "Search recommendations by title, justification, or CVE ID...",
+                  }}
+                />
+              </div>
+              {recommendations.length === 0 && !isRecommendationsLoading ? (
+                <EmptyParty
+                  title="No recommendations yet."
+                  description="Recommendations appear once other DevGuard users or upstream sources have assessed vulnerabilities that also show up in this repository."
+                />
+              ) : (
                 <VexRuleRecommendationsTable
                   recommendations={
                     recommendationsResponse ?? {
@@ -458,9 +469,9 @@ const VexRulesPage: FunctionComponent = () => {
                   isLoading={isRecommendationsLoading}
                   onCreateRule={createRuleFromRecommendation}
                 />
-              </AuthGuard>
-            )}
-          </TabsContent>
+              )}
+            </TabsContent>
+          )}
 
           <TabsContent value="sources" className="mt-4">
             <p className="mb-4 text-sm leading-6 text-muted-foreground">

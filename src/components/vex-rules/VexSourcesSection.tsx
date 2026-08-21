@@ -20,15 +20,16 @@ import useTable from "@/hooks/useTable";
 import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
 
-export type VexSourceType = "cyclonedx" | "csaf";
+export type VexSourceType = "cyclonedx" | "csaf" | "openvex";
 export const isVexSourceType = (type: string): type is VexSourceType =>
-  type === "cyclonedx" || type === "csaf";
+  type === "cyclonedx" || type === "csaf" || type === "openvex";
 
 export type VexSource = ExternalReference & { type: VexSourceType };
 
 export const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
   cyclonedx: "CycloneDX VEX",
   csaf: "CSAF",
+  openvex: "OpenVEX",
 };
 
 interface VexSourcesTableProps {
