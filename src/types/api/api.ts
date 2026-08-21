@@ -231,7 +231,7 @@ export interface DependencyVuln extends BaseVulnDTO {
   level: string | null;
   cveID: string | null;
   priority: number | null; // will be null, if not prioritized yet.
-  rawRiskAssessment: number;
+  riskAssessment: number;
   riskRecalculatedAt: string;
   componentFixedVersion: string | null;
   directDependencyFixedVersion: string | null;
