@@ -163,6 +163,11 @@ export const isNumber = (v: any): v is number => {
   return typeof v === "number" && v === v;
 };
 
+export const getVulnerabilitySourceUrl = (vulnerabilityId: string): string =>
+  vulnerabilityId.startsWith("EUVD-")
+    ? `https://euvd.enisa.europa.eu/enisa/${vulnerabilityId}`
+    : `https://osv.dev/vulnerability/${vulnerabilityId}`;
+
 export const beautifyPurl = (purl: string): string => {
   if (purl === "ROOT") {
     return "Your application";

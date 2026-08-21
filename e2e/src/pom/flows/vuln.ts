@@ -80,6 +80,86 @@ export class VulnFlow {
     await expect(dialog).toBeHidden({ timeout: 20_000 });
   }
 
+  // Locks the vuln behind a VEX rule instead of a manual "accepted" event, so
+  // the direct "Reopen" button on the composer is unavailable afterwards and
+  // reopening can only happen through a "reopen" VEX rule.
+  async acceptRiskViaVexRule() {
+    const firstEdge = this.page.getByTestId("path-edge").first();
+    await expect(firstEdge).toBeVisible({ timeout: 20_000 });
+    await firstEdge.click();
+
+    const dialog = this.page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("heading", { name: "Add VEX rule", exact: true }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    await dialog.getByTestId("vex-rule-tab-accepted").click();
+    await this.fillJustification("Accepting this risk for now.", dialog);
+    await dialog.getByTestId("vex-rule-mark-accepted-risk").click();
+    await expect(dialog).toBeHidden({ timeout: 20_000 });
+  }
+
+  // Writes a fresh "reopen" VEX rule for the currently open vuln detail
+  // page's CVE that only fires once a fix has actually been published, from
+  // the VEX rules page's CEL playground, then verifies it was created and
+  // resolves against the (now closed) vulnerability.
+  async reopenVexRule(testInfo: TestInfo) {
+    const cveId = (
+      await this.page.locator('[data-tour="cve-detail"]').innerText()
+    ).trim();
+
+    await this.page
+      .getByTestId("nav-asset-dependency-risks")
+      .locator("button")
+      .click({ timeout: 20_000 });
+    await this.page
+      .getByTestId("nav-asset-vex-rules")
+      .click({ timeout: 20_000 });
+
+    const celExpression = `vuln.cveId == "${cveId}" && vuln.componentFixedVersion != null`;
+    const playgroundEditor = this.page.locator(".cm-content").first();
+    await playgroundEditor.click();
+    await playgroundEditor.pressSequentially(celExpression);
+
+    await this.page
+      .getByRole("button", { name: "Create rule from this expression" })
+      .click({ timeout: 20_000 });
+
+    const dialog = this.page.getByRole("dialog");
+    await expect(
+      dialog.getByRole("heading", { name: "Add VEX rule", exact: true }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    const ruleTitle = `Reopen ${cveId} once a fix is available`;
+    await dialog.getByTestId("vex-rule-tab-reopened").click();
+    await dialog.locator("input").first().fill(ruleTitle);
+    await this.fillJustification(
+      "A fixed version has been published - reopen so the risk gets reassessed.",
+      dialog,
+    );
+
+    await docShot(this.page, testInfo, "vex-rule-reopen-dialog");
+
+    await dialog.getByTestId("vex-rule-mark-reopened").click();
+    await expect(dialog).toBeHidden({ timeout: 20_000 });
+
+    const reopenRuleRow = this.page
+      .getByTestId("vex-rule-row")
+      .filter({ hasText: ruleTitle });
+    await expect(reopenRuleRow).toBeVisible({ timeout: 20_000 });
+    await reopenRuleRow.click();
+
+    const detailsDialog = this.page.getByRole("dialog");
+    await expect(
+      detailsDialog.getByRole("heading", { name: "VEX rule", exact: true }),
+    ).toBeVisible({ timeout: 20_000 });
+    await expect(
+      detailsDialog.getByText(/Matches \d+ closed vulnerabilit(y|ies)/).first(),
+    ).toBeVisible({ timeout: 20_000 });
+
+    await docShot(this.page, testInfo, "vex-rule-reopened-details");
+  }
+
   async verifyVEXRule() {
     await this.page
       .getByTestId("nav-asset-dependency-risks")
