@@ -160,5 +160,3 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
     </div>
   );
 };
-
-export default GroupStructureFlowchart;

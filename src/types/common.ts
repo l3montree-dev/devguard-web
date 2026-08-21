@@ -16,25 +16,6 @@ import z from "zod";
 
 export type Modify<T, U> = Omit<T, keyof U> & U;
 
-export type State =
-  | "verifiedFix"
-  | "pendingFix"
-  | "pendingTransfered"
-  | "unhandled"
-  | "accepted"
-  | "avoided"
-  | "verifiedTransfered";
-
-export type Project = {
-  name: string;
-  environment: Environment;
-  status: "All handeled" | "Unhandeled Flaws";
-  lastReport: string | null;
-  lastReportDateTime: string | null;
-};
-
-export type Environment = "prod" | "stage" | "dev";
-
 export type ZodConvert<T> = {
   [P in keyof T]: T[P] extends string
     ? z.ZodString

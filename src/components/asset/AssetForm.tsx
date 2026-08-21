@@ -77,7 +77,7 @@ export type AssetFormValues = Modify<
   }
 >;
 
-export const AssetSettingsForm: FunctionComponent<
+const AssetSettingsForm: FunctionComponent<
   Props & {
     forceVerticalSections?: boolean;
     disable?: boolean;

@@ -21,13 +21,6 @@ import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import { useSearchParams } from "next/navigation";
 
-export interface ChartConfig {
-  [key: string]: {
-    label: string;
-    color: string;
-  };
-}
-
 export function VulnerableComponents({
   data,
   mode,

@@ -12,7 +12,7 @@ import PolicyDialog from "../PolicyDialog";
 import { Badge } from "../ui/badge";
 import { buttonVariants } from "../ui/button";
 
-export const PolicyListItem = ({
+const PolicyListItem = ({
   policy,
   onPolicyUpdate,
   onPolicyDelete,

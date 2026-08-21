@@ -1,17 +1,5 @@
-// Copyright (C) 2024 Tim Bastin, l3montree GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
@@ -193,24 +181,6 @@ export const addRecursive = (
       riskMap.set(loadMoreId, 0);
     }
   }
-};
-
-const percentile = (p: number, values: number[]) => {
-  if (values.length === 0) return 0;
-
-  const sorted = [...values].sort((a, b) => a - b);
-
-  const idx = (sorted.length - 1) * p;
-
-  const lower = Math.floor(idx);
-  const upper = Math.ceil(idx);
-
-  if (lower === upper) {
-    return sorted[lower];
-  }
-
-  const weight = idx - lower;
-  return sorted[lower] * (1 - weight) + sorted[upper] * weight;
 };
 
 export const getLayoutedElements = (

@@ -108,5 +108,3 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
     </Dialog>
   );
 };
-
-export default CreateGroupForm;

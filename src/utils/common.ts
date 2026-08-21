@@ -87,17 +87,6 @@ export const extractVersion = (purl: string): string => {
   }
 };
 
-export const purlToDisplayString = (purl: string): string => {
-  if (!purl) return "";
-  try {
-    const { namespace, name, version } = PackageURL.fromString(purl);
-    const base = namespace ? `${namespace}/${name}` : name;
-    return version ? `${base}@${version}` : base;
-  } catch {
-    return purl;
-  }
-};
-
 // Artifact names are already valid purls (e.g. "pkg:oci/my-app") - this just
 // fills in the version, since the asset itself carries no version, only its
 // refs (branches/tags) do.

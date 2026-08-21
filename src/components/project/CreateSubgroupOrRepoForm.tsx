@@ -54,5 +54,3 @@ export const CreateSubgroupOrRepoForm: FunctionComponent<Props> = ({
     </Tabs>
   );
 };
-
-export default CreateSubgroupOrRepoForm;

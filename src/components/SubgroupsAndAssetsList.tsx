@@ -4,7 +4,7 @@ import type { ProjectDTO, SubGroupsAndAsset } from "../types/api/api";
 import NestedList from "./group-list/NestedList";
 import ProjectRow from "./group-list/ProjectRow";
 
-export { isProject, checkType } from "./group-list/utils";
+export { checkType } from "./group-list/utils";
 
 interface Props {
   project?: ProjectDTO;

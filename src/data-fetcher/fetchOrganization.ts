@@ -17,8 +17,6 @@ import type { OrganizationDetailsDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./http-error";
 
-export const OAUTH2_ERROR = "OAUTH2_ERROR";
-
 export async function fetchOrganization(organizationSlug: string) {
   // get the devGuardApiClient
   const devGuardApiClient = await getApiClientInAppRouter();

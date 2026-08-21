@@ -5,7 +5,6 @@
 
 import type { PropsWithChildren } from "react";
 import type {
-  OryCardContentProps,
   OryCardSettingsSectionProps,
   OryFormSectionContentProps,
   OryFormSectionFooterProps,
@@ -15,7 +14,7 @@ import {
   DefaultCardHeader,
 } from "@ory/elements-react/theme";
 import Section from "@/components/common/Section";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
 export function OryCardRoot({ children }: PropsWithChildren) {
@@ -41,10 +40,6 @@ export function OryCardFooter() {
       <DefaultCardFooter />
     </div>
   );
-}
-
-export function OryCardContent({ children }: OryCardContentProps) {
-  return <CardContent className="p-0">{children}</CardContent>;
 }
 
 export function OryCardDivider() {

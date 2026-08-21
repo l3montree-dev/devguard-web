@@ -127,5 +127,3 @@ export const CreateRepositoryForm: FunctionComponent<Props> = ({
     </Dialog>
   );
 };
-
-export default CreateRepositoryForm;
