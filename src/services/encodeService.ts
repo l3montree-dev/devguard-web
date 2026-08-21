@@ -19,14 +19,6 @@ export const encodeObjectBase64 = (input: Record<string, string>) => {
   return Buffer.from(inputString).toString("base64");
 };
 
-export const encodeStringBase64 = (input: string) => {
-  return Buffer.from(input).toString("base64");
-};
-
-export const decodeStringBase64 = (input: string) => {
-  return Buffer.from(input, "base64").toString("utf-8");
-};
-
 export const decodeObjectBase64 = (input: string) => {
   const decodedString = Buffer.from(input, "base64").toString("utf-8");
   return JSON.parse(decodedString);

@@ -13,8 +13,6 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import type { State } from "@/types/common";
-import { defaultScanner } from "./view";
 import { UserRole } from "@/types/api/api";
 import type { DependencyVuln } from "@/types/api/api";
 import { PackageURL } from "packageurl-js";
@@ -22,10 +20,6 @@ import { PackageURL } from "packageurl-js";
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
 }
-
-export const beautifyScannerId = (scannerId: string) => {
-  return scannerId.replace(defaultScanner, "");
-};
 
 export function toSearchParams(obj: Record<string, any>): URLSearchParams {
   const res = Object.keys(obj).reduce(
@@ -39,105 +33,6 @@ export function toSearchParams(obj: Record<string, any>): URLSearchParams {
   );
 
   return new URLSearchParams(res as Record<string, string>);
-}
-
-export function getBGColorByState(state: State) {
-  switch (state) {
-    case "verifiedFix":
-      return "bg-info";
-    case "pendingFix":
-      return "bg-muted-foreground/40";
-    case "pendingTransfered":
-      return "bg-muted-foreground/40";
-    case "unhandled":
-      return "bg-destructive";
-    case "accepted":
-      return "bg-muted-foreground/60";
-    case "avoided":
-      return "bg-muted-foreground/60";
-    case "verifiedTransfered":
-      return "bg-info";
-    default:
-      return "bg-muted-foreground/60";
-  }
-}
-
-export const applyClsxConfig = (
-  config: Record<string, any>,
-  props: Record<string, any>,
-): string => {
-  // iterate over the blok keys and check if a corresponding config key exists.
-  let classNames: Array<string> = [];
-  Object.entries(props).forEach(([key, value]) => {
-    if (key in config) {
-      classNames.push(config[key][value]);
-    }
-  });
-
-  return classNames.join(" ");
-};
-
-export const hasErrors = (errors: Record<string, any>) => {
-  return Object.keys(errors).length > 0;
-};
-
-export const isDarkModeEnabled = () => {
-  if (typeof window === "undefined") return false;
-  return (
-    window.matchMedia &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
-};
-
-export const windowInnerWidth = () => {
-  if (typeof window === "undefined") return 0;
-  return window.innerWidth;
-};
-
-export const windowInnerHeight = () => {
-  if (typeof window === "undefined") return 0;
-  return window.innerHeight;
-};
-
-export function cvssToColor(value: number) {
-  if (value < 1 || value > 10) {
-    return "rgb(255, 255, 255)";
-    throw new Error("Value should be between 1 and 10 but was:" + value);
-  }
-
-  const colorStops = [
-    { stop: 10, color: [225, 29, 72] }, // Red
-    { stop: 8, color: [234, 88, 12] }, // Orange
-    { stop: 6, color: [250, 204, 21] }, // Yellow
-    { stop: 4, color: [5, 150, 105] }, // YellowGreen
-    { stop: 1, color: [5, 150, 105] }, // Green
-  ];
-
-  function interpolateColor(
-    color1: number[],
-    color2: number[],
-    factor: number,
-  ) {
-    const result = color1.slice();
-    for (let i = 0; i < 3; i++) {
-      result[i] = Math.round(result[i] + factor * (color2[i] - color1[i]));
-    }
-    return result;
-  }
-
-  for (let i = 0; i < colorStops.length - 1; i++) {
-    const stop1 = colorStops[i];
-    const stop2 = colorStops[i + 1];
-
-    if (value <= stop1.stop && value >= stop2.stop) {
-      const factor = (value - stop2.stop) / (stop1.stop - stop2.stop);
-      const color = interpolateColor(stop2.color, stop1.color, factor);
-      return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-    }
-  }
-
-  // If value is exactly 1
-  return `rgb(${colorStops[colorStops.length - 1].color.join(", ")})`;
 }
 
 export const getEcosystem = (packageName?: string) => {

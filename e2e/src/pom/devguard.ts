@@ -103,7 +103,7 @@ export class DevGuardPOM {
   }
 
   async loadAndRegister() {
-    await this.loadDevGuard(); 
+    await this.loadDevGuard();
     await this.registerNewUser();
   }
 
