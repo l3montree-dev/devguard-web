@@ -1,11 +1,11 @@
 import AssetHeader from "@/components/common/AssetHeader";
-import React from "react";
+import React, { Suspense } from "react";
 import { AssetProvider } from "../../../../../../../context/AssetContext";
 import { ClientContextWrapper } from "../../../../../../../context/ClientContextWrapper";
 import { fetchAsset } from "../../../../../../../data-fetcher/fetchAsset";
 import { handleHttpError } from "../../../../../../../data-fetcher/handle-http-error";
 
-const AssetLayout = async ({
+export default function AssetLayout({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
@@ -17,7 +17,25 @@ const AssetLayout = async ({
     projectSlug: string;
     assetSlug: string;
   }>;
-}) => {
+}) {
+  return (
+    <Suspense>
+      <AssetShell params={params}>{children}</AssetShell>
+    </Suspense>
+  );
+}
+
+async function AssetShell({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+  }>;
+}) {
   const { organizationSlug, projectSlug, assetSlug } = await params;
 
   try {
@@ -32,8 +50,6 @@ const AssetLayout = async ({
       </ClientContextWrapper>
     );
   } catch (error) {
-    handleHttpError(error);
+    handleHttpError(error, organizationSlug);
   }
-};
-
-export default AssetLayout;
+}

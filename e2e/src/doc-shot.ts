@@ -27,10 +27,11 @@ export async function docShot(
   testInfo: TestInfo,
   name: string,
   options: DocShotOptions = {},
+  delay: number = 2_000,
 ): Promise<string> {
   const file = path.join(DOC_SCREENSHOT_DIR, `${safeScreenshotName(name)}.png`);
 
-  await page.waitForTimeout(2_000);
+  await page.waitForTimeout(delay);
   await page.addStyleTag({ content: HIDE_DEV_OVERLAY_CSS });
 
   const shotOptions = {

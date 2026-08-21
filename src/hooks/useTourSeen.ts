@@ -21,11 +21,6 @@ export const dismissAllTours = () => {
   });
 };
 
-export const hasTourSeen = (tourKey: string): boolean => {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem(storageKey(tourKey)) === "true";
-};
-
 export function useTourSeen(tourKey: string) {
   const key = storageKey(tourKey);
 

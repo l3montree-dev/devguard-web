@@ -186,7 +186,11 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
 
   return (
     <Dialog onOpenChange={setOpen} open={open}>
-      {Trigger && <DialogTrigger asChild>{Trigger}</DialogTrigger>}
+      {Trigger && (
+        <DialogTrigger data-testid="add-webhook-button" asChild>
+          {Trigger}
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -213,7 +217,11 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="My Webhook" {...field} />
+                    <Input
+                      placeholder="My Webhook"
+                      data-testid="webhook-name-input"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     A name to identify the webhook later on.
@@ -228,7 +236,11 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="My Webhook" {...field} />
+                    <Input
+                      placeholder="My Webhook"
+                      data-testid="webhook-description-input"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     A description to identify the webhook later on.
@@ -248,6 +260,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                       autoComplete="url"
                       type="url"
                       required
+                      data-testid="webhook-url-input"
                       {...field}
                     />
                   </FormControl>
@@ -270,6 +283,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                       label="Secret token"
                       placeholder="the secret"
                       nameKey="webhook-integration-secret-token"
+                      data-testid="webhook-secret-input"
                       {...field}
                       copyable={true}
                       copyToastDescription="The webhook secret has been copied to your clipboard."
@@ -304,6 +318,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                       <FormLabel>Enable SBOM Notifications</FormLabel>
                       <FormControl>
                         <Switch
+                          data-testid="webhook-sbom-switch"
                           checked={field.value}
                           onCheckedChange={field.onChange as any}
                         />
@@ -319,6 +334,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                       <FormLabel>Enable Vulnerability Notifications</FormLabel>
                       <FormControl>
                         <Switch
+                          data-testid="webhook-vuln-switch"
                           checked={field.value}
                           onCheckedChange={field.onChange as any}
                         />
@@ -329,15 +345,19 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
               </div>
             </Card>
 
-            <div className="flex flex-row justify-end">
+            <div
+              className="flex flex-row justify-end"
+              data-testid="webhook-edit-buttons"
+            >
               <div className="flex flex-col items-end justify-end gap-2">
                 <div className="flex flex-row gap-2">
                   {initialValues && (
                     <AsyncButton
                       variant={"destructiveOutline"}
+                      data-testid="delete-webhook-button"
                       onClick={async () => {
                         if (onDeleteWebhook) {
-                          await onDeleteWebhook(initialValues.id);
+                          await onDeleteWebhook(initialValues?.id);
                         }
                       }}
                     >
@@ -347,7 +367,11 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant={"secondary"} type="button">
+                      <Button
+                        variant={"secondary"}
+                        type="button"
+                        data-testid="test-webhook-payload"
+                      >
                         {testLoading && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}
@@ -371,6 +395,7 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                         Code-Risks
                       </DropdownMenuItem>
                       <DropdownMenuItem
+                        data-testid="test-webhook-payload-sbom"
                         onClick={() => triggerTest("sampleSbom")}
                       >
                         SBOM
@@ -378,7 +403,11 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
                     </DropdownMenuContent>
                   </DropdownMenu>
 
-                  <Button disabled={isLoading} type="submit">
+                  <Button
+                    disabled={isLoading}
+                    type="submit"
+                    data-testid="webhook-submit-button"
+                  >
                     <Loader />
                     {initialValues ? "Update Webhook" : "Save"}
                   </Button>

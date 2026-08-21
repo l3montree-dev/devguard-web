@@ -7,8 +7,6 @@ export type WithUpdater<T> = { v: T } & {
   update: (newValue: T | ((prev: T) => T)) => void;
 };
 
-export type WithoutUpdater<T> = Omit<T, "update">;
-
 export const NoopUpdater = () => {};
 interface ClientContextWrapperProps<T = any> {
   children: ReactNode;
@@ -33,26 +31,5 @@ export function ClientContextWrapper<T>({
     >
       {children}
     </Provider>
-  );
-}
-
-export type ProviderValue<T> =
-  T extends ComponentType<{ value: infer V; children: ReactNode }> ? V : never;
-
-export interface ProviderConfig<T = any> {
-  Provider: ComponentType<{ value: T; children: ReactNode }>;
-  value: T;
-}
-
-export function MultiContextWrapper({
-  children,
-  providers,
-}: {
-  children: ReactNode;
-  providers: ProviderConfig[];
-}) {
-  return providers.reduceRight(
-    (acc, { Provider, value }) => <Provider value={value}>{acc}</Provider>,
-    children,
   );
 }
