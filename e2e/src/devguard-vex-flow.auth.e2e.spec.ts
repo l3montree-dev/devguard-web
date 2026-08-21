@@ -42,6 +42,15 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().verifyVEXRule();
   });
 
+  test("test to reopen a vulnerability once a fix is available", async ({}, testInfo) => {
+    await devguardPOM.setupSbomUpload();
+    await devguardPOM.vuln().openFirstAffectedComponent();
+    await devguardPOM.vuln().acceptRiskViaVexRule();
+    await devguardPOM.vuln().expectVulnState("Accepted");
+
+    await devguardPOM.vuln().reopenVexRule(testInfo);
+  });
+
   test.skip("test to delete a vex rule", async ({}, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();

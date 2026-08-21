@@ -465,23 +465,21 @@ export interface Relationship {
   targetCve: string;
 }
 export interface VulnWithCVE extends DependencyVuln {
-  cve?:
-    | (Modify<
-        CVE,
-        {
-          cwes: Array<CWE>;
-        }
-      > & {
-        risk: {
-          baseScore: number;
-          withEnvironment: number;
-          withThreatIntelligence: number;
-          withEnvironmentAndThreatIntelligence: number;
-        };
-        exploits: Array<Exploit>;
-        relationships: Array<Relationship>;
-      })
-    | null;
+  cve?: Modify<
+    CVE,
+    {
+      cwes: Array<CWE>;
+    }
+  > & {
+    risk: {
+      baseScore: number;
+      withEnvironment: number;
+      withThreatIntelligence: number;
+      withEnvironmentAndThreatIntelligence: number;
+    };
+    exploits: Array<Exploit>;
+    relationships: Array<Relationship>;
+  };
 }
 
 interface related {
@@ -966,7 +964,7 @@ interface AffectedComponent {
   semverEnd: string | null;
   versionIntroduced: string | null;
   versionFixed: string | null;
-  cves: VulnWithCVE[];
+  cves: CVE[];
 }
 
 export interface VulnInPackage {
