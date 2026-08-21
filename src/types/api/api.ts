@@ -258,6 +258,23 @@ export interface Paged<T> {
 export type InstanceSettings = {
   singleOrganizationMode: boolean;
 };
+
+// GET /api/v1/info - only the fields we consume are typed
+export type InstanceInfo = {
+  build: {
+    version: string;
+    commit: string;
+    branch: string;
+    buildDate: string;
+  };
+  database: {
+    status: string;
+    migrationVersion: number;
+    migrationDirty: boolean;
+    // omitted until the first vulndb import finished
+    vulndbVersion?: string;
+  };
+};
 export interface MinimalDependencyTree {
   nodes: string[];
   dependencies: { [key: string]: string[] };
