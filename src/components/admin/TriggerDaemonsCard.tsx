@@ -17,21 +17,8 @@ import { Input } from "@/components/ui/input";
 import { ArrowPathIcon, PlayIcon } from "@heroicons/react/20/solid";
 import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
-import {
-  adminSSETrigger,
-  AdminAPIError,
-  type AdminDaemonSSEEvent,
-} from "@/services/adminApi";
-
-interface Daemon {
-  id: string;
-  label: string;
-  description: string;
-  /** Admin API endpoint path (relative to /api/v1) */
-  endpoint: string;
-  /** Whether a body payload with assetId is needed */
-  requiresAssetId?: boolean;
-}
+import type { AdminDaemonSSEEvent, Daemon } from "@/types/view/admin";
+import { adminSSETrigger, AdminAPIError } from "@/services/adminApi";
 
 const daemons: Daemon[] = [
   {

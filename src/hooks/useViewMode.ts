@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react";
 
-type ViewMode = "risk" | "cvss";
+import type { ViewMode } from "@/types/view/navigation";
 
 export const useViewMode = (
   storageKey: string = "devguard-view-mode",

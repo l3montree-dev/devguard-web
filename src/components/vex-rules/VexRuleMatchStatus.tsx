@@ -5,7 +5,7 @@ import { FieldDescription } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import { CircleAlert, CircleCheck, CircleDashed, Loader2 } from "lucide-react";
 import type { FunctionComponent } from "react";
-import type { VexRuleMatchCount } from "./useVexRuleMatchCount";
+import type { VexRuleMatchCount } from "@/types/view/vexRules";
 
 /**
  * The one-line verdict under a CEL editor — error, in-flight, or match count —

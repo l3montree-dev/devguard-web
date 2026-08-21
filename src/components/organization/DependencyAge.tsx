@@ -18,7 +18,7 @@ interface Props {
 const MAX_YEARS = 10;
 const SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
 
-type ColorLevel = "green" | "yellow" | "orange" | "red";
+import type { ColorLevel } from "@/types/view/organization";
 
 function ageToColorLevel(seconds: number): ColorLevel {
   const days = seconds / (60 * 60 * 24);

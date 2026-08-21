@@ -11,11 +11,8 @@ import { classNames } from "@/utils/common";
 import { browserApiClient } from "@/services/devGuardApi";
 import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
-import {
-  SOURCE_TYPE_LABEL,
-  useVexSources,
-  type VexSource,
-} from "./useVexSources";
+import type { VexSource } from "@/types/view/vexRules";
+import { SOURCE_TYPE_LABEL, useVexSources } from "./useVexSources";
 
 interface VexSourcesSectionProps {
   // Opens the dialog that adds a VEX file or source URL.

@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import z from "zod";
+import type z from "zod";
 
 export type Modify<T, U> = Omit<T, keyof U> & U;
 
@@ -22,23 +22,7 @@ export type ZodConvert<T> = {
 
 export type ExternalTicketProvider = "github" | "gitlab" | "jira" | "opencode";
 
-export const ExternalTicketProviderNames: {
-  [key in ExternalTicketProvider]: string;
-} = {
-  github: "GitHub",
-  gitlab: "GitLab",
-  jira: "Jira",
-  opencode: "openCode",
-};
-
 export type GitInstances = "GitHub" | "Gitlab";
-
-export const GitInstances: {
-  [key in GitInstances]: string;
-} = {
-  GitHub: "github",
-  Gitlab: "gitlab",
-};
 
 export interface Config {
   "secret-scanning": boolean;

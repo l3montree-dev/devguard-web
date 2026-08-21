@@ -6,7 +6,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
-import type { AssetFormValues } from "../asset/AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 import { CreateRepositoryForm } from "../asset/CreateRepositoryForm";
 import type { CreateProjectReq } from "../../types/api/req";
 import { CreateGroupForm } from "./CreateGroupForm";

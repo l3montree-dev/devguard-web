@@ -19,7 +19,6 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
-import type { AdvisoryAffectedPackage } from "@/types/api/api";
 import { CVSSBadge } from "./common/Severity";
 import { compareSemver } from "@/services/versionCheck";
 import {
@@ -43,14 +42,7 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
-export interface AdvisoryFormData {
-  title: string;
-  description: string;
-  severity: string;
-  vectorString: string;
-  affectedPackages: (Omit<AdvisoryAffectedPackage, "id"> & { id?: string })[];
-  state: string;
-}
+import type { AdvisoryFormData, PackageRow } from "@/types/view/advisory";
 
 interface AdvisoryDialogProps {
   open: boolean;
@@ -58,8 +50,6 @@ interface AdvisoryDialogProps {
   onSubmit: (data: AdvisoryFormData) => Promise<void>;
   initialValues?: AdvisoryFormData;
 }
-
-type PackageRow = Omit<AdvisoryAffectedPackage, "id"> & { id?: string };
 
 const emptyPackage = (): PackageRow => ({
   ecosystem: "",

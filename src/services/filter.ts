@@ -3,11 +3,7 @@
 
 import type { ColumnSort } from "@tanstack/react-table";
 
-export interface FilterForm {
-  field: string;
-  operator: string;
-  value: string;
-}
+import type { FilterForm } from "@/types/view/filter";
 
 export const sortingState2Query = (sortingState: ColumnSort[]) => {
   const query: Record<string, string> = {};

@@ -23,7 +23,8 @@ import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { GroupStructureFlowchart } from "../project/GroupStructureFlowchart";
 import { Button } from "../ui/button";
-import AssetForm, { type AssetFormValues } from "./AssetForm";
+import AssetForm from "./AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 
 const defaultTitle = "Create new repository";
 const defaultDescription =

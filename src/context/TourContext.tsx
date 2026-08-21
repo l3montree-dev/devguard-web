@@ -8,11 +8,7 @@ import { TourProvider, useTour } from "@reactour/tour";
 import type { StepType } from "@reactour/tour";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-interface TourContextType {
-  registerSteps: (steps: StepType[]) => void;
-  openTour: () => void;
-  hasSteps: boolean;
-}
+import type { TourContextType } from "@/types/view/tour";
 
 const TourContext = React.createContext<TourContextType>({
   registerSteps: () => {},

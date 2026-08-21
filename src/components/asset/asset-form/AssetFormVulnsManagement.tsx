@@ -30,7 +30,7 @@ import React, { type FunctionComponent, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import useSWR from "swr";
 import { createUpdateHandler } from "../AssetForm";
-import type { AssetFormValues } from "../AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
 
 import { cn } from "@/lib/utils";

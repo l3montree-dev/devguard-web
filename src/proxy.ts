@@ -4,7 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOryMiddleware } from "@ory/nextjs/middleware";
 import oryConfig from "./ory.config";
-import { rewriteFlow } from "./types/auth";
+import { rewriteFlow } from "./utils/auth";
 
 const proxyToOry = createOryMiddleware(oryConfig);
 

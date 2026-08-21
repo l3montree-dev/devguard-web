@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { FunctionComponent } from "react";
 
-export type PathNodeRole = "root" | "dependency" | "vulnerable";
+import type { PathNodeRole } from "@/types/view/riskHandling";
 
 const roleDescription: Record<PathNodeRole, string> = {
   root: "Your application",

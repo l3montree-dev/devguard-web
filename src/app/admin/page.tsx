@@ -27,12 +27,12 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import InstanceDashboard, {
-  type InstanceDashboardHandle,
-} from "@/components/admin/InstanceDashboard";
-import InstanceTechnicalInfo, {
-  type InstanceTechnicalInfoHandle,
-} from "@/components/admin/InstanceTechnicalInfo";
+import InstanceDashboard from "@/components/admin/InstanceDashboard";
+import InstanceTechnicalInfo from "@/components/admin/InstanceTechnicalInfo";
+import type {
+  InstanceDashboardHandle,
+  InstanceTechnicalInfoHandle,
+} from "@/types/view/admin";
 import AdminTools from "@/components/admin/AdminTools";
 import Section from "@/components/common/Section";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";

@@ -14,7 +14,6 @@ import { browserApiClient } from "@/services/devGuardApi";
 import type {
   ArtifactCreateUpdateRequest,
   ArtifactDTO,
-  ExternalReferenceErrorDTO,
   InformationSources,
 } from "@/types/api/api";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
@@ -43,6 +42,7 @@ import {
 } from "../../../../../../../../../../context/AssetVersionContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import type { UpdateArtifactResponse } from "@/types/view/asset";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -214,10 +214,6 @@ const Artifacts = () => {
       return false;
     }
 
-    interface UpdateArtifactResponse {
-      artifact: ArtifactDTO;
-      invalidURLs: ExternalReferenceErrorDTO[];
-    }
     const resp = (await response.json()) as UpdateArtifactResponse;
     const updatedArtifact = resp.artifact;
 

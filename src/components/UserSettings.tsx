@@ -6,7 +6,7 @@ import { Settings } from "@ory/elements-react/theme";
 import type { SettingsFlow } from "@ory/client-fetch";
 import React, { useMemo } from "react";
 import { oryComponentOverrides } from "./ory/overrides";
-import { rewriteFlow } from "../types/auth";
+import { rewriteFlow } from "../utils/auth";
 
 interface Props {
   flow: SettingsFlow;

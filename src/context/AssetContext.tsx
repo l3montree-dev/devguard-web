@@ -5,7 +5,7 @@
 import { createContext, useContext } from "react";
 import type { AssetDTO } from "../types/api/api";
 import { NoopUpdater } from "./ClientContextWrapper";
-import type { WithUpdater } from "./ClientContextWrapper";
+import type { WithUpdater } from "@/types/view/context";
 
 const AssetContext = createContext<WithUpdater<AssetDTO | null>>({
   v: null,

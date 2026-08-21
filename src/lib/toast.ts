@@ -6,7 +6,7 @@ import type { ExternalToast } from "sonner";
 
 const TOASTER_ID = "devguard";
 
-type ToastMessage = string | React.ReactNode;
+import type { ToastMessage } from "@/types/view/toast";
 
 function withId(data?: ExternalToast): ExternalToast {
   return { ...data, toasterId: TOASTER_ID };

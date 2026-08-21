@@ -17,7 +17,7 @@ import {
   ShieldEllipsis,
   ShieldCheck,
 } from "lucide-react";
-import type { ForwardRefExoticComponent, RefAttributes, SVGProps } from "react";
+import type { AssetMenuItem } from "@/types/view/navigation";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveAssetVersion } from "./useActiveAssetVersion";
 import useDecodedParams from "./useDecodedParams";
@@ -86,21 +86,7 @@ export const useAssetMenu = () => {
     ? existingAssetVersionSlug
     : getAssetVersionSlug(activeAsset!, assetVersion);
 
-  type MenuItem = {
-    title: string;
-    href: string;
-    Icon: ForwardRefExoticComponent<
-      Omit<SVGProps<SVGSVGElement>, "ref"> & {
-        title?: string;
-        titleId?: string;
-      } & RefAttributes<SVGSVGElement>
-    >;
-    isActive: boolean;
-    testId?: string;
-    children?: Array<MenuItem>;
-  };
-
-  let menu: Array<MenuItem> = [];
+  let menu: Array<AssetMenuItem> = [];
 
   if ((activeAsset?.refs?.length ?? 0) > 0) {
     menu.unshift({

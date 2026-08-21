@@ -9,14 +9,9 @@ import {
   useEffect,
   type ProviderProps,
 } from "react";
-import type { OrganizationDetailsDTO } from "../types/api/api";
-import type { WithUpdater } from "./ClientContextWrapper";
-import type { ContentTreeElement } from "../utils/view";
+import type { WithUpdater } from "@/types/view/context";
 
-type OrgContextParams = {
-  organization: OrganizationDetailsDTO | null;
-  contentTree: ContentTreeElement[];
-};
+import type { OrgContextParams } from "@/types/view/context";
 const OrganizationContext = createContext<WithUpdater<OrgContextParams>>({
   v: {
     organization: null,

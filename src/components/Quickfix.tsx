@@ -4,10 +4,7 @@
 import CopyCode from "@/components/common/CopyCode";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import Purl from "@/components/common/Purl";
-import type {
-  DependencyVuln,
-  DetailedDependencyVulnDTO,
-} from "@/types/api/api";
+import type { DetailedDependencyVulnDTO } from "@/types/api/api";
 import { isValidPackagePurl } from "@/utils/common";
 import { Wrench } from "lucide-react";
 import { PackageURL } from "packageurl-js";
@@ -44,10 +41,7 @@ function renderQuickFixText(
   }
 }
 
-type QuickfixVuln = Pick<
-  DependencyVuln,
-  "directDependencyFixedVersion" | "componentFixedVersion" | "vulnerabilityPath"
->;
+import type { QuickfixVuln } from "@/types/view/asset";
 
 export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   if (!vuln.directDependencyFixedVersion && vuln.componentFixedVersion) {

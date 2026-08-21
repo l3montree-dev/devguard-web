@@ -14,7 +14,7 @@ import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
-import type { AssetFormValues } from "../../../../../components/asset/AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 import { CreateRepositoryForm } from "../../../../../components/asset/CreateRepositoryForm";
 import AuthGuard from "../../../../../components/AuthGuard";
 import ProjectTitle from "../../../../../components/common/ProjectTitle";

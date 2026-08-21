@@ -9,7 +9,7 @@ import type {
   InformationSources,
 } from "../types/api/api";
 import { NoopUpdater } from "./ClientContextWrapper";
-import { type WithUpdater } from "./ClientContextWrapper";
+import type { WithUpdater } from "@/types/view/context";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";
 import useDecodedParams from "@/hooks/useDecodedParams";

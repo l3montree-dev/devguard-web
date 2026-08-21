@@ -9,13 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { THEMES, type StyleSettings, type Theme } from "./themes";
+import { THEMES } from "./themes";
 import { getComputedVar, hslStringToHex, hexToHsl } from "./utils";
-
-type VarGroup = {
-  label: string;
-  vars: string[];
-};
+import type {
+  FontPreset,
+  ShadowPreset,
+  StyleSettings,
+  TabType,
+  Theme,
+  VarGroup,
+} from "@/types/view/theme";
 
 const VAR_GROUPS: VarGroup[] = [
   {
@@ -181,14 +184,12 @@ function VarRow({
 }
 
 // ─── Shadow presets ──────────────────────────────────────────────────────────
-type ShadowPreset = { label: string; css: string | null };
 const SHADOW_PRESETS: ShadowPreset[] = [
   { label: "Default", css: null },
   { label: "None", css: `*,*::before,*::after{box-shadow:none!important}` },
 ];
 
 // ─── Font family presets ──────────────────────────────────────────────────────
-type FontPreset = { label: string; stack: string };
 const FONT_PRESETS: FontPreset[] = [
   { label: "Default (Inter)", stack: "" },
   { label: "Lexend", stack: "Lexend, sans-serif" },
@@ -235,8 +236,6 @@ const FONT_SIZE_PRESETS = [
 const LS_KEY = "css-var-editor-overrides";
 const LS_TAB_KEY = "css-var-editor-tab";
 const LS_STYLE_KEY = "css-var-editor-style";
-
-type TabType = "themes" | "style" | "vars";
 
 const DEFAULT_STYLE: StyleSettings = {
   shadowPreset: "Default",

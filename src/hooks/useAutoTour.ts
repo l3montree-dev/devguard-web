@@ -5,7 +5,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import type { ConditionalStep } from "./usePageTour";
+import type { ConditionalStep } from "@/types/view/tour";
 import { usePageTour } from "./usePageTour";
 import { useTourSeen } from "./useTourSeen";
 

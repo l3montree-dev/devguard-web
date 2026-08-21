@@ -32,7 +32,11 @@ import {
   traverseDownward,
   traverseUpward,
 } from "../utils/dependencyGraphHelpers";
-import type { ViewDependencyTreeNode } from "../utils/dependencyGraphHelpers";
+import type {
+  ContextMenuState,
+  VexSelection,
+  ViewDependencyTreeNode,
+} from "../types/view/dependencyGraph";
 import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
 import { Button } from "./ui/button";
 import {
@@ -72,32 +76,6 @@ function getPathSuffix(
 }
 
 // Types for the context menu
-type MenuType = "edge" | "node" | null;
-
-interface ContextMenuState {
-  type: MenuType;
-  x: number;
-  y: number;
-  childIndex?: number;
-  // Full path suffix from the clicked position to the leaf
-  path: string[];
-}
-
-// VEX justification options
-export type VexSelection =
-  | {
-      type: "edge";
-      justification: string;
-      // this is the index of the child in the path
-      childIndex: number;
-      path: string[]; // full path from parent to child, used for rule creation
-    }
-  | {
-      type: "node";
-      justification: string;
-      path: string[]; // suffix from the clicked node to the leaf
-    };
-
 const nodeTypes = {
   customNode: DependencyGraphNode,
   loadMoreNode: LoadMoreNode,

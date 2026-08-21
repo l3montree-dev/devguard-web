@@ -478,15 +478,9 @@ function Crane({ color }: { color: string }) {
   );
 }
 
+import type { Colors } from "@/types/view/threejs";
+
 // ─── Colors type ────────────────────────────────────────────────────────────
-interface Colors {
-  primary: string;
-  structure: string;
-  dim: string;
-  dim2: string;
-  water: string;
-  shipHull: string;
-}
 
 // ─── Main scene orchestrator ────────────────────────────────────────────────
 function SceneObjects({ colors }: { colors: Colors }) {

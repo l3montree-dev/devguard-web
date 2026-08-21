@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { filterForm2Query, sortingState2Query } from "@/services/filter";
-import type { FilterForm } from "@/services/filter";
+import type { FilterForm } from "@/types/view/filter";
 import type { OnChangeFn, SortingState, Updater } from "@tanstack/react-table";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";

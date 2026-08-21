@@ -39,24 +39,7 @@ import {
 import { UserCircle2Icon } from "lucide-react";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
-
-// ── Types ──────────────────────────────────────────────────────
-
-interface OrgAdmin {
-  id: string;
-  name: string;
-  avatarUrl: string | null;
-  role: string;
-}
-
-export interface ExternalOrg {
-  id: string;
-  /** The reserved @-prefixed slug, e.g. "@gitlab" or "@opencode" */
-  slug: string;
-  /** Identifier of the backing instance integration (e.g. "opencode") */
-  instance_id: string;
-  admins: OrgAdmin[];
-}
+import type { ExternalOrg, OrgAdmin } from "@/types/view/admin";
 
 interface Props {
   orgs: ExternalOrg[];

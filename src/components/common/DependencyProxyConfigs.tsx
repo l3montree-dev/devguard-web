@@ -42,11 +42,10 @@ function matchPattern(pattern: string, packagePurl: string): boolean {
   return true;
 }
 
-interface CheckResult {
-  packagePurl: string;
-  blocked: boolean;
-  matchedRule: string;
-}
+import type {
+  CheckResult,
+  DependencyProxyConfig,
+} from "@/types/view/dependencyProxy";
 
 function checkRulesAgainstPackages(
   rulesText: string,
@@ -78,11 +77,6 @@ function checkRulesAgainstPackages(
 
     return { packagePurl, blocked, matchedRule };
   });
-}
-
-interface DependencyProxyConfig {
-  rules: string;
-  minReleaseAge: number;
 }
 
 const defaultConfig: DependencyProxyConfig = {

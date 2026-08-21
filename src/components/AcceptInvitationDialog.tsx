@@ -19,9 +19,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-interface InvitationFormValues {
-  "invitation-url": string;
-}
+import type { InvitationFormValues } from "@/types/view/invitation";
 
 export default function AcceptInvitationDialog({
   isOpen,

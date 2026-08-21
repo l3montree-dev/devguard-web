@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { toast } from "@/lib/toast";
-import type { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { CheckIcon } from "@heroicons/react/24/outline";
@@ -32,11 +31,7 @@ const MAX_LENGTH = 4000;
 // The FP dropdown defaults to "Vulnerable code not in execute path".
 const DEFAULT_FP_OPTION = Object.keys(vexOptionMessages)[2];
 
-export interface AssessmentSubmit {
-  status: VulnEventDTO["type"];
-  justification?: string;
-  mechanicalJustification?: string;
-}
+import type { AssessmentSubmit } from "@/types/view/riskAssessment";
 
 interface VulnAssessmentComposerProps {
   /** Current vulnerability state (e.g. "open", "accepted", "falsePositive"). */

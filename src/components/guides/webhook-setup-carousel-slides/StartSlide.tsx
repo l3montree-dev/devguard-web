@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ExternalTicketProviderNames } from "@/types/common";
+import { ExternalTicketProviderNames } from "@/const/providers";
 import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import ProviderSetup from "../ProviderSetup";

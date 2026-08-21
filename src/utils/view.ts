@@ -12,7 +12,8 @@ import type {
 } from "@/types/api/api";
 import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
-import { getUserFullName, type User } from "@/types/auth";
+import type { User } from "@/types/auth";
+import { getUserFullName } from "@/utils/auth";
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
     case "mitigate":
@@ -385,9 +386,7 @@ export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
 
-export interface ContentTreeElement extends ProjectDTO {
-  assets: Array<AssetDTO>;
-}
+import type { ContentTreeElement } from "@/types/view/context";
 
 export const normalizeContentTree = (
   contentTree: Array<ContentTreeElement>,

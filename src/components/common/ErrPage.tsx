@@ -10,7 +10,7 @@ import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState } from "react";
 import { useConfig } from "@/context/ConfigContext";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { getUserFullName } from "@/types/auth";
+import { getUserFullName } from "@/utils/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CopyCode from "@/components/common/CopyCode";
 import { classNames } from "../../utils/common";

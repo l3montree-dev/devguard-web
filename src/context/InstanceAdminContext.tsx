@@ -12,23 +12,12 @@ import React, {
   useState,
 } from "react";
 import { RefreshCw } from "lucide-react";
+import type {
+  AdminAuthState,
+  InstanceAdminContextValue,
+} from "@/types/view/admin";
 
 const SESSION_DURATION_MS = 10 * 60 * 1000;
-
-interface InstanceAdminContextValue {
-  /** Whether an admin signing key is currently held in memory. */
-  isAuthenticated: boolean;
-  /** Store the imported, non-extractable signing key in memory for this tab. */
-  authenticate: (key: CryptoKey) => void;
-  /** Drop the in-memory signing key. */
-  logout: () => void;
-  /** Reset the auto-logout timer back to the full session duration. */
-  refreshSession: () => void;
-  /** Retrieve the in-memory signing key. Returns null if not authenticated. */
-  getSigningKey: () => CryptoKey | null;
-  /** Absolute timestamp (ms) when the admin session is auto-cleared. */
-  expiresAt: number | null;
-}
 
 const InstanceAdminContext = createContext<InstanceAdminContextValue>({
   isAuthenticated: false,
@@ -38,11 +27,6 @@ const InstanceAdminContext = createContext<InstanceAdminContextValue>({
   getSigningKey: () => null,
   expiresAt: null,
 });
-
-interface AdminAuthState {
-  isAuthenticated: boolean;
-  expiresAt: number | null;
-}
 
 export function InstanceAdminProvider({
   children,

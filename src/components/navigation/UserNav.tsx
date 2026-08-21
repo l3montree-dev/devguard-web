@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useConfig } from "../../context/ConfigContext";
-import { getUserFullName } from "../../types/auth";
+import { getUserFullName } from "../../utils/auth";
 import HelpDropdown from "./HelpDropdown";
 import StarRepo from "./StarRepo";
 

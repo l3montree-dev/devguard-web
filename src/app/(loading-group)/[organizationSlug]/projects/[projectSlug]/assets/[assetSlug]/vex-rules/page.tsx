@@ -21,9 +21,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
-import VexRuleRecommendationList, {
-  type RecommendationEntry,
-} from "@/components/vex-rules/VexRuleRecommendationList";
+import VexRuleRecommendationList from "@/components/vex-rules/VexRuleRecommendationList";
+import type { RecommendationEntry } from "@/types/view/vexRules";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
 import {
   vexRuleRecommendationsURL,

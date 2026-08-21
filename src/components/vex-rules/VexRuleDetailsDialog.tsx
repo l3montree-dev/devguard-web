@@ -18,6 +18,7 @@ import { FieldDescription } from "@/components/ui/field";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import type { CreateVexRuleRequest, VexRule } from "@/types/api/api";
+import type { EditableRule } from "@/types/view/vexRules";
 import { CircleAlert } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
 import VexRuleForm from "./VexRuleForm";
@@ -35,10 +36,6 @@ interface VexRuleDetailsDialogProps {
 }
 
 // The parts of a rule this dialog edits; the rest is recreated verbatim.
-type EditableRule = Pick<
-  CreateVexRuleRequest,
-  "title" | "celExpression" | "justification"
->;
 
 const editableOf = (rule: VexRule): EditableRule => ({
   title: rule.title ?? "",

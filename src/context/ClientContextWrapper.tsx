@@ -6,9 +6,7 @@
 import { useState } from "react";
 import type { ReactNode, ComponentType } from "react";
 
-export type WithUpdater<T> = { v: T } & {
-  update: (newValue: T | ((prev: T) => T)) => void;
-};
+import type { WithUpdater } from "@/types/view/context";
 
 export const NoopUpdater = () => {};
 interface ClientContextWrapperProps<T = any> {

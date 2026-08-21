@@ -33,7 +33,10 @@ import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 
-type BadgeVariant = "CRITICAL" | "MEDIUM" | "LOW" | "HIGH";
+import type {
+  BadgeVariant,
+  ControlRelationship,
+} from "@/types/view/compliance";
 
 function securityLevelVariant(value: string): BadgeVariant {
   if (value === "erhöht") return "MEDIUM";
@@ -113,9 +116,6 @@ const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   { ssr: false },
 );
-
-type ControlRelationship =
-  DetailedComplianceRiskDTO["mappedControls"][number]["relationship"];
 
 const relationshipDescription: Record<ControlRelationship, string> = {
   "equivalent-to": "This control is equivalent to the related control.",

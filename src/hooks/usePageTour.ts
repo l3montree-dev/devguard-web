@@ -3,11 +3,10 @@
 
 "use client";
 
-import type { StepType } from "@reactour/tour";
 import { useEffect } from "react";
 import { useTourContext } from "@/context/TourContext";
 
-export type ConditionalStep = StepType & { condition?: boolean };
+import type { ConditionalStep } from "@/types/view/tour";
 
 export function usePageTour(steps: ConditionalStep[]) {
   const { registerSteps, openTour } = useTourContext();

@@ -7,15 +7,14 @@ import {
   type DependencyVuln,
   type MinimalDependencyTree,
 } from "../types/api/api";
+import type {
+  EdgeMaps,
+  ViewDependencyTreeNode,
+} from "../types/view/dependencyGraph";
 // Pagination settings
 export const MAX_CHILDREN_PER_PAGE = 50;
 export const INITIAL_CHILDREN_TO_SHOW = 20;
 export const MIN_VISIBLE_NODES = 2000;
-
-export interface EdgeMaps {
-  childToParentEdges: Map<string, Array<{ parent: string; edgeId: string }>>;
-  parentToChildEdges: Map<string, Array<{ child: string; edgeId: string }>>;
-}
 
 const isInfoSource = (name: string) => {
   return (
@@ -734,20 +733,6 @@ export const convertPathsToTree = (
 
   return root;
 };
-
-export interface ViewDependencyTreeNode extends Omit<
-  DependencyTreeNode,
-  "children"
-> {
-  id: string;
-  risk: number;
-  parents: Array<ViewDependencyTreeNode>;
-  children: ViewDependencyTreeNode[];
-  nodeType: "root" | "artifact" | "component" | "infosource";
-  infoSourceType?: "sbom" | "csaf" | "vex";
-  // Optional flag that marks nodes participating in a cycle. Used to avoid infinite recursion and for UI highlighting.
-  hasCycle?: boolean;
-}
 
 export function minimalTreeToViewDependencyTreeNode(
   tree?: MinimalDependencyTree,

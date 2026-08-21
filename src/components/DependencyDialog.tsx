@@ -27,7 +27,7 @@ import DateString, { parseDateOnly } from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
 import { convertPathsToTree } from "../utils/dependencyGraphHelpers";
-import type { ViewDependencyTreeNode } from "../utils/dependencyGraphHelpers";
+import type { ViewDependencyTreeNode } from "../types/view/dependencyGraph";
 
 interface Props {
   open: boolean;

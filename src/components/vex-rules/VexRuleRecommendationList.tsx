@@ -4,16 +4,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import type { VexRuleRecommendation } from "@/types/api/api";
+import type { RecommendationEntry } from "@/types/view/vexRules";
 import { classNames } from "@/utils/common";
 import { VerifiedIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
 import VexRuleResult from "./VexRuleResult";
-
-export interface RecommendationEntry {
-  vulnID: string;
-  recommendation: VexRuleRecommendation;
-}
 
 interface VexRuleRecommendationListProps {
   recommendations: RecommendationEntry[];

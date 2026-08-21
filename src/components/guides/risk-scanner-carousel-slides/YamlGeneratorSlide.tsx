@@ -8,7 +8,7 @@ import type {
   OrganizationDetailsDTO,
   ProjectDTO,
 } from "../../../types/api/api";
-import { GitInstances } from "../../../types/common";
+import type { GitInstances } from "../../../types/common";
 import { type Config } from "../../../types/common";
 import CopyCode, { CopyCodeFragment } from "../../common/CopyCode";
 import { Button } from "../../ui/button";

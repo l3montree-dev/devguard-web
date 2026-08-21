@@ -3,19 +3,7 @@
 
 import type { Config } from "./types/common";
 
-type jobName =
-  | "secret-scanning"
-  | "sast"
-  | "iac"
-  | "sca"
-  | "build"
-  | "container-scanning"
-  | "push"
-  | "sign"
-  | "attest"
-  | "full"
-  | "sbom-upload"
-  | "sarif-upload";
+import type { JobName } from "@/types/view/integration";
 
 const generateWorkflowSnippet = (
   jobName: string,
@@ -36,7 +24,7 @@ const generateWorkflowSnippet = (
             devguard-token: "\${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings`;
 
 const yamlGitlab: Record<
-  jobName,
+  JobName,
   (config: Config & { frontendUrl: string }) => string
 > = {
   "secret-scanning": (config) => `
@@ -195,7 +183,7 @@ ${needs.map((n) => `      - ${n}`).join("\n")}`;
 };
 
 const generateGitlabSnippet = (
-  jobName: jobName,
+  jobName: JobName,
   workflowFile: string,
   orgSlug: string,
   projectSlug: string,
