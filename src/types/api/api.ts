@@ -1137,6 +1137,8 @@ export type ExternalReference = {
   assetId: string;
   url: string;
   type: "cyclonedx" | "csaf" | "openvex" | "unknown";
+  // Number of VEX rules synced from this source into this asset.
+  vexRuleCount: number;
   error?: string | null;
 };
 

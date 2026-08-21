@@ -9,12 +9,8 @@ import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Filter from "@/components/Filter";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
@@ -27,17 +23,23 @@ import {
   vexRuleRecommendationsURL,
   useVexRuleRecommendations,
 } from "@/components/vex-rules/useVexRuleRecommendations";
-import VexSourcesSection from "@/components/vex-rules/VexSourcesSection";
-import { useVexSources } from "@/components/vex-rules/useVexSources";
+import VexSourcesTable, {
+  isVexSourceType,
+  type VexSource,
+} from "@/components/vex-rules/VexSourcesSection";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
-import { ChevronDown } from "lucide-react";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { Paged, VexRule, VexRulePrefill } from "@/types/api/api";
+import type {
+  ExternalReference,
+  Paged,
+  VexRule,
+  VexRulePrefill,
+} from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
@@ -45,6 +47,25 @@ import useSWR from "swr";
 import Link from "next/link";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useFilter from "@/hooks/useFilter";
+import useRouterQuery from "@/hooks/useRouterQuery";
+
+const sourcesFilterOptions = [
+  {
+    label: "Type",
+    value: "type",
+    operators: [{ value: "is" }, { value: "is not" }],
+    filterValues: [
+      { value: "cyclonedx", label: "CycloneDX VEX" },
+      { value: "csaf", label: "CSAF" },
+    ],
+  },
+  {
+    label: "URL",
+    value: "url",
+    operators: [{ value: "ilike", label: "contains" }],
+    filterValues: [],
+  },
+];
 
 const filterOptions = [
   {
@@ -97,6 +118,8 @@ const VexRulesPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
   const handleSearch = useDebouncedQuerySearch();
   const { handleFilter, removeFilter, clearAllFilters } = useFilter();
+  const pushQuery = useRouterQuery();
+  const activeTab = searchParams?.get("tab") ?? "rules";
   const assetMenu = useAssetMenu();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
@@ -109,13 +132,22 @@ const VexRulesPage: FunctionComponent = () => {
     () => buildFilterSearchParams(searchParams),
     [searchParams],
   );
+  const defaultQuery = useMemo(
+    () => new URLSearchParams({ page: "1", pageSize: "25" }),
+    [],
+  );
+  const rulesQuery = activeTab === "rules" ? query : defaultQuery;
+  const sourcesQuery = activeTab === "sources" ? query : defaultQuery;
 
   const {
     data: vexRulesResponse,
     error,
     isLoading,
     mutate,
-  } = useSWR<Paged<VexRule>>(`${vexRulesUrl}/?${query.toString()}`, fetcher);
+  } = useSWR<Paged<VexRule>>(
+    `${vexRulesUrl}/?${rulesQuery.toString()}`,
+    fetcher,
+  );
   const vexRules = vexRulesResponse?.data ?? [];
 
   const handleVexUpload = async (params: { file: File }) => {
@@ -143,7 +175,41 @@ const VexRulesPage: FunctionComponent = () => {
     setAddRuleDialogOpen(true);
   };
 
-  const { sources: vexSources } = useVexSources();
+  const vexSourcesUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
+  const {
+    data: vexSourcesResponse,
+    isLoading: isVexSourcesLoading,
+    mutate: mutateVexSources,
+  } = useSWR<Paged<ExternalReference>>(
+    `${vexSourcesUrl}/?${sourcesQuery.toString()}`,
+    fetcher,
+  );
+
+  const vexSources = useMemo(
+    () =>
+      vexSourcesResponse && {
+        ...vexSourcesResponse,
+        data: vexSourcesResponse.data.filter(
+          (ref): ref is VexSource => isVexSourceType(ref.type),
+        ),
+      },
+    [vexSourcesResponse],
+  );
+
+
+  // Switching tabs resets search/filter/sort/page, since both tabs share
+  // those query params.
+  const handleTabChange = (tab: string) => {
+    const reset: Record<string, undefined> = {
+      search: undefined,
+      page: undefined,
+    };
+    searchParams?.forEach((_, key) => {
+      if (key.startsWith("filterQuery[") || key.startsWith("sort["))
+        reset[key] = undefined;
+    });
+    pushQuery({ ...reset, tab });
+  };
 
   const { recommendations } = useVexRuleRecommendations(
     vexRuleRecommendationsURL({ organizationSlug, projectSlug, assetSlug }),
@@ -219,114 +285,162 @@ const VexRulesPage: FunctionComponent = () => {
         </AuthGuard>
       </Section>
 
-      <Section
-        forceVertical
-        title="Active VEX rules"
-        description="Every rule currently applied to this repository - your own and the ones synced from upstream sources."
-        className="mb-6 border-t pt-6"
-      >
-        <div className="mb-4 flex flex-row gap-2">
-          <Filter
-            options={filterOptions}
-            onFilter={handleFilter}
-            onRemoveFilter={removeFilter}
-            onClearAllFilters={clearAllFilters}
-            search={{
-              onChange: handleSearch,
-              defaultValue: searchParams?.get("search") ?? "",
-              placeholder:
-                "Search VEX rules by title, justification, or CVE ID...",
-            }}
-          />
-        </div>
-        {vexRules.length === 0 ? (
-          <EmptyParty
-            title="No VEX rules found."
-            description="VEX rules define how vulnerabilities are handled based on their context. Try an expression in the playground above to create your first rule, or sync one from an upstream source."
-          />
-        ) : (
-          <VexRulesTable
-            rules={
-              vexRulesResponse ?? {
-                data: [],
-                total: 0,
-                page: 1,
-                pageSize: 25,
-              }
-            }
-            urlBase={vexRulesUrl}
-            isLoading={isLoading}
-            onMutate={() => mutate()}
-          />
-        )}
-      </Section>
+      <Section forceVertical className="mb-6 border-t pt-6">
+        <Tabs value={activeTab}>
+          <TabsList>
+            <TabsTrigger
+              data-testid="vex-rules-tab-rules"
+              onClick={() => handleTabChange("rules")}
+              value="rules"
+            >
+              VEX rules
+              {!!vexRulesResponse?.total && (
+                <Badge variant="secondary" className="ml-2 font-medium">
+                  {vexRulesResponse.total}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              data-testid="vex-rules-tab-recommendations"
+              onClick={() => handleTabChange("recommendations")}
+              value="recommendations"
+            >
+              Recommendations
+              {recommendations.length > 0 && (
+                <Badge variant="secondary" className="ml-2 font-medium">
+                  {recommendations.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger
+              data-testid="vex-rules-tab-sources"
+              onClick={() => handleTabChange("sources")}
+              value="sources"
+            >
+              Upstream VEX sources
+              {!!vexSources?.total && (
+                <Badge variant="secondary" className="ml-2 font-medium">
+                  {vexSources.total}
+                </Badge>
+              )}
+            </TabsTrigger>
+          </TabsList>
 
-      <AuthGuard require="member">
-        {recommendations.length > 0 && (
-          <Section
-            forceVertical
-            title="Recommendations based on your organisation assessments, upstream sources and other DevGuard users"
-            description={
-              <>
-                Other users of DevGuard assessed vulnerabilities that are found
-                in your Reposiotory already. Based on a majority vote, the
-                following VEX rules are recommended. Nothing is applied until
-                you create the rule. You can find the list of official upstream
-                sources that devguard syncs{" "}
-                <Link
-                  href={
-                    "https://github.com/l3montree-dev/devguard/blob/main/vulndb/upstream_vex_service.go#L27"
+          <TabsContent value="rules" className="mt-4">
+            <div className="mb-4 flex flex-row gap-2">
+              <Filter
+                options={filterOptions}
+                onFilter={handleFilter}
+                onRemoveFilter={removeFilter}
+                onClearAllFilters={clearAllFilters}
+                search={{
+                  onChange: handleSearch,
+                  defaultValue: searchParams?.get("search") ?? "",
+                  placeholder:
+                    "Search VEX rules by title, justification, or CVE ID...",
+                }}
+              />
+            </div>
+            {vexRules.length === 0 ? (
+              <EmptyParty
+                title="No VEX rules found."
+                description="VEX rules define how vulnerabilities are handled based on their context. Try an expression in the playground above to create your first rule, or sync one from an upstream source."
+              />
+            ) : (
+              <VexRulesTable
+                rules={
+                  vexRulesResponse ?? {
+                    data: [],
+                    total: 0,
+                    page: 1,
+                    pageSize: 25,
                   }
-                  target="_blank"
-                >
-                  in the GitHub repository
-                </Link>
-              </>
-            }
-            className="mb-6 border-t pt-6"
-          >
-            <VexRuleRecommendationList
-              recommendations={recommendations}
-              onCreateRule={(entry: RecommendationEntry) => {
-                setRulePrefill({
-                  celExpression: entry.recommendation.celExpression,
-                  justification: entry.recommendation.justification,
-                  mechanicalJustification:
-                    entry.recommendation.mechanicalJustification,
-                  wasRecommended: true,
-                  title: entry.recommendation.title,
-                });
-                setAddRuleDialogOpen(true);
-              }}
-            />
-          </Section>
-        )}
-      </AuthGuard>
-
-      <Collapsible className="mb-6 border-t pt-6">
-        <CollapsibleTrigger
-          data-testid="upstream-vex-sources-trigger"
-          className="group flex w-full cursor-pointer flex-row items-center justify-between"
-        >
-          <span className="flex flex-row items-center gap-2 text-base font-semibold leading-7 text-foreground">
-            Your additional Upstream VEX sources
-            {vexSources.length > 0 && (
-              <Badge variant="secondary" className="font-medium">
-                {vexSources.length}
-              </Badge>
+                }
+                urlBase={vexRulesUrl}
+                isLoading={isLoading}
+                onMutate={() => mutate()}
+              />
             )}
-          </span>
-          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-4">
-          <p className="mb-4 text-sm leading-6 text-muted-foreground">
-            URLs, usually provided by your suppliers, that carry VEX data for
-            the components you use. Syncing a source creates the rules listed
-            above.
-          </p>
-          <VexSourcesSection onAddSource={() => setUploadDialogOpen(true)} />
-        </CollapsibleContent>
-      </Collapsible>
+          </TabsContent>
+
+          <TabsContent value="recommendations" className="mt-4">
+            <p className="mb-4 text-sm leading-6 text-muted-foreground">
+              Other users of DevGuard assessed vulnerabilities that are found in
+              your repository already. Based on a majority vote, the following
+              VEX rules are recommended. Nothing is applied until you create the
+              rule. You can find the list of official upstream sources that
+              devguard syncs{" "}
+              <Link
+                href={
+                  "https://github.com/l3montree-dev/devguard/blob/main/vulndb/upstream_vex_service.go#L27"
+                }
+                target="_blank"
+              >
+                in the GitHub repository
+              </Link>
+              .
+            </p>
+            {recommendations.length === 0 ? (
+              <EmptyParty
+                title="No recommendations yet."
+                description="Recommendations appear once other DevGuard users or upstream sources have assessed vulnerabilities that also show up in this repository."
+              />
+            ) : (
+              <AuthGuard require="member">
+                <VexRuleRecommendationList
+                  recommendations={recommendations}
+                  onCreateRule={(entry: RecommendationEntry) => {
+                    setRulePrefill({
+                      celExpression: entry.recommendation.celExpression,
+                      justification: entry.recommendation.justification,
+                      mechanicalJustification:
+                        entry.recommendation.mechanicalJustification,
+                      wasRecommended: true,
+                      title: entry.recommendation.title,
+                    });
+                    setAddRuleDialogOpen(true);
+                  }}
+                />
+              </AuthGuard>
+            )}
+          </TabsContent>
+
+          <TabsContent value="sources" className="mt-4">
+            <p className="mb-4 text-sm leading-6 text-muted-foreground">
+              URLs, usually provided by your suppliers, that carry VEX data for
+              the components you use. Syncing a source creates the rules listed
+              in the VEX rules tab.
+            </p>
+            <div className="mb-4 flex flex-row gap-2">
+              <Filter
+                options={sourcesFilterOptions}
+                onFilter={handleFilter}
+                onRemoveFilter={removeFilter}
+                onClearAllFilters={clearAllFilters}
+                search={{
+                  onChange: handleSearch,
+                  defaultValue: searchParams?.get("search") ?? "",
+                  placeholder: "Search upstream sources by URL...",
+                }}
+              />
+            </div>
+            <VexSourcesTable
+              sources={
+                vexSources ?? {
+                  data: [],
+                  total: 0,
+                  page: 1,
+                  pageSize: 25,
+                }
+              }
+              apiUrl={vexSourcesUrl}
+              isLoading={isVexSourcesLoading}
+              onMutate={() => mutateVexSources()}
+              onAddSource={() => setUploadDialogOpen(true)}
+            />
+          </TabsContent>
+        </Tabs>
+      </Section>
 
       <VexUploadModal
         open={uploadDialogOpen}
