@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import AssetHeader from "@/components/common/AssetHeader";
 import React, { Suspense } from "react";
 import { AssetProvider } from "../../../../../../../context/AssetContext";

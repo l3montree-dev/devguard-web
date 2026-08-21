@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { AssetFormValues } from "@/components/asset/AssetForm";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";

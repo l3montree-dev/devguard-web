@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useCallback, useEffect, useState } from "react";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import DependencyGraph from "@/components/DependencyGraph";

@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 /* eslint-disable local/require-loading-boundary -- this page only redirects and
    renders PageSkeleton itself; a loading.tsx here is the root one and would
    become the fallback for every route in the app. */

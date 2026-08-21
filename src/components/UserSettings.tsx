@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { OryClientConfiguration } from "@ory/elements-react";
 import { Settings } from "@ory/elements-react/theme";
 import type { SettingsFlow } from "@ory/client-fetch";

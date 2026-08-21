@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { browserApiClient } from "@/services/devGuardApi";
 import { createAccessToken as createAccessToken } from "@/services/accessTokenService";
 import type {

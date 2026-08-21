@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import Link from "next/link";
 import React from "react";
 import { useActiveProject } from "../../hooks/useActiveProject";

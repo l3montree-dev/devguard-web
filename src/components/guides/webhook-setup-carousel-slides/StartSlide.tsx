@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

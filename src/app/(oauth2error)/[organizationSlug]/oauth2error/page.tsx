@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 /* eslint-disable local/require-loading-boundary -- terminal 403 page; it only
    unwraps params via use() and has no data to wait for. */
 "use client";

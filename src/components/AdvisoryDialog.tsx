@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import React, { type FunctionComponent, useState } from "react";
 import dynamic from "next/dynamic";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";

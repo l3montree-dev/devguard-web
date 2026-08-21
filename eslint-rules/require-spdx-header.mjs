@@ -66,7 +66,7 @@ export default createRule({
           messageId: "missing",
           fix(fixer) {
             const text = sourceCode.getText();
-            const header = `// SPDX-License-Identifier: ${EXPECTED}\n`;
+            const header = `// Copyright ${new Date().getFullYear()} L3montree GmbH and the DevGuard Contributors.\n// SPDX-License-Identifier: \t${EXPECTED}\n`;
             // A shebang has to stay on line one; a "use client" directive does
             // not, because comments may precede it.
             if (!text.startsWith("#!")) {

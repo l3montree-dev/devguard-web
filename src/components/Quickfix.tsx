@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import CopyCode from "@/components/common/CopyCode";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import Purl from "@/components/common/Purl";
