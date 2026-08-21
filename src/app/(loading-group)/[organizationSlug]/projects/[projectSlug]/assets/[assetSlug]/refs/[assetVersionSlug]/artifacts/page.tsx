@@ -41,7 +41,6 @@ import {
   useRootNodes,
   useUpdateAssetVersionState,
 } from "../../../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 
@@ -471,7 +470,7 @@ const Artifacts = () => {
       />
       <AlertDialog
         open={Boolean(deleteDialogOpen)}
-        onOpenChange={(open) => setDeleteDialogOpen(null)}
+        onOpenChange={() => setDeleteDialogOpen(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

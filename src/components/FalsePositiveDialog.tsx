@@ -33,7 +33,6 @@ import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { documentationLinks } from "../const/documentationLinks";
-import { Badge } from "./ui/badge";
 import { beautifyPurl } from "../utils/common";
 
 const MarkdownEditor = dynamic(

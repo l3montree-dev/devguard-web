@@ -33,7 +33,6 @@ import {
 import {
   BuildingOffice2Icon,
   ChevronRightIcon,
-  ShieldCheckIcon,
   TrashIcon,
   UserPlusIcon,
 } from "@heroicons/react/20/solid";

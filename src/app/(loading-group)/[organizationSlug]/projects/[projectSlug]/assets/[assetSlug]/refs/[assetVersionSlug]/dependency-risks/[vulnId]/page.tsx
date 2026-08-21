@@ -10,7 +10,6 @@ import MitigateDialog from "@/components/MitigateDialog";
 import VulnState from "@/components/common/VulnState";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependency-risk-tour";
 import DetailedRiskAssessment from "@/components/risk-assessment/DetailedRiskAssessment";
-import ManagementDecisions from "@/components/risk-assessment/ManagementDecisions";
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import VulnAssessmentComposer from "@/components/risk-assessment/VulnAssessmentComposer";
 import PathToComponent from "@/components/risk-handling/PathToComponent";

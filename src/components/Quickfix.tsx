@@ -8,7 +8,7 @@ import type {
   DependencyVuln,
   DetailedDependencyVulnDTO,
 } from "@/types/api/api";
-import { extractVersion, isValidPackagePurl } from "@/utils/common";
+import { isValidPackagePurl } from "@/utils/common";
 import { Wrench } from "lucide-react";
 import { PackageURL } from "packageurl-js";
 import type { FunctionComponent } from "react";

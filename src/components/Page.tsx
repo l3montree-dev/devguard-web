@@ -3,10 +3,9 @@
 
 "use client";
 import Head from "next/head";
-import React, { type PropsWithChildren, useEffect, useState } from "react";
+import React, { type PropsWithChildren, useEffect } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
-import { Toaster } from "./ui/sonner";
 import { toast } from "@/lib/toast";
 import Markdown from "./common/Markdown";
 import { Megaphone } from "lucide-react";

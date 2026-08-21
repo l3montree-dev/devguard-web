@@ -17,9 +17,6 @@ import { toast } from "@/lib/toast";
 import type { GitLabIntegrationDTO } from "@/types/api/api";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import { ImageZoom } from "./Zoom";
-import { useTheme } from "next-themes";
 
 export function urlToBaseURL(url: string): string {
   const regex = /^(https?:\/\/[^\/]+)/i; //regex rule https://regex101.com/r/n3xN3y/1
@@ -72,12 +69,6 @@ export default function GitLabIntegrationForm({
       );
     }
   };
-
-  const { theme, resolvedTheme } = useTheme();
-  const imageSrc =
-    theme === "dark"
-      ? "/assets/gitlab-create-token-dark.png"
-      : "/assets/gitlab-create-token-white.png";
 
   return (
     <Form {...form}>

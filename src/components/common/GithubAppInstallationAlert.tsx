@@ -4,7 +4,6 @@
 import React, { type FunctionComponent, type PropsWithChildren } from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,

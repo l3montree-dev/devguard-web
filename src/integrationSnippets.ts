@@ -70,7 +70,7 @@ const yamlGitlab: Record<
     }
     return snippet;
   },
-  build: (config) => `
+  build: () => `
     stage: "oci-image"
     image: "image.tar"
     image_tag: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
@@ -181,11 +181,11 @@ ${needs.map((n) => `      - ${n}`).join("\n")}`;
     }
     return snippet;
   },
-  "sarif-upload": (config) => `
+  "sarif-upload": () => `
     stage: "test"
     sarif_file: "results.sarif"
     `,
-  "sbom-upload": (config) => `
+  "sbom-upload": () => `
     stage: "test"
     sbom_file: "results.sbom"
     `,

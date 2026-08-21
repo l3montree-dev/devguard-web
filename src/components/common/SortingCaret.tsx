@@ -2,12 +2,10 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import {
-  ChevronUpIcon,
   ArrowsUpDownIcon,
   ArrowUpIcon,
   ArrowDownIcon,
 } from "@heroicons/react/24/outline";
-import { Arrow } from "@radix-ui/react-tooltip";
 import React, { type FunctionComponent } from "react";
 
 interface Props {

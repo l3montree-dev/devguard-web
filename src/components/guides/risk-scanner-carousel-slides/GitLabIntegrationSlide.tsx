@@ -17,7 +17,6 @@
 
 import React, { type FunctionComponent } from "react";
 import { CarouselItem } from "../../ui/carousel";
-import type { CarouselApi } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import type {
   OrganizationDetailsDTO,

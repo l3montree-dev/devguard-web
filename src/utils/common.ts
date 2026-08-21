@@ -133,18 +133,13 @@ export const validateArtifactNameAgainstPurlSpec = (
   const hashIndex = testPurl.indexOf("#");
   const questionIndex = testPurl.indexOf("?");
 
-  let insertIndex = testPurl.length;
   if (
     atIndex !== -1 &&
     (hashIndex === -1 || atIndex > hashIndex) &&
     (questionIndex === -1 || atIndex > questionIndex)
   ) {
     // There's a version after the last @, replace it
-    insertIndex = atIndex;
     testPurl = testPurl.substring(0, atIndex);
-  } else {
-    // No version found, append one
-    insertIndex = testPurl.length;
   }
 
   testPurl = `${testPurl}@1.0.0`;

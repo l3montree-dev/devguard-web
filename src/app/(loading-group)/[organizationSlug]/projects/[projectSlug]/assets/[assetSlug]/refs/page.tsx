@@ -287,7 +287,7 @@ const RefsPage = () => {
         isTag={createDialogOpen === "tag"}
         onOpenChange={() => setCreateDialogOpen(false)}
       />
-      <AlertDialog open={Boolean(open)} onOpenChange={(open) => setOpen(null)}>
+      <AlertDialog open={Boolean(open)} onOpenChange={() => setOpen(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>

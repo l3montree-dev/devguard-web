@@ -33,7 +33,6 @@ import VexSourcesSection from "@/components/vex-rules/VexSourcesSection";
 import { useVexSources } from "@/components/vex-rules/useVexSources";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import { fetcher } from "@/data-fetcher/fetcher";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { ChevronDown } from "lucide-react";

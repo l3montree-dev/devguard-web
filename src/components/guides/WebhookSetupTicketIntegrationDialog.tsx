@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 import React, { type FunctionComponent } from "react";

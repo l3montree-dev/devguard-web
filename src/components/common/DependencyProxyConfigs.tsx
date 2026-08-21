@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Diagnostic } from "@codemirror/lint";
 import Section from "./Section";
 import { CopyCodeFragment } from "./CopyCode";

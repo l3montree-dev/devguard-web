@@ -5,7 +5,6 @@ import Orb from "./ui/orb";
 import { Loader2 } from "lucide-react";
 import React, { type FunctionComponent } from "react";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,

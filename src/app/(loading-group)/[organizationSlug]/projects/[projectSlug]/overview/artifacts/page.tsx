@@ -10,7 +10,7 @@ import { useOrganization } from "@/context/OrganizationContext";
 import useTable from "@/hooks/useTable";
 import { useViewMode } from "@/hooks/useViewMode";
 import type { ReleaseDTO, RiskHistory } from "@/types/api/api";
-import { beautifyPurl, classNames } from "@/utils/common";
+import { classNames } from "@/utils/common";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import "@xyflow/react/dist/style.css";

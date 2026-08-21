@@ -3,12 +3,7 @@
 
 import React, { type FunctionComponent } from "react";
 import type { VulnEventDTO } from "../types/api/api";
-import {
-  defaultScanner,
-  eventMessages,
-  eventTypeMessages,
-  findUser,
-} from "../utils/view";
+import { eventMessages, eventTypeMessages, findUser } from "../utils/view";
 
 import Markdown from "./common/Markdown";
 
@@ -17,22 +12,19 @@ import FormatDate from "./risk-assessment/FormatDate";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import Image from "next/image";
-import { Badge } from "./ui/badge";
 import { useActiveProject } from "../hooks/useActiveProject";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import EcosystemImage from "./common/EcosystemImage";
-import { Tooltip, TooltipContent } from "./ui/tooltip";
-import { TooltipTrigger } from "@radix-ui/react-tooltip";
 
 interface Props {
   events: VulnEventDTO[];
   index: number;
   event: VulnEventDTO;
 }
-const VulnEventItem: FunctionComponent<Props> = ({ event, events, index }) => {
+const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const user = findUser(event.userId, activeOrg, currentUser);

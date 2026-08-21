@@ -12,7 +12,6 @@ import { NoopUpdater } from "./ClientContextWrapper";
 import { type WithUpdater } from "./ClientContextWrapper";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
 const AssetVersionContext = createContext<

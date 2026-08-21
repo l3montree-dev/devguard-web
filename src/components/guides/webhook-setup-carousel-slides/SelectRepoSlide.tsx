@@ -40,7 +40,7 @@ export default function SelectRepoSlide({
     activeOrg.githubAppInstallations.length > 0 ||
     activeOrg.jiraIntegrations.length > 0;
 
-  const [editRepo, setEditRepo] = useState(!Boolean(repositoryId));
+  const [_editRepo, setEditRepo] = useState(!Boolean(repositoryId));
 
   const [selectedRepo, setSelectedRepo] = useState<{
     id: string;

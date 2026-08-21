@@ -3,23 +3,9 @@
 
 // @ts-nocheck
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Canvas, extend, useFrame, useLoader } from "@react-three/fiber";
-import {
-  useGLTF,
-  useTexture,
-  Environment,
-  Lightformer,
-} from "@react-three/drei";
-import {
-  BallCollider,
-  CuboidCollider,
-  Physics,
-  RigidBody,
-  useRopeJoint,
-  useSphericalJoint,
-  RigidBodyProps,
-} from "@react-three/rapier";
+import { Canvas, extend } from "@react-three/fiber";
+import { Environment, Lightformer } from "@react-three/drei";
+import { Physics } from "@react-three/rapier";
 import { MeshLineGeometry, MeshLineMaterial } from "meshline";
 import * as THREE from "three";
 import Band from "./LanyardBand";

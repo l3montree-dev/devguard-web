@@ -39,7 +39,7 @@ export default function JiraIntegrationForm({
   }>();
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
-  const [open, setOpen] = React.useState(false);
+  const [_open, setOpen] = React.useState(false);
 
   const handleSubmit = async (params: {
     url: string;

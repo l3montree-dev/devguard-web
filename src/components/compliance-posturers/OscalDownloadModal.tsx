@@ -3,7 +3,6 @@
 
 "use client";
 
-import { DelayedDownloadButton } from "../common/DelayedDownloadButton";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import Image from "next/image";
 import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 import {

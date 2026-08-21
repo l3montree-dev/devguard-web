@@ -11,7 +11,6 @@ import VexRuleActionsCell from "./VexRuleActionsCell";
 import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
 import VexRuleResult from "./VexRuleResult";
 import VexRuleSourceBadge from "./VexRuleSourceBadge";
-import VexRuleMatchStatus from "./VexRuleMatchStatus";
 
 interface VexRulesTableProps {
   rules: VexRule[];

@@ -12,7 +12,7 @@ interface Props {
   className?: string;
 }
 
-const FrameworkIcon: FunctionComponent<Props> = ({ framework, className }) => {
+const FrameworkIcon: FunctionComponent<Props> = ({ className }) => {
   return (
     <ShieldCheck
       className={classNames(

@@ -13,7 +13,6 @@ export async function GET(request: NextRequest, ctx: any) {
     // Get search params for artifact and version query parameters
     const searchParams = request.nextUrl.searchParams;
     const artifact = searchParams.get("artifact");
-    const version = searchParams.get("version");
 
     if (!artifact) {
       return NextResponse.json(

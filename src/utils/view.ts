@@ -12,7 +12,6 @@ import type {
 } from "@/types/api/api";
 import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
-import { config } from "../config";
 import { getUserFullName, type User } from "@/types/auth";
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {

@@ -44,7 +44,7 @@ const GitlabTokenSlide = ({
   prevIndex,
   yamlGeneratorSlideIndex,
 }: GitlabTokenSlideProps) => {
-  const { theme, resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   const imageSrc =
     theme === "dark"
       ? "/assets/gitlab-token-dark.png"

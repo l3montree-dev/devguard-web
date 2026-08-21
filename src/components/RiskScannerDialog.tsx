@@ -6,7 +6,6 @@ import Fade from "embla-carousel-fade";
 
 import { useAutosetup } from "@/hooks/useAutosetup";
 import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
-import { useRouter } from "next/navigation";
 import React, {
   type FunctionComponent,
   useCallback,
@@ -16,7 +15,6 @@ import React, {
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "@/lib/toast";
-import { useUpdateAsset } from "../context/AssetContext";
 import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
@@ -84,8 +82,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     updateLayout: () => {},
   });
 
-  const router = useRouter();
-
   const asset = useActiveAsset()!;
 
   const [selectedScanner, setSelectedScanner] = React.useState<
@@ -107,7 +103,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   });
 
   // Manual integration state
-  const [variant, setVariant] = React.useState<"manual" | "auto">("auto");
+  const [_variant, setVariant] = React.useState<"manual" | "auto">("auto");
   const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sbom");
   const updateOrg = useUpdateOrganization();
 
@@ -215,7 +211,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
-  const updateAsset = useUpdateAsset();
   const uploadSBOM = async (params: {
     branchOrTagName: string;
     branchOrTagSlug: string;

@@ -13,7 +13,6 @@ import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/api/api";
 import type { ExternalTicketProvider } from "@/types/common";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useUpdateOrganization } from "../../../context/OrganizationContext";
 import useDecodedPathname from "../../../hooks/useDecodedPathname";
 
@@ -65,7 +64,6 @@ export default function ProviderIntegrationSetupSlide({
   };
 
   const pathname = useDecodedPathname();
-  const router = useRouter();
 
   return (
     <CarouselItem>

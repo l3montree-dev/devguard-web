@@ -4,7 +4,6 @@
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
-import Alert from "@/components/common/Alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";

@@ -3,6 +3,7 @@
 
 import tseslint from "typescript-eslint";
 import prettier from "eslint-plugin-prettier";
+import unusedImports from "eslint-plugin-unused-imports";
 import nextConfig from "eslint-config-next/core-web-vitals";
 import requireLoadingBoundary from "./eslint-rules/require-loading-boundary.mjs";
 import noComponentTypeDeclarations from "./eslint-rules/no-component-type-declarations.mjs";
@@ -66,7 +67,10 @@ export default tseslint.config([
   {
     files: [...OURS, "e2e/**/*.ts"],
     ignores: NOT_OURS,
+    plugins: { "unused-imports": unusedImports },
     rules: {
+      // Autofixable, unlike the no-unused-vars report it takes over.
+      "unused-imports/no-unused-imports": "warn",
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

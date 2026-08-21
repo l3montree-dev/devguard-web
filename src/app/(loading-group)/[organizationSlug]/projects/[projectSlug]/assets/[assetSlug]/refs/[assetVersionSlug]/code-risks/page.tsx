@@ -49,10 +49,6 @@ import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
-interface Props {
-  vulns: Paged<FirstPartyVuln>;
-}
-
 const columnHelper = createColumnHelper<FirstPartyVuln>();
 
 const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
@@ -157,7 +153,6 @@ const Index: FunctionComponent = () => {
   const {
     data: vulns,
     isLoading,
-    error,
     mutate: mutateVulns,
   } = useSWR<Paged<FirstPartyVuln>>(
     uri +

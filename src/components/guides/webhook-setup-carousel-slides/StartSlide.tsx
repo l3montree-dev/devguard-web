@@ -4,7 +4,6 @@
 import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { CarouselItem } from "@/components/ui/carousel";
 import type { CarouselApi } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -45,7 +44,6 @@ export default function StartSlide({
   isLoadingRepositories,
   provider,
   webhookSetupSlideIndex,
-  providerIntegrationSlideIndex,
   api,
 }: StartSlideProps) {
   useEffect(() => {

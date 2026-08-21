@@ -22,7 +22,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { documentationLinks } from "@/const/documentationLinks";
-import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import {
   useActiveAssetVersion,
@@ -132,7 +131,6 @@ const Index: FunctionComponent = () => {
   }, []);
   const config = useConfig();
   const latestScannerImage = useScannerImage();
-  const { session } = useSession();
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
@@ -195,7 +193,6 @@ const Index: FunctionComponent = () => {
   const {
     data: vulns,
     isLoading,
-    error,
     mutate: mutateVulns,
   } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
     keepPreviousData: true,

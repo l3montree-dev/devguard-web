@@ -6,7 +6,7 @@
 import AuthGuard from "@/components/AuthGuard";
 import { groupBy } from "lodash";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";

@@ -17,8 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { CrossIcon, Loader2, XIcon } from "lucide-react";
+import { Loader2, XIcon } from "lucide-react";
 import { classNames } from "@/utils/common";
 import { Badge } from "../ui/badge";
 import { Checkbox } from "../ui/checkbox";
@@ -41,7 +40,6 @@ interface Props {
 
 export function MultiselectCombobox(props: Props) {
   const [open, setOpen] = React.useState(false);
-  const [searchQuery, setSearchQuery] = React.useState("");
   const { loading } = props;
 
   const selectedValues = React.useMemo(() => {

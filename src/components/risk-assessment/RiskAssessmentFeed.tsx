@@ -167,14 +167,9 @@ const RiskFeedItem = ({
   event,
   events,
   org,
-  project,
-  asset,
   currentUser,
-  activeAssetVersion,
-  currentUserRole,
   vulnerabilityName,
   deleteEvent,
-  page,
   directDependencyFixedVersion,
   inGroup,
 }: {
@@ -460,7 +455,7 @@ export default function RiskAssessmentFeed({
               <CollapsibleContent className="flex mt-10 flex-col gap-10">
                 {groupedEvents
                   .slice(0, groupedEvents.length - 2)
-                  .map((groupOrEvent, index) => {
+                  .map((groupOrEvent) => {
                     if (Array.isArray(groupOrEvent)) {
                       return (
                         <RiskFeedGroupHeader
@@ -519,7 +514,7 @@ export default function RiskAssessmentFeed({
         <div className="flex flex-col gap-10">
           {groupedEvents
             .slice(Math.max(groupedEvents.length - 2, 0), groupedEvents.length)
-            .map((groupOrEvent, index) => {
+            .map((groupOrEvent) => {
               if (Array.isArray(groupOrEvent)) {
                 return (
                   <RiskFeedGroupHeader
