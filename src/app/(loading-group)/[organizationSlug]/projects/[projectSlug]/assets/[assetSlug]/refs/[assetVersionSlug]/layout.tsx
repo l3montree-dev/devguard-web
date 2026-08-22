@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 import { AssetVersionProvider } from "../../../../../../../../../context/AssetVersionContext";
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
-import { handleHttpError } from "../../../../../../../../../data-fetcher/handle-http-error";
+import { handleHttpError } from "../../../../../../../../../data-fetcher/handleHttpError";
 
 const AssetVersionLayout = ({
   // Layouts must accept a children prop.

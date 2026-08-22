@@ -3,7 +3,7 @@
 
 import { notFound, redirect } from "next/navigation";
 import { config } from "../config";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export function handleHttpError(
   error: unknown,

@@ -3,7 +3,7 @@
 
 import type { AssetDTO, ProjectDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export async function fetchProject(
   organizationSlug: string,

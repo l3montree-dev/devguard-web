@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { signAdminRequest } from "./admin-request-signing";
+import { signAdminRequest } from "./adminRequestSigning";
 import { parseSSEStream } from "../lib/sse";
 import type { SSEEvent } from "@/types/view/sse";
 import type { AdminDaemonSSEEvent } from "@/types/view/admin";

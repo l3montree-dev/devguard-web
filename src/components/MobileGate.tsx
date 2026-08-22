@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import React from "react";
-import NotSupported from "@/components/notsupported";
+import NotSupported from "@/components/NotSupported";
 
 export default function MobileGate({
   children,

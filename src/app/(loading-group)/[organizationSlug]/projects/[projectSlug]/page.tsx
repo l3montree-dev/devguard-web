@@ -39,7 +39,7 @@ import type {
 } from "../../../../../types/api/api";
 import type { CreateProjectReq } from "../../../../../types/api/req";
 
-import { groupHomeTourSteps } from "@/components/common/tours/group-home-tour";
+import { groupHomeTourSteps } from "@/components/common/tours/groupHomeTour";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,

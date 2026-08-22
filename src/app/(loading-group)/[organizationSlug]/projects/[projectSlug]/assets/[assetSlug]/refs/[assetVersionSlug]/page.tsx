@@ -14,7 +14,7 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import { useAutoTour } from "@/hooks/useAutoTour";
-import { repoHomeTourSteps } from "@/components/common/tours/repo-home-tour";
+import { repoHomeTourSteps } from "@/components/common/tours/repoHomeTour";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useMemo } from "react";

@@ -8,7 +8,7 @@ import AssetForm from "@/components/asset/AssetForm";
 import type { AssetFormValues } from "@/types/view/asset";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
-import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import { repoSettingsTourSteps } from "@/components/common/tours/repoSettingsTour";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InputWithButton } from "@/components/ui/input-with-button";

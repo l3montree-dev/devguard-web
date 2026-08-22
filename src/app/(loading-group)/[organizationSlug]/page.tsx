@@ -23,7 +23,7 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
-import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
+import { orgHomeTourSteps } from "@/components/common/tours/orgHomeTour";
 import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
 import { CreateGroupForm } from "@/components/project/CreateGroupForm";
 import Sort from "@/components/Sort";

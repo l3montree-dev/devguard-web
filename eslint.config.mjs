@@ -10,6 +10,7 @@ import noComponentTypeDeclarations from "./eslint-rules/no-component-type-declar
 import requireSpdxHeader from "./eslint-rules/require-spdx-header.mjs";
 import noRawFetch from "./eslint-rules/no-raw-fetch.mjs";
 import noDataFetchingInView from "./eslint-rules/no-data-fetching-in-view.mjs";
+import filenameConvention from "./eslint-rules/filename-convention.mjs";
 
 const local = {
   rules: {
@@ -18,6 +19,7 @@ const local = {
     "require-spdx-header": requireSpdxHeader,
     "no-raw-fetch": noRawFetch,
     "no-data-fetching-in-view": noDataFetchingInView,
+    "filename-convention": filenameConvention,
   },
 };
 
@@ -131,6 +133,41 @@ export default tseslint.config([
     ignores: [...DATA_LAYER, ...NOT_OURS, ...TESTS],
     rules: {
       "local/no-data-fetching-in-view": "warn",
+    },
+  },
+
+  // PascalCase components, useXxx hooks, camelCase everything else. src/pages
+  // is exempt: there the file name is the API route.
+  {
+    files: OURS,
+    ignores: [
+      ...NOT_OURS,
+      ...TESTS,
+      "src/components/ui/**",
+      "src/pages/**",
+      "src/app/**/*.json/**",
+    ],
+    rules: {
+      "local/filename-convention": "warn",
+    },
+  },
+
+  // Identifier casing. Properties are deliberately unconstrained - API DTOs
+  // carry backend spellings such as `instance_id`.
+  {
+    files: [...OURS, "e2e/**/*.ts"],
+    ignores: [...NOT_OURS, "src/components/ui/**"],
+    rules: {
+      "@typescript-eslint/naming-convention": [
+        "warn",
+        { selector: "typeLike", format: ["PascalCase"] },
+        {
+          selector: "variable",
+          format: ["camelCase", "PascalCase", "UPPER_CASE"],
+          leadingUnderscore: "allow",
+        },
+        { selector: "function", format: ["camelCase", "PascalCase"] },
+      ],
     },
   },
 ]);

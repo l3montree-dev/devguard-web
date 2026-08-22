@@ -4,7 +4,7 @@
 import type { OrganizationDTO } from "@/types/api/api";
 import { uniqBy } from "lodash";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export async function fetchOrgs() {
   // get the devGuardApiClient

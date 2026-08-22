@@ -40,7 +40,7 @@ function sleep(timeInMs: number) {
 }
 
 // TODO: Remove this workaround once https://github.com/l3montree-dev/devguard/issues/1193 is fixed
-export async function TEMPORARY_WORKAROUND(
+export async function temporaryWorkaround(
   page: Page,
   devguardPOM: DevGuardPOM,
 ) {

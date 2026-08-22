@@ -6,7 +6,7 @@ import React, { Suspense } from "react";
 import { AssetProvider } from "../../../../../../../context/AssetContext";
 import { ClientContextWrapper } from "../../../../../../../context/ClientContextWrapper";
 import { fetchAsset } from "../../../../../../../data-fetcher/fetchAsset";
-import { handleHttpError } from "../../../../../../../data-fetcher/handle-http-error";
+import { handleHttpError } from "../../../../../../../data-fetcher/handleHttpError";
 
 export default function AssetLayout({
   // Layouts must accept a children prop.

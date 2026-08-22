@@ -8,7 +8,7 @@ import {
   useInstanceAdmin,
 } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient } from "@/services/adminApi";
-import { importAdminKey } from "@/services/admin-request-signing";
+import { importAdminKey } from "@/services/adminRequestSigning";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";

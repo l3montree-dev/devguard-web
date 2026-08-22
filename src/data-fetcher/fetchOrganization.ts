@@ -3,7 +3,7 @@
 
 import type { OrganizationDetailsDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export async function fetchOrganization(organizationSlug: string) {
   // get the devGuardApiClient

@@ -4,7 +4,7 @@
 import type { AssetDTO } from "@/types/api/api";
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
 
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export async function fetchAsset(
   organizationSlug: string,

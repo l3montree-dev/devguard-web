@@ -58,7 +58,7 @@ const emptyPackage = (): PackageRow => ({
   versionEnd: "",
 });
 
-const Version_RE = /^v?\d+\.\d+\.\d+$/;
+const VERSION_RE = /^v?\d+\.\d+\.\d+$/;
 
 const defaultValues = (initialValues?: AdvisoryFormData): AdvisoryFormData => ({
   title: initialValues?.title ?? "",
@@ -365,7 +365,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                       rules={{
                         required: "Version Start is required",
                         pattern: {
-                          value: Version_RE,
+                          value: VERSION_RE,
                           message: "Format: 1.2.3",
                         },
                       }}
@@ -390,7 +390,7 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                       rules={{
                         required: "Version End is required",
                         pattern: {
-                          value: Version_RE,
+                          value: VERSION_RE,
                           message: "Format: 1.2.3",
                         },
                         validate: (value) => {
@@ -400,8 +400,8 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
                           if (
                             !value ||
                             !start ||
-                            !Version_RE.test(value) ||
-                            !Version_RE.test(start)
+                            !VERSION_RE.test(value) ||
+                            !VERSION_RE.test(start)
                           ) {
                             return true;
                           }

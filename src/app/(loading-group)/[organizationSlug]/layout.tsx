@@ -9,7 +9,7 @@ import OrgHeader from "@/components/common/OrgHeader";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
-import { handleHttpError } from "../../../data-fetcher/handle-http-error";
+import { handleHttpError } from "../../../data-fetcher/handleHttpError";
 
 export default function OrganizationLayout({
   // Layouts must accept a children prop.

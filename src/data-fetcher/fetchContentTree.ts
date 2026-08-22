@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export async function fetchContentTree(organizationSlug: string) {
   // get the devGuardApiClient

@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
 import { describe } from "node:test";
 import { OpenCodePOM } from "./pom/opencode";
 import { DevGuardPOM } from "./pom/devguard";
-import { loginToDevGuardUsingOpenCode, TEMPORARY_WORKAROUND } from "./utils";
+import { loginToDevGuardUsingOpenCode, temporaryWorkaround } from "./utils";
 
 describe("DevGuard <-> OpenCode login / logout flows", () => {
   test.beforeEach(async ({ page }) => {
@@ -24,7 +24,7 @@ describe("DevGuard <-> OpenCode login / logout flows", () => {
 
     await loginToDevGuardUsingOpenCode(page);
 
-    await TEMPORARY_WORKAROUND(page, devguardPOM);
+    await temporaryWorkaround(page, devguardPOM);
 
     // check if login was successful
     await expect(
