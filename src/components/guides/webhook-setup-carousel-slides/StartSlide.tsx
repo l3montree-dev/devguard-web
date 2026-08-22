@@ -1,7 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
 import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { CarouselItem } from "@/components/ui/carousel";
 import type { CarouselApi } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -12,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ExternalTicketProviderNames } from "@/types/common";
+import { ExternalTicketProviderNames } from "@/const/providers";
 import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import ProviderSetup from "../ProviderSetup";
@@ -42,7 +44,6 @@ export default function StartSlide({
   isLoadingRepositories,
   provider,
   webhookSetupSlideIndex,
-  providerIntegrationSlideIndex,
   api,
 }: StartSlideProps) {
   useEffect(() => {

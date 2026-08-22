@@ -1,12 +1,13 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import useAccessToken from "../hooks/useAccessToken";
-import { DatePicker } from "./DatePicker";
 import CopyCode from "./common/CopyCode";
 import Section from "./common/Section";
 import { Button } from "./ui/button";

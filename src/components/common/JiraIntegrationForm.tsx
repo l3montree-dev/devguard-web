@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import {
   Form,
   FormControl,
@@ -36,7 +39,7 @@ export default function JiraIntegrationForm({
   }>();
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
-  const [open, setOpen] = React.useState(false);
+  const [_open, setOpen] = React.useState(false);
 
   const handleSubmit = async (params: {
     url: string;

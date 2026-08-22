@@ -50,7 +50,7 @@ import {
 } from "../../../../context/OrganizationContext";
 import Alert from "../../../../components/common/Alert";
 import { useAutoTour } from "@/hooks/useAutoTour";
-import { orgSettingsTourSteps } from "@/components/common/tours/org-settings-tour";
+import { orgSettingsTourSteps } from "@/components/common/tours/orgSettingsTour";
 import InvitedMembersTable from "@/components/InvitedMembersTable";
 import AccessTokenManagement from "@/components/AccessTokenManagement";
 import useDecodedParams from "@/hooks/useDecodedParams";

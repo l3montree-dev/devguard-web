@@ -2,11 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
 
-import {
-  ArrowRightEndOnRectangleIcon,
-  CogIcon,
-  PlusIcon,
-} from "@heroicons/react/24/outline";
+import { CogIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 import DynamicHeader from "./DynamicHeader";
 

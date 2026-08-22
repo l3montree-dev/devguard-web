@@ -1,17 +1,5 @@
-// Copyright (C) 2024 Tim Bastin, l3montree GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
@@ -179,14 +167,9 @@ const RiskFeedItem = ({
   event,
   events,
   org,
-  project,
-  asset,
   currentUser,
-  activeAssetVersion,
-  currentUserRole,
   vulnerabilityName,
   deleteEvent,
-  page,
   directDependencyFixedVersion,
   inGroup,
 }: {
@@ -472,7 +455,7 @@ export default function RiskAssessmentFeed({
               <CollapsibleContent className="flex mt-10 flex-col gap-10">
                 {groupedEvents
                   .slice(0, groupedEvents.length - 2)
-                  .map((groupOrEvent, index) => {
+                  .map((groupOrEvent) => {
                     if (Array.isArray(groupOrEvent)) {
                       return (
                         <RiskFeedGroupHeader
@@ -531,7 +514,7 @@ export default function RiskAssessmentFeed({
         <div className="flex flex-col gap-10">
           {groupedEvents
             .slice(Math.max(groupedEvents.length - 2, 0), groupedEvents.length)
-            .map((groupOrEvent, index) => {
+            .map((groupOrEvent) => {
               if (Array.isArray(groupOrEvent)) {
                 return (
                   <RiskFeedGroupHeader

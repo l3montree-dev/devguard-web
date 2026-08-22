@@ -1,17 +1,5 @@
-// Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { UserRole } from "@/types/api/api";
 import type { DependencyVuln } from "@/types/api/api";
@@ -87,17 +75,6 @@ export const extractVersion = (purl: string): string => {
   }
 };
 
-export const purlToDisplayString = (purl: string): string => {
-  if (!purl) return "";
-  try {
-    const { namespace, name, version } = PackageURL.fromString(purl);
-    const base = namespace ? `${namespace}/${name}` : name;
-    return version ? `${base}@${version}` : base;
-  } catch {
-    return purl;
-  }
-};
-
 // Artifact names are already valid purls (e.g. "pkg:oci/my-app") - this just
 // fills in the version, since the asset itself carries no version, only its
 // refs (branches/tags) do.
@@ -156,18 +133,13 @@ export const validateArtifactNameAgainstPurlSpec = (
   const hashIndex = testPurl.indexOf("#");
   const questionIndex = testPurl.indexOf("?");
 
-  let insertIndex = testPurl.length;
   if (
     atIndex !== -1 &&
     (hashIndex === -1 || atIndex > hashIndex) &&
     (questionIndex === -1 || atIndex > questionIndex)
   ) {
     // There's a version after the last @, replace it
-    insertIndex = atIndex;
     testPurl = testPurl.substring(0, atIndex);
-  } else {
-    // No version found, append one
-    insertIndex = testPurl.length;
   }
 
   testPurl = `${testPurl}@1.0.0`;

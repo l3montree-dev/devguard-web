@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import Purl from "@/components/common/Purl";
@@ -10,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { FunctionComponent } from "react";
 
-export type PathNodeRole = "root" | "dependency" | "vulnerable";
+import type { PathNodeRole } from "@/types/view/riskHandling";
 
 const roleDescription: Record<PathNodeRole, string> = {
   root: "Your application",

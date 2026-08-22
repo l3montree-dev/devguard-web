@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import Page from "@/components/Page";
@@ -30,7 +33,10 @@ import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 
-type BadgeVariant = "CRITICAL" | "MEDIUM" | "LOW" | "HIGH";
+import type {
+  BadgeVariant,
+  ControlRelationship,
+} from "@/types/view/compliance";
 
 function securityLevelVariant(value: string): BadgeVariant {
   if (value === "erhöht") return "MEDIUM";
@@ -110,9 +116,6 @@ const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   { ssr: false },
 );
-
-type ControlRelationship =
-  DetailedComplianceRiskDTO["mappedControls"][number]["relationship"];
 
 const relationshipDescription: Record<ControlRelationship, string> = {
   "equivalent-to": "This control is equivalent to the related control.",

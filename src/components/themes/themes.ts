@@ -1,20 +1,7 @@
-export type Theme = {
-  name: string;
-  description: string;
-  swatch: string;
-  dark: boolean;
-  vars: Record<string, string>;
-  style: StyleSettings;
-};
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-export type StyleSettings = {
-  shadowPreset: string;
-  fontFamily: string;
-  displayFont: string;
-  fontSize: string;
-  letterSpacing: string;
-  lineHeight: string;
-};
+import type { Theme } from "@/types/view/theme";
 
 export const THEMES: Theme[] = [
   {

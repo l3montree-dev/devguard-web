@@ -29,15 +29,12 @@ import {
 import type { InstanceInfoDTO } from "@/types/api/api";
 import { adminBrowserApiClient } from "@/services/adminApi";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
-import {
-  checkForUpdate,
-  type VersionCheckResult,
-} from "@/services/versionCheck";
+import { checkForUpdate } from "@/services/versionCheck";
 import { formatBytes, formatDateTime, formatDuration } from "@/utils/format";
-
-export interface InstanceTechnicalInfoHandle {
-  refresh: () => void;
-}
+import type {
+  InstanceTechnicalInfoHandle,
+  VersionCheckResult,
+} from "@/types/view/admin";
 
 function Row({
   label,

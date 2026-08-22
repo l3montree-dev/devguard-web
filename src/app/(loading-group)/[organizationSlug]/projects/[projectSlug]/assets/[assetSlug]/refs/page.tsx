@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import { TagIcon } from "@heroicons/react/24/outline";
@@ -284,7 +287,7 @@ const RefsPage = () => {
         isTag={createDialogOpen === "tag"}
         onOpenChange={() => setCreateDialogOpen(false)}
       />
-      <AlertDialog open={Boolean(open)} onOpenChange={(open) => setOpen(null)}>
+      <AlertDialog open={Boolean(open)} onOpenChange={() => setOpen(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>

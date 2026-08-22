@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -475,15 +478,9 @@ function Crane({ color }: { color: string }) {
   );
 }
 
+import type { Colors } from "@/types/view/threejs";
+
 // ─── Colors type ────────────────────────────────────────────────────────────
-interface Colors {
-  primary: string;
-  structure: string;
-  dim: string;
-  dim2: string;
-  water: string;
-  shipHull: string;
-}
 
 // ─── Main scene orchestrator ────────────────────────────────────────────────
 function SceneObjects({ colors }: { colors: Colors }) {

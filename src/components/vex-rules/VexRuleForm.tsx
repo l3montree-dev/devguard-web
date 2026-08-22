@@ -18,12 +18,8 @@ import {
 import { Input } from "../ui/input";
 import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
-import {
-  analyzeVexRuleEffect,
-  resolveCut,
-  type VexRuleEffect,
-  type VexRuleVulnContext,
-} from "./vexRuleParser";
+import { analyzeVexRuleEffect, resolveCut } from "./vexRuleParser";
+import type { VexRuleEffect, VexRuleVulnContext } from "@/types/view/vexRules";
 import type { VexRuleEventType } from "@/types/api/api";
 
 const MarkdownEditor = dynamic(

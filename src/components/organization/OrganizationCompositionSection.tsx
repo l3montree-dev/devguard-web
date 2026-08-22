@@ -6,7 +6,7 @@ import MostUsedEcosystems from "@/components/organization/MostUsedEcosystems";
 import StructureCard from "@/components/organization/StructureCard";
 import MostVulnerableList from "@/components/organization/MostVulnerableList";
 import DependencyAge from "@/components/organization/DependencyAge";
-import type { OrgOverview, VulnDistributionInStructure } from "@/types/api/api";
+import type { OrgOverview } from "@/types/api/api";
 
 export interface OrganizationCompositionSectionProps {
   mode: "risk" | "cvss";
@@ -14,12 +14,7 @@ export interface OrganizationCompositionSectionProps {
   orgStatistics: OrgOverview | undefined;
 }
 
-interface StructureColumn {
-  type: "Projects" | "Assets" | "Artifacts";
-  listTitle: string;
-  count: number | undefined;
-  entries: VulnDistributionInStructure[];
-}
+import type { StructureColumn } from "@/types/view/organization";
 
 export default function OrganizationCompositionSection({
   mode,

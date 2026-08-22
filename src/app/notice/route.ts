@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { NextResponse } from "next/server";
 
 const ISSUE_URL = `https://api.github.com/repos/l3montree-dev/devguard/issues/2622`;

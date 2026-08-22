@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import { useSearchParams } from "next/navigation";
-import type { FilterForm } from "@/services/filter";
+import type { FilterForm } from "@/types/view/filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,12 +27,7 @@ import { ChevronLeftIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 
 const MIN_SEARCH_LENGTH = 3;
 
-interface FilterOption {
-  label: string;
-  value: string;
-  operators: Array<{ value: string; label?: string }>;
-  filterValues?: Array<{ value: string; label?: string }>;
-}
+import type { FilterOption, Step } from "@/types/view/filter";
 
 interface Props {
   options: FilterOption[];
@@ -45,8 +40,6 @@ interface Props {
     placeholder?: string;
   };
 }
-
-type Step = "label" | "operator" | "value";
 
 const Filter: FunctionComponent<Props> = ({
   options,

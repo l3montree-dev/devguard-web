@@ -1,8 +1,11 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import type { ConditionalStep } from "./usePageTour";
+import type { ConditionalStep } from "@/types/view/tour";
 import { usePageTour } from "./usePageTour";
 import { useTourSeen } from "./useTourSeen";
 

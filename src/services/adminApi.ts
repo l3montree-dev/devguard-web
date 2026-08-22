@@ -1,8 +1,10 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-import { signAdminRequest } from "./admin-request-signing";
-import { parseSSEStream, type SSEEvent } from "../lib/sse";
+import { signAdminRequest } from "./adminRequestSigning";
+import { parseSSEStream } from "../lib/sse";
+import type { SSEEvent } from "@/types/view/sse";
+import type { AdminDaemonSSEEvent } from "@/types/view/admin";
 
 /**
  * Create an API client for instance admin requests.
@@ -46,11 +48,6 @@ export const adminBrowserApiClient = async (
 /**
  * SSE event payload from daemon trigger endpoints.
  */
-export interface AdminDaemonSSEEvent {
-  event: "log" | "done" | "error";
-  data: string;
-}
-
 /**
  * Error subclass carrying the HTTP status code from a failed admin API call.
  */

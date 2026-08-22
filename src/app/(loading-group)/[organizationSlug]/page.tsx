@@ -1,19 +1,7 @@
-"use client";
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-// Copyright (C) 2023 Tim Bastin, Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -35,7 +23,7 @@ import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
-import { orgHomeTourSteps } from "@/components/common/tours/org-home-tour";
+import { orgHomeTourSteps } from "@/components/common/tours/orgHomeTour";
 import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
 import { CreateGroupForm } from "@/components/project/CreateGroupForm";
 import Sort from "@/components/Sort";
@@ -45,14 +33,13 @@ import SubgroupsAndAssetsList, {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
-import { useSession } from "@/context/SessionContext";
 import { usePageTour } from "@/hooks/usePageTour";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import AuthGuard from "@/components/AuthGuard";
 import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
-import { Loader2, Megaphone } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import useSWR from "swr";
 import EmptyParty from "../../../components/common/EmptyParty";
 import ListRenderer from "../../../components/common/ListRenderer";
@@ -64,7 +51,6 @@ const OrganizationHomePage: FunctionComponent = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const { session } = useSession();
   const [syncRunning, setSyncRunning] = useState(false);
   const searchParams = useSearchParams();
 

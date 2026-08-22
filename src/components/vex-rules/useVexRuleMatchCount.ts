@@ -6,20 +6,8 @@
 import { checkCelSyntax } from "@/components/common/celLinter";
 import { browserApiClient } from "@/services/devGuardApi";
 import type { VexRuleEventType } from "@/types/api/api";
+import type { VexRuleMatchCount } from "@/types/view/vexRules";
 import { useEffect, useRef, useState } from "react";
-
-export interface VexRuleMatchCount {
-  // Syntax error of the current expression, or null when it parses.
-  syntaxError?: ReturnType<typeof checkCelSyntax>;
-  hasSyntaxError?: boolean;
-  // A request is in flight for the current expression.
-  isTesting?: boolean;
-  // The /test call failed (network, or the backend rejected the expression).
-  testingError?: string | null;
-  // How many vulnerabilities of this asset the expression matches; null while
-  // unknown (empty, invalid or not yet tested).
-  matchCount: number | null;
-}
 
 /**
  * Counts the vulnerabilities an expression would match, via the rule test

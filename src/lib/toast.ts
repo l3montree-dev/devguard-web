@@ -1,9 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { toast as sonnerToast } from "sonner";
 import type { ExternalToast } from "sonner";
 
 const TOASTER_ID = "devguard";
 
-type ToastMessage = string | React.ReactNode;
+import type { ToastMessage } from "@/types/view/toast";
 
 function withId(data?: ExternalToast): ExternalToast {
   return { ...data, toasterId: TOASTER_ID };

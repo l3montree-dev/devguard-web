@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { Diagnostic } from "@codemirror/lint";
 import type { EditorView } from "codemirror";
 import type {
@@ -6,15 +9,7 @@ import type {
   CompletionResult,
 } from "@codemirror/autocomplete";
 
-type TokenType =
-  "number" | "string" | "ident" | "bool" | "null" | "punct" | "eof";
-
-interface Token {
-  type: TokenType;
-  value: string;
-  start: number;
-  end: number;
-}
+import type { Token, TokenType } from "@/types/view/codeEditor";
 
 class CelSyntaxError extends Error {
   pos: number;
@@ -604,7 +599,7 @@ const VULN_FIELDS: Completion[] = [
     label: "componentFixedVersion",
     type: "property",
     detail: "string | null",
-    info: "The bare version of the vulnerable component itself that resolves this vuln, e.g. \"4.17.21\" - null while no fix has been published",
+    info: 'The bare version of the vulnerable component itself that resolves this vuln, e.g. "4.17.21" - null while no fix has been published',
   },
   {
     label: "directDependencyFixedVersion",

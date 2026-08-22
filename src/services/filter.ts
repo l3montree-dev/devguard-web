@@ -1,10 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { ColumnSort } from "@tanstack/react-table";
 
-export interface FilterForm {
-  field: string;
-  operator: string;
-  value: string;
-}
+import type { FilterForm } from "@/types/view/filter";
 
 export const sortingState2Query = (sortingState: ColumnSort[]) => {
   const query: Record<string, string> = {};

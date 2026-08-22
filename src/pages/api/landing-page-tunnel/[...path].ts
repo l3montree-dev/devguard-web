@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { config as appConfig } from "@/config";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from "node:stream";

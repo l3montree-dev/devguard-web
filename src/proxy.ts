@@ -1,7 +1,10 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { NextRequest, NextResponse } from "next/server";
 import { createOryMiddleware } from "@ory/nextjs/middleware";
 import oryConfig from "./ory.config";
-import { rewriteFlow } from "./types/auth";
+import { rewriteFlow } from "./utils/auth";
 
 const proxyToOry = createOryMiddleware(oryConfig);
 

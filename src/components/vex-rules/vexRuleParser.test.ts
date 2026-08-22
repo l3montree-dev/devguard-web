@@ -7,8 +7,8 @@ import {
   buildPathPatternRule,
   extractPathPattern,
   resolveCut,
-  type VexRuleVulnContext,
 } from "./vexRuleParser";
+import type { VexRuleVulnContext } from "@/types/view/vexRules";
 
 const path = ["pkg:npm/a@1.0.0", "pkg:npm/b@2.0.0", "pkg:npm/c@3.0.0"];
 const vuln: VexRuleVulnContext = {

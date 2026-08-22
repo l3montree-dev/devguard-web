@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
@@ -18,9 +21,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
-import VexRuleRecommendationList, {
-  type RecommendationEntry,
-} from "@/components/vex-rules/VexRuleRecommendationList";
+import VexRuleRecommendationList from "@/components/vex-rules/VexRuleRecommendationList";
+import type { RecommendationEntry } from "@/types/view/vexRules";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
 import {
   vexRuleRecommendationsURL,
@@ -30,7 +32,6 @@ import VexSourcesSection from "@/components/vex-rules/VexSourcesSection";
 import { useVexSources } from "@/components/vex-rules/useVexSources";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import { fetcher } from "@/data-fetcher/fetcher";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { ChevronDown } from "lucide-react";

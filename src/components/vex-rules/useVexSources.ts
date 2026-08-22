@@ -6,16 +6,13 @@
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import type { ExternalReference } from "@/types/api/api";
+import type { VexSource, VexSourceType } from "@/types/view/vexRules";
 import useSWR from "swr";
-
-export type VexSourceType = "cyclonedx" | "csaf";
 
 export const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
   cyclonedx: "CycloneDX VEX",
   csaf: "CSAF",
 };
-
-export type VexSource = ExternalReference & { type: VexSourceType };
 
 const isVexSourceType = (type: string): type is VexSourceType =>
   type === "cyclonedx" || type === "csaf";

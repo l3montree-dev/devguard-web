@@ -1,10 +1,14 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 import AccessTokenManagement from "@/components/AccessTokenManagement";
 import Page from "@/components/Page";
-import AssetForm, { type AssetFormValues } from "@/components/asset/AssetForm";
+import AssetForm from "@/components/asset/AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
-import { repoSettingsTourSteps } from "@/components/common/tours/repo-settings-tour";
+import { repoSettingsTourSteps } from "@/components/common/tours/repoSettingsTour";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { InputWithButton } from "@/components/ui/input-with-button";
@@ -50,7 +54,7 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   return el[0];
 };
 
-type SecretType = "webhook";
+import type { SecretType } from "@/types/view/asset";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();

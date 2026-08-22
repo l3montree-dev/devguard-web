@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 // Copyright 2024 Tim Bastin, l3montree GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +44,7 @@ const GitlabTokenSlide = ({
   prevIndex,
   yamlGeneratorSlideIndex,
 }: GitlabTokenSlideProps) => {
-  const { theme, resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   const imageSrc =
     theme === "dark"
       ? "/assets/gitlab-token-dark.png"

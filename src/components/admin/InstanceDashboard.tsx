@@ -43,10 +43,7 @@ import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
-
-export interface InstanceDashboardHandle {
-  refresh: () => void;
-}
+import type { InstanceDashboardHandle } from "@/types/view/admin";
 
 const formatAvg = (n: number | undefined) =>
   (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 });

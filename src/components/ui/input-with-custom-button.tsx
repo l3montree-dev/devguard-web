@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import { Label } from "./label";
 import { Button } from "./button";
 import type { ButtonProps } from "./button";
-import { Input } from "./input";
 
 interface InputWithButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;

@@ -1,7 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -114,7 +116,7 @@ export function RiskHistoryDistributionDiagram({
                   }
                 />
                 <defs>
-                  {["critical", "high", "medium", "low"].map((level, i) => {
+                  {["critical", "high", "medium", "low"].map((level) => {
                     const sev = level.toUpperCase();
                     return (
                       <linearGradient

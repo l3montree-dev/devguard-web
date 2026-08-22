@@ -4,9 +4,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ExternalOrgAdminCard, {
-  type ExternalOrg,
-} from "@/components/admin/ExternalOrgAdminCard";
+import ExternalOrgAdminCard from "@/components/admin/ExternalOrgAdminCard";
+import type { ExternalOrg } from "@/types/view/admin";
 import InstanceSettingsCard from "@/components/admin/InstanceSettingsCard";
 import TriggerDaemonsCard from "@/components/admin/TriggerDaemonsCard";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
