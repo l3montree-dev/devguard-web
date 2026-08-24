@@ -657,7 +657,7 @@ const Index: FunctionComponent = () => {
                 <div data-tour="risk-score with details">
                   <div>
                     <RiskSeverityRadialChart
-                      risk={vuln.rawRiskAssessment}
+                      risk={vuln.riskAssessment}
                       cvss={vuln.cve?.risk.baseScore ?? 0}
                     />
                   </div>

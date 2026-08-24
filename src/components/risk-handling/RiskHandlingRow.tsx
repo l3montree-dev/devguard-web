@@ -217,7 +217,7 @@ const VulnWithCveTableRow = ({
       </td>
       <td className="py-3 px-4 flex-col">
         <div className="flex">
-          <Severity risk={vuln.rawRiskAssessment} />
+          <Severity risk={vuln.riskAssessment} />
         </div>
       </td>
       <td className="py-3 px-4">
@@ -374,7 +374,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const hasMultiplePaths = vulns.length > 1;
           const isCveExpanded = expandedCves.has(cveID);
           const sortedVulns = vulns.sort(
-            (a, b) => b.rawRiskAssessment - a.rawRiskAssessment,
+            (a, b) => b.riskAssessment - a.riskAssessment,
           );
           const isPathExplosion =
             sortedVulns[0]?.vulnerabilityPath?.length === 0;
@@ -496,7 +496,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   </div>
                 </td>
                 <td className="py-2 px-4 flex">
-                  <Severity risk={sortedVulns[0]?.rawRiskAssessment ?? 0} />
+                  <Severity risk={sortedVulns[0]?.riskAssessment ?? 0} />
                 </td>
                 <td className="py-2 px-4">
                   <CvssCell cvss={sortedVulns[0]?.cve?.cvss} />
