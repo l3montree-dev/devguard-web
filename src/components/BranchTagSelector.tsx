@@ -4,6 +4,8 @@ import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useRefDistributions } from "@/hooks/useRefDistributions";
+import CVERainbowBadge from "./CVERainbowBadge";
 import useDecodedParams from "../hooks/useDecodedParams";
 import { browserApiClient } from "../services/devGuardApi";
 import { Button } from "./ui/button";
@@ -69,6 +71,8 @@ export function BranchTagSelector({
 
   const pathname = usePathname();
   const updateAsset = useUpdateAsset();
+
+  const { distributionByRef } = useRefDistributions();
 
   const handleBranchTagCreation = async () => {
     const body = {
@@ -142,7 +146,7 @@ export function BranchTagSelector({
           <CaretDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="z-50 w-56">
+      <DropdownMenuContent align="start" className="z-50 w-80">
         <Input
           onKeyDown={(e) => e.stopPropagation()}
           placeholder="Search"
@@ -190,6 +194,7 @@ export function BranchTagSelector({
             <div style={{ maxHeight: "480px", overflowY: "auto" }}>
               {filteredItems.map((item) => (
                 <DropdownMenuCheckboxItem
+                  className="cursor-pointer"
                   checked={selected === item.name}
                   key={item.slug}
                   onClick={() => {
@@ -203,6 +208,11 @@ export function BranchTagSelector({
                       (default branch)
                     </span>
                   )}
+                  {distributionByRef[item.name] && (
+                    <span className="ml-2">
+                      <CVERainbowBadge {...distributionByRef[item.name]} />
+                    </span>
+                  )}
                 </DropdownMenuCheckboxItem>
               ))}
             </div>
@@ -212,7 +222,7 @@ export function BranchTagSelector({
         <Link
           href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs`}
         >
-          <DropdownMenuItem className="text-sm text-foreground block font-medium text-center w-full">
+          <DropdownMenuItem className="text-sm text-foreground cursor-pointer block font-medium text-center w-full">
             View all branches and tags
           </DropdownMenuItem>
         </Link>
