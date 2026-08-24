@@ -1,10 +1,9 @@
-import type { AssetVersionDTO } from "@/types/api/api";
+import type { AssetVersionDTO, RiskHistory } from "@/types/api/api";
 import { PlusCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { useRefDistributions } from "@/hooks/useRefDistributions";
 import CVERainbowBadge from "./CVERainbowBadge";
 import useDecodedParams from "../hooks/useDecodedParams";
 import { browserApiClient } from "../services/devGuardApi";
@@ -21,6 +20,16 @@ import { Input } from "./ui/input";
 import { useUpdateAsset } from "../context/AssetContext";
 import Link from "next/link";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { mapValues, groupBy, sumBy } from "lodash";
+import useSWR from "swr";
+
+type RefDistribution = {
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+};
 
 export function BranchTagSelector({
   branches,
@@ -72,7 +81,29 @@ export function BranchTagSelector({
   const pathname = usePathname();
   const updateAsset = useUpdateAsset();
 
-  const { distributionByRef } = useRefDistributions();
+  const artifactName = useSearchParams()?.get("artifact");
+
+  const { data: riskHistories, isLoading } = useSWR<RiskHistory[]>(
+    `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/stats/risk-history/?start=${start}&end=${end}` +
+      (artifactName ? `&artifactName=${encodeURIComponent(artifactName)}` : ""),
+    fetcher,
+  );
+
+  const distributionByRef = useMemo(() => {
+    const latest: Record<string, RiskHistory> = {};
+    for (const history of riskHistories ?? []) {
+      latest[history.assetVersionName + "|" + history.artifactName] = history;
+    }
+    return mapValues(
+      groupBy(Object.values(latest), "assetVersionName"),
+      (rows): RefDistribution => ({
+        low: sumBy(rows, "cvePurlLowCvss"),
+        medium: sumBy(rows, "cvePurlMediumCvss"),
+        high: sumBy(rows, "cvePurlHighCvss"),
+        critical: sumBy(rows, "cvePurlCriticalCvss"),
+      }),
+    );
+  }, [riskHistories]);
 
   const handleBranchTagCreation = async () => {
     const body = {
@@ -230,3 +261,7 @@ export function BranchTagSelector({
     </DropdownMenu>
   );
 }
+
+const dateOnly = (ms: number) => new Date(ms).toISOString().split("T")[0];
+const start = dateOnly(Date.now() - 30 * 864e5);
+const end = dateOnly(Date.now());
