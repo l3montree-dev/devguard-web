@@ -246,7 +246,6 @@ export interface EnvDTO {
 }
 
 export interface BaseVulnDTO {
-  message: string | null;
   ruleId: string;
   id: string;
   createdAt: string;
@@ -259,7 +258,6 @@ export interface BaseVulnDTO {
     | "markedForTransfer"
     | "implemented"
     | "notApplicable";
-  priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;
   assetId: string;
@@ -271,7 +269,7 @@ export interface DependencyVuln extends BaseVulnDTO {
   level: string | null;
   cveID: string | null;
   priority: number | null; // will be null, if not prioritized yet.
-  rawRiskAssessment: number;
+  riskAssessment: number;
   riskRecalculatedAt: string;
   componentFixedVersion: string | null;
   directDependencyFixedVersion: string | null;
@@ -780,6 +778,7 @@ interface snippetContents {
 }
 
 export interface FirstPartyVuln extends BaseVulnDTO {
+  message: string | null;
   uri: string;
 
   snippetContents: snippetContents[];
