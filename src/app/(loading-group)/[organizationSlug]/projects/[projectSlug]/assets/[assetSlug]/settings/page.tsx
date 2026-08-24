@@ -102,7 +102,6 @@ const Index: FunctionComponent = () => {
   const form = useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
-      reachableFromInternet: asset.reachableFromInternet ?? false,
       vulnAutoReopenAfterDays: asset.vulnAutoReopenAfterDays ?? -1,
       cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
@@ -114,6 +113,16 @@ const Index: FunctionComponent = () => {
         isNumber(asset.riskAutomaticTicketThreshold) ||
         isNumber(asset.cvssAutomaticTicketThreshold),
       ),
+      enableExposureMetrics: [
+        asset.modifiedAttackVector,
+        asset.modifiedAttackComplexity,
+        asset.modifiedPrivilegesRequired,
+        asset.modifiedScope,
+        asset.modifiedUserInteraction,
+        asset.modifiedConfidentiality,
+        asset.modifiedIntegrity,
+        asset.modifiedAvailability,
+      ].some((v) => v && v !== "X"),
     },
   });
 

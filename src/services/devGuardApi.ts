@@ -12,19 +12,7 @@
 //
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import type { GetServerSidePropsContext } from "next";
 import { config } from "../config";
-
-export const getApiClientFromContext = (ctx: GetServerSidePropsContext) => {
-  const { req } = ctx;
-
-  return getApiClientFromRequest(req);
-};
-
-export type DevGuardApiClient = (
-  input: string,
-  init?: RequestInit,
-) => Promise<Response>;
 
 export const getApiClientFromRequest = (req: {
   cookies: Partial<{

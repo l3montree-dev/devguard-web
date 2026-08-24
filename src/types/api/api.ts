@@ -51,18 +51,51 @@ export enum RequirementsLevel {
   Medium = "medium",
   High = "high",
 }
+
+export enum ModifiedAttackVector {
+  Network = "network",
+  Adjacent = "adjacent",
+  Local = "local",
+  Physical = "physical",
+  NotDefined = "X",
+}
+
+export enum ModifiedAttackComplexity {
+  Low = "low",
+  High = "high",
+  NotDefined = "X",
+}
+
+export enum ModifiedPrivilegesRequired {
+  None = "none",
+  Low = "low",
+  Hgih = "high",
+  NotDefined = "X",
+}
+
+export enum ModifiedScope {
+  Unchanged = "unchanged",
+  Changed = "changed",
+  NotDefined = "X",
+}
+
+export enum ModifiedUserInteraction {
+  NotDefined = "X",
+  None = "none",
+  Required = "required",
+}
+
+export enum ModifiedRequirementsLevel {
+  NotDefined = "X",
+  None = "none",
+  Low = "low",
+  High = "high",
+}
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 interface AppModelDTO {
   id: string;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface AssetMetricsDTO {
-  enabledImageSigning: boolean;
-  verifiedSupplyChainsPercentage: number;
-  enabledContainerScanning: boolean;
-  enabledSCA: boolean;
 }
 
 export interface GitLabIntegrationDTO {
@@ -203,8 +236,6 @@ export interface ProjectDTO {
 
   subGroupsAndAsset?: Array<SubGroupsAndAsset>;
 }
-export type ExpandedVulnDTOState =
-  DependencyVuln["state"] | "not-found" | "detected";
 export interface EnvDTO {
   name: string;
   description: string;
@@ -279,10 +310,6 @@ interface EventArbitraryJsonData {
   scannerIds: string;
 }
 
-export enum UpstreamState {
-  Internal = 0,
-  Upstream = 2,
-}
 interface BaseVulnEventDTO {
   userId: string;
   createdAt: string;
@@ -339,24 +366,6 @@ export interface FixedEventDTO extends BaseVulnEventDTO {
 export interface DetectedEventDTO extends BaseVulnEventDTO {
   type: "detected";
   arbitraryJSONData: EventArbitraryJsonData & RiskCalculationReport;
-}
-
-export interface AddedScannerEventDTO extends BaseVulnEventDTO {
-  type: "addedScanner";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    scannerIds: string;
-  };
-}
-
-export interface RemovedScannerEventDTO extends BaseVulnEventDTO {
-  type: "removedScanner";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    scannerIds: string;
-  };
-}
-
-export interface DetectedOnAnotherBranchEventDTO extends BaseVulnEventDTO {
-  type: "detectedOnAnotherBranch";
 }
 
 export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
@@ -496,23 +505,21 @@ export interface Relationship {
   targetCve: string;
 }
 export interface VulnWithCVE extends DependencyVuln {
-  cve?:
-    | (Modify<
-        CVE,
-        {
-          cwes: Array<CWE>;
-        }
-      > & {
-        risk: {
-          baseScore: number;
-          withEnvironment: number;
-          withThreatIntelligence: number;
-          withEnvironmentAndThreatIntelligence: number;
-        };
-        exploits: Array<Exploit>;
-        relationships: Array<Relationship>;
-      })
-    | null;
+  cve?: Modify<
+    CVE,
+    {
+      cwes: Array<CWE>;
+    }
+  > & {
+    risk: {
+      baseScore: number;
+      withEnvironment: number;
+      withThreatIntelligence: number;
+      withEnvironmentAndThreatIntelligence: number;
+    };
+    exploits: Array<Exploit>;
+    relationships: Array<Relationship>;
+  };
 }
 
 interface related {
@@ -577,16 +584,24 @@ export interface AssetDTO {
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
   availabilityRequirement: RequirementsLevel;
+  modifiedAttackVector: ModifiedAttackVector;
+  modifiedAttackComplexity: ModifiedAttackComplexity;
+  modifiedPrivilegesRequired: ModifiedPrivilegesRequired;
+  modifiedScope: ModifiedScope;
+  modifiedUserInteraction: ModifiedUserInteraction;
+  modifiedConfidentiality: ModifiedRequirementsLevel;
+  modifiedIntegrity: ModifiedRequirementsLevel;
+  modifiedAvailability: ModifiedRequirementsLevel;
 
   repositoryId?: string;
   repositoryName?: string;
 
-  reachableFromInternet: boolean;
   paranoidMode: boolean;
 
   signingPubKey?: string;
 
   enableTicketRange: boolean;
+  enableExposureMetrics: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
 
@@ -621,15 +636,6 @@ export interface DependencyTreeNode {
   children: DependencyTreeNode[];
 }
 
-export interface AffectedPackage {
-  CVE: CVE;
-  CVEID: string;
-  FixedVersion: string;
-  IntroducedVersion: string;
-  PackageName: string;
-  PurlWithVersion: string;
-}
-
 export interface ComponentRisk {
   [component: string]: {
     low: number;
@@ -658,34 +664,6 @@ export interface License {
 export interface LicenseResponse {
   license: License;
   count: number;
-}
-
-export interface RiskDistribution {
-  assetId: string;
-  assetVersionName: string;
-  label: string;
-  low: number;
-  medium: number;
-  high: number;
-  critical: number;
-}
-export interface VulnCountByScanner {
-  [scannerId: string]: number;
-}
-
-export interface DependencyCountByscanner {
-  [scanner: string]: number;
-}
-
-export interface VulnAggregationStateAndChange {
-  was: {
-    open: number;
-    fixed: number;
-  };
-  now: {
-    open: number;
-    fixed: number;
-  };
 }
 
 export interface VulnByPackage {
@@ -726,11 +704,6 @@ export interface ArtifactDTO {
 
 export interface DetailedLicenseRiskDTO extends LicenseRiskDTO {
   events: VulnEventDTO[];
-}
-
-export interface PolicyFrameworks {
-  framework: string;
-  controls: string[];
 }
 
 export interface CompliancePostureWithControlDTO {
@@ -1039,7 +1012,7 @@ interface AffectedComponent {
   semverEnd: string | null;
   versionIntroduced: string | null;
   versionFixed: string | null;
-  cves: VulnWithCVE[];
+  cves: CVE[];
 }
 
 export interface VulnInPackage {
@@ -1077,8 +1050,6 @@ export type VexRule = {
   createdAt: string;
   updatedAt: string;
 };
-
-export type VexRulesDTO = Paged<VexRule>;
 
 export type MechanicalJustificationType =
   | "component_not_present"

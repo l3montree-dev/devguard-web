@@ -1,11 +1,11 @@
 import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
-import React from "react";
+import React, { Suspense } from "react";
 import { AssetVersionProvider } from "../../../../../../../../../context/AssetVersionContext";
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { handleHttpError } from "../../../../../../../../../data-fetcher/handle-http-error";
 
-const AssetLayout = async ({
+const AssetVersionLayout = ({
   // Layouts must accept a children prop.
   // This will be populated with nested layouts or pages
   children,
@@ -19,6 +19,25 @@ const AssetLayout = async ({
     assetVersionSlug: string;
   }>;
 }) => {
+  return (
+    <Suspense>
+      <AssetVersionShell params={params}>{children}</AssetVersionShell>
+    </Suspense>
+  );
+};
+
+async function AssetVersionShell({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{
+    organizationSlug: string;
+    projectSlug: string;
+    assetSlug: string;
+    assetVersionSlug: string;
+  }>;
+}) {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     await params;
 
@@ -50,8 +69,8 @@ const AssetLayout = async ({
       </ClientContextWrapper>
     );
   } catch (error) {
-    handleHttpError(error);
+    handleHttpError(error, organizationSlug);
   }
-};
+}
 
-export default AssetLayout;
+export default AssetVersionLayout;

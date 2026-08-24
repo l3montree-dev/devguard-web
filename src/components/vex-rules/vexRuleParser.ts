@@ -257,10 +257,6 @@ function attributeEffect(
 const IDENTIFIER_PATTERN = /vuln\.(?:cveId|cve\.cve)\s*==\s*["']([^"']+)["']/;
 
 /** The advisory a rule pins itself to (CVE-… / GHSA-…), if it does. */
-export function extractVulnIdentifier(cel: string): string | null {
-  return stripCelComments(cel).match(IDENTIFIER_PATTERN)?.[1] ?? null;
-}
-
 function matchAttribute(
   expr: string,
   vuln: VexRuleVulnContext,

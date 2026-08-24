@@ -1,4 +1,3 @@
-import { config } from "./config";
 import type { Config } from "./types/common";
 
 type jobName =
@@ -249,22 +248,6 @@ export const generateDockerSnippet = (
   return `docker run -v "$(PWD):/app" ${scannerImage} \\
 devguard-scanner ${command} \\
     --path=${path} \\
-    --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
-    --apiUrl="${apiUrl}" \\
-    --token="${token ? token : "TOKEN"}" \\
-    --webUI="${frontendUrl}"`;
-};
-
-export const generateCliSnippet = (
-  command: string,
-  orgSlug: string,
-  projectSlug: string,
-  assetSlug: string,
-  apiUrl: string,
-  frontendUrl: string,
-  token?: string,
-) => {
-  return `devguard-scanner ${command} . \\
     --assetName="${orgSlug}/projects/${projectSlug}/assets/${assetSlug}" \\
     --apiUrl="${apiUrl}" \\
     --token="${token ? token : "TOKEN"}" \\
