@@ -38,18 +38,8 @@ import CreateRefDialog from "../../../../../../../../components/CreateBranchDial
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
 import AuthGuard from "../../../../../../../../components/AuthGuard";
-import { fetcher } from "@/data-fetcher/fetcher";
-import { mapValues, groupBy, sumBy } from "lodash";
-import useSWR from "swr";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
-import { useSearchParams } from "next/navigation";
-
-type RefDistribution = {
-  low: number;
-  medium: number;
-  high: number;
-  critical: number;
-};
+import { useRefDistributions } from "@/hooks/useRefDistributions";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -126,29 +116,7 @@ const RefsPage = () => {
     }
   };
 
-  const artifactName = useSearchParams()?.get("artifact");
-
-  const { data: riskHistories, isLoading } = useSWR<RiskHistory[]>(
-    `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/stats/risk-history/?start=${start}&end=${end}` +
-      (artifactName ? `&artifactName=${encodeURIComponent(artifactName)}` : ""),
-    fetcher,
-  );
-
-  const distributionByRef = useMemo(() => {
-    const latest: Record<string, RiskHistory> = {};
-    for (const history of riskHistories ?? []) {
-      latest[history.assetVersionName + "|" + history.artifactName] = history;
-    }
-    return mapValues(
-      groupBy(Object.values(latest), "assetVersionName"),
-      (rows): RefDistribution => ({
-        low: sumBy(rows, "cvePurlLowCvss"),
-        medium: sumBy(rows, "cvePurlMediumCvss"),
-        high: sumBy(rows, "cvePurlHighCvss"),
-        critical: sumBy(rows, "cvePurlCriticalCvss"),
-      }),
-    );
-  }, [riskHistories]);
+  const { distributionByRef } = useRefDistributions();
 
   return (
     <Page
@@ -366,7 +334,3 @@ const RefsPage = () => {
 };
 
 export default RefsPage;
-
-const dateOnly = (ms: number) => new Date(ms).toISOString().split("T")[0];
-const start = dateOnly(Date.now() - 30 * 864e5);
-const end = dateOnly(Date.now());
