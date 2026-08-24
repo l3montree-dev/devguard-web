@@ -175,7 +175,9 @@ const RefsPage = () => {
               <thead className="border-b bg-card text-foreground">
                 <tr>
                   <th className="p-4 text-left">Name</th>
+                  <th className="p-4 text-left" />
                   <th className="p-4 text-left">Last scan received</th>
+                  <th className="p-4 text-left">CVSS Exposure</th>
                   <th className="p-4 text-left" />
                 </tr>
               </thead>
@@ -202,15 +204,18 @@ const RefsPage = () => {
                       <Badge variant={"outline"}>
                         <TagIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                         {tag.name}
-                        {distributionByRef[tag.name] && (
-                          <span className="ml-2">
-                            <CVERainbowBadge {...distributionByRef[tag.name]} />
-                          </span>
-                        )}
                       </Badge>
                     </td>
+                    <td className="px-4 py-2" />
                     <td className="px-4 py-2">
                       <DateString date={parseDateOnly(tag.lastAccessedAt)} />
+                    </td>
+                    <td className="px-4 py-2">
+                      {distributionByRef[tag.name] && (
+                        <span>
+                          <CVERainbowBadge {...distributionByRef[tag.name]} />
+                        </span>
+                      )}
                     </td>
                     <AuthGuard require="admin">
                       <td className="px-4 py-2 flex flex-row justify-end">
@@ -255,6 +260,7 @@ const RefsPage = () => {
                   <th className="p-4 text-left">Name</th>
                   <th className="p-4 text-left">Default</th>
                   <th className="p-4 text-left">Last scan received</th>
+                  <th className="p-4 text-left">CVSS Exposure</th>
                   <th className="p-4 text-left" />
                 </tr>
               </thead>
@@ -281,13 +287,6 @@ const RefsPage = () => {
                       <Badge variant={"outline"}>
                         <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                         {branch.name}
-                        {distributionByRef[branch.name] && (
-                          <span className="ml-2">
-                            <CVERainbowBadge
-                              {...distributionByRef[branch.name]}
-                            />
-                          </span>
-                        )}
                       </Badge>
                     </td>
                     <td className="px-4 py-2">
@@ -297,6 +296,15 @@ const RefsPage = () => {
                     </td>
                     <td className="px-4 py-2">
                       <DateString date={parseDateOnly(branch.lastAccessedAt)} />
+                    </td>
+                    <td className="px-4 py-2">
+                      {distributionByRef[branch.name] && (
+                        <span>
+                          <CVERainbowBadge
+                            {...distributionByRef[branch.name]}
+                          />
+                        </span>
+                      )}
                     </td>
                     <AuthGuard require="admin">
                       <td className="px-4 py-2 flex flex-row justify-end">
