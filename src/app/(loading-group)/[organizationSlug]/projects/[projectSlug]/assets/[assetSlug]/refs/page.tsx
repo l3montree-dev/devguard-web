@@ -3,7 +3,7 @@ import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import { TagIcon } from "@heroicons/react/24/outline";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { GitBranchIcon, TriangleAlert } from "lucide-react";
-import React from "react";
+import React, { useMemo } from "react";
 import { toast } from "@/lib/toast";
 import Page from "../../../../../../../../components/Page";
 import AssetTitle from "../../../../../../../../components/common/AssetTitle";
@@ -33,11 +33,23 @@ import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActive
 import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import { browserApiClient } from "../../../../../../../../services/devGuardApi";
-import type { AssetVersionDTO } from "../../../../../../../../types/api/api";
+import type { AssetVersionDTO, RiskHistory } from "@/types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
 import AuthGuard from "../../../../../../../../components/AuthGuard";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { mapValues, groupBy, sumBy } from "lodash";
+import useSWR from "swr";
+import CVERainbowBadge from "@/components/CVERainbowBadge";
+import { useSearchParams } from "next/navigation";
+
+type RefDistribution = {
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+};
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -113,6 +125,31 @@ const RefsPage = () => {
       toast.error("Failed to update default ref");
     }
   };
+
+  const artifactName = useSearchParams()?.get("artifact");
+
+  const { data: riskHistories, isLoading } = useSWR<RiskHistory[]>(
+    `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/stats/risk-history/?start=${start}&end=${end}` +
+      (artifactName ? `&artifactName=${encodeURIComponent(artifactName)}` : ""),
+    fetcher,
+  );
+
+  const distributionByRef = useMemo(() => {
+    const latest: Record<string, RiskHistory> = {};
+    for (const history of riskHistories ?? []) {
+      latest[history.assetVersionName + "|" + history.artifactName] = history;
+    }
+    return mapValues(
+      groupBy(Object.values(latest), "assetVersionName"),
+      (rows): RefDistribution => ({
+        low: sumBy(rows, "cvePurlLowCvss"),
+        medium: sumBy(rows, "cvePurlMediumCvss"),
+        high: sumBy(rows, "cvePurlHighCvss"),
+        critical: sumBy(rows, "cvePurlCriticalCvss"),
+      }),
+    );
+  }, [riskHistories]);
+
   return (
     <Page
       Menu={assetMenu}
@@ -165,6 +202,11 @@ const RefsPage = () => {
                       <Badge variant={"outline"}>
                         <TagIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                         {tag.name}
+                        {distributionByRef[tag.name] && (
+                          <span className="ml-2">
+                            <CVERainbowBadge {...distributionByRef[tag.name]} />
+                          </span>
+                        )}
                       </Badge>
                     </td>
                     <td className="px-4 py-2">
@@ -239,6 +281,13 @@ const RefsPage = () => {
                       <Badge variant={"outline"}>
                         <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
                         {branch.name}
+                        {distributionByRef[branch.name] && (
+                          <span className="ml-2">
+                            <CVERainbowBadge
+                              {...distributionByRef[branch.name]}
+                            />
+                          </span>
+                        )}
                       </Badge>
                     </td>
                     <td className="px-4 py-2">
@@ -309,3 +358,7 @@ const RefsPage = () => {
 };
 
 export default RefsPage;
+
+const dateOnly = (ms: number) => new Date(ms).toISOString().split("T")[0];
+const start = dateOnly(Date.now() - 30 * 864e5);
+const end = dateOnly(Date.now());
