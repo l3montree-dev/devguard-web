@@ -3,6 +3,7 @@
 
 export type CvssMetric = {
   key: string;
+  field?: string;
   label: string;
   group?: string;
   options: { v: string; l: string }[];
