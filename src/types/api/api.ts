@@ -51,6 +51,46 @@ export enum RequirementsLevel {
   Medium = "medium",
   High = "high",
 }
+
+export enum ModifiedAttackVector {
+  Network = "network",
+  Adjacent = "adjacent",
+  Local = "local",
+  Physical = "physical",
+  NotDefined = "X",
+}
+
+export enum ModifiedAttackComplexity {
+  Low = "low",
+  High = "high",
+  NotDefined = "X",
+}
+
+export enum ModifiedPrivilegesRequired {
+  None = "none",
+  Low = "low",
+  Hgih = "high",
+  NotDefined = "X",
+}
+
+export enum ModifiedScope {
+  Unchanged = "unchanged",
+  Changed = "changed",
+  NotDefined = "X",
+}
+
+export enum ModifiedUserInteraction {
+  NotDefined = "X",
+  None = "none",
+  Required = "required",
+}
+
+export enum ModifiedRequirementsLevel {
+  NotDefined = "X",
+  None = "none",
+  Low = "low",
+  High = "high",
+}
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 interface AppModelDTO {
   id: string;
@@ -206,7 +246,6 @@ export interface EnvDTO {
 }
 
 export interface BaseVulnDTO {
-  message: string | null;
   ruleId: string;
   id: string;
   createdAt: string;
@@ -219,7 +258,6 @@ export interface BaseVulnDTO {
     | "markedForTransfer"
     | "implemented"
     | "notApplicable";
-  priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;
   assetId: string;
@@ -231,7 +269,7 @@ export interface DependencyVuln extends BaseVulnDTO {
   level: string | null;
   cveID: string | null;
   priority: number | null; // will be null, if not prioritized yet.
-  rawRiskAssessment: number;
+  riskAssessment: number;
   riskRecalculatedAt: string;
   componentFixedVersion: string | null;
   directDependencyFixedVersion: string | null;
@@ -544,16 +582,24 @@ export interface AssetDTO {
   confidentialityRequirement: RequirementsLevel;
   integrityRequirement: RequirementsLevel;
   availabilityRequirement: RequirementsLevel;
+  modifiedAttackVector: ModifiedAttackVector;
+  modifiedAttackComplexity: ModifiedAttackComplexity;
+  modifiedPrivilegesRequired: ModifiedPrivilegesRequired;
+  modifiedScope: ModifiedScope;
+  modifiedUserInteraction: ModifiedUserInteraction;
+  modifiedConfidentiality: ModifiedRequirementsLevel;
+  modifiedIntegrity: ModifiedRequirementsLevel;
+  modifiedAvailability: ModifiedRequirementsLevel;
 
   repositoryId?: string;
   repositoryName?: string;
 
-  reachableFromInternet: boolean;
   paranoidMode: boolean;
 
   signingPubKey?: string;
 
   enableTicketRange: boolean;
+  enableExposureMetrics: boolean;
   cvssAutomaticTicketThreshold: number | null;
   riskAutomaticTicketThreshold: number | null;
 
@@ -732,6 +778,7 @@ interface snippetContents {
 }
 
 export interface FirstPartyVuln extends BaseVulnDTO {
+  message: string | null;
   uri: string;
 
   snippetContents: snippetContents[];
