@@ -246,7 +246,6 @@ export interface EnvDTO {
 }
 
 export interface BaseVulnDTO {
-  message: string | null;
   ruleId: string;
   id: string;
   createdAt: string;
@@ -259,7 +258,6 @@ export interface BaseVulnDTO {
     | "markedForTransfer"
     | "implemented"
     | "notApplicable";
-  priority: number | null; // will be null, if not prioritized yet.
   ticketId: string | null;
   ticketUrl: string | null;
   assetId: string;
@@ -780,6 +778,7 @@ interface snippetContents {
 }
 
 export interface FirstPartyVuln extends BaseVulnDTO {
+  message: string | null;
   uri: string;
 
   snippetContents: snippetContents[];
