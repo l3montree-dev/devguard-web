@@ -65,7 +65,7 @@ const MostVulnerableList: FunctionComponent<Props> = ({
   }
 
   return (
-    <Card>
+    <Card className="flex flex-1 flex-col">
       <CardHeader>
         <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription className="text-sm">
