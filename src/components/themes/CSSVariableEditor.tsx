@@ -11,6 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { THEMES } from "./themes";
 import { getComputedVar, hslStringToHex, hexToHsl } from "./utils";
+import { removeLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
 import type {
   FontPreset,
   ShadowPreset,
@@ -141,6 +142,7 @@ function VarRow({
   const [value, setValue] = useState("");
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setValue(getComputedVar(name));
   }, [name]);
 
@@ -407,7 +409,7 @@ export function CSSVariableEditor() {
 
   function saveStyleSettings(next: StyleSettings) {
     setStyleSettings(next);
-    localStorage.setItem(LS_STYLE_KEY, JSON.stringify(next));
+    writeLocalStorage(LS_STYLE_KEY, JSON.stringify(next));
   }
 
   function handleChange(name: string, value: string) {
@@ -415,7 +417,7 @@ export function CSSVariableEditor() {
     setActiveTheme(null);
     setOverrides((prev) => {
       const next = { ...prev, [name]: value };
-      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      writeLocalStorage(LS_KEY, JSON.stringify(next));
       return next;
     });
   }
@@ -428,7 +430,7 @@ export function CSSVariableEditor() {
     applyOverrides(theme.vars);
     setOverrides(theme.vars);
     setActiveTheme(theme.name);
-    localStorage.setItem(LS_KEY, JSON.stringify(theme.vars));
+    writeLocalStorage(LS_KEY, JSON.stringify(theme.vars));
 
     const s = { ...DEFAULT_STYLE, ...theme.style };
     saveStyleSettings(s);
@@ -441,7 +443,7 @@ export function CSSVariableEditor() {
     }
     setOverrides({});
     setActiveTheme(null);
-    localStorage.removeItem(LS_KEY);
+    removeLocalStorage(LS_KEY);
 
     const def = DEFAULT_STYLE;
     saveStyleSettings(def);
@@ -462,7 +464,7 @@ export function CSSVariableEditor() {
 
   function switchTab(t: TabType) {
     setTab(t);
-    localStorage.setItem(LS_TAB_KEY, t);
+    writeLocalStorage(LS_TAB_KEY, t);
   }
 
   const filteredGroups = useMemo(

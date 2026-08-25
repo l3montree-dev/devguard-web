@@ -11,6 +11,8 @@ import requireSpdxHeader from "./eslint-rules/require-spdx-header.mjs";
 import noRawFetch from "./eslint-rules/no-raw-fetch.mjs";
 import noDataFetchingInView from "./eslint-rules/no-data-fetching-in-view.mjs";
 import filenameConvention from "./eslint-rules/filename-convention.mjs";
+import noDirectLocalStorage from "./eslint-rules/no-direct-local-storage.mjs";
+import noDirectSessionStorage from "./eslint-rules/no-direct-session-storage.mjs";
 
 const local = {
   rules: {
@@ -20,6 +22,8 @@ const local = {
     "no-raw-fetch": noRawFetch,
     "no-data-fetching-in-view": noDataFetchingInView,
     "filename-convention": filenameConvention,
+    "no-direct-local-storage": noDirectLocalStorage,
+    "no-direct-session-storage": noDirectSessionStorage,
   },
 };
 
@@ -44,6 +48,9 @@ export default tseslint.config([
       "**/tailwind.config.js",
       "**/next.config.js",
       ".next/**",
+      "playwright-report/**",
+      "playwright/**",
+      "test-results/**",
     ],
   },
   ...nextConfig,
@@ -149,6 +156,22 @@ export default tseslint.config([
     ],
     rules: {
       "local/filename-convention": "warn",
+    },
+  },
+
+  // The storage modules are the one place that may touch the globals.
+  {
+    files: OURS,
+    ignores: [...NOT_OURS, ...TESTS, "src/hooks/useLocalStorage.ts"],
+    rules: {
+      "local/no-direct-local-storage": "warn",
+    },
+  },
+  {
+    files: OURS,
+    ignores: [...NOT_OURS, ...TESTS, "src/hooks/useSessionStorage.ts"],
+    rules: {
+      "local/no-direct-session-storage": "warn",
     },
   },
 

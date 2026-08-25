@@ -651,7 +651,8 @@ export default function ContainerYardScene() {
   const [colors, setColors] = useState(readPalette);
 
   useEffect(() => {
-    setColors(readPalette());
+    const id = requestAnimationFrame(() => setColors(readPalette()));
+    return () => cancelAnimationFrame(id);
   }, [resolvedTheme]);
 
   useEffect(() => {

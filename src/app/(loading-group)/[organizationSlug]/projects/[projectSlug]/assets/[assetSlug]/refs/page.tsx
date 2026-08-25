@@ -40,6 +40,7 @@ import type { AssetVersionDTO } from "../../../../../../../../types/api/api";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
+import { readLocalStorage, removeLocalStorage } from "@/hooks/useLocalStorage";
 import AuthGuard from "../../../../../../../../components/AuthGuard";
 
 const RefsPage = () => {
@@ -75,13 +76,11 @@ const RefsPage = () => {
         };
       });
       // If the deleted ref is the last viewed ref, remove it from localStorage
-      const stored = localStorage.getItem(
+      const stored = readLocalStorage(
         "lastViewedAssetVersionSlug" + params.assetSlug,
       );
       if (stored === open.slug) {
-        localStorage.removeItem(
-          "lastViewedAssetVersionSlug" + params.assetSlug,
-        );
+        removeLocalStorage("lastViewedAssetVersionSlug" + params.assetSlug);
         eventBus.dispatch({ type: "assetVersionDeleted", payload: {} });
       }
 

@@ -137,6 +137,12 @@ const LicenseCall = (props: {
       assetVersionSlug: string;
     };
   const [license, setLicense] = useState(props.license.licenseId);
+  const [prevLicenseId, setPrevLicenseId] = useState(props.license.licenseId);
+
+  if (props.license.licenseId !== prevLicenseId) {
+    setPrevLicenseId(props.license.licenseId);
+    setLicense(props.license.licenseId);
+  }
 
   const handleManuallyOverwriteLicenseChange = async (license: string) => {
     // delete the overwritten license
@@ -165,10 +171,6 @@ const LicenseCall = (props: {
       toast.success("Successfully corrected the license to " + license);
     }
   };
-
-  useEffect(() => {
-    setLicense(props.license.licenseId);
-  }, [props.license]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

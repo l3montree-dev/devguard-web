@@ -57,13 +57,16 @@ const Filter: FunctionComponent<Props> = ({
   const [selectedOperator, setSelectedOperator] = useState<string>("");
   const [filterValue, setFilterValue] = useState<string>("");
   const [inputQuery, setInputQuery] = useState<string>("");
-  const [activeSearchQuery, setActiveSearchQuery] = useState<string>(
-    search?.defaultValue ?? "",
-  );
+  const defaultSearchQuery = search?.defaultValue ?? "";
+  const [activeSearchQuery, setActiveSearchQuery] =
+    useState<string>(defaultSearchQuery);
+  const [prevDefaultSearchQuery, setPrevDefaultSearchQuery] =
+    useState(defaultSearchQuery);
 
-  useEffect(() => {
-    setActiveSearchQuery(search?.defaultValue ?? "");
-  }, [search?.defaultValue]);
+  if (defaultSearchQuery !== prevDefaultSearchQuery) {
+    setPrevDefaultSearchQuery(defaultSearchQuery);
+    setActiveSearchQuery(defaultSearchQuery);
+  }
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
 
   // Filter-button popover state

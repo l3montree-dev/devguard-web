@@ -33,6 +33,7 @@ import SubgroupsAndAssetsList, {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUpdateOrganization } from "@/context/OrganizationContext";
+import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
 import { usePageTour } from "@/hooks/usePageTour";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import AuthGuard from "@/components/AuthGuard";
@@ -223,13 +224,13 @@ const OrganizationHomePage: FunctionComponent = () => {
     // trigger a sync on page load - if the org has an external entity provider
     if (activeOrg.externalEntityProviderId) {
       // check in localStorage if the sync was already triggered
-      const lastSync = localStorage.getItem(`lastSync-${activeOrg.slug}`);
+      const lastSync = readLocalStorage(`lastSync-${activeOrg.slug}`);
       if (
         !lastSync ||
         new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
       ) {
         // if not, trigger sync
-        localStorage.setItem(
+        writeLocalStorage(
           `lastSync-${activeOrg.slug}`,
           new Date().toISOString(),
         );

@@ -68,9 +68,12 @@ const ProjectRow: FunctionComponent<Props> = ({
     }
   }, [onFetchData, project.slug, project.id]);
 
-  useEffect(() => {
+  const [prevHasContent, setPrevHasContent] = useState(hasContent);
+
+  if (hasContent !== prevHasContent) {
+    setPrevHasContent(hasContent);
     if (hasContent) setIsOpen(true);
-  }, [hasContent]);
+  }
 
   useEffect(() => {
     if (isOpen && !isFetched && !inFlight.current) {

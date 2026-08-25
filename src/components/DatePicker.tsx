@@ -5,7 +5,7 @@
 
 import { addYears, format, isValid, parse } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -26,13 +26,14 @@ interface DatePickerProps {
 const DATE_FORMAT = "dd/MM/yyyy";
 
 export function DatePicker({ date, onDateChange, variant }: DatePickerProps) {
-  const [inputValue, setInputValue] = useState(
-    date ? format(date, DATE_FORMAT) : "",
-  );
+  const formattedDate = date ? format(date, DATE_FORMAT) : "";
+  const [inputValue, setInputValue] = useState(formattedDate);
+  const [prevFormattedDate, setPrevFormattedDate] = useState(formattedDate);
 
-  useEffect(() => {
-    setInputValue(date ? format(date, DATE_FORMAT) : "");
-  }, [date]);
+  if (formattedDate !== prevFormattedDate) {
+    setPrevFormattedDate(formattedDate);
+    setInputValue(formattedDate);
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;

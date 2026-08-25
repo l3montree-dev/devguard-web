@@ -15,6 +15,7 @@ import AcceptInvitationDialog from "./AcceptInvitationDialog";
 
 import { toast } from "@/lib/toast";
 import { useUpdateSession } from "@/context/SessionContext";
+import { writeLocalStorage } from "@/hooks/useLocalStorage";
 
 export default function OrgRegisterForm() {
   const updateSession = useUpdateSession();
@@ -52,7 +53,7 @@ export default function OrgRegisterForm() {
 
     form.reset();
 
-    localStorage.setItem("lastActiveOrg", orgDTO.slug);
+    writeLocalStorage("lastActiveOrg", orgDTO.slug);
     // move the user to the newly created organization
     setTimeout(() => router.push(`/${orgDTO.slug}`), 0);
   };

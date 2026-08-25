@@ -69,12 +69,7 @@ export function InstanceAdminProvider({
 
   useEffect(() => {
     if (!state.expiresAt) return;
-    const remaining = state.expiresAt - Date.now();
-    if (remaining <= 0) {
-      logout();
-      return;
-    }
-    const id = setTimeout(logout, remaining);
+    const id = setTimeout(logout, Math.max(state.expiresAt - Date.now(), 0));
     return () => clearTimeout(id);
   }, [state.expiresAt, logout]);
 

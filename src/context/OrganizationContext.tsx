@@ -10,6 +10,7 @@ import {
   type ProviderProps,
 } from "react";
 import type { WithUpdater } from "@/types/view/context";
+import { writeLocalStorage } from "@/hooks/useLocalStorage";
 
 import type { OrgContextParams } from "@/types/view/context";
 const OrganizationContext = createContext<WithUpdater<OrgContextParams>>({
@@ -26,7 +27,7 @@ export const OrganizationProvider = (
   useEffect(() => {
     const org = props.value.v.organization;
     if (org && org.id !== "" && org.slug !== "/") {
-      localStorage.setItem("lastActiveOrg", org.slug);
+      writeLocalStorage("lastActiveOrg", org.slug);
     }
   }, [props.value.v.organization]);
 

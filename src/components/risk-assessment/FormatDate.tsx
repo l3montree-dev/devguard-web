@@ -1,8 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { useIsHydrated } from "@/hooks/useIsHydrated";
 
 const timeAgo = (prevDate: Date) => {
   const diff = Number(new Date()) - Number(prevDate);
@@ -32,30 +32,24 @@ const timeAgo = (prevDate: Date) => {
 };
 
 const FormatDate = ({ dateString }: { dateString: string }) => {
-  const [time, setTime] = useState<{
-    localeTime: string;
-    timeAgo: string;
-  } | null>(null);
-  useEffect(() => {
-    const date = new Date(dateString);
-    setTime({
-      localeTime:
-        date.toLocaleDateString() +
-        ", " +
-        date.toLocaleTimeString(undefined, {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      timeAgo: timeAgo(date),
+  const isHydrated = useIsHydrated();
+  if (!isHydrated) return null;
+
+  const date = new Date(dateString);
+  const localeTime =
+    date.toLocaleDateString() +
+    ", " +
+    date.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
     });
-  }, [dateString]);
-  if (!time) return null;
+
   return (
     <Tooltip>
       <TooltipTrigger>
-        <time dateTime={dateString}>{time.timeAgo}</time>
+        <time dateTime={dateString}>{timeAgo(date)}</time>
       </TooltipTrigger>
-      <TooltipContent>{time.localeTime}</TooltipContent>
+      <TooltipContent>{localeTime}</TooltipContent>
     </Tooltip>
   );
 };

@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 import { toast } from "@/lib/toast";
 import { extractInvitationCode } from "@/utils/url";
+import { writeLocalStorage } from "@/hooks/useLocalStorage";
 
 interface Props {
   isOpen: boolean;
@@ -63,7 +64,7 @@ export default function AcceptInvitationDialog({
     form.reset();
     onOpenChange(false);
 
-    localStorage.setItem("lastActiveOrg", slug);
+    writeLocalStorage("lastActiveOrg", slug);
     router.replace(`/${slug}`);
   };
 

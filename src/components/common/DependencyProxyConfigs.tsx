@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
@@ -204,7 +204,8 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   const [rulesCheckerOpen, setRulesCheckerOpen] = useState(false);
   const initializedForUrl = useRef<string | null | undefined>(undefined);
 
-  const [selectedProxyTab, setSelectedProxyTab] = useState("");
+  const [proxyTab, setSelectedProxyTab] = useState("");
+  const selectedProxyTab = proxyTab || Object.keys(proxyUrls ?? {})[0] || "";
 
   const [checkerRulesText, setCheckerRulesText] = useState(
     "# Example package URLs to test against the rules: \n" +
@@ -216,15 +217,13 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
       "\n" +
       "pkg:go/github.com/lodash/lodash@v1.0.0",
   );
-  const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
-
-  useEffect(() => {
-    if (checkerRulesText.trim()) {
-      setCheckResults(checkRulesAgainstPackages(rulesText, checkerRulesText));
-    } else {
-      setCheckResults([]);
-    }
-  }, [rulesText, checkerRulesText]);
+  const checkResults: CheckResult[] = useMemo(
+    () =>
+      checkerRulesText.trim()
+        ? checkRulesAgainstPackages(rulesText, checkerRulesText)
+        : [],
+    [rulesText, checkerRulesText],
+  );
 
   useEffect(() => {
     if (data !== undefined && initializedForUrl.current !== configUrl) {
@@ -234,12 +233,6 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
       initializedForUrl.current = configUrl;
     }
   }, [data, configUrl]);
-
-  useEffect(() => {
-    if (proxyUrls && !selectedProxyTab) {
-      setSelectedProxyTab(Object.keys(proxyUrls)[0] ?? "");
-    }
-  }, [proxyUrls, selectedProxyTab]);
 
   const handleEditorValidation = (
     isValid: boolean,

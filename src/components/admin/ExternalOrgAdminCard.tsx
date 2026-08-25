@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,10 +50,12 @@ interface Props {
 export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
   const { getSigningKey } = useInstanceAdmin();
   const [orgs, setOrgs] = useState<ExternalOrg[]>(initialOrgs);
+  const [prevOrgs, setPrevOrgs] = useState(initialOrgs);
 
-  useEffect(() => {
+  if (initialOrgs !== prevOrgs) {
+    setPrevOrgs(initialOrgs);
     setOrgs(initialOrgs);
-  }, [initialOrgs]);
+  }
   const [emailInputs, setEmailInputs] = useState<Record<string, string>>({});
   const [addingFor, setAddingFor] = useState<string | null>(null);
   const [assigning, setAssigning] = useState(false);

@@ -465,11 +465,14 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
 
-  useEffect(() => {
-    if (open) {
-      setSlideHistory([getStartIndex()]);
-    }
-  }, [open, initialSlide]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevInitialSlide, setPrevInitialSlide] = useState(initialSlide);
+
+  if (open !== prevOpen || initialSlide !== prevInitialSlide) {
+    setPrevOpen(open);
+    setPrevInitialSlide(initialSlide);
+    if (open) setSlideHistory([getStartIndex()]);
+  }
 
   const prevIndex =
     slideHistory[slideHistory.length - 2] ?? slideHistory[0] ?? 0;

@@ -29,6 +29,7 @@ const Zoomable = (props: {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCls(
       "fixed z-[9999] pointer-events-auto transition-all top-0 left-0 right-0 bottom-0 bg-black/50 scale-100 cursor-zoom-out",
     );

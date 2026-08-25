@@ -12,6 +12,11 @@ import { EventEmitter } from "events";
 import { findLast, uniqBy } from "lodash";
 import { useEffect, useState } from "react";
 import useScopedAccessToken from "./useScopedAccessToken";
+import {
+  readSessionStorage,
+  removeSessionStorage,
+  writeSessionStorage,
+} from "./useSessionStorage";
 
 const hasPrivKey = (pat: Token): pat is SeeOnceATWithPrivKey =>
   "privKey" in pat && Boolean(pat.privKey);
@@ -39,7 +44,7 @@ export default function useAccessToken(
       setAccessTokens((prev) => uniqBy([...prev, accessToken], "fingerprint"));
     };
 
-    const stored = sessionStorage.getItem(scopedAT);
+    const stored = readSessionStorage(scopedAT);
     if (stored) {
       const parsed = JSON.parse(stored) as
         SeeOnceATWithPrivKey | SeeOnceATWithBearerToken;
@@ -57,12 +62,12 @@ export default function useAccessToken(
       method: "DELETE",
     });
     setAccessTokens((prev) => prev.filter((p) => p.id !== accessToken.id));
-    const storedAccessToken = sessionStorage.getItem(scopedAT);
+    const storedAccessToken = readSessionStorage(scopedAT);
     if (
       storedAccessToken &&
       JSON.parse(storedAccessToken).id === accessToken.id
     ) {
-      sessionStorage.removeItem(scopedAT);
+      removeSessionStorage(scopedAT);
     }
   };
 
@@ -93,7 +98,7 @@ export default function useAccessToken(
     const accessToken = await createAccessToken(data, baseUrl);
 
     setAccessTokens((prev) => [...prev, accessToken]);
-    sessionStorage.setItem(scopedAT, JSON.stringify(accessToken));
+    writeSessionStorage(scopedAT, JSON.stringify(accessToken));
     newATEventEmitter.emit(scopedAT, accessToken);
     return accessToken;
   }

@@ -103,12 +103,13 @@ const Index: FunctionComponent = () => {
   );
   const deleteEvent = useDeleteEvent();
 
-  // Update updatedLicense when vuln data changes
-  useEffect(() => {
-    if (vuln?.component.license) {
-      setUpdatedLicense(vuln.component.license);
-    }
-  }, [vuln?.component.license]);
+  const vulnLicense = vuln?.component.license;
+  const [prevVulnLicense, setPrevVulnLicense] = useState(vulnLicense);
+
+  if (vulnLicense !== prevVulnLicense) {
+    setPrevVulnLicense(vulnLicense);
+    if (vulnLicense) setUpdatedLicense(vulnLicense);
+  }
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];

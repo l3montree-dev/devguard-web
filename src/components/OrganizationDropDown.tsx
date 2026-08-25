@@ -39,6 +39,11 @@ import {
 import { useSession, useUpdateSession } from "../context/SessionContext";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useInstanceSettings } from "../hooks/useInstanceSettings";
+import {
+  readLocalStorage,
+  useLocalStorage,
+  writeLocalStorage,
+} from "@/hooks/useLocalStorage";
 import { truncateMiddle } from "@/utils/common";
 
 const activeOrgName = (name: string, slug: string) => {
@@ -59,7 +64,7 @@ const OrganizationDropDown = () => {
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
 
-  const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+  const [lastActiveOrg] = useLocalStorage("lastActiveOrg");
 
   let activeOrg = useActiveOrg() as OrganizationDTO | null;
   if (!activeOrg && lastActiveOrg) {
@@ -80,14 +85,14 @@ const OrganizationDropDown = () => {
     // trigger a sync on page load - if the org has an external entity provider
     if (user) {
       // check in localStorage if the sync was already triggered
-      const lastSync = localStorage.getItem(`lastSync-${user.id}`);
+      const lastSync = readLocalStorage(`lastSync-${user.id}`);
       if (
         !lastSync ||
         new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
       ) {
         setOrgSyncRunning(true);
         // if not, trigger sync
-        localStorage.setItem(`lastSync-${user.id}`, new Date().toISOString());
+        writeLocalStorage(`lastSync-${user.id}`, new Date().toISOString());
 
         browserApiClient("/trigger-sync/", {
           method: "GET",

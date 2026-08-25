@@ -9,6 +9,7 @@ import Main from "./Main";
 import { toast } from "@/lib/toast";
 import Markdown from "./common/Markdown";
 import { Megaphone } from "lucide-react";
+import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
 
 type PageProps = {
   title: string;
@@ -38,7 +39,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       .then((res) => res.json())
       .then(({ notice }) => {
         if (!notice) return;
-        if (localStorage.getItem(STORAGE_KEY) === notice.updatedAt) return;
+        if (readLocalStorage(STORAGE_KEY) === notice.updatedAt) return;
 
         toast(<Markdown>{notice.description}</Markdown>, {
           icon: <Megaphone className="h-4 w-4" />,
@@ -46,7 +47,7 @@ const Page = (props: PropsWithChildren<PageProps>) => {
           duration: Infinity,
           closeButton: true,
           onDismiss: () => {
-            localStorage.setItem(STORAGE_KEY, notice.updatedAt);
+            writeLocalStorage(STORAGE_KEY, notice.updatedAt);
           },
         });
       });

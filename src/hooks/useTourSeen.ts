@@ -4,6 +4,7 @@
 "use client";
 
 import { useState } from "react";
+import { readLocalStorage, writeLocalStorage } from "./useLocalStorage";
 
 const ALL_TOUR_KEYS = [
   "org-home",
@@ -20,7 +21,7 @@ const storageKey = (tourKey: string) => `devguard:tourSeen:${tourKey}`;
 
 export const dismissAllTours = () => {
   ALL_TOUR_KEYS.forEach((key) => {
-    localStorage.setItem(storageKey(key), "true");
+    writeLocalStorage(storageKey(key), "true");
   });
 };
 
@@ -29,11 +30,11 @@ export function useTourSeen(tourKey: string) {
 
   const [showModal, setShowModal] = useState(() => {
     if (typeof window === "undefined") return false;
-    return localStorage.getItem(key) !== "true";
+    return readLocalStorage(key) !== "true";
   });
 
   const markSeen = () => {
-    localStorage.setItem(key, "true");
+    writeLocalStorage(key, "true");
     setShowModal(false);
   };
 

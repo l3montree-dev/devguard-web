@@ -22,10 +22,16 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
   const [confirmTouched, setConfirmTouched] = useState(false);
   const { value, name, autocomplete, maxlength, ...rest } = attributes;
 
+  const [prevIsSubmitting, setPrevIsSubmitting] = useState(isSubmitting);
+
+  if (isSubmitting !== prevIsSubmitting) {
+    setPrevIsSubmitting(isSubmitting);
+    if (isSubmitting) setConfirmTouched(false);
+  }
+
   useEffect(() => {
     if (isSubmitting) {
       resetField("confirmPassword");
-      setConfirmTouched(false);
     }
   }, [isSubmitting, resetField]);
 

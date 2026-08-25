@@ -18,6 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { InvitationForm } from "@/components/InvitationForm";
 import { getLogoutUrl } from "@/server/actions/logout";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { writeLocalStorage } from "@/hooks/useLocalStorage";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import LoggedInAs from "@/components/misc/LoggedInAs";
 import { extractInvitationCode } from "@/utils/url";
@@ -55,7 +56,7 @@ const AcceptInvitation = () => {
       }
 
       const { slug } = await resp.json();
-      localStorage.setItem("lastActiveOrg", slug);
+      writeLocalStorage("lastActiveOrg", slug);
       router.replace(`/${slug}`);
       return true;
     },

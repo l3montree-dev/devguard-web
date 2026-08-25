@@ -88,7 +88,8 @@ export default function SelectRepoSlide({
     { value: string; label: string }[] | null
   >(null);
 
-  const { handleSearchRepos } = useRepositorySearch(repositories);
+  const { repos, searchLoading, handleSearchRepos } =
+    useRepositorySearch(repositories);
 
   const [isLoadingRepositories, setIsLoadingRepositories] = useState(false);
 
@@ -134,10 +135,10 @@ export default function SelectRepoSlide({
                   data-testid="repo-selector"
                   onValueChange={handleSearchRepos}
                   placeholder="Search repository..."
-                  items={repositories ?? []}
-                  loading={isLoadingRepositories}
+                  items={repos}
+                  loading={isLoadingRepositories || searchLoading}
                   onSelect={(repoId: string) => {
-                    const repo = repositories?.find((r) => r.value === repoId);
+                    const repo = repos.find((r) => r.value === repoId);
                     if (repo) {
                       setSelectedRepo({ id: repo.value, name: repo.label });
                     }
