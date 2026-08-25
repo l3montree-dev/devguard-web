@@ -29,10 +29,19 @@ export function AffectedBranchesTags({
   const project = useActiveProject();
   const asset = useActiveAsset();
 
+  const typeByRefName = useMemo(
+    () =>
+      Object.fromEntries(
+        (asset?.refs ?? []).map((ref) => [ref.name, ref.type]),
+      ),
+    [asset?.refs],
+  );
+
   const d = useMemo(
     () =>
       Object.entries(data)
         .map(([refName, dist]) => ({ refName, dist }))
+        .filter(({ refName }) => typeByRefName[refName] === type)
         .toSorted(
           (a, b) =>
             b.dist.critical - a.dist.critical ||
@@ -40,11 +49,11 @@ export function AffectedBranchesTags({
             b.dist.medium - a.dist.medium ||
             b.dist.low - a.dist.low,
         ),
-    [data],
+    [data, type, typeByRefName],
   );
 
   return (
-    <Card>
+    <Card className="flex flex-1 flex-col">
       <CardHeader>
         <CardTitle className="relative w-full">
           {type == "branch" ? "Top 5 affected Branches" : "Top 5 affected Tags"}
