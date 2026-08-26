@@ -1,4 +1,3 @@
-import React from "react";
 import { classNames } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
 
@@ -11,7 +10,7 @@ interface Props {
 
 const CVERainbowBadge = (props: Props) => {
   return (
-    <div className="flex flex-row font-normal text-xs text-white rounded-full overflow-hidden whitespace-nowrap items-center">
+    <div className="inline-flex flex-row font-normal text-xs text-white rounded-full overflow-hidden whitespace-nowrap items-center">
       <span
         className={classNames(
           "inline-block px-1",
