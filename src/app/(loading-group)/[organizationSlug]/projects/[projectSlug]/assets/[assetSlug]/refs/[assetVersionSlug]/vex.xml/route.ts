@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { NextRequest, NextResponse } from "next/server";
 import { getApiClientFromRequest } from "@/services/devGuardApi";
 import { cookies } from "next/headers";
@@ -10,7 +13,6 @@ export async function GET(request: NextRequest, ctx: any) {
     // Get search params for artifact and version query parameters
     const searchParams = request.nextUrl.searchParams;
     const artifact = searchParams.get("artifact");
-    const version = searchParams.get("version");
 
     if (!artifact) {
       return NextResponse.json(

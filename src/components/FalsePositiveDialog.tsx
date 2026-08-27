@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { useState } from "react";
@@ -30,7 +33,6 @@ import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { documentationLinks } from "../const/documentationLinks";
-import { Badge } from "./ui/badge";
 import { beautifyPurl } from "../utils/common";
 
 const MarkdownEditor = dynamic(

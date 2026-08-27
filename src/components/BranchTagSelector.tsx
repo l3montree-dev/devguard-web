@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { AssetVersionDTO } from "@/types/api/api";
 import { PlusCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";

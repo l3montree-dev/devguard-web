@@ -35,7 +35,7 @@ import { useState } from "react";
 import type { FunctionComponent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { createUpdateHandler } from "../AssetForm";
-import type { AssetFormValues } from "../AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 import { CircleHelp, Settings2 } from "lucide-react";
 
 interface Props {

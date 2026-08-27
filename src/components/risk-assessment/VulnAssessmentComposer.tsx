@@ -5,7 +5,6 @@
 
 import AuthGuard from "@/components/AuthGuard";
 import { AsyncButton, Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { toast } from "@/lib/toast";
-import type { VulnEventDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { CheckIcon } from "@heroicons/react/24/outline";
@@ -33,11 +31,7 @@ const MAX_LENGTH = 4000;
 // The FP dropdown defaults to "Vulnerable code not in execute path".
 const DEFAULT_FP_OPTION = Object.keys(vexOptionMessages)[2];
 
-export interface AssessmentSubmit {
-  status: VulnEventDTO["type"];
-  justification?: string;
-  mechanicalJustification?: string;
-}
+import type { AssessmentSubmit } from "@/types/view/riskAssessment";
 
 interface VulnAssessmentComposerProps {
   /** Current vulnerability state (e.g. "open", "accepted", "falsePositive"). */
@@ -102,43 +96,6 @@ const VulnAssessmentComposer: FunctionComponent<
       return false;
     }
     return submit(data);
-  };
-
-  // Keyboard shortcuts, scoped to the composer card. ⌘/Ctrl is accepted on
-  // every platform; the browser/editor default for the matched keys is
-  // suppressed so the assessment action wins instead.
-  const handleShortcut = (e: React.KeyboardEvent) => {
-    if (!(e.metaKey || e.ctrlKey)) return;
-
-    // Comment (⌘ + Shift + Enter) is available in every state. Plain ⌘ + Enter
-    // is left to the editor, where it inserts a new line.
-    if (e.key === "Enter") {
-      if (!e.shiftKey) return;
-      e.preventDefault();
-      attemptSubmit({ status: "comment", justification });
-      return;
-    }
-
-    // The remaining actions only exist while the vuln is open.
-    if (!isOpen) return;
-    switch (e.key.toLowerCase()) {
-      case "a":
-        e.preventDefault();
-        attemptSubmit({ status: "accepted", justification });
-        break;
-      case "f":
-        e.preventDefault();
-        attemptSubmit({
-          status: "falsePositive",
-          justification,
-          mechanicalJustification: fpOption,
-        });
-        break;
-      case "r":
-        e.preventDefault();
-        onCreateVexRule();
-        break;
-    }
   };
 
   const shortcuts = [

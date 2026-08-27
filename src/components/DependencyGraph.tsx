@@ -1,17 +1,6 @@
-// Copyright (C) 2024 Tim Bastin, l3montree GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { DependencyVuln, VexRule } from "@/types/api/api";
 
 import { beautifyPurl, classNames } from "@/utils/common";
@@ -43,7 +32,11 @@ import {
   traverseDownward,
   traverseUpward,
 } from "../utils/dependencyGraphHelpers";
-import type { ViewDependencyTreeNode } from "../utils/dependencyGraphHelpers";
+import type {
+  ContextMenuState,
+  VexSelection,
+  ViewDependencyTreeNode,
+} from "../types/view/dependencyGraph";
 import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
 import { Button } from "./ui/button";
 import {
@@ -83,32 +76,6 @@ function getPathSuffix(
 }
 
 // Types for the context menu
-type MenuType = "edge" | "node" | null;
-
-interface ContextMenuState {
-  type: MenuType;
-  x: number;
-  y: number;
-  childIndex?: number;
-  // Full path suffix from the clicked position to the leaf
-  path: string[];
-}
-
-// VEX justification options
-export type VexSelection =
-  | {
-      type: "edge";
-      justification: string;
-      // this is the index of the child in the path
-      childIndex: number;
-      path: string[]; // full path from parent to child, used for rule creation
-    }
-  | {
-      type: "node";
-      justification: string;
-      path: string[]; // suffix from the clicked node to the leaf
-    };
-
 const nodeTypes = {
   customNode: DependencyGraphNode,
   loadMoreNode: LoadMoreNode,

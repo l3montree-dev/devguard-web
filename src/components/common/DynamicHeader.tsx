@@ -39,14 +39,7 @@ function getLevelMapping(level: number) {
   return mapping;
 }
 
-interface MenuItem {
-  title: string;
-  href: string;
-  Icon: React.ComponentType<{ className?: string }>;
-  isActive?: boolean;
-  testId?: string;
-  children?: Array<MenuItem>;
-}
+import type { MenuItem } from "@/types/view/navigation";
 
 interface Props {
   Title: ReactNode;

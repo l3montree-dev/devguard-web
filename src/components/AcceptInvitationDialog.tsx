@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
@@ -16,9 +19,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-interface InvitationFormValues {
-  "invitation-url": string;
-}
+import type { InvitationFormValues } from "@/types/view/invitation";
 
 export default function AcceptInvitationDialog({
   isOpen,

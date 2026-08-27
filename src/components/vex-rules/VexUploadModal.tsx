@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -47,7 +50,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   onUpload,
 }) => {
   const params = useDecodedParams();
-  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
+  const { organizationSlug, projectSlug, assetSlug } = params;
 
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [isUploading, setIsUploading] = useState(false);
@@ -176,12 +179,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   const canAddSource =
     !isAdding &&
     (activeTab === "csaf" ? newCsafUrl.trim() : newVexUrl.trim()) !== "";
-
-  const isPurlValid = (purl: string): boolean => {
-    const purlRegex =
-      /^pkg:[a-z][a-z0-9+.-]*\/[a-zA-Z0-9._~%@/-]+[a-zA-Z0-9](?:[@?#].*)?$/;
-    return purlRegex.test(purl);
-  };
 
   const isFileUploadDisabled = !vexFile || isUploading;
 

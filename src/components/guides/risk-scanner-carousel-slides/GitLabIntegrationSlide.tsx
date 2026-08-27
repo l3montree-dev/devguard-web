@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 // Copyright 2024 Lars Hermges, l3montree GmbH
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +17,6 @@
 
 import React, { type FunctionComponent } from "react";
 import { CarouselItem } from "../../ui/carousel";
-import type { CarouselApi } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
 import type {
   OrganizationDetailsDTO,

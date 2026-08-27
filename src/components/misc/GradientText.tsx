@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import React, { type ReactNode } from "react";
@@ -15,7 +18,6 @@ export default function GradientText({
   className = "",
   colors = ["#ffaa40", "#9c40ff", "#ffaa40"],
   animationSpeed = 8,
-  showBorder = false,
 }: GradientTextProps) {
   const gradientStyle = {
     backgroundImage: `linear-gradient(to right, ${colors.join(", ")})`,

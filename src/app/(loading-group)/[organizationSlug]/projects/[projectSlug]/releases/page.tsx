@@ -1,5 +1,7 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
@@ -33,7 +35,6 @@ import { type Modify } from "../../../../../../types/common";
 const Releases = () => {
   const menu = useProjectMenu();
   const [open, setOpen] = React.useState(false);
-  const router = useRouter();
   const { organizationSlug, projectSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;

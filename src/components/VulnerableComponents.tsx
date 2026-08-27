@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import {
@@ -20,13 +23,6 @@ import { useActiveProject } from "../hooks/useActiveProject";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import { useSearchParams } from "next/navigation";
-
-export interface ChartConfig {
-  [key: string]: {
-    label: string;
-    color: string;
-  };
-}
 
 export function VulnerableComponents({
   data,

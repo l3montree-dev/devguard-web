@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { classNames } from "@/utils/common";
@@ -9,7 +12,7 @@ interface Props {
   className?: string;
 }
 
-const FrameworkIcon: FunctionComponent<Props> = ({ framework, className }) => {
+const FrameworkIcon: FunctionComponent<Props> = ({ className }) => {
   return (
     <ShieldCheck
       className={classNames(

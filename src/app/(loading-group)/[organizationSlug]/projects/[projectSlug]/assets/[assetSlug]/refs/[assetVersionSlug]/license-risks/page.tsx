@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 import SortingCaret from "@/components/common/SortingCaret";
 import { DocDrawer } from "@/components/common/DocDrawer";
@@ -10,7 +13,6 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -18,7 +20,6 @@ import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import LicenseRiskRow from "@/components/risk-handling/LicenseRiskRow";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";

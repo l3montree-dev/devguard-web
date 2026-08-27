@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
@@ -90,7 +93,7 @@ import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAss
 import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { useAutoTour } from "@/hooks/useAutoTour";
-import { dependencyInsightsTourSteps } from "@/components/common/tours/dependency-insights-tour";
+import { dependencyInsightsTourSteps } from "@/components/common/tours/dependencyInsightsTour";
 
 const scorecardRanges: Record<string, [number | null, number | null]> = {
   bad: [null, 3],

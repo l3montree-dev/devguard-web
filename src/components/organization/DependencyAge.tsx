@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -15,7 +18,7 @@ interface Props {
 const MAX_YEARS = 10;
 const SECONDS_PER_YEAR = 365.25 * 24 * 60 * 60;
 
-type ColorLevel = "green" | "yellow" | "orange" | "red";
+import type { ColorLevel } from "@/types/view/organization";
 
 function ageToColorLevel(seconds: number): ColorLevel {
   const days = seconds / (60 * 60 * 24);

@@ -1,15 +1,16 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import type { Paged, VulnEventDTO } from "@/types/api/api";
-import type { FunctionComponent } from "react";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
-import { buildFilterSearchParams } from "@/utils/url";
 import VulnEventItem from "@/components/VulnEventItem";
 import Section from "@/components/common/Section";
 import useSWR from "swr";

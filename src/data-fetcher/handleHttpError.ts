@@ -1,6 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { notFound, redirect } from "next/navigation";
 import { config } from "../config";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export function handleHttpError(
   error: unknown,

@@ -1,16 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-interface AssetVersionDeletedEvent {}
+import type { Events, Listener } from "@/types/view/events";
 
-type Events = {
-  assetVersionDeleted: AssetVersionDeletedEvent;
-};
-
-type Listener<T extends keyof Events> = {
-  id: string;
-  callback: (payload: Events[T]) => void;
-};
 class EventBus {
   private listeners: {
     [K in keyof Events]: Listener<K>[];

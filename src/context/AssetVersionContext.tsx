@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 import { createContext, useContext } from "react";
 import type {
@@ -6,10 +9,9 @@ import type {
   InformationSources,
 } from "../types/api/api";
 import { NoopUpdater } from "./ClientContextWrapper";
-import { type WithUpdater } from "./ClientContextWrapper";
+import type { WithUpdater } from "@/types/view/context";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
 const AssetVersionContext = createContext<

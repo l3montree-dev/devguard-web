@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import VexRuleForm from "./VexRuleForm";
-import type { VexRuleVulnContext } from "./vexRuleParser";
+import type { VexRuleVulnContext } from "@/types/view/vexRules";
 import { browserApiClient } from "@/services/devGuardApi";
 import { toast } from "@/lib/toast";
 import {

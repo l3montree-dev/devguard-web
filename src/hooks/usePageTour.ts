@@ -1,10 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
-import type { StepType } from "@reactour/tour";
 import { useEffect } from "react";
 import { useTourContext } from "@/context/TourContext";
 
-export type ConditionalStep = StepType & { condition?: boolean };
+import type { ConditionalStep } from "@/types/view/tour";
 
 export function usePageTour(steps: ConditionalStep[]) {
   const { registerSteps, openTour } = useTourContext();

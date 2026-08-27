@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

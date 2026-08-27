@@ -11,7 +11,7 @@ import { oryComponentOverrides } from "../../components/ory/overrides";
 import oryConfig from "../../ory.config";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
-import { rewriteFlow } from "../../types/auth";
+import { rewriteFlow } from "../../utils/auth";
 import { config } from "../../config";
 import { redirect } from "next/navigation";
 import { Card, CardContent } from "../../components/ui/card";

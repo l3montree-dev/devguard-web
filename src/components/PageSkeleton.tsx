@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { classNames } from "../utils/common";
 import SkeletonListItems from "./common/SkeletonListItems";
 import { Skeleton } from "./ui/skeleton";

@@ -1,9 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
 import { groupBy } from "lodash";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";

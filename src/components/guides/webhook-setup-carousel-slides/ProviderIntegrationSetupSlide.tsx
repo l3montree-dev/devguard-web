@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import GitLabIntegrationForm from "@/components/common/GitLabIntegrationForm";
 import JiraIntegrationForm from "@/components/common/JiraIntegrationForm";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -10,7 +13,6 @@ import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/api/api";
 import type { ExternalTicketProvider } from "@/types/common";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useUpdateOrganization } from "../../../context/OrganizationContext";
 import useDecodedPathname from "../../../hooks/useDecodedPathname";
 
@@ -62,7 +64,6 @@ export default function ProviderIntegrationSetupSlide({
   };
 
   const pathname = useDecodedPathname();
-  const router = useRouter();
 
   return (
     <CarouselItem>

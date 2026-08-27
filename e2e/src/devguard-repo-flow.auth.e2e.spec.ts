@@ -21,14 +21,12 @@ test.describe("DevGuard repo flows", () => {
     await docShot(page, testInfo, "devguard-cli-screen");
   });
 
-  test("test create, settings and delete (through settings) of repo", async ({
-    page,
-  }) => {
+  test("test create, settings and delete (through settings) of repo", async () => {
     await devguardPOM.repo().settingClickthroughRepo();
     await devguardPOM.repo().deleteRepo();
   });
 
-  test("test manual sbom upload", async ({ page }) => {
+  test("test manual sbom upload", async () => {
     await devguardPOM.setupSbomUpload();
   });
 

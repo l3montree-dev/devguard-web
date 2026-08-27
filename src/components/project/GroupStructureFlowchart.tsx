@@ -9,7 +9,7 @@ import { Fragment, type FunctionComponent, type ReactNode } from "react";
 // Longer names make the flowchart grow and squish the form next to it, use truncateMiddle beyond this
 const maxNameLength = 44;
 
-type StepState = "existing" | "pending" | "next";
+import type { Step, StepState } from "@/types/view/project";
 
 const stepStyles: Record<
   StepState,
@@ -27,14 +27,6 @@ const stepStyles: Record<
     value: "text-muted-foreground",
   },
 };
-
-interface Step {
-  Icon: typeof Building2;
-  label: string;
-  value: ReactNode;
-  description: ReactNode;
-  state: StepState;
-}
 
 const FlowchartNode: FunctionComponent<Step> = ({
   Icon,
@@ -160,5 +152,3 @@ export const GroupStructureFlowchart: FunctionComponent<Props> = ({
     </div>
   );
 };
-
-export default GroupStructureFlowchart;

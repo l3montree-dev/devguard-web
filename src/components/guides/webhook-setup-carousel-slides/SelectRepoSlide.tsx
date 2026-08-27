@@ -1,4 +1,7 @@
-import type { AssetFormValues } from "@/components/asset/AssetForm";
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+import type { AssetFormValues } from "@/types/view/asset";
 import { Combobox } from "@/components/common/Combobox";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
@@ -37,7 +40,7 @@ export default function SelectRepoSlide({
     activeOrg.githubAppInstallations.length > 0 ||
     activeOrg.jiraIntegrations.length > 0;
 
-  const [editRepo, setEditRepo] = useState(!Boolean(repositoryId));
+  const [_editRepo, setEditRepo] = useState(!Boolean(repositoryId));
 
   const [selectedRepo, setSelectedRepo] = useState<{
     id: string;

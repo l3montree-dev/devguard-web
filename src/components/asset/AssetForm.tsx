@@ -4,8 +4,6 @@
 import { useState } from "react";
 import type { FunctionComponent } from "react";
 import { UserRole } from "@/types/api/api";
-import type { AssetDTO } from "@/types/api/api";
-import type { Modify } from "@/types/common";
 import type { UseFormReturn } from "react-hook-form";
 import Section from "../common/Section";
 import React from "react";
@@ -68,16 +66,9 @@ export const createUpdateHandler = <T extends keyof AssetFormValues>(
   };
 };
 
-export type AssetFormValues = Modify<
-  AssetDTO,
-  {
-    cvssAutomaticTicketThreshold: number[];
-    riskAutomaticTicketThreshold: number[];
-    enableTicketRange: boolean;
-  }
->;
+import type { AssetFormValues } from "@/types/view/asset";
 
-export const AssetSettingsForm: FunctionComponent<
+const AssetSettingsForm: FunctionComponent<
   Props & {
     forceVerticalSections?: boolean;
     disable?: boolean;

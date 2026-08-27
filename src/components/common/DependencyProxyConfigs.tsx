@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Diagnostic } from "@codemirror/lint";
 import Section from "./Section";
 import { CopyCodeFragment } from "./CopyCode";
@@ -43,11 +42,10 @@ function matchPattern(pattern: string, packagePurl: string): boolean {
   return true;
 }
 
-interface CheckResult {
-  packagePurl: string;
-  blocked: boolean;
-  matchedRule: string;
-}
+import type {
+  CheckResult,
+  DependencyProxyConfig,
+} from "@/types/view/dependencyProxy";
 
 function checkRulesAgainstPackages(
   rulesText: string,
@@ -79,11 +77,6 @@ function checkRulesAgainstPackages(
 
     return { packagePurl, blocked, matchedRule };
   });
-}
-
-interface DependencyProxyConfig {
-  rules: string;
-  minReleaseAge: number;
 }
 
 const defaultConfig: DependencyProxyConfig = {

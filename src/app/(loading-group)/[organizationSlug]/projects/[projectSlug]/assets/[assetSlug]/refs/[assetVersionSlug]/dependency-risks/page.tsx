@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
@@ -19,7 +22,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { documentationLinks } from "@/const/documentationLinks";
-import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import {
   useActiveAssetVersion,
@@ -129,7 +131,6 @@ const Index: FunctionComponent = () => {
   }, []);
   const config = useConfig();
   const latestScannerImage = useScannerImage();
-  const { session } = useSession();
 
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
@@ -192,7 +193,6 @@ const Index: FunctionComponent = () => {
   const {
     data: vulns,
     isLoading,
-    error,
     mutate: mutateVulns,
   } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
     keepPreviousData: true,

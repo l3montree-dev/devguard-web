@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import * as OTPAuth from "otpauth";
 import { DevGuardPOM } from "./pom/devguard";
 import type { Page } from "@playwright/test";
@@ -37,7 +40,7 @@ function sleep(timeInMs: number) {
 }
 
 // TODO: Remove this workaround once https://github.com/l3montree-dev/devguard/issues/1193 is fixed
-export async function TEMPORARY_WORKAROUND(
+export async function temporaryWorkaround(
   page: Page,
   devguardPOM: DevGuardPOM,
 ) {

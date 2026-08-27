@@ -1,10 +1,13 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import type { ProjectDTO, SubGroupsAndAsset } from "../types/api/api";
 import NestedList from "./group-list/NestedList";
 import ProjectRow from "./group-list/ProjectRow";
 
-export { isProject, checkType } from "./group-list/utils";
+export { checkType } from "./group-list/utils";
 
 interface Props {
   project?: ProjectDTO;

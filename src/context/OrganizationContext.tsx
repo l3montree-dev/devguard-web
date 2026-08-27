@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import {
@@ -6,14 +9,9 @@ import {
   useEffect,
   type ProviderProps,
 } from "react";
-import type { OrganizationDetailsDTO } from "../types/api/api";
-import type { WithUpdater } from "./ClientContextWrapper";
-import type { ContentTreeElement } from "../utils/view";
+import type { WithUpdater } from "@/types/view/context";
 
-type OrgContextParams = {
-  organization: OrganizationDetailsDTO | null;
-  contentTree: ContentTreeElement[];
-};
+import type { OrgContextParams } from "@/types/view/context";
 const OrganizationContext = createContext<WithUpdater<OrgContextParams>>({
   v: {
     organization: null,

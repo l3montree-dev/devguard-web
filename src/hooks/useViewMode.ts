@@ -1,6 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useState, useEffect } from "react";
 
-type ViewMode = "risk" | "cvss";
+import type { ViewMode } from "@/types/view/navigation";
 
 export const useViewMode = (
   storageKey: string = "devguard-view-mode",
