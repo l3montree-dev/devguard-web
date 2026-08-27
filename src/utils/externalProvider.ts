@@ -1,4 +1,13 @@
+import { useConfig } from "@/context/ConfigContext";
+
 export const providerIdToBaseURL = (provider?: string) => {
+  const config = useConfig();
+  const oauthConfig = config.gitlabOAuth2Config?.find(
+    (oauthConf) => provider === oauthConf.providerID,
+  );
+  if (oauthConfig) {
+    return oauthConfig.gitlabBaseURL;
+  }
   if (provider === "gitlab") {
     return "https://gitlab.com";
   } else if (provider === "opencode") {

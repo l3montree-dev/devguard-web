@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode, ComponentType } from "react";
 
 export type WithUpdater<T> = { v: T } & {
@@ -20,6 +20,12 @@ export function ClientContextWrapper<T>({
   value,
 }: ClientContextWrapperProps<T>) {
   const [state, update] = useState(value);
+
+  useEffect(() => {
+    update(value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
   return (
     <Provider
       value={
