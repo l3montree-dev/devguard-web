@@ -145,7 +145,7 @@ export function BranchTagSelector({
           <CaretDownIcon className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="z-50 w-56">
+      <DropdownMenuContent align="start" className="z-50 w-80">
         <Input
           onKeyDown={(e) => e.stopPropagation()}
           placeholder="Search"
@@ -193,6 +193,7 @@ export function BranchTagSelector({
             <div style={{ maxHeight: "480px", overflowY: "auto" }}>
               {filteredItems.map((item) => (
                 <DropdownMenuCheckboxItem
+                  className="cursor-pointer"
                   checked={selected === item.name}
                   key={item.slug}
                   onClick={() => {
@@ -215,7 +216,7 @@ export function BranchTagSelector({
         <Link
           href={`/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs`}
         >
-          <DropdownMenuItem className="text-sm text-foreground block font-medium text-center w-full">
+          <DropdownMenuItem className="text-sm text-foreground cursor-pointer block font-medium text-center w-full">
             View all branches and tags
           </DropdownMenuItem>
         </Link>

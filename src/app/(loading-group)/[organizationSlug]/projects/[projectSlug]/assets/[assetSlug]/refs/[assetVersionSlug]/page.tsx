@@ -42,6 +42,8 @@ import Link from "next/link";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import { RiskHistoryDistributionDiagram } from "../../../../../../../../../components/RiskHistoryDistributionDiagram";
+import { AffectedBranchesTags } from "@/components/AffectedBranchesTags";
+import { useRefDistributions } from "@/hooks/useRefDistributions";
 import SeverityCard from "../../../../../../../../../components/SeverityCard";
 import { Badge } from "../../../../../../../../../components/ui/badge";
 import { AsyncButton } from "../../../../../../../../../components/ui/button";
@@ -135,6 +137,9 @@ const Index: FunctionComponent = () => {
     });
     return reduceRiskHistories(completeRiskHistory);
   }, [riskHistoryResp]);
+
+  const { distributionByRef, isLoading: distributionByRefLoading } =
+    useRefDistributions();
 
   const project = activeProject;
   const asset = activeAsset;
@@ -380,6 +385,22 @@ const Index: FunctionComponent = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-2 flex flex-col">
+                <AffectedBranchesTags
+                  isLoading={distributionByRefLoading}
+                  data={distributionByRef}
+                  type={"branch"}
+                />
+              </div>
+              <div className="col-span-2 flex flex-col">
+                <AffectedBranchesTags
+                  isLoading={distributionByRefLoading}
+                  data={distributionByRef}
+                  type={"tag"}
+                />
+              </div>
             </div>
             <RiskHistoryDistributionDiagram
               isLoading={riskHistoryLoading}
