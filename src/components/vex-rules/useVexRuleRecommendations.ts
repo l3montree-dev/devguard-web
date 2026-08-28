@@ -45,8 +45,6 @@ export function findRecommendationForVuln(
   );
 }
 
-const ALL_RECOMMENDATIONS_PAGE_SIZE = "10000";
-
 /** The recommendation for a single vulnerability, or null if there is none. */
 export function useVexRuleRecommendation(
   baseUrl: string | null,
