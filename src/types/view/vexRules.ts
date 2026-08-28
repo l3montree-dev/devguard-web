@@ -1,11 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type {
-  CreateVexRuleRequest,
-  ExternalReference,
-  VexRuleRecommendation,
-} from "@/types/api/api";
+import type { CreateVexRuleRequest } from "@/types/api/api";
 import type { checkCelSyntax } from "@/components/common/celLinter";
 
 export interface VexRuleVulnContext {
@@ -35,10 +31,6 @@ export interface VexRuleEffect {
   matchedOn?: { field: "cveId" | "componentPurl"; value: string };
 }
 
-export type VexSourceType = "cyclonedx" | "csaf";
-
-export type VexSource = ExternalReference & { type: VexSourceType };
-
 export interface VexRuleMatchCount {
   // Syntax error of the current expression, or null when it parses.
   syntaxError?: ReturnType<typeof checkCelSyntax>;
@@ -50,11 +42,6 @@ export interface VexRuleMatchCount {
   // How many vulnerabilities of this asset the expression matches; null while
   // unknown (empty, invalid or not yet tested).
   matchCount: number | null;
-}
-
-export interface RecommendationEntry {
-  vulnID: string;
-  recommendation: VexRuleRecommendation;
 }
 
 export type EditableRule = Pick<
