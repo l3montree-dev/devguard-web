@@ -4,12 +4,9 @@
 import { HEADER_HEIGHT } from "@/const/viewConstants";
 import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
-import Link from "next/link";
 import React, { type FunctionComponent } from "react";
-import { documentationLinks } from "@/const/documentationLinks";
-
-import { useConfig } from "../context/ConfigContext";
 import EntityProviderBanner from "./common/EntityProviderBanner";
+import Footer from "./misc/Footer";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -43,7 +40,6 @@ const Main: FunctionComponent<Props> = ({
   breadcrumbs,
 }) => {
   const dimensions = useDimensions();
-  const themeConfig = useConfig();
 
   return (
     <main className="flex-1 font-body">
@@ -82,61 +78,7 @@ const Main: FunctionComponent<Props> = ({
         {children}
       </div>
       <div className="bg-footer">
-        <footer className="mx-auto max-w-screen-xl px-6 py-8 text-sm text-muted-foreground lg:px-8">
-          <div className="mb-2 flex flex-row gap-5">
-            <Link
-              className="!text-muted-foreground hover:!text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={documentationLinks.docsIntroduction}
-            >
-              Documentation
-            </Link>
-            <Link
-              className="!text-muted-foreground hover:!text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/l3montree-dev/devguard"
-            >
-              GitHub
-            </Link>
-            <Link
-              className="!text-muted-foreground hover:!text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={themeConfig.imprintLink}
-            >
-              Imprint
-            </Link>
-            <a
-              className="!text-muted-foreground hover:!text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href={themeConfig.termsOfUseLink}
-            >
-              Terms of Use
-            </a>
-            <a
-              className="!text-muted-foreground hover:!text-foreground"
-              href={themeConfig.privacyPolicyLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Privacy
-            </a>
-            <Link
-              className="!text-muted-foreground hover:!text-foreground"
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/l3montree-dev/devguard/blob/main/LICENSE.txt"
-            >
-              AGPL-3.0-License
-            </Link>
-          </div>
-          Copyright © {new Date().getFullYear()} L3montree GmbH and the DevGuard
-          Contributors. All rights reserved. Version{" "}
-          {process.env.NEXT_PUBLIC_VERSION}
-        </footer>
+        <Footer variant="app" />
       </div>
     </main>
   );

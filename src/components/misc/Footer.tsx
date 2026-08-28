@@ -1,19 +1,46 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { config } from "@/config";
+"use client";
+
 import { documentationLinks } from "@/const/documentationLinks";
+import { useConfig } from "@/context/ConfigContext";
+import { useInstanceInfo } from "@/hooks/useInstanceSettings";
+import { classNames } from "@/utils/common";
 import Link from "next/link";
 
-export default function Footer() {
+const linkClassName = "!text-muted-foreground hover:!text-foreground";
+
+interface Props {
+  // "app" is the container-width footer of the app shell, "auth" the centered one on the login/registration pages
+  variant?: "app" | "auth";
+}
+
+export default function Footer({ variant = "auth" }: Props) {
+  const config = useConfig();
+  const instanceInfo = useInstanceInfo();
+  const isApp = variant === "app";
+
   return (
     <footer
       id="misc-footer"
-      className="px-4 text-center text-xs text-muted-foreground sm:px-10 sm:text-sm"
+      className={classNames(
+        "text-muted-foreground",
+        isApp
+          ? "mx-auto max-w-screen-xl px-6 py-8 text-sm lg:px-8"
+          : "px-4 text-center text-xs sm:px-10 sm:text-sm",
+      )}
     >
-      <div className="mb-2 flex flex-wrap justify-center gap-x-4 gap-y-1 sm:gap-5">
+      <div
+        className={classNames(
+          "mb-2 flex",
+          isApp
+            ? "flex-row gap-5"
+            : "flex-wrap justify-center gap-x-4 gap-y-1 sm:gap-5",
+        )}
+      >
         <Link
-          className="!text-muted-foreground hover:!text-foreground"
+          className={linkClassName}
           target="_blank"
           rel="noopener noreferrer"
           href={documentationLinks.docsIntroduction}
@@ -21,7 +48,7 @@ export default function Footer() {
           Documentation
         </Link>
         <Link
-          className="!text-muted-foreground hover:!text-foreground"
+          className={linkClassName}
           target="_blank"
           rel="noopener noreferrer"
           href="https://github.com/l3montree-dev/devguard"
@@ -29,7 +56,7 @@ export default function Footer() {
           GitHub
         </Link>
         <Link
-          className="!text-muted-foreground hover:!text-foreground"
+          className={linkClassName}
           target="_blank"
           rel="noopener noreferrer"
           href={config.imprintLink}
@@ -37,7 +64,7 @@ export default function Footer() {
           Imprint
         </Link>
         <a
-          className="!text-muted-foreground hover:!text-foreground"
+          className={linkClassName}
           target="_blank"
           rel="noopener noreferrer"
           href={config.termsOfUseLink}
@@ -45,7 +72,7 @@ export default function Footer() {
           Terms of Use
         </a>
         <a
-          className="!text-muted-foreground hover:!text-foreground"
+          className={linkClassName}
           target="_blank"
           rel="noopener noreferrer"
           href={config.privacyPolicyLink}
@@ -53,7 +80,7 @@ export default function Footer() {
           Privacy
         </a>
         <Link
-          className="!text-muted-foreground hover:!text-foreground"
+          className={linkClassName}
           target="_blank"
           rel="noopener noreferrer"
           href="https://github.com/l3montree-dev/devguard/blob/main/LICENSE.txt"
@@ -61,13 +88,17 @@ export default function Footer() {
           AGPL-3.0-License
         </Link>
       </div>
-      <p className="text-balance">
-        Copyright © {process.env.NEXT_PUBLIC_BUILD_YEAR} L3montree GmbH and the
-        DevGuard Contributors. All rights reserved.{" "}
-        <span className="block sm:inline">
-          Version {process.env.NEXT_PUBLIC_VERSION}
-        </span>
-      </p>
+      <div className={isApp ? "flex gap-1" : ""}>
+        <p className={"text-balance mb-2"}>
+          Copyright © {process.env.NEXT_PUBLIC_BUILD_YEAR} L3montree GmbH and
+          the DevGuard Contributors. All rights reserved.
+        </p>
+        <p className={"text-balance sm:inline"}>
+          Web-Version: {process.env.NEXT_PUBLIC_VERSION ?? "dev"}
+          {instanceInfo?.apiVersion &&
+            ` · API-Version ${instanceInfo.apiVersion}`}
+        </p>
+      </div>
     </footer>
   );
 }

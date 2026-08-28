@@ -16,30 +16,30 @@
 "use client";
 
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { toast } from "@/lib/toast";
 import type { OrganizationDTO } from "@/types/api/api";
+import { truncateMiddle } from "@/utils/common";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { uniqBy } from "lodash";
 import { Loader2, PlusIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { toast } from "@/lib/toast";
+import { useConfig } from "../context/ConfigContext";
+import { useSession, useUpdateSession } from "../context/SessionContext";
+import { useActiveOrg } from "../hooks/useActiveOrg";
 import { browserApiClient } from "../services/devGuardApi";
 import GitProviderIcon from "./GitProviderIcon";
 import { Badge } from "./ui/badge";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useSession, useUpdateSession } from "../context/SessionContext";
-import { useActiveOrg } from "../hooks/useActiveOrg";
-import { useInstanceSettings } from "../hooks/useInstanceSettings";
-import { truncateMiddle } from "@/utils/common";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -57,7 +57,7 @@ const OrganizationDropDown = () => {
 
   const user = useCurrentUser();
   const router = useRouter();
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useConfig();
 
   const lastActiveOrg = localStorage.getItem("lastActiveOrg");
 

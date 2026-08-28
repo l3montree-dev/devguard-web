@@ -15,6 +15,7 @@ import FalsePositiveDialog from "@/components/FalsePositiveDialog";
 import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AsyncButton, Button } from "@/components/ui/button";
 import {
     Card,
@@ -35,6 +36,7 @@ import {
     useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import useTable from "@/hooks/useTable";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
@@ -42,7 +44,7 @@ import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
 import type { ColumnDef } from "@tanstack/react-table";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import { CircleFadingArrowUp, CircleHelp, Loader2 } from "lucide-react";
+import { CircleFadingArrowUp, CircleHelp, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
@@ -143,6 +145,7 @@ const Index: FunctionComponent = () => {
   const latestScannerImage = useScannerImage();
 
   const assetMenu = useAssetMenu();
+  const instanceInfo = useInstanceInfo();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
 
@@ -630,6 +633,17 @@ const Index: FunctionComponent = () => {
         </div>
       ) : !vulns?.data?.length ? (
         <div>
+          {instanceInfo?.vulndbInitialized === false && (
+            <Alert>
+              <Info />
+              <AlertTitle>Vulnerability database is still importing</AlertTitle>
+              <AlertDescription>
+                This instance is importing the vulnerability database for the
+                first time. Until it is done, no dependency risks can be
+                identified. Please reload this page in about 5 minutes.
+              </AlertDescription>
+            </Alert>
+          )}
           <EmptyParty
             title="No matching results."
             description="Risk identification is the process of determining what risks exist in the asset and what their characteristics are. This process is done by identifying, assessing, and prioritizing risks."
