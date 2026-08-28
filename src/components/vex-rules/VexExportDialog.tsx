@@ -3,6 +3,7 @@
 
 "use client";
 
+import { useArtifacts } from "@/hooks/useArtifacts";
 import AuthGuard from "@/components/AuthGuard";
 import Callout from "@/components/common/Callout";
 import { DelayedDownloadButton } from "@/components/common/DelayedDownloadButton";
@@ -25,14 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useConfig } from "@/context/ConfigContext";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import useDecodedParams from "@/hooks/useDecodedParams";
-import type { ArtifactDTO } from "@/types/api/api";
 import { FileCode, GitBranchIcon } from "lucide-react";
 import Image from "next/image";
 import { useState, type FunctionComponent } from "react";
-import useSWR from "swr";
 
 interface VexExportDialogProps {
   open: boolean;
@@ -63,11 +61,14 @@ const VexExportDialog: FunctionComponent<VexExportDialogProps> = ({
     refs[0]?.slug;
 
   const assetBasePath = `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}`;
-  const { data: artifacts } = useSWR<ArtifactDTO[]>(
-    open && ref
-      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${ref}/artifacts/`
-      : null,
-    fetcher,
+  const { data: artifacts } = useArtifacts(
+    {
+      organization: organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug: ref ?? "",
+    },
+    Boolean(open && ref),
   );
 
   const [selectedArtifact, setSelectedArtifact] = useState<string | undefined>(

@@ -8,8 +8,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { Bug } from "lucide-react";
 import type { FunctionComponent } from "react";
-import type { DependencyVuln } from "../../types/api/api";
+
 import { Badge } from "../ui/badge";
+import type { DependencyVuln } from "@/types/dto";
 
 // Uses the shared Badge color variants (muted background + matching border and
 // text) so vuln states read like every other status badge in the app.

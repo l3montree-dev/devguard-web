@@ -1,8 +1,9 @@
 // Copyright 2025 rafaeishikho.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { UserRole } from "@/types/api/api";
-import type { OrganizationDetailsDTO, ProjectDTO } from "@/types/api/api";
+import { UserRole } from "@/types/view/vuln";
+import type { OrganizationDetailsDTO, ProjectDetailsDTO } from "@/types/dto";
+
 import type { User } from "@/types/auth";
 import { useMemo } from "react";
 import { useActiveOrg } from "./useActiveOrg";
@@ -29,7 +30,7 @@ export const useCurrentUserRole = () => {
       project,
       asset,
     );
-  }, [currentUser, project, activeOrg, projectSlug]);
+  }, [currentUser, project, activeOrg, projectSlug, asset]);
 };
 
 export const isLoggedIn = (role: UserRole | null): boolean => role !== null;
@@ -61,7 +62,7 @@ export const getCurrentUserRole = (
   currentUser: User | undefined,
   org: OrganizationDetailsDTO,
   projectSlug?: string | undefined,
-  project?: ProjectDTO | null,
+  project?: ProjectDetailsDTO | null,
   asset?: ReturnType<typeof useActiveAsset> | null,
 ): UserRole | null => {
   if (!currentUser) {
@@ -73,7 +74,7 @@ export const getCurrentUserRole = (
       (member) => member.id === currentUser.id,
     );
     if (assetMember) {
-      return assetMember.role || UserRole.Member;
+      return (assetMember.role as UserRole) || UserRole.Member;
     }
   }
 
@@ -82,7 +83,7 @@ export const getCurrentUserRole = (
       (member) => member.id === currentUser.id,
     );
     if (projectMember) {
-      return projectMember.role || UserRole.Member;
+      return (projectMember.role as UserRole) || UserRole.Member;
     }
   }
 
@@ -91,7 +92,7 @@ export const getCurrentUserRole = (
       (member) => member.id === currentUser.id,
     );
     if (orgMember) {
-      return orgMember.role || UserRole.Member;
+      return (orgMember.role as UserRole) || UserRole.Member;
     }
   }
 

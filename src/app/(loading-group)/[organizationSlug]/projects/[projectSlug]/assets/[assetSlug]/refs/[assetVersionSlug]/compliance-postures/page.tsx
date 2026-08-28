@@ -19,20 +19,17 @@ const Index = () => {
 
   const assetMenu = useAssetMenu();
 
-  const apiBaseUrl =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/refs/" +
-    assetVersionSlug +
-    "/compliance-postures/";
+  const scope = {
+    level: "assetVersion",
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  } as const;
 
   return (
     <CompliancePosturesListView
-      apiBaseUrl={apiBaseUrl}
+      scope={scope}
       Menu={assetMenu}
       Title={<AssetTitle />}
     />

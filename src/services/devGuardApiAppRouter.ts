@@ -2,22 +2,9 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { cookies } from "next/headers";
-import { getApiClientFromCookies } from "./devGuardApi";
+import { serverClient } from "./apiClient";
 
-export const getApiClientInAppRouter = async () => {
+export const getServerClientInAppRouter = async () => {
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("ory_kratos_session");
-  return getApiClientFromCookies(sessionCookie?.value);
-};
-
-export const getApiClientInRouteHandler = (request: Request) => {
-  const cookieHeader = request.headers.get("cookie") || "";
-  const sessionCookie = cookieHeader
-    .split(";")
-    .map((cookie) => cookie.trim())
-    .find((cookie) => cookie.startsWith("ory_kratos_session="));
-  const sessionCookieValue = sessionCookie
-    ? sessionCookie.split("=")[1]
-    : undefined;
-  return getApiClientFromCookies(sessionCookieValue);
+  return serverClient(cookieStore.get("ory_kratos_session")?.value);
 };

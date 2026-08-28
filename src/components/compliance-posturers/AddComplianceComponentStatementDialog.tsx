@@ -3,6 +3,7 @@
 
 "use client";
 
+import { useComplianceComponentsForControl } from "@/hooks/useCompliancePosture";
 import { AsyncButton } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,18 +20,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type {
-  ComplianceComponentDetailsDTO,
-  ComplianceComponentImplementsControlStatementDTO,
-  ImplementationStatus,
-} from "@/types/api/api";
+import type { PostureScope } from "@/services/compliancePostureService";
+import { createStatement } from "@/services/compliancePostureService";
+import type { ImplementationStatus } from "@/types/view/compliance";
+import type { ComplianceComponentImplementsControlStatementDTO } from "@/types/dto";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import useSWR from "swr";
 import ComplianceComponentIcon from "./ComplianceComponentIcon";
 
 const MarkdownEditor = dynamic(
@@ -52,7 +49,7 @@ const IMPLEMENTATION_STATUSES: {
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  apiBaseUrl: string;
+  scope: PostureScope;
   frameworkControlId: string;
   attachedComponentIds: string[];
   onCreated: (
@@ -63,16 +60,13 @@ interface Props {
 const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
   open,
   setOpen,
-  apiBaseUrl,
+  scope,
   frameworkControlId,
   attachedComponentIds,
   onCreated,
 }) => {
-  const { data: allComponents } = useSWR<ComplianceComponentDetailsDTO[]>(
-    open
-      ? `/compliance-components/?filterQuery[frameworkControlId][is]=${encodeURIComponent(frameworkControlId)}`
-      : null,
-    fetcher,
+  const { data: allComponents } = useComplianceComponentsForControl(
+    open ? frameworkControlId : undefined,
   );
 
   const components = useMemo(
@@ -111,27 +105,19 @@ const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
       return;
     }
 
-    const resp = await browserApiClient(
-      `${apiBaseUrl}${frameworkControlId}/components/${componentId}/`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          implementationStatus: status,
-          description,
-        }),
-      },
-    );
-
-    if (!resp.ok) {
+    let json: ComplianceComponentImplementsControlStatementDTO;
+    try {
+      json = (await createStatement(scope, frameworkControlId, componentId, {
+        implementationStatus: status,
+        description,
+      })) as ComplianceComponentImplementsControlStatementDTO;
+    } catch {
       toast.error("Failed to attach component", {
         description: "Please try again later.",
       });
       return;
     }
 
-    const json: ComplianceComponentImplementsControlStatementDTO =
-      await resp.json();
     toast.success("Component attached");
     reset();
     setOpen(false);

@@ -22,7 +22,10 @@ import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
 import VexRuleRecommendationList from "@/components/vex-rules/VexRuleRecommendationList";
-import type { RecommendationEntry } from "@/types/view/vexRules";
+import type {
+  RecommendationEntry,
+  VexRulePrefill,
+} from "@/types/view/vexRules";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
 import {
   vexRuleRecommendationsURL,
@@ -31,17 +34,16 @@ import {
 import VexSourcesSection from "@/components/vex-rules/VexSourcesSection";
 import { useVexSources } from "@/components/vex-rules/useVexSources";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { ChevronDown } from "lucide-react";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { Paged, VexRule, VexRulePrefill } from "@/types/api/api";
+import { uploadVex } from "@/services/scanUploadService";
+import { useVexRules } from "@/hooks/useVexRules";
+
 import { buildFilterSearchParams } from "@/utils/url";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
-import useSWR from "swr";
 import Link from "next/link";
 
 const VexRulesPage: FunctionComponent = () => {
@@ -58,7 +60,7 @@ const VexRulesPage: FunctionComponent = () => {
     assetSlug: string;
   };
 
-  const vexRulesUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`;
+  const scope = { organization: organizationSlug, projectSlug, assetSlug };
   const query = useMemo(
     () => buildFilterSearchParams(searchParams),
     [searchParams],
@@ -69,23 +71,21 @@ const VexRulesPage: FunctionComponent = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR<Paged<VexRule>>(`${vexRulesUrl}/?${query.toString()}`, fetcher);
+  } = useVexRules(scope, query);
   const vexRules = vexRulesResponse?.data ?? [];
 
   const handleVexUpload = async (params: { file: File }) => {
-    const response = await browserApiClient(`/vex`, {
-      method: "POST",
-      body: await params.file.text(),
-      headers: {
-        "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
-        "X-Origin": "vex-upload",
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      toast.error("Failed to upload VEX file: " + errorText);
-      throw new Error("Failed to upload VEX file: " + errorText);
+    try {
+      await uploadVex(
+        {
+          assetName: `${organizationSlug}/${projectSlug}/${assetSlug}`,
+          origin: "vex-upload",
+        },
+        await params.file.text(),
+      );
+    } catch (error) {
+      toast.error("Failed to upload VEX file: " + String(error));
+      throw error;
     }
 
     toast.success("VEX file uploaded successfully");
@@ -166,10 +166,7 @@ const VexRulesPage: FunctionComponent = () => {
         </div>
 
         <AuthGuard require="member">
-          <CelPlayground
-            baseUrl={vexRulesUrl}
-            onCreateRule={openCreateDialog}
-          />
+          <CelPlayground scope={scope} onCreateRule={openCreateDialog} />
         </AuthGuard>
       </Section>
 
@@ -187,7 +184,7 @@ const VexRulesPage: FunctionComponent = () => {
         ) : (
           <VexRulesTable
             rules={vexRules}
-            urlBase={vexRulesUrl}
+            scope={scope}
             isLoading={isLoading}
             onMutate={() => mutate()}
           />
@@ -269,7 +266,7 @@ const VexRulesPage: FunctionComponent = () => {
       <AddVexRuleDialog
         open={addRuleDialogOpen}
         onOpenChange={setAddRuleDialogOpen}
-        baseUrl={vexRulesUrl}
+        scope={scope}
         onCreated={() => mutate()}
         prefill={rulePrefill}
       />

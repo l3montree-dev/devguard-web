@@ -3,9 +3,9 @@
 
 "use client";
 
+import type { ExternalReference } from "@/types/dto";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
-import type { ExternalReference } from "@/types/api/api";
 import type { VexSource, VexSourceType } from "@/types/view/vexRules";
 import useSWR from "swr";
 
@@ -28,9 +28,9 @@ export function useVexSources() {
     assetSlug: string;
   };
 
-  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
+  const scope = { organization: organizationSlug, projectSlug, assetSlug };
   const { data, error, mutate, isLoading } = useSWR<ExternalReference[]>(
-    apiUrl,
+    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`,
     fetcher,
   );
 
@@ -38,5 +38,5 @@ export function useVexSources() {
     isVexSourceType(ref.type),
   );
 
-  return { sources, apiUrl, error, isLoading, mutate };
+  return { sources, scope, error, isLoading, mutate };
 }

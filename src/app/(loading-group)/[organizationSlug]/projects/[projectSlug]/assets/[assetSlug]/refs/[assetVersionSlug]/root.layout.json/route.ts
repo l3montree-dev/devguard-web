@@ -2,20 +2,11 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { NextRequest, NextResponse } from "next/server";
-import { getApiClientFromRequest } from "@/services/devGuardApi";
-import { cookies } from "next/headers";
+import { streamFromApi } from "@/services/streamingClient";
 
 export async function GET(request: NextRequest, ctx: any) {
   try {
     const { organizationSlug, projectSlug, assetSlug } = await ctx.params;
-
-    // Get cookies for authentication
-    const cookieStore = await cookies();
-    const apiClient = getApiClientFromRequest({
-      cookies: Object.fromEntries(
-        cookieStore.getAll().map((c) => [c.name, c.value]),
-      ),
-    });
 
     const uri =
       "/organizations/" +
@@ -26,7 +17,7 @@ export async function GET(request: NextRequest, ctx: any) {
       assetSlug +
       "/in-toto/root.layout.json";
 
-    const rootLayout = await apiClient(uri);
+    const rootLayout = await streamFromApi(uri);
 
     if (!rootLayout.ok) {
       return NextResponse.json(

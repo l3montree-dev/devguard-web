@@ -29,25 +29,26 @@ import {
 } from "@/hooks/useActiveAssetVersion";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useTable from "@/hooks/useTable";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import { batchUpdateDependencyVulns } from "@/services/vulnService";
+import { useDependencyVulnList } from "@/hooks/useVulnList";
+import type { VulnByPackage, VulnWithCVE } from "@/types/view/vuln";
 import { buildFilterSearchParams } from "@/utils/url";
-import type { ColumnDef } from "@tanstack/react-table";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
+
+import { flexRender } from "@tanstack/react-table";
 import { CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
@@ -64,9 +65,9 @@ const severityRanges: Record<string, [number | null, number | null]> = {
 
 const rangeFilterFields = ["CVE.cvss", "raw_risk_assessment"];
 
-const columnHelper = createColumnHelper<VulnByPackage>();
+const columnHelper = createAppColumnHelper<VulnByPackage>();
 
-const columnsDef: ColumnDef<VulnByPackage, any>[] = [
+const columnsDef: TableColumnDef<VulnByPackage, any>[] = [
   {
     ...columnHelper.accessor("packageName", {
       header: "Package",
@@ -173,30 +174,21 @@ const Index: FunctionComponent = () => {
     return p;
   }, [searchParams]);
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/";
-
-  const vulnsSwrKey =
-    uri +
-    "refs/" +
-    assetVersionSlug +
-    "/" +
-    "dependency-vulns/?" +
-    queryWithState.toString();
+  const vulnScope = useMemo(
+    () => ({
+      organization: organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    }),
+    [organizationSlug, projectSlug, assetSlug, assetVersionSlug],
+  );
 
   const {
     data: vulns,
     isLoading,
     mutate: mutateVulns,
-  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
-    keepPreviousData: true,
-  });
+  } = useDependencyVulnList<VulnByPackage>(vulnScope, queryWithState);
   const handleBulkAction = useCallback(
     async (params: {
       vulnIds: string[];
@@ -230,22 +222,12 @@ const Index: FunctionComponent = () => {
 
       await mutateVulns(
         async () => {
-          const resp = await browserApiClient(
-            uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                vulnIds: params.vulnIds,
-                status: params.status,
-                justification: params.justification,
-                mechanicalJustification: params.mechanicalJustification ?? "",
-              }),
-            },
-          );
-
-          if (!resp.ok) {
-            throw new Error("Bulk action failed");
-          }
+          await batchUpdateDependencyVulns(vulnScope, {
+            vulnIds: params.vulnIds,
+            status: params.status,
+            justification: params.justification,
+            mechanicalJustification: params.mechanicalJustification ?? "",
+          } as never);
 
           // clear selection for the affected IDs
           setSelectedVulnIds((prev) => {
@@ -264,7 +246,7 @@ const Index: FunctionComponent = () => {
         },
       );
     },
-    [uri, assetVersionSlug, mutateVulns, vulns],
+    [vulnScope, mutateVulns, vulns],
   );
 
   const handleSearch = useDebouncedQuerySearch();
@@ -386,11 +368,13 @@ const Index: FunctionComponent = () => {
   );
 
   // Compute selected open/closed IDs for batch actions
+  const vulnData = vulns?.data;
+
   const { selectedOpenIds, selectedClosedIds } = useMemo(() => {
-    if (!vulns?.data) return { selectedOpenIds: [], selectedClosedIds: [] };
+    if (!vulnData) return { selectedOpenIds: [], selectedClosedIds: [] };
 
     const vulnById = new Map<string, { state: string }>();
-    vulns.data.forEach((pkg) => {
+    vulnData.forEach((pkg) => {
       pkg.vulns.forEach((v) => {
         vulnById.set(v.id, { state: v.state });
       });
@@ -412,7 +396,7 @@ const Index: FunctionComponent = () => {
     });
 
     return { selectedOpenIds: openIds, selectedClosedIds: closedIds };
-  }, [vulns?.data, selectedVulnIds]);
+  }, [vulnData, selectedVulnIds]);
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>

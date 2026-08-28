@@ -1,12 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { browserApiClient } from "./devGuardApi";
+import { generateKeyPair } from "./keyService";
 import type {
   SeeOncePatWithBearerToken as SeeOnceAccessTokenWithBearerToken,
   SeeOncePatWithPrivKey as SeeOnceAccessTokenWithPrivKey,
-} from "@/types/api/api";
-import { browserApiClient } from "./devGuardApi";
-import { generateKeyPair } from "./keyService";
+} from "@/types/view/accessToken";
 
 async function createAccessToken(
   data: {

@@ -15,9 +15,13 @@ const Config = () => {
   const project = useActiveProject();
   const projectMenu = useProjectMenu();
 
-  const baseUrl =
+  const scope =
     org && project
-      ? "/organizations/" + org.slug + "/projects/" + project.slug
+      ? ({
+          level: "project",
+          organization: org.slug,
+          projectSlug: project.slug,
+        } as const)
       : null;
 
   return (
@@ -36,7 +40,7 @@ const Config = () => {
       Menu={projectMenu}
       Title={<ProjectTitle />}
     >
-      <DependencyProxyConfigs baseUrl={baseUrl} />
+      <DependencyProxyConfigs scope={scope} />
     </Page>
   );
 };

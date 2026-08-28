@@ -3,14 +3,14 @@
 
 "use client";
 
-import type { ProjectDTO, SubGroupsAndAsset } from "../types/api/api";
+import type { SubGroupProject, SubGroupsAndAsset } from "@/types/view/project";
 import NestedList from "./group-list/NestedList";
 import ProjectRow from "./group-list/ProjectRow";
 
 export { checkType } from "./group-list/utils";
 
 interface Props {
-  project?: ProjectDTO;
+  project?: SubGroupProject;
   subgroupsWithAssets?: SubGroupsAndAsset[];
   onFetchData: (projectSlug: string, projectId: string) => any;
   error?: Error;

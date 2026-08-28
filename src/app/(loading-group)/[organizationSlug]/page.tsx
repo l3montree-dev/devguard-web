@@ -6,17 +6,13 @@
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Page from "../../../components/Page";
 
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
-import { browserApiClient } from "../../../services/devGuardApi";
-import type {
-  Paged,
-  ProjectDTO,
-  SubGroupsAndAsset,
-} from "../../../types/api/api";
-import type { CreateProjectReq } from "../../../types/api/req";
+import type { Paged } from "@/types/view/pagination";
+import type { SubGroupProject, SubGroupsAndAsset } from "@/types/view/project";
+import type { ProjectCreateRequest } from "@/services/projectService";
 
 import Section from "@/components/common/Section";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
@@ -32,8 +28,7 @@ import SubgroupsAndAssetsList, {
 } from "@/components/SubgroupsAndAssetsList";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useUpdateOrganization } from "@/context/OrganizationContext";
-import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
+import { useOrgTriggerSync } from "@/hooks/useOrgTriggerSync";
 import { usePageTour } from "@/hooks/usePageTour";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import AuthGuard from "@/components/AuthGuard";
@@ -41,21 +36,18 @@ import { useWelcomeTour } from "@/hooks/useWelcomeTour";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { Loader2 } from "lucide-react";
-import useSWR from "swr";
 import EmptyParty from "../../../components/common/EmptyParty";
 import ListRenderer from "../../../components/common/ListRenderer";
-import { fetcher } from "../../../data-fetcher/fetcher";
 import useRouterQuery from "../../../hooks/useRouterQuery";
+import { useOrgProjects } from "@/hooks/useOrgProjects";
+import { createProject, listProjectResources } from "@/services/projectService";
 
 const OrganizationHomePage: FunctionComponent = () => {
   const [viewedProject, setViewedProject] = useState<"all" | "inactive">("all");
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const activeOrg = useActiveOrg();
-  const [syncRunning, setSyncRunning] = useState(false);
   const searchParams = useSearchParams();
-
-  const updateOrganization = useUpdateOrganization();
 
   const currentUserRole = useCurrentUserRole();
 
@@ -74,33 +66,14 @@ const OrganizationHomePage: FunctionComponent = () => {
     return p;
   }, [searchParams]);
 
-  const stillOnPage = useRef(true);
   const pushQuery = useRouterQuery();
-
-  const swrUrl = isSearchActive
-    ? `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/search?${queryWithState.toString()}`
-    : `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/?${queryWithState.toString()}`;
 
   const {
     isLoading,
     data: projects,
     error,
     mutate,
-  } = useSWR<Paged<SubGroupsAndAsset>>(
-    swrUrl,
-    async (url: string) => {
-      const data = await fetcher<Paged<ProjectDTO>>(url);
-      // we need to transform the data to add the resourceType field to each item, so that we can distinguish between projects and assets in the SubgroupsAndAssetsList component
-      return {
-        ...data,
-        data: data.data.map((item) => ({
-          ...item,
-          resourceType: "project",
-        })),
-      } as Paged<SubGroupsAndAsset>;
-    },
-    { keepPreviousData: true },
-  );
+  } = useOrgProjects(activeOrg.slug, queryWithState, isSearchActive);
 
   const debouncedHandleSearch = useMemo(
     () =>
@@ -121,43 +94,13 @@ const OrganizationHomePage: FunctionComponent = () => {
     }
   };
 
-  const handleTriggerSync = useCallback(async () => {
-    setSyncRunning(true);
-    const resp = await browserApiClient(
-      `/organizations/${activeOrg.slug}/trigger-sync`,
-    );
-    if (resp.ok) {
-      const contentTreeResp = await browserApiClient(
-        `/organizations/${decodeURIComponent(activeOrg.slug)}/content-tree`,
-      );
-      const contentTree = await contentTreeResp.json();
-      updateOrganization((prev) => ({
-        ...prev,
-        contentTree: contentTree,
-      }));
-      toast.success("Sync triggered successfully!");
-      // reload the page to show the updated projects
-      if (stillOnPage.current) {
-        mutate();
-      }
-    } else {
-      toast.error("Failed to trigger sync. Please try again later.");
-    }
-    setSyncRunning(false);
-  }, [activeOrg.slug, mutate]);
+  const { triggerSync, syncRunning } = useOrgTriggerSync(mutate);
 
-  const handleCreateProject = async (req: CreateProjectReq) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/projects",
-      {
-        method: "POST",
-        body: JSON.stringify(req),
-      },
-    );
-    if (resp.ok) {
-      const res: ProjectDTO = await resp.json();
+  const handleCreateProject = async (req: ProjectCreateRequest) => {
+    try {
+      const res = await createProject(activeOrg.slug, req);
       router.push(`/${activeOrg.slug}/projects/${res.slug}`);
-    } else {
+    } catch {
       toast("Error", {
         description: "Could not create project",
       });
@@ -167,80 +110,47 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const handleLazyDataFetching = useCallback(
     async (projectSlug: string, projectId: string) => {
-      const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+      const subGroupsAndAsset = (await listProjectResources(
+        {
+          organization: decodeURIComponent(activeOrg.slug),
+          projectSlug: decodeURIComponent(projectSlug),
+        },
+        projectId,
+      )) as unknown as Paged<SubGroupsAndAsset>;
 
-      const resp = await browserApiClient(base);
-      if (resp.ok) {
-        const data = await resp.json();
-        const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
+      mutate(
+        (prev) => {
+          if (!prev) return prev;
+          // traverse the whole tree, find the correct project and update it with the new data
+          const recursiveFn = (item: SubGroupsAndAsset): SubGroupsAndAsset => {
+            const { asset, subgroup } = checkType(item);
+            if (asset != null) {
+              return asset;
+            }
 
-        mutate(
-          (prev) => {
-            if (!prev) return prev;
-            // traverse the whole tree, find the correct project and update it with the new data
-            const recursiveFn = (
-              item: SubGroupsAndAsset,
-            ): SubGroupsAndAsset => {
-              const { asset, subgroup } = checkType(item);
-              if (asset != null) {
-                return asset;
-              }
-
-              if (subgroup.id === projectId) {
-                return {
-                  ...subgroup,
-                  subGroupsAndAsset: subGroupsAndAsset.data,
-                };
-              }
-
+            if (subgroup.id === projectId) {
               return {
                 ...subgroup,
-                subGroupsAndAsset:
-                  subgroup?.subGroupsAndAsset?.map(recursiveFn),
+                subGroupsAndAsset: subGroupsAndAsset.data,
               };
-            };
+            }
 
             return {
-              ...prev,
-              data: prev.data.map(recursiveFn) as Array<
-                ProjectDTO & {
-                  resourceType: "project";
-                }
-              >,
+              ...subgroup,
+              subGroupsAndAsset: subgroup?.subGroupsAndAsset?.map(recursiveFn),
             };
-          },
-          { revalidate: false },
-        );
-      } else {
-        toast.error(
-          "Failed to load subgroups and assets. Please try again later.",
-        );
-      }
+          };
+
+          return {
+            ...prev,
+            data: prev.data.map(recursiveFn),
+          };
+        },
+        { revalidate: false },
+      );
     },
     [activeOrg.slug, mutate],
   );
-
-  useEffect(() => {
-    // trigger a sync on page load - if the org has an external entity provider
-    if (activeOrg.externalEntityProviderId) {
-      // check in localStorage if the sync was already triggered
-      const lastSync = readLocalStorage(`lastSync-${activeOrg.slug}`);
-      if (
-        !lastSync ||
-        new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
-      ) {
-        // if not, trigger sync
-        writeLocalStorage(
-          `lastSync-${activeOrg.slug}`,
-          new Date().toISOString(),
-        );
-        handleTriggerSync();
-      }
-    }
-    return () => {
-      stillOnPage.current = false;
-    };
-  }, [activeOrg.externalEntityProviderId, activeOrg.slug, handleTriggerSync]);
 
   const importingIntoEmptyList = syncRunning && projects?.data.length === 0;
 
@@ -289,7 +199,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               <Button
                 size={"sm"}
                 variant={"outline"}
-                onClick={handleTriggerSync}
+                onClick={() => triggerSync()}
                 disabled={syncRunning}
               >
                 {syncRunning ? (
@@ -386,18 +296,10 @@ const OrganizationHomePage: FunctionComponent = () => {
                     <div key={project.id} className="flex flex-col">
                       <div className="flex flex-col gap-2">
                         <SubgroupsAndAssetsList
-                          project={
-                            project as ProjectDTO & {
-                              resourceType: "project";
-                            }
-                          }
+                          project={project as SubGroupProject}
                           onFetchData={handleLazyDataFetching}
                           subgroupsWithAssets={
-                            (
-                              project as ProjectDTO & {
-                                resourceType: "project";
-                              }
-                            ).subGroupsAndAsset
+                            (project as SubGroupProject).subGroupsAndAsset
                           }
                           projectSlug={project.slug}
                         />

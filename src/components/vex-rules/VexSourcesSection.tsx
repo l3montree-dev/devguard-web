@@ -8,7 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import { classNames } from "@/utils/common";
-import { browserApiClient } from "@/services/devGuardApi";
+import {
+  deleteExternalReference,
+  syncExternalReferences,
+} from "@/services/externalReferenceService";
 import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
 import type { VexSource } from "@/types/view/vexRules";
@@ -25,16 +28,13 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
-  const { sources, apiUrl, error, isLoading, mutate } = useVexSources();
+  const { sources, scope, error, isLoading, mutate } = useVexSources();
 
   // The endpoint takes no source: it re-syncs all of them, hence one button.
   const handleSyncAll = async () => {
     setIsSyncing(true);
     try {
-      const response = await browserApiClient(`${apiUrl}/sync/`, {
-        method: "POST",
-      });
-      if (!response.ok) throw new Error(response.statusText);
+      await syncExternalReferences(scope);
       toast.success("Syncing all upstream VEX sources");
       mutate();
     } catch {
@@ -47,11 +47,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
   const handleDelete = async (source: VexSource) => {
     setDeletingUrl(source.url);
     try {
-      const response = await browserApiClient(
-        `${apiUrl}/${encodeURIComponent(source.url)}`,
-        { method: "DELETE" },
-      );
-      if (!response.ok) throw new Error(response.statusText);
+      await deleteExternalReference(scope, source.url);
       toast.success(`Removed ${source.url}`);
       mutate();
     } catch {

@@ -10,17 +10,18 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
-import type { Paged, ProjectDependency } from "@/types/api/api";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import type { ProjectDependency } from "@/types/view/component";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
+
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/dist/client/components/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import useSWR from "swr";
+import { useProjectComponentList } from "@/hooks/useComponents";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
-import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../../../../hooks/useOrganizationMenu";
 
@@ -36,12 +37,6 @@ const OrgDependencySearch: FunctionComponent = () => {
     organizationSlug: string;
   };
   const project = useActiveProject();
-  const url =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    project?.slug +
-    "/components";
   const handleSearch = useDebouncedQuerySearch();
 
   const searchParams = useSearchParams();
@@ -52,9 +47,9 @@ const OrgDependencySearch: FunctionComponent = () => {
     return params;
   }, [searchParams]);
 
-  const columnHelper = createColumnHelper<ProjectDependency>();
+  const columnHelper = createAppColumnHelper<ProjectDependency>();
 
-  const columnsDef: ColumnDef<ProjectDependency, any>[] = [
+  const columnsDef: TableColumnDef<ProjectDependency, any>[] = [
     columnHelper.accessor("dependencyPurl", {
       header: "Package",
       id: "dependencyPurl",
@@ -101,17 +96,9 @@ const OrgDependencySearch: FunctionComponent = () => {
     }),
   ];
 
-  const { data: components, isLoading } = useSWR<Paged<ProjectDependency>>(
-    url + "?" + params?.toString(),
-    fetcher,
-    {
-      fallbackData: {
-        data: [],
-        page: 1,
-        pageSize: 20,
-        total: 0,
-      },
-    },
+  const { data: components, isLoading } = useProjectComponentList(
+    { organization: organizationSlug, projectSlug: project?.slug ?? "" },
+    params,
   );
 
   const { table } = useTable({

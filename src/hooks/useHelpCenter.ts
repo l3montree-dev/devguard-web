@@ -5,12 +5,10 @@
 
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import type {
-  AssetDTO,
-  Paged,
-  ProjectDTO,
-  VulnByPackage,
-} from "@/types/api/api";
+import type { VulnByPackage } from "@/types/view/vuln";
+import type { AssetDTO, ProjectDTO } from "@/types/dto";
+
+import type { Paged } from "@/types/view/pagination";
 import type {
   HelpCenter,
   TourSearch,

@@ -3,22 +3,25 @@
 
 "use client";
 
+import { useOrgPolicies } from "@/hooks/useCompliancePostures";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import type { Policy } from "@/types/api/api";
+import type { Policy } from "@/types/dto";
 import { useState } from "react";
 import type { FunctionComponent } from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import EmptyParty from "../../../../components/common/EmptyParty";
 import ListRenderer from "../../../../components/common/ListRenderer";
 import PolicyListItem from "../../../../components/common/PolicyListItem";
 import PolicyDialog from "../../../../components/PolicyDialog";
 import { Button } from "../../../../components/ui/button";
-import { fetcher } from "../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../hooks/useDecodedParams";
 import { useOrganizationMenu } from "../../../../hooks/useOrganizationMenu";
-import { browserApiClient } from "../../../../services/devGuardApi";
+import {
+  createPolicy,
+  deletePolicy,
+  updatePolicy,
+} from "@/services/policyService";
 import { DocDrawer } from "@/components/common/DocDrawer";
 
 const ComplianceIndex: FunctionComponent = () => {
@@ -32,28 +35,21 @@ const ComplianceIndex: FunctionComponent = () => {
     isLoading,
     error,
     mutate,
-  } = useSWR<Array<Policy>>(
-    "/organizations/" + organizationSlug + "/policies/",
-    fetcher,
-  );
+  } = useOrgPolicies(organizationSlug);
 
   const handleCreatePolicy = async (policy: Policy) => {
     mutate(
       async (prev) => {
-        let url = "/organizations/" + organizationSlug + "/policies/";
-
-        const resp = await browserApiClient(url, {
-          method: "POST",
-          body: JSON.stringify(policy),
-        });
-
-        if (!resp.ok) {
+        let newPolicy;
+        try {
+          newPolicy = await createPolicy(organizationSlug, policy as never);
+        } catch {
           toast.error("Failed to create policy");
           return;
         }
-        // update the policies
-        const newPolicy = await resp.json();
-        return [newPolicy, ...(prev || [])];
+        // POST returns the bound request DTO, which carries no id - the
+        // list is corrected by the revalidation that follows.
+        return [newPolicy as unknown as Policy, ...(prev || [])];
       },
       {
         optimisticData: (prev) => [
@@ -70,21 +66,17 @@ const ComplianceIndex: FunctionComponent = () => {
   const handlePolicyUpdate = async (policy: Policy) => {
     mutate(
       async (prev) => {
-        let url =
-          "/organizations/" + organizationSlug + "/policies/" + policy.id;
-
-        const resp = await browserApiClient(url, {
-          method: "PUT",
-          body: JSON.stringify(policy),
-        });
-
-        if (!resp.ok) {
+        let newPolicy;
+        try {
+          newPolicy = (await updatePolicy(
+            organizationSlug,
+            policy.id,
+            policy as never,
+          )) as unknown as Policy;
+        } catch {
           toast.error("Failed to update policy");
           return;
         }
-
-        // update the policies
-        const newPolicy = await resp.json();
         toast.success("Policy updated successfully");
         return prev?.map((p) => (p.id === newPolicy.id ? newPolicy : p));
       },
@@ -98,19 +90,12 @@ const ComplianceIndex: FunctionComponent = () => {
   const handlePolicyDelete = async (policy: Policy) => {
     mutate(
       async (prev) => {
-        let url =
-          "/organizations/" + organizationSlug + "/policies/" + policy.id;
-
-        const resp = await browserApiClient(url, {
-          method: "DELETE",
-        });
-
-        if (!resp.ok) {
+        try {
+          await deletePolicy(organizationSlug, policy.id);
+        } catch {
           toast.error("Failed to delete policy");
           return;
         }
-
-        // update the policies
         toast.success("Policy deleted successfully");
         return prev?.filter((p) => p.id !== policy.id);
       },

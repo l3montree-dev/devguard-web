@@ -12,7 +12,9 @@ const Config = () => {
   const org = useActiveOrg();
   const orgMenu = useOrganizationMenu();
 
-  const baseUrl = org ? "/organizations/" + org.slug : null;
+  const scope = org
+    ? ({ level: "organization", organization: org.slug } as const)
+    : null;
 
   return (
     <Page
@@ -30,7 +32,7 @@ const Config = () => {
       title={""}
       Menu={orgMenu}
     >
-      <DependencyProxyConfigs baseUrl={baseUrl} />
+      <DependencyProxyConfigs scope={scope} />
     </Page>
   );
 };

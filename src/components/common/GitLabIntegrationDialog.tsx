@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { GitLabIntegrationDTO } from "@/types/api/api";
+import type { GitLabIntegrationDTO } from "@/types/dto";
 import React, { type FunctionComponent, type ReactNode } from "react";
 import {
   Dialog,

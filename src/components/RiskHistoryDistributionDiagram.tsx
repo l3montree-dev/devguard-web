@@ -15,7 +15,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import type { ReleaseRiskHistory } from "@/types/api/api";
+import type { RiskHistoryPoint } from "@/types/view/riskHistory";
 import {
   Area,
   AreaChart,
@@ -32,7 +32,7 @@ export function RiskHistoryDistributionDiagram({
   mode = "risk",
   isLoading,
 }: {
-  data: ReleaseRiskHistory[];
+  data: RiskHistoryPoint[];
   mode?: "risk" | "cvss";
   isLoading: boolean;
 }) {
@@ -103,7 +103,7 @@ export function RiskHistoryDistributionDiagram({
                 <ChartTooltip
                   cursor={false}
                   labelFormatter={(value) =>
-                    new Date(value).toLocaleDateString("de-DE", {
+                    new Date(String(value)).toLocaleDateString("de-DE", {
                       month: "short",
                       day: "numeric",
                     })

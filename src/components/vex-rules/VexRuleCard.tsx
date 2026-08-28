@@ -4,13 +4,14 @@
 "use client";
 
 import CelCodeBlock from "@/components/common/CelCodeBlock";
-import type { VexRule } from "@/types/api/api";
+
 import { formatDate } from "@/utils/format";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { Lock } from "lucide-react";
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 import Markdown from "../common/Markdown";
+import type { VexRule } from "@/types/view/vexRules";
 
 interface VexRuleCardProps {
   vexRule: VexRule;

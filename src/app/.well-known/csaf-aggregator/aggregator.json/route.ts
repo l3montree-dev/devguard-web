@@ -3,17 +3,12 @@
 
 // just return whatever we fetch from
 
-import { getApiClientInRouteHandler } from "../../../../services/devGuardApiAppRouter";
+import { streamFromApiWithRequest } from "@/services/streamingClient";
 
 export async function GET(request: Request) {
-  const client = getApiClientInRouteHandler(request);
-
-  // just do a fetch to the same route
-  const response = await client(
+  const response = await streamFromApiWithRequest(
+    request,
     "/.well-known/csaf-aggregator/aggregator.json/",
-    {
-      method: "GET",
-    },
   );
 
   // return the response as is

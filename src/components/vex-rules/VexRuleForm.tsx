@@ -19,8 +19,13 @@ import { Input } from "../ui/input";
 import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import { analyzeVexRuleEffect, resolveCut } from "./vexRuleParser";
-import type { VexRuleEffect, VexRuleVulnContext } from "@/types/view/vexRules";
-import type { VexRuleEventType } from "@/types/api/api";
+import type {
+  VexRuleEffect,
+  VexRuleEventType,
+  VexRuleVulnContext,
+} from "@/types/view/vexRules";
+
+import type { AssetScope } from "@/services/vexRuleService";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -81,7 +86,7 @@ const PathConnector: FunctionComponent<{
 };
 
 interface VexRuleFormProps {
-  baseUrl: string;
+  scope: AssetScope;
   title: string;
   onTitleChange: (title: string) => void;
   celExpression: string;
@@ -101,7 +106,7 @@ interface VexRuleFormProps {
 }
 
 const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
-  baseUrl,
+  scope,
   title,
   onTitleChange,
   celExpression,
@@ -114,7 +119,7 @@ const VexRuleForm: FunctionComponent<VexRuleFormProps> = ({
 }) => {
   const isReduced = variant === "reduced";
   const matchScope = eventType === "reopened" ? "closed" : "open";
-  const matchStatus = useVexRuleMatchCount(baseUrl, celExpression, eventType);
+  const matchStatus = useVexRuleMatchCount(scope, celExpression, eventType);
   const { hasSyntaxError } = matchStatus;
 
   // What to render for this rule/vuln combination — the parser decides the kind

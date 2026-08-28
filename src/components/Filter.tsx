@@ -3,10 +3,10 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FunctionComponent } from "react";
 import { useSearchParams } from "next/navigation";
-import type { FilterForm } from "@/types/view/filter";
+import type { FilterForm, FilterOption, Step } from "@/types/view/filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,8 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronLeftIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 
 const MIN_SEARCH_LENGTH = 3;
-
-import type { FilterOption, Step } from "@/types/view/filter";
 
 interface Props {
   options: FilterOption[];

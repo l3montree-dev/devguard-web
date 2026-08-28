@@ -18,10 +18,8 @@
 import React, { type FunctionComponent } from "react";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import type {
-  OrganizationDetailsDTO,
-  GitLabIntegrationDTO,
-} from "../../../types/api/api";
+import type { GitLabIntegrationDTO, OrganizationDetailsDTO } from "@/types/dto";
+
 import GitLabIntegrationForm from "../../common/GitLabIntegrationForm";
 
 interface GitLabIntegrationSlideProps {

@@ -4,18 +4,19 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import type { VexRule } from "@/types/api/api";
+
 import { classNames } from "@/utils/common";
 import { useState, type FunctionComponent } from "react";
 import VexRuleActionsCell from "./VexRuleActionsCell";
 import VexRuleDetailsDialog from "./VexRuleDetailsDialog";
 import VexRuleResult from "./VexRuleResult";
 import VexRuleSourceBadge from "./VexRuleSourceBadge";
+import type { VexRule } from "@/types/view/vexRules";
+import type { AssetScope } from "@/services/vexRuleService";
 
 interface VexRulesTableProps {
   rules: VexRule[];
-  // API base of this asset's VEX rules, e.g. /organizations/o/.../vex-rules
-  urlBase: string;
+  scope: AssetScope;
   isLoading?: boolean;
   onMutate: () => void;
 }
@@ -25,7 +26,7 @@ const COLUMNS = ["Rule", "Source", "Result", ""];
 /** One flat row per rule; the source is a badge, not a grouping level. */
 const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
   rules,
-  urlBase,
+  scope,
   isLoading,
   onMutate,
 }) => {
@@ -101,7 +102,8 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
                           clicks to itself. */}
                       <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         <VexRuleActionsCell
-                          deleteUrl={`${urlBase}/${rule.id}`}
+                          scope={scope}
+                          ruleId={rule.id}
                           onEdit={() => setSelectedRule(rule)}
                           onDeleted={onMutate}
                         />
@@ -119,7 +121,7 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
         onOpenChange={(open) => {
           if (!open) setSelectedRule(null);
         }}
-        urlBase={urlBase}
+        scope={scope}
         onChanged={onMutate}
       />
     </>

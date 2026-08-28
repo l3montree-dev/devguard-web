@@ -4,9 +4,9 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import type { OrganizationDTO, OrganizationDetailsDTO } from "../types/api/api";
+import type { OrganizationDTO, OrganizationDetailsDTO } from "@/types/dto";
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { createOrganization } from "@/services/organizationService";
 import { Form } from "./ui/form";
 
 import { OrgForm } from "./OrgForm";
@@ -24,25 +24,21 @@ export default function OrgRegisterForm() {
 
   const router = useRouter();
   const handleOrgCreation = async (data: OrganizationDTO) => {
-    const resp = await browserApiClient("/organizations/", {
-      method: "POST",
-      body: JSON.stringify({
+    let orgDTO: OrganizationDetailsDTO;
+    try {
+      orgDTO = (await createOrganization({
         ...data,
         numberOfEmployees: !!data.numberOfEmployees
           ? Number(data.numberOfEmployees)
           : undefined,
-      }),
-    });
-
-    if (resp.status !== 200) {
+      } as never)) as unknown as OrganizationDetailsDTO;
+    } catch {
       toast.error("Could not create organization", {
         description:
           "Organization creation is currently disabled or an error occurred. Please contact your administrator.",
       });
       return;
     }
-
-    const orgDTO: OrganizationDetailsDTO = await resp.json();
 
     updateSession((prev) => ({
       ...prev,

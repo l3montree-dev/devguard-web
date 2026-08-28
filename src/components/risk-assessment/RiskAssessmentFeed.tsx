@@ -8,8 +8,8 @@ import { useActiveProject } from "@/hooks/useActiveProject";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import AuthGuard from "@/components/AuthGuard";
-import { UserRole } from "@/types/api/api";
-import type { VulnEventDTO } from "@/types/api/api";
+import { UserRole } from "@/types/view/vuln";
+import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { classNames } from "@/utils/common";
 import {
   eventMessages,
@@ -70,10 +70,6 @@ export function EventTypeIcon({
   switch (eventType) {
     case "licenseDecision":
       return <Scale className="h-4 w-4" />;
-    case "ticketClosed":
-      return <CheckIcon className="h-4 w-4" />;
-    case "ticketDeleted":
-      return <StopIcon className="h-4 w-4" />;
     case "accepted":
       return <SpeakerXMarkIcon className="h-4 w-4" />;
     case "fixed":

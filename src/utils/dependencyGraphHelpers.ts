@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import dagre, { graphlib } from "@dagrejs/dagre";
-import {
-  type DependencyTreeNode,
-  type DependencyVuln,
-  type MinimalDependencyTree,
-} from "../types/api/api";
+import type { DependencyTreeNode } from "@/types/view/dependencyGraph";
+import type { DependencyVuln, MinimalDependencyTree } from "@/types/dto";
+
 import type {
   EdgeMaps,
   ViewDependencyTreeNode,

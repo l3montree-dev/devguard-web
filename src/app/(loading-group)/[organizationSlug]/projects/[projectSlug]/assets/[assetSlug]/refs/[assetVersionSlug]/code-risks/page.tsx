@@ -3,6 +3,7 @@
 
 "use client";
 
+import type { FirstPartyVuln } from "@/types/dto";
 import SortingCaret from "@/components/common/SortingCaret";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import AuthGuard from "@/components/AuthGuard";
@@ -10,10 +11,11 @@ import AuthGuard from "@/components/AuthGuard";
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
 import FalsePositiveDialog from "@/components/FalsePositiveDialog";
 import Page from "@/components/Page";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { FirstPartyVuln, Paged } from "@/types/api/api";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import { batchUpdateFirstPartyVulns } from "@/services/vulnService";
+import { useFirstPartyVulnList } from "@/hooks/useVulnList";
+
+import { flexRender } from "@tanstack/react-table";
+
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
@@ -30,18 +32,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
 import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
-import useSWR from "swr";
 import { CopyCodeFragment } from "../../../../../../../../../../components/common/CopyCode";
 import { DelayedDownloadButton } from "../../../../../../../../../../components/common/DelayedDownloadButton";
 import RiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
@@ -49,9 +51,9 @@ import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 
-const columnHelper = createColumnHelper<FirstPartyVuln>();
+const columnHelper = createAppColumnHelper<FirstPartyVuln>();
 
-const columnsDef: ColumnDef<FirstPartyVuln, any>[] = [
+const columnsDef: TableColumnDef<FirstPartyVuln, any>[] = [
   columnHelper.accessor("uri", {
     header: "Filename",
     cell: (info) => {
@@ -141,31 +143,21 @@ const Index: FunctionComponent = () => {
     return p;
   }, [searchParams]);
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/";
+  const vulnScope = useMemo(
+    () => ({
+      organization: organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    }),
+    [organizationSlug, projectSlug, assetSlug, assetVersionSlug],
+  );
 
   const {
     data: vulns,
     isLoading,
     mutate: mutateVulns,
-  } = useSWR<Paged<FirstPartyVuln>>(
-    uri +
-      "refs/" +
-      assetVersionSlug +
-      "/" +
-      "first-party-vulns/?" +
-      query.toString(),
-    fetcher,
-    {
-      keepPreviousData: true,
-    },
-  );
+  } = useFirstPartyVulnList<FirstPartyVuln>(vulnScope, query);
 
   const handleBulkAction = useCallback(
     async (bulkParams: {
@@ -200,23 +192,12 @@ const Index: FunctionComponent = () => {
 
       await mutateVulns(
         async () => {
-          const resp = await browserApiClient(
-            uri + "refs/" + assetVersionSlug + "/first-party-vulns/batch/",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                vulnIds: bulkParams.vulnIds,
-                status: bulkParams.status,
-                justification: bulkParams.justification,
-                mechanicalJustification:
-                  bulkParams.mechanicalJustification ?? "",
-              }),
-            },
-          );
-
-          if (!resp.ok) {
-            throw new Error("Bulk action failed");
-          }
+          await batchUpdateFirstPartyVulns(vulnScope, {
+            vulnIds: bulkParams.vulnIds,
+            status: bulkParams.status,
+            justification: bulkParams.justification,
+            mechanicalJustification: bulkParams.mechanicalJustification ?? "",
+          } as never);
 
           setSelectedVulnIds((prev) => {
             const next = new Set(prev);
@@ -233,7 +214,7 @@ const Index: FunctionComponent = () => {
         },
       );
     },
-    [uri, assetVersionSlug, mutateVulns, vulns],
+    [vulnScope, mutateVulns, vulns],
   );
 
   const { selectedOpenIds, selectedClosedIds } = useMemo(() => {

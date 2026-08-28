@@ -1,8 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AssetDTO } from "@/types/api/api";
-import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import type { AssetDTO } from "@/types/dto";
+import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
 
 import { HttpError } from "./httpError";
 
@@ -11,11 +11,20 @@ export async function fetchAsset(
   projectSlug: string,
   assetSlug: string,
 ) {
-  const devGuardApiClient = await getApiClientInAppRouter();
+  const client = await getServerClientInAppRouter();
 
-  const url = `/organizations/${decodeURIComponent(organizationSlug)}/projects/${projectSlug}/assets/${assetSlug}`;
-  // console.log(url);
-  const r = await devGuardApiClient(url);
+  const { data, response: r } = await client.GET(
+    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}",
+    {
+      params: {
+        path: {
+          organization: decodeURIComponent(organizationSlug),
+          projectSlug,
+          assetSlug,
+        },
+      },
+    },
+  );
 
   if (!r.ok) {
     throw new HttpError(`Failed to fetch asset: ${r.status} ${r.statusText}`, {
@@ -26,6 +35,6 @@ export async function fetchAsset(
     });
   }
   // parse the organization
-  const asset: AssetDTO = await r.json();
+  const asset = data as AssetDTO;
   return asset;
 }

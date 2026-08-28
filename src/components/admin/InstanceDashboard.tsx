@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import type { InstanceOverview } from "@/types/dto";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getSeverityClassNames } from "@/components/common/Severity";
@@ -35,15 +36,15 @@ import {
   UsersIcon,
 } from "@heroicons/react/20/solid";
 import type {
-  InstanceOverview,
+  InstanceDashboardHandle,
   InstanceUsageStatistics,
-} from "@/types/api/api";
+} from "@/types/view/admin";
+
 import { adminBrowserApiClient } from "@/services/adminApi";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
-import type { InstanceDashboardHandle } from "@/types/view/admin";
 
 const formatAvg = (n: number | undefined) =>
   (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 });

@@ -1,15 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type {
-  AssetDTO,
-  ComponentRisk,
-  OrganizationDetailsDTO,
-  ProjectDTO,
-  ReleaseRiskHistory,
-  RiskHistory,
-  VulnEventDTO,
-} from "@/types/api/api";
+import type { ComponentRisk } from "@/types/view/component";
+import type { RiskHistoryPoint } from "@/types/view/riskHistory";
+
+import type { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/dto";
+
+import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
 import type { User } from "@/types/auth";
@@ -100,12 +97,6 @@ export const eventTypeMessages = (
           event.arbitraryJSONData.finalLicenseDecision ||
         event.arbitraryJSONData.license ||
         "unknown license";
-      break;
-    case "ticketClosed":
-      message = "closed the ticket for " + flawName;
-      break;
-    case "ticketDeleted":
-      message = "deleted the ticket for " + flawName;
       break;
     case "mitigate":
       message = "created a ticket for " + flawName;
@@ -201,8 +192,6 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   rawRiskAssessmentUpdated: "bg-secondary text-secondary-foreground!",
   reopened: "bg-destructive text-destructive-foreground!",
   comment: "bg-secondary text-secondary-foreground!",
-  ticketClosed: "bg-destructive text-destructive-foreground!",
-  ticketDeleted: "bg-destructive text-destructive-foreground!",
   licenseDecision: "bg-warning text-warning-foreground!",
   attachedComplianceComponent: "bg-success text-success-foreground!",
   removedComplianceComponent: "bg-secondary text-secondary-foreground!",
@@ -332,9 +321,11 @@ export const findUser = (
   };
 };
 
+// The diagram plots only the day and the cvePurl* buckets, so that is all this
+// sums up - the per-day rows come from different risk history DTOs.
 export const reduceRiskHistories = (
-  histories: RiskHistory[][],
-): Array<ReleaseRiskHistory> => {
+  histories: RiskHistoryPoint[][],
+): RiskHistoryPoint[] => {
   return histories.map((dayHistories) => {
     return dayHistories.reduce(
       (acc, curr) => {
@@ -357,10 +348,7 @@ export const reduceRiskHistories = (
         return acc;
       },
       {
-        id: dayHistories[0]?.id || "",
-        day: dayHistories[0]?.day || new Date(),
-        assetId: dayHistories[0]?.assetId || "",
-        artifactName: dayHistories[0]?.artifactName || "",
+        day: dayHistories[0]?.day ?? "",
         cvePurlLow: 0,
         cvePurlMedium: 0,
         cvePurlHigh: 0,
@@ -377,7 +365,7 @@ export const reduceRiskHistories = (
         cvePurlFixableMediumCvss: 0,
         cvePurlFixableHighCvss: 0,
         cvePurlFixableCriticalCvss: 0,
-      } as RiskHistory,
+      } as RiskHistoryPoint,
     );
   });
 };
@@ -393,8 +381,8 @@ export const normalizeContentTree = (
 ) => {
   const assetMap: {
     [key: string]:
-      | (AssetDTO & {
-          project: ProjectDTO;
+      | (ContentTreeElement["assets"][number] & {
+          project: Omit<ContentTreeElement, "assets">;
         })
       | undefined;
   } = {};

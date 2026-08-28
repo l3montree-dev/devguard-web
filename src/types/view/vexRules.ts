@@ -1,11 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type {
-  CreateVexRuleRequest,
-  ExternalReference,
-  VexRuleRecommendation,
-} from "@/types/api/api";
+import type { components } from "@/types/api/generated";
+import type { ExternalReference } from "@/types/dto";
+
+type S = components["schemas"];
+import type { MechanicalJustificationType } from "@/types/view/vuln";
+
 import type { checkCelSyntax } from "@/components/common/celLinter";
 
 export interface VexRuleVulnContext {
@@ -61,3 +62,44 @@ export type EditableRule = Pick<
   CreateVexRuleRequest,
   "title" | "celExpression" | "justification"
 >;
+
+export type VexRulePrefill = {
+  celExpression: string;
+  title?: string;
+  justification?: string;
+  mechanicalJustification?: MechanicalJustificationType;
+  wasRecommended?: boolean;
+};
+
+// The DTO types eventType as the full VulnEventType union; a VEX rule can only
+// ever carry one of these three.
+export type VexRuleEventType = "accepted" | "falsePositive" | "reopened";
+
+export type VexRule = Omit<S["dtos.VEXRuleDTO"], "eventType"> & {
+  eventType: VexRuleEventType;
+};
+
+// mechanicalJustification and wasRecommended are optional in practice: the Go
+// struct has no validate:"required" on either.
+export type CreateVexRuleRequest = Omit<
+  S["dtos.CreateVEXRuleRequest"],
+  "eventType" | "mechanicalJustification" | "wasRecommended"
+> & {
+  eventType: VexRuleEventType;
+  mechanicalJustification?: S["dtos.MechanicalJustificationType"];
+  wasRecommended?: boolean;
+};
+
+// A rule other DevGuard organizations already apply to this vulnerability,
+// picked by trust-weighted agreement (crowdsourced vexing). Not a rule of this
+// asset yet - it becomes one once accepted.
+export type VexRuleRecommendation = Omit<
+  S["dtos.VexRuleRecommendation"],
+  "eventType" | "assetSlug" | "projectSlug"
+> & {
+  eventType: VexRuleEventType;
+  // set only when the recommendation came from an asset the user can already
+  // reach, so the frontend can link to it
+  assetSlug?: string;
+  projectSlug?: string;
+};

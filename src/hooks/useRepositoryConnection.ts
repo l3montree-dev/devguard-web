@@ -14,7 +14,7 @@ export default function useRepositoryConnection() {
   const activeAsset = useActiveAsset();
   const [selectedProvider, setSelectedProvider] =
     useState<ExternalTicketProvider>(
-      activeAsset?.repositoryProvider || "gitlab",
+      (activeAsset?.repositoryProvider as ExternalTicketProvider) || "gitlab",
     );
 
   const [repositories, setRepositories] = useState<

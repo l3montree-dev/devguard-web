@@ -9,17 +9,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import type { ArtifactRequest } from "@/services/artifactService";
 import type { UseFormReturn } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import ArtifactForm from "./ArtifactForm";
 
 interface Props {
-  form: UseFormReturn<ArtifactCreateUpdateRequest>;
+  form: UseFormReturn<ArtifactRequest>;
   isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSubmit?: (data: ArtifactCreateUpdateRequest) => Promise<void> | void;
+  onSubmit?: (data: ArtifactRequest) => Promise<void> | void;
   onDelete?: () => Promise<void> | void;
   isEditMode?: boolean;
 }
@@ -31,7 +31,7 @@ const ArtifactDialog = ({
   onSubmit,
   isEditMode = false,
 }: Props) => {
-  const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
+  const handleSubmit = async (data: ArtifactRequest) => {
     if (onSubmit) {
       await onSubmit(data);
     }

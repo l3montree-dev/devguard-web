@@ -15,16 +15,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
+import { deleteVexRule } from "@/services/vexRuleService";
+import type { AssetScope } from "@/services/vexRuleService";
 
 interface VexRuleActionsCellProps {
-  deleteUrl: string;
+  scope: AssetScope;
+  ruleId: string;
   onEdit: () => void;
   onDeleted: () => void;
 }
 
 const VexRuleActionsCell: FunctionComponent<VexRuleActionsCellProps> = ({
-  deleteUrl,
+  scope,
+  ruleId,
   onEdit,
   onDeleted,
 }) => {
@@ -34,14 +37,7 @@ const VexRuleActionsCell: FunctionComponent<VexRuleActionsCellProps> = ({
     setIsDeleting(true);
 
     try {
-      const response = await browserApiClient(deleteUrl, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete VEX rule");
-      }
-
+      await deleteVexRule(scope, ruleId);
       toast.success("VEX rule deleted");
       onDeleted();
     } catch (error) {

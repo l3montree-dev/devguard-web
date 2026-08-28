@@ -14,18 +14,19 @@ import { HEADER_HEIGHT, SIDEBAR_WIDTH } from "@/const/viewConstants";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useDependencyGraph } from "@/hooks/useDependencyGraph";
 import useDimensions from "@/hooks/useDimensions";
-import type { DependencyVuln, MinimalDependencyTree } from "@/types/api/api";
-import { toSearchParams } from "@/utils/common";
+
 import { Loader2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
-import useSWR from "swr";
 import { useArtifacts } from "../../../../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../../hooks/useRouterQuery";
 import RootNodeSelector from "@/components/RootNodeSelector";
+import {
+  useAffectedComponents,
+  useDependencyGraphData,
+} from "@/hooks/useComponents";
 
 const DependencyGraphPage: FunctionComponent = () => {
   const searchParams = useSearchParams();
@@ -43,36 +44,21 @@ const DependencyGraphPage: FunctionComponent = () => {
   const menu = useAssetMenu();
   const artifacts = useArtifacts();
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/refs/" +
-    assetVersionSlug;
+  const graphScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
 
   // fetch a personal access token from the user
 
-  const { data: affectedComponents } = useSWR<DependencyVuln[]>(
-    uri + "/affected-components/",
-    fetcher,
-  );
+  const { data: affectedComponents } = useAffectedComponents(graphScope);
 
-  const { data: graphData } = useSWR<MinimalDependencyTree>(
-    uri +
-      "/dependency-graph/?" +
-      toSearchParams({
-        artifactName: searchParams?.get("artifact") ?? undefined,
-        origin: searchParams?.get("origin") ?? undefined,
-        all: searchParams?.get("all") ? "1" : undefined,
-      }),
-    fetcher,
-    {
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-    },
+  const { data: graphData } = useDependencyGraphData(
+    graphScope,
+    searchParams?.get("artifact") ?? undefined,
+    searchParams?.get("origin") ?? undefined,
   );
 
   const graph = useDependencyGraph(

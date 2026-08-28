@@ -7,7 +7,6 @@ import VulnerabilityTrends from "@/components/organization/VulnerabilityTrends";
 import DetectionsRemediationsChart from "@/components/organization/DetectionsRemediationsChart";
 import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
-import type { OrgOverview } from "@/types/api/api";
 
 export interface AverageStatsSectionProps {
   mode: "risk" | "cvss";
@@ -16,6 +15,7 @@ export interface AverageStatsSectionProps {
 }
 
 import type { SeverityRemediation } from "@/types/view/organization";
+import type { OrgOverview } from "@/types/dto";
 
 export default function AverageStatsSection({
   mode,

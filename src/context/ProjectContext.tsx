@@ -3,11 +3,11 @@
 
 "use client";
 import { createContext, useContext } from "react";
-import type { AssetDTO, ProjectDTO } from "../types/api/api";
+import type { AssetDTO, ProjectDetailsDTO } from "@/types/dto";
 import type { WithUpdater } from "@/types/view/context";
 
 const ProjectContext = createContext<
-  WithUpdater<(ProjectDTO & { assets: AssetDTO[] }) | null>
+  WithUpdater<(ProjectDetailsDTO & { assets: AssetDTO[] }) | null>
 >({ v: null, update: () => {} });
 export const ProjectProvider = ProjectContext.Provider;
 export const useProject = () => useContext(ProjectContext).v;

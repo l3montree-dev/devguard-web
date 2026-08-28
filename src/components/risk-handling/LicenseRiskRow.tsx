@@ -8,8 +8,9 @@ import {
   extractVersion,
   truncateMiddle,
 } from "@/utils/common";
+import type { LicenseRiskDTO } from "@/types/dto";
 import { usePathname, useRouter } from "next/navigation";
-import type { LicenseRiskDTO } from "../../types/api/api";
+
 import EcosystemImage from "../common/EcosystemImage";
 import { Badge } from "../ui/badge";
 import { getSeverityClassNames } from "../common/Severity";

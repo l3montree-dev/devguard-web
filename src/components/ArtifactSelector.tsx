@@ -10,7 +10,7 @@ import { toast } from "@/lib/toast";
 import { useUpdateAssetVersionState } from "../context/AssetVersionContext";
 import useDecodedParams from "../hooks/useDecodedParams";
 import useRouterQuery from "../hooks/useRouterQuery";
-import { browserApiClient } from "../services/devGuardApi";
+import { createArtifact } from "@/services/artifactService";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -78,25 +78,25 @@ export function SimpleArtifactSelector({
       return;
     }
 
-    const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${effectiveAssetVersionSlug}/artifacts/`,
-      {
-        method: "POST",
-        body: JSON.stringify({
-          artifactName: filter,
-          upstreamUrls: [],
-        }),
-      },
-    );
-    if (!resp.ok) {
-      toast.error("Failed to create artifact: " + resp.statusText);
+    let newArtifact;
+    try {
+      newArtifact = await createArtifact(
+        {
+          organization: params.organizationSlug,
+          projectSlug: params.projectSlug,
+          assetSlug: params.assetSlug,
+          assetVersionSlug: effectiveAssetVersionSlug,
+        },
+        { artifactName: filter, informationSources: [] },
+      );
+    } catch (error) {
+      toast.error("Failed to create artifact: " + String(error));
       return;
     }
 
-    const newArtifact = await resp.json();
     updateAssetVersion((prev) => ({
       ...prev!,
-      artifacts: [...prev!.artifacts, newArtifact],
+      artifacts: [...prev!.artifacts, newArtifact as never],
     }));
     toast.success("Artifact created successfully");
     onSelect(filter);

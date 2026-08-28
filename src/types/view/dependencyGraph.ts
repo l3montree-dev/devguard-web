@@ -1,8 +1,6 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { DependencyTreeNode } from "@/types/api/api";
-
 export type MenuType = "edge" | "node" | null;
 
 export interface ContextMenuState {
@@ -46,4 +44,9 @@ export interface ViewDependencyTreeNode extends Omit<
   infoSourceType?: "sbom" | "csaf" | "vex";
   // Optional flag that marks nodes participating in a cycle. Used to avoid infinite recursion and for UI highlighting.
   hasCycle?: boolean;
+}
+
+export interface DependencyTreeNode {
+  name: string;
+  children: DependencyTreeNode[];
 }

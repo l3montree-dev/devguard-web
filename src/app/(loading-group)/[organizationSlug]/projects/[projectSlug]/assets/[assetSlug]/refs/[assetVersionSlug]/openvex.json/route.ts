@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { NextRequest, NextResponse } from "next/server";
-import { getApiClientFromRequest } from "@/services/devGuardApi";
-import { cookies } from "next/headers";
+import { streamFromApi } from "@/services/streamingClient";
 
 export async function GET(request: NextRequest, ctx: any) {
   try {
@@ -21,14 +20,6 @@ export async function GET(request: NextRequest, ctx: any) {
       );
     }
 
-    // Get cookies for authentication
-    const cookieStore = await cookies();
-    const apiClient = getApiClientFromRequest({
-      cookies: Object.fromEntries(
-        cookieStore.getAll().map((c) => [c.name, c.value]),
-      ),
-    });
-
     const uri =
       "/organizations/" +
       organizationSlug +
@@ -42,7 +33,7 @@ export async function GET(request: NextRequest, ctx: any) {
       encodeURIComponent(artifact) +
       "/openvex.json/";
 
-    const vex = await apiClient(uri);
+    const vex = await streamFromApi(uri);
 
     if (!vex.ok) {
       return NextResponse.json(

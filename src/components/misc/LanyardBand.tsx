@@ -43,16 +43,20 @@ export default function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
   };
 
   const { nodes, materials } = useGLTF("/gltf/card.glb") as any;
-  const texture = useTexture("/assets/lanyard.png");
-  const [curve] = useState(
-    () =>
-      new THREE.CatmullRomCurve3([
-        new THREE.Vector3(),
-        new THREE.Vector3(),
-        new THREE.Vector3(),
-        new THREE.Vector3(),
-      ]),
-  );
+  const texture = useTexture("/assets/lanyard.png", (loaded) => {
+    const tex = Array.isArray(loaded) ? loaded[0] : loaded;
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  });
+  const [curve] = useState(() => {
+    const c = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    ]);
+    c.curveType = "chordal";
+    return c;
+  });
   const [dragged, drag] = useState<false | THREE.Vector3>(false);
   const [hovered, hover] = useState(false);
 
@@ -126,9 +130,6 @@ export default function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
       card.current.setAngvel({ x: ang.x, y: ang.y - rot.y * 0.25, z: ang.z });
     }
   });
-
-  curve.curveType = "chordal";
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
   return (
     <>

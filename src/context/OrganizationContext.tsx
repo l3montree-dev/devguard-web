@@ -9,10 +9,9 @@ import {
   useEffect,
   type ProviderProps,
 } from "react";
-import type { WithUpdater } from "@/types/view/context";
+import type { OrgContextParams, WithUpdater } from "@/types/view/context";
 import { writeLocalStorage } from "@/hooks/useLocalStorage";
 
-import type { OrgContextParams } from "@/types/view/context";
 const OrganizationContext = createContext<WithUpdater<OrgContextParams>>({
   v: {
     organization: null,

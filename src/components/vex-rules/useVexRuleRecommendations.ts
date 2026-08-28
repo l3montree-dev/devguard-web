@@ -5,8 +5,8 @@
 
 import { FetcherError } from "@/data-fetcher/fetcher";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { VexRuleRecommendation } from "@/types/api/api";
 import useSWR from "swr";
+import type { VexRuleRecommendation } from "@/types/view/vexRules";
 
 export function vexRuleRecommendationsURL(params: {
   organizationSlug: string;

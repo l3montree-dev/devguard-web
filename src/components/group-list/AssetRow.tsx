@@ -6,7 +6,7 @@ import Link from "next/link";
 import type { ComponentPropsWithoutRef, FunctionComponent } from "react";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { cn } from "../../lib/utils";
-import type { AssetDTO } from "../../types/api/api";
+import type { AssetDTO } from "@/types/dto";
 import Markdown from "../common/Markdown";
 import { Badge } from "../ui/badge";
 

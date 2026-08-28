@@ -3,11 +3,13 @@
 
 "use client";
 import { createContext, useContext } from "react";
-import type { AssetDTO } from "../types/api/api";
+import type { AssetDetailsDTO } from "@/types/dto";
 import { NoopUpdater } from "./ClientContextWrapper";
 import type { WithUpdater } from "@/types/view/context";
 
-const AssetContext = createContext<WithUpdater<AssetDTO | null>>({
+const AssetContext = createContext<
+  WithUpdater<(AssetDetailsDTO & { webhookSecret?: string }) | null>
+>({
   v: null,
   update: NoopUpdater,
 });

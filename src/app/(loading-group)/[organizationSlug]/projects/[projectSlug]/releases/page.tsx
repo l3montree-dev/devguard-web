@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import type { ReleaseItem } from "@/types/view/release";
 import React from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import Alert from "../../../../../../components/common/Alert";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import ListItem from "../../../../../../components/common/ListItem";
@@ -20,17 +20,17 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../../../../../../components/ui/tooltip";
-import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import AuthGuard from "../../../../../../components/AuthGuard";
-import { browserApiClient } from "../../../../../../services/devGuardApi";
-import type {
-  CandidatesDTO,
-  Paged,
-  ReleaseDTO,
-  ReleaseItem,
-} from "../../../../../../types/api/api";
+import {
+  createRelease,
+  deleteRelease as deleteReleaseRequest,
+} from "@/services/releaseService";
+import { useReleaseCandidates, useReleases } from "@/hooks/useReleases";
+
+import type { ReleaseDTO } from "@/types/dto";
+
 import { type Modify } from "../../../../../../types/common";
 const Releases = () => {
   const menu = useProjectMenu();
@@ -40,24 +40,15 @@ const Releases = () => {
     projectSlug: string;
   };
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/releases/";
+  const releaseScope = { organization: organizationSlug, projectSlug };
 
   const {
     data: releases,
     mutate,
     isLoading,
     error,
-  } = useSWR<Paged<ReleaseDTO>>(uri, fetcher);
-  const { data: candidates } = useSWR<CandidatesDTO>(
-    uri + "candidates/",
-    fetcher,
-    { fallbackData: { artifacts: [], releases: [] } },
-  );
+  } = useReleases(releaseScope);
+  const { data: candidates } = useReleaseCandidates(releaseScope);
 
   const handleReleaseCreation = async (
     release: Modify<
@@ -67,41 +58,26 @@ const Releases = () => {
       }
     >,
   ) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/releases/",
-      { method: "POST", body: JSON.stringify(release) },
-    );
-
-    if (resp.ok) {
-      toast.success("Release created");
-      setOpen(false);
-      mutate();
-    } else {
+    try {
+      await createRelease(releaseScope, release as never);
+    } catch {
       toast.error("Failed to create release");
+      return;
     }
+    toast.success("Release created");
+    setOpen(false);
+    mutate();
   };
 
   const deleteRelease = async (release: ReleaseDTO) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/releases/" +
-        release.id,
-      { method: "DELETE" },
-    );
-
-    if (resp.ok) {
-      toast.success("Release deleted");
-      mutate();
-    } else {
+    try {
+      await deleteReleaseRequest(releaseScope, release.id);
+    } catch {
       toast.error("Failed to delete release");
+      return;
     }
+    toast.success("Release deleted");
+    mutate();
   };
 
   return (
@@ -161,7 +137,7 @@ const Releases = () => {
                                   ? item.childReleaseName
                                   : item.artifactName +
                                     "@" +
-                                    item.artifactAssetVersionName}
+                                    item.assetVersionName}
                               </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -170,7 +146,7 @@ const Releases = () => {
                                 : "Artifact: " +
                                   item.artifactName +
                                   "@" +
-                                  item.artifactAssetVersionName}
+                                  item.assetVersionName}
                             </TooltipContent>
                           </Tooltip>
                         ))}

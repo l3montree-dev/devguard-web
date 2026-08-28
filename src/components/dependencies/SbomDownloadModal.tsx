@@ -21,13 +21,13 @@ import { Badge } from "../ui/badge";
 import type { Dispatch, SetStateAction } from "react";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import type { ArtifactDTO } from "../../types/api/api";
+import type { ArtifactDTO } from "@/types/dto";
 import { useSelectArtifact } from "../ArtifactSelector";
 import { useConfig } from "../../context/ConfigContext";
 import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
 import { useActiveAsset } from "../../hooks/useActiveAsset";
 import { usePublicSharing } from "./PublicUrlSection";
-import { useDownloadPdf } from "./useDownloadPdf";
+import { useDownloadPdf } from "@/hooks/useDownloadPdf";
 import { ArtifactAndPublicUrlGrid } from "./ArtifactAndPublicUrlGrid";
 
 interface SbomDownloadModalProps {
@@ -53,7 +53,7 @@ export default function SbomDownloadModal({
   const { sharesInformation, isPublicLoading, handleTogglePublic } =
     usePublicSharing();
   const { isLoading, handleDownload: handleDownloadPdfSbom } = useDownloadPdf(
-    pathname,
+    `${pathname}/..`,
     "sbom.pdf",
     "SBOM PDF",
   );

@@ -1,7 +1,13 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AdvisoryFormData } from "@/types/view/advisory";
+import type {
+  AdvisoryEventSubmit,
+  AdvisoryFormData,
+  AdvisoryState,
+  DetailedSecurityAdvisoryDTO,
+  SecurityAdvisory,
+} from "@/types/view/advisory";
 import { useSession } from "@/context/SessionContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -9,19 +15,14 @@ import useDecodedParams from "@/hooks/useDecodedParams";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
-import type {
-  AdvisoryState,
-  DetailedSecurityAdvisoryDTO,
-  Paged,
-  SecurityAdvisory,
-  VulnEventDTO,
-} from "@/types/api/api";
+
+import type { VulnEventDTO } from "@/types/view/vulnEvents";
+
+import type { Paged } from "@/types/view/pagination";
 import { buildFilterSearchParams } from "@/utils/url";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import useSWR, { mutate } from "swr";
-
-import type { AdvisoryEventSubmit } from "@/types/view/advisory";
 
 const request = async (
   url: string,

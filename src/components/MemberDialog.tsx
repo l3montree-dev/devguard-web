@@ -12,8 +12,8 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 
-import { browserApiClient } from "@/services/devGuardApi";
-import type { InviteRequest } from "@/types/api/api";
+import { inviteOrgMember } from "@/services/organizationService";
+import type { InviteRequest } from "@/types/dto";
 import { useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
 import Callout from "./common/Callout";
@@ -36,24 +36,19 @@ const MemberDialog: FunctionComponent<Props> = ({ isOpen, onOpenChange }) => {
   const activeOrg = useActiveOrg();
 
   const handleInvite = async (data: InviteRequest) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/members",
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      },
-    );
-
-    if (!resp.ok) {
-      if (resp.status == 409) {
-        toast.error("User is already member of the organization");
-        return;
-      }
-      toast.error("Failed to invite member");
+    let invitation;
+    try {
+      invitation = await inviteOrgMember(activeOrg.slug, data as never);
+    } catch (error) {
+      toast.error(
+        (error as { status?: number }).status === 409
+          ? "User is already member of the organization"
+          : "Failed to invite member",
+      );
       return;
     }
 
-    const { code } = await resp.json();
+    const { code } = invitation as { code: string };
     const url = new URL(window.location.href);
     setInvitationCode(url.origin + "/accept-invitation?code=" + code);
     form.reset();

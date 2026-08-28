@@ -15,7 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { VulnDistributionInStructure } from "@/types/api/api";
+import type { VulnDistributionInStructure } from "@/types/view/riskHistory";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
 import { truncateMiddle } from "@/utils/common";
 import { useActiveOrg } from "@/hooks/useActiveOrg";

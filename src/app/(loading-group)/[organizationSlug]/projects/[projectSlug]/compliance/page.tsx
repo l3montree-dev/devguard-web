@@ -5,12 +5,11 @@
 
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
-import type { Policy } from "@/types/api/api";
+import type { Policy } from "@/types/dto";
 
 import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import ListRenderer from "../../../../../../components/common/ListRenderer";
 import { PolicyListItem } from "../../../../../../components/common/ProjectPolicyListItem";
@@ -19,11 +18,10 @@ import { buttonVariants } from "../../../../../../components/ui/button";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
-import { browserApiClient } from "../../../../../../services/devGuardApi";
+import { useProjectPolicies } from "@/hooks/useProjectPolicies";
 import { DocDrawer } from "@/components/common/DocDrawer";
 
 const ComplianceIndex = () => {
-  const params = useDecodedParams();
   const menu = useProjectMenu();
   const activeOrg = useActiveOrg();
 
@@ -33,108 +31,23 @@ const ComplianceIndex = () => {
     projectSlug: string;
   };
 
-  const {
-    data: policies,
-    mutate,
-    error,
-    isLoading,
-  } = useSWR<Array<Policy & { enabled: boolean }>>(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/policies/",
-    async (url: string) => {
-      const [enabledPolicies, allPolicies] = await Promise.all([
-        browserApiClient(url).then((r) => r.json()),
-        browserApiClient(
-          "/organizations/" + organizationSlug + "/policies/",
-        ).then((r) => r.json()),
-      ]);
-      return allPolicies.map((policy: Policy) => ({
-        ...policy,
-        enabled: enabledPolicies.some((p: Policy) => p.id === policy.id),
-      }));
-    },
-  );
+  const { policies, isLoading, error, enablePolicy, disablePolicy } =
+    useProjectPolicies({ organization: organizationSlug, projectSlug });
 
   const handleEnablePolicy = async (policy: Policy) => {
-    mutate(
-      async (prev) => {
-        const { organizationSlug, projectSlug } = params as {
-          organizationSlug: string;
-          projectSlug: string;
-        };
-
-        let url =
-          "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/policies/" +
-          policy.id;
-
-        const resp = await browserApiClient(url, {
-          method: "PUT",
-        });
-
-        if (!resp.ok) {
-          toast.error("Failed to enable policy");
-        }
-        return (
-          prev?.map((p) =>
-            p.id === policy.id ? { ...p, enabled: true } : p,
-          ) || []
-        );
-      },
-      {
-        optimisticData(currentData) {
-          return (
-            currentData?.map((p) =>
-              p.id === policy.id ? { ...p, enabled: true } : p,
-            ) || []
-          );
-        },
-        rollbackOnError: true,
-      },
-    );
+    try {
+      await enablePolicy(policy);
+    } catch {
+      toast.error("Failed to enable policy");
+    }
   };
 
   const handleDisablePolicy = async (policy: Policy) => {
-    const { organizationSlug, projectSlug } = params as {
-      organizationSlug: string;
-      projectSlug: string;
-    };
-
-    mutate(
-      async (prev) => {
-        let url =
-          "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/policies/" +
-          policy.id;
-
-        const resp = await browserApiClient(url, {
-          method: "DELETE",
-        });
-
-        if (!resp.ok) {
-          toast.error("Failed to disable policy");
-          return;
-        }
-        return prev?.map((p) =>
-          p.id === policy.id ? { ...p, enabled: false } : p,
-        );
-      },
-      {
-        optimisticData: (currentData) =>
-          currentData?.map((p) =>
-            p.id === policy.id ? { ...p, enabled: false } : p,
-          ) || [],
-      },
-    );
+    try {
+      await disablePolicy(policy);
+    } catch {
+      toast.error("Failed to disable policy");
+    }
   };
 
   return (

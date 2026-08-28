@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import React, { type FunctionComponent } from "react";
-import type { VulnEventDTO } from "../types/api/api";
+import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { eventMessages, eventTypeMessages, findUser } from "../utils/view";
 
 import Markdown from "./common/Markdown";

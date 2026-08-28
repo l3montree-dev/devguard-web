@@ -3,11 +3,8 @@
 
 import type { FunctionComponent } from "react";
 import { integrationSnippets } from "../../../integrationSnippets";
-import type {
-  AssetDTO,
-  OrganizationDetailsDTO,
-  ProjectDTO,
-} from "../../../types/api/api";
+import type { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/dto";
+
 import type { GitInstances } from "../../../types/common";
 import { type Config } from "../../../types/common";
 import CopyCode, { CopyCodeFragment } from "../../common/CopyCode";

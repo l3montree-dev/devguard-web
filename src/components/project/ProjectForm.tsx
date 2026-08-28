@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { ProjectDTO } from "@/types/api/api";
+import type { ProjectDTO } from "@/types/dto";
 import type { FunctionComponent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import {

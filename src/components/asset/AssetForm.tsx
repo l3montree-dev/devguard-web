@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import type { FunctionComponent } from "react";
-import { UserRole } from "@/types/api/api";
+import { UserRole } from "@/types/view/vuln";
 import type { UseFormReturn } from "react-hook-form";
 import Section from "../common/Section";
 import React from "react";

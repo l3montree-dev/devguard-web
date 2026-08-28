@@ -3,6 +3,7 @@
 
 "use client";
 
+import { usePats } from "@/hooks/usePats";
 import ManagePatsDialog from "@/components/ManagePatsDialog";
 import NewTokenDialog from "@/components/NewTokenDialog";
 import { DatePicker } from "@/components/DatePicker";
@@ -18,16 +19,12 @@ import { addYears } from "date-fns";
 import { KeyRoundIcon, ShieldCheckIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
-import useSWR from "swr";
+import { useForm, useWatch } from "react-hook-form";
 import Section from "@/components/common/Section";
-import { fetcher } from "@/data-fetcher/fetcher";
 import type {
-  AsymmetricAccessTokenDTO,
   SeeOncePatWithBearerToken,
   SeeOncePatWithPrivKey,
-  SymmetricAccessTokenDTO,
-} from "@/types/api/api";
+} from "@/types/view/accessToken";
 
 const TOKEN_TYPES = [
   {
@@ -79,7 +76,7 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
     }
   };
 
-  const { register, handleSubmit, reset, setValue, watch } = useForm<{
+  const { register, handleSubmit, reset, setValue, control } = useForm<{
     description: string;
     scan: boolean;
     manage: boolean;
@@ -93,11 +90,11 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
     },
   });
 
-  const symmetric = watch("symmetric");
+  const symmetric = useWatch({ control, name: "symmetric" });
+  const scan = useWatch({ control, name: "scan" });
+  const manage = useWatch({ control, name: "manage" });
 
-  const { data: pats } = useSWR<
-    Array<SymmetricAccessTokenDTO | AsymmetricAccessTokenDTO>
-  >(url, fetcher, { fallbackData: [] });
+  const { data: pats } = usePats(url);
 
   const {
     AccessToken: accessTokens,
@@ -202,7 +199,7 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
                       </p>
                     </div>
                     <Checkbox
-                      checked={Boolean(watch("scan"))}
+                      checked={Boolean(scan)}
                       onCheckedChange={(e) => setValue("scan", Boolean(e))}
                     />
                   </label>
@@ -214,7 +211,7 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
                       </p>
                     </div>
                     <Checkbox
-                      checked={Boolean(watch("manage"))}
+                      checked={Boolean(manage)}
                       onCheckedChange={(e) => setValue("manage", Boolean(e))}
                     />
                   </label>

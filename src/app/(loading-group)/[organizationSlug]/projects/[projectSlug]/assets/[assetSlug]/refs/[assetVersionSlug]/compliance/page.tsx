@@ -2,21 +2,19 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import { useAssetVersionCompliance } from "@/hooks/useCompliancePostures";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import type { PolicyEvaluation } from "@/types/api/api";
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { FunctionComponent } from "react";
-import useSWR from "swr";
 import ColoredBadge from "../../../../../../../../../../components/common/ColoredBadge";
 import EmptyParty from "../../../../../../../../../../components/common/EmptyParty";
 import ListItem from "../../../../../../../../../../components/common/ListItem";
 import ListRenderer from "../../../../../../../../../../components/common/ListRenderer";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { violationLengthToLevel } from "../../../../../../../../../../utils/view";
 import { DocDrawer } from "@/components/common/DocDrawer";
@@ -35,10 +33,12 @@ const ComplianceIndex: FunctionComponent = () => {
     data: compliance,
     isLoading,
     error,
-  } = useSWR<PolicyEvaluation[]>(
-    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance`,
-    fetcher,
-  );
+  } = useAssetVersionCompliance({
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  });
 
   const pathname = usePathname();
 

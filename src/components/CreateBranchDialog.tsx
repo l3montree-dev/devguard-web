@@ -13,7 +13,7 @@ import {
 } from "./ui/dialog";
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { browserApiClient } from "@/services/devGuardApi";
+import { createAssetVersion } from "@/services/assetVersionService";
 import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../context/AssetContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
@@ -40,25 +40,22 @@ const CreateRefDialog: FunctionComponent<Props> = ({
   const [branchOrTagName, setBranchOrTagName] = useState("");
 
   const handleCreateRef = async () => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        activeProject.slug +
-        "/assets/" +
-        activeAsset.slug +
-        "/refs",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          name: branchOrTagName,
-          tag: isTag,
-        }),
-      },
-    );
+    let created;
+    try {
+      created = await createAssetVersion(
+        {
+          organization: activeOrg.slug,
+          projectSlug: activeProject.slug,
+          assetSlug: activeAsset.slug,
+        },
+        { name: branchOrTagName, tag: isTag } as never,
+      );
+    } catch {
+      created = null;
+    }
 
-    if (resp.ok) {
-      const newRef = await resp.json();
+    if (created) {
+      const newRef = created;
       toast.success(`${isTag ? "Tag" : "Branch"} created successfully`);
       updateAsset((prev) => {
         if (!prev) return prev;

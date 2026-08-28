@@ -1,8 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { ArtifactDTO } from "@/types/api/api";
-import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import type { ArtifactDTO } from "@/types/dto";
+import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
 
 export async function fetchArtifacts(
   organizationSlug: string,
@@ -10,17 +10,27 @@ export async function fetchArtifacts(
   assetSlug: string,
   assetVersionSlug: string,
 ) {
-  const devGuardApiClient = await getApiClientInAppRouter();
+  const client = await getServerClientInAppRouter();
 
-  const url = `/organizations/${decodeURIComponent(organizationSlug)}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts`;
-  // console.log(url);
-  const r = await devGuardApiClient(url);
+  const { data, response: r } = await client.GET(
+    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/artifacts/",
+    {
+      params: {
+        path: {
+          organization: decodeURIComponent(organizationSlug),
+          projectSlug,
+          assetSlug,
+          assetVersionSlug,
+        },
+      },
+    },
+  );
 
   if (!r.ok) {
     return [];
   }
 
   // parse the organization
-  const artifacts: ArtifactDTO[] = await r.json();
+  const artifacts = data as ArtifactDTO[];
   return artifacts;
 }

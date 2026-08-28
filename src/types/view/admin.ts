@@ -1,21 +1,19 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-export interface OrgAdmin {
-  id: string;
-  name: string;
-  avatarUrl: string | null;
-  role: string;
-}
+// avatarUrl is a pointer in Go, so it is nullable despite the spec declaring it
+// required.
+import type { components } from "@/types/api/generated";
 
-export interface ExternalOrg {
-  id: string;
-  /** The reserved @-prefixed slug, e.g. "@gitlab" or "@opencode" */
-  slug: string;
-  /** Identifier of the backing instance integration (e.g. "opencode") */
-  instance_id: string;
+type S = components["schemas"];
+
+export type OrgAdmin = Omit<S["dtos.UserDTO"], "avatarUrl"> & {
+  avatarUrl: string | null;
+};
+
+export type ExternalOrg = Omit<S["dtos.AdminsInOrg"], "admins"> & {
   admins: OrgAdmin[];
-}
+};
 
 export interface InstanceDashboardHandle {
   refresh: () => void;
@@ -67,4 +65,16 @@ export interface VersionCheckResult {
   latestUrl: string;
   /** Whether the running version is behind the latest release */
   updateAvailable: boolean;
+}
+
+// Instance-wide usage counters from `GET /admin/statistics/usage/`.
+// NOTE: the backend `dtos.InstanceUsageStatistics` struct carries no `json`
+// tags, so the serialized keys are the Go field names verbatim (PascalCase).
+export interface InstanceUsageStatistics {
+  NumberOfUsers: number;
+  NumberOfOrganizations: number;
+  NumberOfProjects: number;
+  NumberOfAssetVersions: number;
+  NumberOfTicketSyncedProjects: number;
+  NumberOfProjectsWithGitlabIntegration: number;
 }

@@ -83,6 +83,7 @@ const Index: FunctionComponent = () => {
     params.projectSlug,
     params.assetSlug,
     router,
+    searchParams,
   ]);
 
   if (!asset) {
@@ -300,7 +301,9 @@ const Index: FunctionComponent = () => {
                   organizationSlug={params.organizationSlug}
                   projectSlug={params.projectSlug}
                   assetSlug={params.assetSlug}
-                  repositoryProvider={asset.repositoryProvider}
+                  repositoryProvider={
+                    asset.repositoryProvider as "github" | "gitlab" | undefined
+                  }
                 />
               </div>
             </CollapsibleContent>

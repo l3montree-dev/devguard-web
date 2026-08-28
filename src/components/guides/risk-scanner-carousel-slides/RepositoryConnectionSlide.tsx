@@ -18,7 +18,7 @@
 import React, { type FunctionComponent } from "react";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import type { OrganizationDetailsDTO } from "../../../types/api/api";
+import type { OrganizationDetailsDTO } from "@/types/dto";
 import type { ExternalTicketProvider } from "../../../types/common";
 import ProviderSetup from "../ProviderSetup";
 

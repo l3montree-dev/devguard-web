@@ -17,14 +17,14 @@ const Config = () => {
   const asset = useActiveAsset();
   const assetMenu = useAssetMenu();
 
-  const baseUrl =
+  const scope =
     org && project && asset
-      ? "/organizations/" +
-        org.slug +
-        "/projects/" +
-        project.slug +
-        "/assets/" +
-        asset.slug
+      ? ({
+          level: "asset",
+          organization: org.slug,
+          projectSlug: project.slug,
+          assetSlug: asset.slug,
+        } as const)
       : null;
 
   return (
@@ -43,7 +43,7 @@ const Config = () => {
       Menu={assetMenu}
       Title={<AssetTitle />}
     >
-      <DependencyProxyConfigs baseUrl={baseUrl} />
+      <DependencyProxyConfigs scope={scope} />
     </Page>
   );
 };

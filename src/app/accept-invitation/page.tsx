@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { acceptInvitation } from "@/services/organizationService";
 import Head from "next/head";
 import Footer from "@/components/misc/Footer";
 import ContainerYardScene from "@/components/threejs/ContainerYardScene";
@@ -43,19 +43,13 @@ const AcceptInvitation = () => {
 
   const acceptCode = useCallback(
     async (code: string) => {
-      const resp = await browserApiClient("/accept-invitation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
-      });
-
-      if (!resp.ok) {
+      let slug;
+      try {
+        ({ slug } = await acceptInvitation(code));
+      } catch {
         return false;
       }
 
-      const { slug } = await resp.json();
       writeLocalStorage("lastActiveOrg", slug);
       router.replace(`/${slug}`);
       return true;

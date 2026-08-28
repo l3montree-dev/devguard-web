@@ -1,8 +1,6 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { DependencyVuln, VexRule } from "@/types/api/api";
-
 import { beautifyPurl, classNames } from "@/utils/common";
 
 import {
@@ -47,6 +45,8 @@ import {
 } from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Move } from "lucide-react";
+import type { VexRule } from "@/types/view/vexRules";
+import type { DependencyVuln } from "@/types/dto";
 
 // Returns the suffix of the path starting at nodeId going toward the leaf.
 // Uses highlightPath if the node appears in it; otherwise falls back to
@@ -117,8 +117,11 @@ const DependencyGraph: FunctionComponent<{
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
   // Pre-compute child counts for auto-expansion
-  const childCountMapRef = useRef<Map<string, number>>(new Map());
-  const childrenLimitMapRef = useRef<Map<string, number>>(new Map());
+  const childCountMap = useMemo(() => {
+    const counts = new Map<string, number>();
+    populateChildCounts(graph, counts);
+    return counts;
+  }, [graph]);
 
   // Compute direct dependencies with available patches
   const directDepsWithPatches = useMemo(() => {
@@ -141,18 +144,15 @@ const DependencyGraph: FunctionComponent<{
     return set;
   }, [vulns]);
 
-  if (childCountMapRef.current.size === 0) {
-    populateChildCounts(graph, childCountMapRef.current);
-  }
-
   // Auto-expand nodes until we have at least MIN_VISIBLE_NODES
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => {
-    return autoExpandToMinimum(
-      graph,
-      childCountMapRef.current,
-      childrenLimitMapRef.current,
-    );
+    return autoExpandToMinimum(graph, childCountMap, new Map());
   });
+
+  // Track how many children to show for each node
+  const [childrenLimitMap, setChildrenLimitMap] = useState<Map<string, number>>(
+    () => new Map(),
+  );
 
   // Handle expansion toggle from arrow click
   const handleExpansionToggle = useCallback((nodeId: string) => {
@@ -173,12 +173,11 @@ const DependencyGraph: FunctionComponent<{
     });
   }, []);
 
-  // Track how many children to show for each node
-  const [childrenLimitMap, setChildrenLimitMap] = useState<Map<string, number>>(
-    () => childrenLimitMapRef.current,
-  );
   const previousNodesRef = useRef<Array<any>>([]);
 
+  /* eslint-disable react-hooks/refs -- dagre needs the previous frame's node
+     positions to keep nodes from jumping when a subtree expands; prior-render
+     data is only reachable through a ref. */
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
     const [nodes, edges] = getLayoutedElements(
       graph,
@@ -205,7 +204,9 @@ const DependencyGraph: FunctionComponent<{
     childrenLimitMap,
     handleExpansionToggle,
     enableContextMenu,
+    directDepsWithPatches,
   ]);
+  /* eslint-enable react-hooks/refs */
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

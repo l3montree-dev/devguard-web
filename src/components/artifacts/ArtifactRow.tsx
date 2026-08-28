@@ -1,7 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { ArtifactDTO, InformationSources } from "@/types/api/api";
+import type { InformationSource } from "@/services/artifactService";
+import type { ArtifactDTO } from "@/types/dto";
 import {
   classNames,
   validateArtifactNameAgainstPurlSpec,
@@ -31,7 +32,7 @@ import AuthGuard from "../AuthGuard";
 interface Props {
   artifact: ArtifactDTO;
   index: number;
-  rootNodes: InformationSources[];
+  rootNodes: InformationSource[];
   selectedSourceUrls: Set<string>;
   onToggleSource: (url: string) => void;
   onToggleAllSources: (urls: string[]) => void;

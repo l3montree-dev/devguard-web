@@ -2,14 +2,15 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import type { LicenseRiskDTO } from "@/types/dto";
 import SortingCaret from "@/components/common/SortingCaret";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
-import type { LicenseResponse, LicenseRiskDTO, Paged } from "@/types/api/api";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+
+import { flexRender } from "@tanstack/react-table";
+
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
@@ -24,12 +25,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useTable from "@/hooks/useTable";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import useSWR from "swr";
+import { useComponentLicenses } from "@/hooks/useAssetVersionStats";
+import { useLicenseRiskList } from "@/hooks/useVulnList";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
@@ -50,9 +53,9 @@ import {
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import Filter from "@/components/Filter";
 
-const columnHelper = createColumnHelper<LicenseRiskDTO>();
+const columnHelper = createAppColumnHelper<LicenseRiskDTO>();
 
-const columnsDef: ColumnDef<LicenseRiskDTO, any>[] = [
+const columnsDef: TableColumnDef<LicenseRiskDTO, any>[] = [
   {
     ...columnHelper.accessor("componentPurl", {
       header: "Package",
@@ -104,15 +107,6 @@ const Index: FunctionComponent = () => {
 
   const searchParams = useSearchParams();
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/";
-
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
     const state = searchParams?.get("state");
@@ -134,29 +128,21 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
 
-  const { data: vulns, isLoading } = useSWR<Paged<LicenseRiskDTO>>(
-    uri +
-      "refs/" +
-      assetVersionSlug +
-      "/" +
-      "license-risks?" +
-      query.toString(),
-    fetcher,
-    { keepPreviousData: true },
+  const vulnScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
+
+  const { data: vulns, isLoading } = useLicenseRiskList<LicenseRiskDTO>(
+    vulnScope,
+    query,
   );
 
-  const { data: licenses, isLoading: licensesLoading } = useSWR<
-    LicenseResponse[]
-  >(
-    uri +
-      "refs/" +
-      assetVersionSlug +
-      "/components/licenses/" +
-      (searchParams?.has("artifact")
-        ? "?artifact=" +
-          encodeURIComponent(searchParams.get("artifact") as string)
-        : ""),
-    fetcher,
+  const { data: licenses, isLoading: licensesLoading } = useComponentLicenses(
+    vulnScope,
+    searchParams?.get("artifact") ?? undefined,
   );
 
   // Known risky/unknown license identifiers that should be highlighted as warnings

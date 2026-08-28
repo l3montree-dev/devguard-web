@@ -10,12 +10,17 @@ import { Button } from "@/components/ui/button";
 import { documentationLinks } from "@/const/documentationLinks";
 import AuthGuard from "@/components/AuthGuard";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import { browserApiClient } from "@/services/devGuardApi";
+import {
+  createArtifact as createArtifactRequest,
+  deleteArtifact as deleteArtifactRequest,
+  syncArtifactExternalSources,
+  updateArtifact as updateArtifactRequest,
+} from "@/services/artifactService";
 import type {
-  ArtifactCreateUpdateRequest,
-  ArtifactDTO,
-  InformationSources,
-} from "@/types/api/api";
+  ArtifactRequest,
+  InformationSource,
+} from "@/services/artifactService";
+import type { ArtifactDTO } from "@/types/dto";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { TriangleAlert } from "lucide-react";
 import Link from "next/link";
@@ -42,7 +47,6 @@ import {
 } from "../../../../../../../../../../context/AssetVersionContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
-import type { UpdateArtifactResponse } from "@/types/view/asset";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -71,7 +75,7 @@ const Artifacts = () => {
 
   const { rootNodes, mutate } = useRootNodes();
 
-  const artifactForm = useForm<ArtifactCreateUpdateRequest>({
+  const artifactForm = useForm<ArtifactRequest>({
     defaultValues: {
       artifactName: "",
       informationSources: [],
@@ -122,7 +126,7 @@ const Artifacts = () => {
     artifactForm.reset();
   };
 
-  const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
+  const handleSubmit = async (data: ArtifactRequest) => {
     let success = false;
 
     if (dialogState.mode === "create") {
@@ -140,12 +144,22 @@ const Artifacts = () => {
     }
   };
 
+  const versionScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
+
   const handleDelete = async () => {
     if (deleteDialogOpen) {
-      const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(deleteDialogOpen.artifactName)}/`;
-      const resp = await browserApiClient(url, { method: "DELETE" });
-      if (!resp.ok) {
-        toast.error("Failed to delete artifact: " + resp.statusText);
+      try {
+        await deleteArtifactRequest(
+          versionScope,
+          deleteDialogOpen.artifactName,
+        );
+      } catch (error) {
+        toast.error("Failed to delete artifact: " + String(error));
         return;
       }
       updateAssetVersionState((prev) => ({
@@ -161,34 +175,25 @@ const Artifacts = () => {
   };
 
   const syncExternalSources = async (artifactName: string) => {
-    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}/sync-external-sources/`;
-    const resp = await browserApiClient(url, { method: "POST" });
-    if (!resp.ok) {
-      toast.error("Failed to sync external sources: " + resp.statusText);
+    try {
+      await syncArtifactExternalSources(versionScope, artifactName);
+    } catch (error) {
+      toast.error("Failed to sync external sources: " + String(error));
       return;
     }
 
     toast.success("External sources synced. Reload required to see updates.");
   };
 
-  const createArtifact = async (
-    data: ArtifactCreateUpdateRequest,
-  ): Promise<boolean> => {
-    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/`;
-    const resp = await browserApiClient(url, {
-      method: "POST",
-      body: JSON.stringify({
-        artifactName: data.artifactName,
-        informationSources: data.informationSources || [],
-      }),
-    });
-
-    if (!resp.ok) {
-      toast.error("Failed to create artifact: " + resp.statusText);
+  const createArtifact = async (data: ArtifactRequest): Promise<boolean> => {
+    let newArtifact;
+    try {
+      newArtifact = await createArtifactRequest(versionScope, data);
+    } catch (error) {
+      toast.error("Failed to create artifact: " + String(error));
       return false;
     }
 
-    const newArtifact = await resp.json();
     updateAssetVersionState((prev) => ({
       ...prev!,
       artifacts: [...prev!.artifacts, newArtifact],
@@ -199,22 +204,15 @@ const Artifacts = () => {
   };
 
   const updateArtifact = async (
-    artifact: ArtifactCreateUpdateRequest,
+    artifact: ArtifactRequest,
   ): Promise<boolean> => {
-    const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifact.artifactName)}`;
-    const response = await browserApiClient(url, {
-      method: "PUT",
-      body: JSON.stringify({
-        artifactName: artifact.artifactName,
-        informationSources: artifact.informationSources || [],
-      }),
-    });
-    if (!response.ok) {
-      toast.error("Failed to update artifact: " + response.statusText);
+    let resp;
+    try {
+      resp = await updateArtifactRequest(versionScope, artifact);
+    } catch (error) {
+      toast.error("Failed to update artifact: " + String(error));
       return false;
     }
-
-    const resp = (await response.json()) as UpdateArtifactResponse;
     const updatedArtifact = resp.artifact;
 
     if (resp.invalidURLs && resp.invalidURLs.length > 0) {
@@ -269,7 +267,7 @@ const Artifacts = () => {
     // Group selected URLs by artifact
     const artifactUpdates: Array<{
       artifactName: string;
-      remainingSources: InformationSources[];
+      remainingSources: InformationSource[];
     }> = [];
 
     for (const artifact of artifacts) {
@@ -298,27 +296,12 @@ const Artifacts = () => {
     let errorCount = 0;
 
     for (const { artifactName, remainingSources } of artifactUpdates) {
-      const url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts/${encodeURIComponent(artifactName)}`;
-
       try {
-        const response = await browserApiClient(url, {
-          method: "PUT",
-          body: JSON.stringify({
-            artifactName,
-            informationSources: remainingSources,
-          }),
+        await updateArtifactRequest(versionScope, {
+          artifactName,
+          informationSources: remainingSources,
         });
-
-        if (response.ok) {
-          successCount++;
-        } else {
-          errorCount++;
-          console.error(
-            "Failed to update artifact:",
-            artifactName,
-            response.statusText,
-          );
-        }
+        successCount++;
       } catch (error) {
         errorCount++;
         console.error("Error updating artifact:", artifactName, error);

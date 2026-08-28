@@ -1,15 +1,10 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type {
-  AssetDTO,
-  ProjectDTO,
-  SubGroupsAndAsset,
-} from "../../types/api/api";
+import type { AssetDTO } from "@/types/dto";
+import type { SubGroupProject, SubGroupsAndAsset } from "@/types/view/project";
 
-export function isProject(
-  d: SubGroupsAndAsset,
-): d is ProjectDTO & { resourceType: "project" } {
+export function isProject(d: SubGroupsAndAsset): d is SubGroupProject {
   return d.resourceType === "project";
 }
 
@@ -20,7 +15,7 @@ export function checkType(data: SubGroupsAndAsset):
     }
   | {
       asset: null;
-      subgroup: ProjectDTO & { resourceType: "project" };
+      subgroup: SubGroupProject;
     } {
   return isProject(data)
     ? { asset: null, subgroup: data }

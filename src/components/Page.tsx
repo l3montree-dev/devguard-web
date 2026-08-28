@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import { useGlobalNotice } from "@/hooks/useGlobalNotice";
 import Head from "next/head";
 import React, { type PropsWithChildren, useEffect } from "react";
 import { classNames } from "../utils/common";
@@ -32,26 +33,23 @@ type PageProps = {
 
 // Add that the navigation is a prop
 const Page = (props: PropsWithChildren<PageProps>) => {
+  const notice = useGlobalNotice();
+
   useEffect(() => {
     const STORAGE_KEY = "global-notice-updatedAt";
+    if (!notice) return;
+    if (readLocalStorage(STORAGE_KEY) === notice.updatedAt) return;
 
-    fetch(`/notice`)
-      .then((res) => res.json())
-      .then(({ notice }) => {
-        if (!notice) return;
-        if (readLocalStorage(STORAGE_KEY) === notice.updatedAt) return;
-
-        toast(<Markdown>{notice.description}</Markdown>, {
-          icon: <Megaphone className="h-4 w-4" />,
-          id: "global-notice",
-          duration: Infinity,
-          closeButton: true,
-          onDismiss: () => {
-            writeLocalStorage(STORAGE_KEY, notice.updatedAt);
-          },
-        });
-      });
-  }, []);
+    toast(<Markdown>{notice.description}</Markdown>, {
+      icon: <Megaphone className="h-4 w-4" />,
+      id: "global-notice",
+      duration: Infinity,
+      closeButton: true,
+      onDismiss: () => {
+        writeLocalStorage(STORAGE_KEY, notice.updatedAt);
+      },
+    });
+  }, [notice]);
   return (
     <>
       <Head>

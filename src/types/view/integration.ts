@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 
 export type ManualUploadKind = "sbom" | "sarif" | "vex";
 

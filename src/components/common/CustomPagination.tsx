@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { Paged } from "@/types/api/api";
+import type { Paged } from "@/types/view/pagination";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 

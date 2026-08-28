@@ -1,18 +1,23 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { OrganizationDetailsDTO } from "@/types/api/api";
-import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import type { OrganizationDetailsDTO } from "@/types/dto";
+import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
 import { HttpError } from "./httpError";
 
 export async function fetchOrganization(organizationSlug: string) {
   // get the devGuardApiClient
-  const devGuardApiClient = await getApiClientInAppRouter();
+  const client = await getServerClientInAppRouter();
 
   if (organizationSlug) {
     // get the organization
-    const org = await devGuardApiClient(
-      "/organizations/" + decodeURIComponent(organizationSlug),
+    const { data, response: org } = await client.GET(
+      "/organizations/{organization}",
+      {
+        params: {
+          path: { organization: decodeURIComponent(organizationSlug) },
+        },
+      },
     );
 
     // if the organization slug starts with an @ it is actually an identity provider
@@ -44,9 +49,7 @@ export async function fetchOrganization(organizationSlug: string) {
       }
     }
     // parse the organization
-    const organization: OrganizationDetailsDTO = await org.json();
-
-    return organization;
+    return data as OrganizationDetailsDTO;
   } else {
     return null;
   }

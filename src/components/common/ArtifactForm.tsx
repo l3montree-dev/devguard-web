@@ -1,7 +1,7 @@
 // Copyright 2025 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import type { ArtifactRequest } from "@/services/artifactService";
 import { AlertTriangle, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useFieldArray } from "react-hook-form";
@@ -23,7 +23,7 @@ import { documentationLinks } from "@/const/documentationLinks";
 import { Alert, AlertDescription } from "../ui/alert";
 
 interface Props {
-  form: UseFormReturn<ArtifactCreateUpdateRequest>;
+  form: UseFormReturn<ArtifactRequest>;
   isEditMode?: boolean;
 }
 

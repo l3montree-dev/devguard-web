@@ -3,13 +3,7 @@
 
 "use client";
 
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
+import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import {
   Card,
   CardContent,
@@ -26,9 +20,7 @@ import {
   CircleStackIcon,
   CodeBracketIcon,
 } from "@heroicons/react/20/solid";
-import type { InstanceInfoDTO } from "@/types/api/api";
-import { adminBrowserApiClient } from "@/services/adminApi";
-import { useInstanceAdmin } from "@/context/InstanceAdminContext";
+import { useAdminQuery } from "@/hooks/useAdminQuery";
 import { checkForUpdate } from "@/services/versionCheck";
 import { formatBytes, formatDateTime, formatDuration } from "@/utils/format";
 import type {
@@ -73,50 +65,33 @@ function Row({
 
 export default forwardRef<InstanceTechnicalInfoHandle>(
   function InstanceTechnicalInfo(_, ref) {
-    const { getSigningKey } = useInstanceAdmin();
-    const [info, setInfo] = useState<InstanceInfoDTO | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const {
+      data: info,
+      isLoading: loading,
+      error: fetchError,
+      mutate: refresh,
+    } = useAdminQuery("/info");
+
     const [versionCheck, setVersionCheck] = useState<VersionCheckResult | null>(
       null,
     );
 
-    const loadInfo = useCallback(async () => {
-      const key = getSigningKey();
-      if (!key) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const resp = await adminBrowserApiClient("/info", key);
-        if (!resp.ok) {
-          setError(`Server returned ${resp.status}`);
-          return;
-        }
-        const data = (await resp.json()) as InstanceInfoDTO;
-        setInfo(data);
-        setError(null);
-
-        // Fire-and-forget version check
-        checkForUpdate(data.build.version)
-          .then((result) => setVersionCheck(result))
-          .catch(() => {
-            /* non-critical */
-          });
-      } catch {
-        setError("Failed to fetch instance info.");
-      } finally {
-        setLoading(false);
-      }
-    }, [getSigningKey]);
-
-    useImperativeHandle(ref, () => ({ refresh: loadInfo }), [loadInfo]);
+    const version = info?.build?.version;
 
     useEffect(() => {
-      loadInfo();
-    }, [loadInfo]);
+      if (!version) return;
+      let ignore = false;
+      checkForUpdate(version).then((result) => {
+        if (!ignore) setVersionCheck(result);
+      });
+      return () => {
+        ignore = true;
+      };
+    }, [version]);
+
+    useImperativeHandle(ref, () => ({ refresh }), [refresh]);
+
+    const error = fetchError ? "Failed to fetch instance info." : null;
 
     if (loading) {
       return (

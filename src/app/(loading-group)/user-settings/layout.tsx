@@ -6,7 +6,7 @@ import React from "react";
 
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
-import type { OrganizationDetailsDTO } from "../../../types/api/api";
+import type { OrganizationDetailsDTO } from "@/types/dto";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.

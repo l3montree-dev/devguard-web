@@ -3,9 +3,8 @@
 
 "use client";
 
+import { usePolicyEvaluation } from "@/hooks/useCompliancePostures";
 import Page from "@/components/Page";
-
-import type { PolicyEvaluation } from "@/types/api/api";
 
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import Markdown from "@/components/common/Markdown";
@@ -30,8 +29,6 @@ import {
 } from "@/components/ui/card";
 import ColoredBadge from "@/components/common/ColoredBadge";
 import AccessTokenSection from "@/components/AccessTokenSection";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import Err from "../../../../../../../../../../../components/common/Err";
@@ -58,11 +55,14 @@ const Index = () => {
     data: policyDetails,
     error,
     isLoading,
-  } = useSWR<PolicyEvaluation>(
-    organizationSlug && projectSlug && assetSlug && assetVersionSlug && control
-      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/compliance/${control}`
-      : null,
-    fetcher,
+  } = usePolicyEvaluation(
+    {
+      organization: organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    },
+    control,
   );
 
   const assetMenu = useAssetMenu();

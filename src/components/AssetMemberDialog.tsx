@@ -13,8 +13,8 @@ import {
 } from "./ui/dialog";
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { browserApiClient } from "@/services/devGuardApi";
-import { UserRole } from "@/types/api/api";
+import { inviteAssetMembers } from "@/services/assetService";
+import { UserRole } from "@/types/view/vuln";
 import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../context/AssetContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
@@ -45,23 +45,21 @@ const AssetMemberDialog: FunctionComponent<Props> = ({
 
   const handleInviteSelectedMembers = async () => {
     const ids = selectedMembers.map((m) => m.value);
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        activeProject.slug +
-        "/assets/" +
-        activeAsset.slug +
-        "/members",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          ids,
-        }),
-      },
-    );
+    let ok = true;
+    try {
+      await inviteAssetMembers(
+        {
+          organization: activeOrg.slug,
+          projectSlug: activeProject.slug,
+          assetSlug: activeAsset.slug,
+        },
+        ids,
+      );
+    } catch {
+      ok = false;
+    }
 
-    if (!resp.ok) {
+    if (!ok) {
       toast.error("Failed to invite member");
       return;
     } else {
@@ -72,6 +70,7 @@ const AssetMemberDialog: FunctionComponent<Props> = ({
             .filter((e) => ids.includes(e.id))
             .map((e) => ({
               ...e,
+              avatarUrl: e.avatarUrl ?? "",
               role: UserRole.Member,
             })),
         ),

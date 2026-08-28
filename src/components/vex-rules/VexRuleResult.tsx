@@ -12,11 +12,10 @@ import {
   SpeakerXMarkIcon,
   StopIcon,
 } from "@heroicons/react/24/outline";
-import type {
-  MechanicalJustificationType,
-  VexRuleEventType,
-} from "@/types/api/api";
+import type { MechanicalJustificationType } from "@/types/view/vuln";
+
 import type { FunctionComponent } from "react";
+import type { VexRuleEventType } from "@/types/view/vexRules";
 
 interface VexRuleResultProps {
   eventType: VexRuleEventType;

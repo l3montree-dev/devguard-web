@@ -3,8 +3,6 @@
 
 "use client";
 
-import { useCallback, useState } from "react";
-
 export const readSessionStorage = (key: string) => {
   if (typeof window === "undefined") return null;
   try {
@@ -29,18 +27,4 @@ export const removeSessionStorage = (key: string) => {
   } catch (error) {
     console.error(`cannot remove sessionStorage key ${key}`, error);
   }
-};
-
-export const useSessionStorage = (key: string) => {
-  const [value, setValue] = useState(() => readSessionStorage(key));
-
-  const store = useCallback(
-    (next: string) => {
-      writeSessionStorage(key, next);
-      setValue(next);
-    },
-    [key],
-  );
-
-  return [value, store] as const;
 };

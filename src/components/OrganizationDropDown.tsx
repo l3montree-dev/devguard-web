@@ -15,16 +15,11 @@
 // limitations under the License.
 "use client";
 
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import type { OrganizationDTO } from "@/types/api/api";
+import type { OrganizationDTO } from "@/types/dto";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
-import { uniqBy } from "lodash";
 import { Loader2, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { toast } from "@/lib/toast";
-import { browserApiClient } from "../services/devGuardApi";
 import GitProviderIcon from "./GitProviderIcon";
 import { Badge } from "./ui/badge";
 import {
@@ -36,14 +31,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useSession, useUpdateSession } from "../context/SessionContext";
+import { useSession } from "../context/SessionContext";
 import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useInstanceSettings } from "../hooks/useInstanceSettings";
-import {
-  readLocalStorage,
-  useLocalStorage,
-  writeLocalStorage,
-} from "@/hooks/useLocalStorage";
+import { useOrgSync } from "../hooks/useOrgSync";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { truncateMiddle } from "@/utils/common";
 
 const activeOrgName = (name: string, slug: string) => {
@@ -57,10 +49,6 @@ const activeOrgName = (name: string, slug: string) => {
 };
 const OrganizationDropDown = () => {
   const orgs = useSession().organizations;
-  const updateOrganizations = useUpdateSession();
-  const [orgSyncRunning, setOrgSyncRunning] = useState(false);
-
-  const user = useCurrentUser();
   const router = useRouter();
   const instanceSettings = useInstanceSettings();
 
@@ -81,44 +69,7 @@ const OrganizationDropDown = () => {
     }
   };
 
-  useEffect(() => {
-    // trigger a sync on page load - if the org has an external entity provider
-    if (user) {
-      // check in localStorage if the sync was already triggered
-      const lastSync = readLocalStorage(`lastSync-${user.id}`);
-      if (
-        !lastSync ||
-        new Date().getTime() - new Date(lastSync).getTime() > 1000 * 60 * 60
-      ) {
-        setOrgSyncRunning(true);
-        // if not, trigger sync
-        writeLocalStorage(`lastSync-${user.id}`, new Date().toISOString());
-
-        browserApiClient("/trigger-sync/", {
-          method: "GET",
-        })
-          .then((response) => {
-            setOrgSyncRunning(false);
-
-            if (response.ok) {
-              toast.success("Organization synced successfully");
-              // if the response is ok, update the organizations
-              return response.json().then((data: Array<OrganizationDTO>) => {
-                updateOrganizations((prev) => ({
-                  ...prev,
-                  organizations: uniqBy(data.concat(orgs), "id"),
-                }));
-              });
-            }
-          })
-          .catch((err) => {
-            toast.error("Failed to sync organization");
-            console.error("Failed to trigger organization sync", err);
-            setOrgSyncRunning(false);
-          });
-      }
-    }
-  }, [user, updateOrganizations, orgs]);
+  const orgSyncRunning = useOrgSync();
 
   const handleNavigateToSetupOrg = () => {
     router.push(`/setup`);

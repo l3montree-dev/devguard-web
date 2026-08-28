@@ -35,6 +35,7 @@ function parseDate(value: unknown): number | null {
 
 export async function GET() {
   try {
+    // eslint-disable-next-line local/no-raw-fetch, local/no-data-fetching-in-view -- server side route handler reading GitHub, not the DevGuard API
     const res = await fetch(ISSUE_URL, {
       headers: {
         Accept: "application/vnd.github+json",

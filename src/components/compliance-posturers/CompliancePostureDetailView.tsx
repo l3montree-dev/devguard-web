@@ -5,15 +5,21 @@
 
 import Page from "@/components/Page";
 
-import { browserApiClient } from "@/services/devGuardApi";
+import type { PostureScope } from "@/services/compliancePostureService";
+import {
+  createPostureEvent,
+  deleteStatement,
+} from "@/services/compliancePostureService";
+import {
+  useComplianceComponentsForControl,
+  useCompliancePosture,
+} from "@/hooks/useCompliancePosture";
 import type {
-  AssetDTO,
-  AssetVersionDTO,
-  ComplianceComponentDetailsDTO,
   DetailedComplianceRiskDTO,
-  ProjectDTO,
   VulnEventDTO,
-} from "@/types/api/api";
+} from "@/types/view/vulnEvents";
+import type { AssetDTO, AssetVersionDTO, ProjectDTO } from "@/types/dto";
+
 import Image from "next/image";
 
 import AuthGuard from "@/components/AuthGuard";
@@ -91,7 +97,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
@@ -99,7 +104,6 @@ import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/
 import { ChevronRightIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "sonner";
-import useSWR from "swr";
 import FrameworkIcon from "./FrameworkIcon";
 import {
   EquivalentToIcon,
@@ -202,7 +206,7 @@ function MappedControlsGroup({
 }
 
 interface Props {
-  apiBaseUrl: string;
+  scope: PostureScope;
   vulnId: string;
   Menu?: any[];
   Title?: ReactNode;
@@ -263,27 +267,16 @@ const InheritedHandlingWarning = (
     );
 };
 
-const CompliancePostureDetailView = ({
-  apiBaseUrl,
-  vulnId,
-  Menu,
-  Title,
-}: Props) => {
+const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
   const {
     data: vuln,
     error,
     isLoading,
     mutate,
-  } = useSWR<DetailedComplianceRiskDTO>(
-    vulnId ? `${apiBaseUrl}${vulnId}/` : null,
-    fetcher,
-  );
+  } = useCompliancePosture(scope, vulnId);
 
-  const { data: availableComponents } = useSWR<ComplianceComponentDetailsDTO[]>(
-    vuln
-      ? `/compliance-components/?filterQuery[frameworkControlId][is]=${encodeURIComponent(vuln.frameworkControlId)}`
-      : null,
-    fetcher,
+  const { data: availableComponents } = useComplianceComponentsForControl(
+    vuln?.frameworkControlId,
   );
 
   const attachedComponentIds = useMemo(
@@ -320,13 +313,9 @@ const CompliancePostureDetailView = ({
       (s) => s.id === statementId,
     );
 
-    const resp = await browserApiClient(
-      `${apiBaseUrl}components/${statementId}/`,
-      {
-        method: "DELETE",
-      },
-    );
-    if (!resp.ok) {
+    try {
+      await deleteStatement(scope, statementId);
+    } catch {
       toast("Failed to remove component", {
         description: "Please try again later.",
       });
@@ -451,28 +440,11 @@ const CompliancePostureDetailView = ({
 
     const mutatePromise = mutate(
       async (current) => {
-        let json: any;
-        if (data.status === "mitigate") {
-          const resp = await browserApiClient(
-            `${apiBaseUrl}${vuln.frameworkControlId}/mitigate`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ comment: data.justification }),
-            },
-          );
-          json = await resp.json();
-        } else {
-          const resp = await browserApiClient(
-            `${apiBaseUrl}${vuln.frameworkControlId}/`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
-        }
+        const json = (await createPostureEvent(
+          scope,
+          vuln.frameworkControlId,
+          data,
+        )) as unknown as DetailedComplianceRiskDTO;
 
         if (!json.events) {
           toast("Failed to update vulnerability", {
@@ -721,7 +693,7 @@ const CompliancePostureDetailView = ({
                   <AddComplianceComponentStatementDialog
                     open={showAddComponent}
                     setOpen={setShowAddComponent}
-                    apiBaseUrl={apiBaseUrl}
+                    scope={scope}
                     frameworkControlId={vuln.frameworkControlId}
                     attachedComponentIds={(vuln.byComponents ?? []).map(
                       (s) => s.complianceComponentId,

@@ -10,8 +10,9 @@ import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import useRepositorySearch, { convertRepos } from "@/hooks/useRepositorySearch";
-import { browserApiClient } from "@/services/devGuardApi";
-import { useEffect, useState } from "react";
+import { patchAsset } from "@/services/assetService";
+import { useIntegrationRepositories } from "@/hooks/useIntegrationRepositories";
+import { useMemo, useState } from "react";
 import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
@@ -58,64 +59,37 @@ export default function SelectRepoSlide({
   const handleUpdateSelectedRepository = async (
     data: Partial<AssetFormValues>,
   ) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project!.slug + // can never be null
-        "/assets/" +
-        asset.slug,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          ...data,
-        }),
-      },
-    );
-
-    if (!resp.ok) {
+    let updated;
+    try {
+      updated = await patchAsset(
+        {
+          organization: activeOrg.slug,
+          projectSlug: project!.slug, // can never be null
+          assetSlug: asset.slug,
+        },
+        data as never,
+      );
+    } catch {
       toast.error("Failed to connect repository. Please try again.");
       return;
     }
-    if (resp.ok) {
-      const r = await resp.json();
-      updateAsset(r);
-      toast.success("Repository connected successfully.");
-    }
+
+    updateAsset(updated as never);
+    toast.success("Repository connected successfully.");
   };
 
-  const [repositories, setRepositories] = useState<
-    { value: string; label: string }[] | null
-  >(null);
+  const {
+    repositories: fetchedRepositories,
+    isLoading: isLoadingRepositories,
+  } = useIntegrationRepositories(activeOrg.slug);
+
+  const repositories = useMemo(
+    () => convertRepos(fetchedRepositories),
+    [fetchedRepositories],
+  );
 
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
-
-  const [isLoadingRepositories, setIsLoadingRepositories] = useState(false);
-
-  useEffect(() => {
-    const fetchRepositories = async () => {
-      setIsLoadingRepositories(true);
-      const [repoResp] = await Promise.all([
-        browserApiClient(
-          "/organizations/" + activeOrg.slug + "/integrations/repositories",
-        ),
-      ]);
-      if (repoResp.ok) {
-        const data = await repoResp.json();
-        setRepositories(convertRepos(data));
-      } else {
-        toast.error("Failed to fetch repositories. Please try again.");
-      }
-      setIsLoadingRepositories(false);
-    };
-    fetchRepositories();
-  }, [
-    activeOrg.gitLabIntegrations,
-    activeOrg.githubAppInstallations,
-    activeOrg.jiraIntegrations,
-    activeOrg.slug,
-  ]);
 
   return (
     <CarouselItem>

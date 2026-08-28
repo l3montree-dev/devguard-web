@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import type { VulnByPackage, VulnWithCVE } from "@/types/view/vuln";
 import { classNames, stateLabels } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Row } from "@tanstack/react-table";
@@ -21,9 +21,10 @@ import Link from "next/link";
 import { WrenchIcon } from "lucide-react";
 import { isQuickfixAvailable } from "../Quickfix";
 import WarningWithDescription from "../common/WarningWithDescription";
+import type { TableFeatures } from "@/hooks/useTable";
 
 interface Props {
-  row: Row<VulnByPackage>;
+  row: Row<TableFeatures, VulnByPackage>;
   index: number;
   arrLength: number;
   selectedVulnIds: Set<string>;

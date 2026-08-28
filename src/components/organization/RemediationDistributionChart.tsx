@@ -3,6 +3,7 @@
 
 "use client";
 
+import type { RemediationTypeUsage } from "@/types/dto";
 import { Pie, PieChart } from "recharts";
 
 import {
@@ -20,7 +21,6 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import type { FunctionComponent } from "react";
-import type { RemediationTypeUsage } from "@/types/api/api";
 
 interface Props {
   distribution: RemediationTypeUsage | undefined;
@@ -123,8 +123,12 @@ const RemediationTypeDistribution: FunctionComponent<Props> = ({
                 strokeWidth={2}
               />
               <ChartLegend
-                content={<ChartLegendContent nameKey="type" />}
-                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                content={
+                  <ChartLegendContent
+                    nameKey="type"
+                    className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                  />
+                }
               />
             </PieChart>
           </ChartContainer>

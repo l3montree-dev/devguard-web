@@ -35,8 +35,11 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { browserApiClient } from "../../../../../../../../services/devGuardApi";
-import type { AssetVersionDTO } from "../../../../../../../../types/api/api";
+import {
+  deleteAssetVersion,
+  makeAssetVersionDefault,
+} from "@/services/assetVersionService";
+import type { AssetVersionDTO } from "@/types/dto";
 import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
@@ -52,21 +55,27 @@ const RefsPage = () => {
     projectSlug: string;
     assetSlug: string;
   };
+
+  const refScope = {
+    organization: params.organizationSlug,
+    projectSlug: params.projectSlug,
+    assetSlug: params.assetSlug,
+  };
+
   const [open, setOpen] = React.useState<AssetVersionDTO | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = React.useState<
     false | "tag" | "branch"
   >(false);
   const handleDeleteRef = async () => {
     if (!open) return;
-    const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/` +
-        open.slug,
-      {
-        method: "DELETE",
-      },
-    );
+    let deleted = true;
+    try {
+      await deleteAssetVersion(refScope, open.slug);
+    } catch {
+      deleted = false;
+    }
 
-    if (resp.ok) {
+    if (deleted) {
       toast.success("Ref deleted successfully");
       updateAsset((prev) => {
         if (!prev) return prev;
@@ -91,14 +100,14 @@ const RefsPage = () => {
   };
 
   const handleMakeDefault = async (item: AssetVersionDTO) => {
-    const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${item.slug}/make-default`,
-      {
-        method: "POST",
-      },
-    );
+    let ok = true;
+    try {
+      await makeAssetVersionDefault(refScope, item.slug);
+    } catch {
+      ok = false;
+    }
 
-    if (resp.ok) {
+    if (ok) {
       toast.success("Default ref updated successfully");
 
       updateAsset((prev) => {

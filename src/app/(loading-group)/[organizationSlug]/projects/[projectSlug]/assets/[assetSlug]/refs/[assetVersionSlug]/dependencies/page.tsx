@@ -3,6 +3,13 @@
 
 "use client";
 
+import type {
+  Component,
+  ComponentPaged,
+  ScoreCard,
+} from "@/types/view/component";
+import type { License } from "@/types/dto";
+
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import Filter from "@/components/Filter";
@@ -29,15 +36,15 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
-import { browserApiClient } from "@/services/devGuardApi";
-import type {
-  Component,
-  ComponentPaged,
-  License,
-  LicenseResponse,
-  Paged,
-  ScoreCard,
-} from "@/types/api/api";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import {
+  overwriteComponentLicense,
+  refreshComponentLicenses,
+} from "@/services/componentService";
+import { useComponentList } from "@/hooks/useComponents";
+import { useComponentLicenses } from "@/hooks/useAssetVersionStats";
+
 import {
   beautifyPurl,
   classNames,
@@ -53,8 +60,8 @@ import {
   ScaleIcon,
   StarIcon,
 } from "@heroicons/react/24/outline";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
+
 import "@xyflow/react/dist/style.css";
 import {
   ChevronDownIcon,
@@ -65,10 +72,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import DependencyDialog from "../../../../../../../../../../components/DependencyDialog";
 import DateString, {
   parseDateOnly,
@@ -88,7 +94,6 @@ import {
   TooltipTrigger,
 } from "../../../../../../../../../../components/ui/tooltip";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
@@ -145,31 +150,23 @@ const LicenseCall = (props: {
   }
 
   const handleManuallyOverwriteLicenseChange = async (license: string) => {
-    // delete the overwritten license
-    const resp = await browserApiClient(
-      "/organizations/" +
-        organizationSlug +
-        "/projects/" +
-        projectSlug +
-        "/assets/" +
-        assetSlug +
-        "/refs/" +
-        assetVersionSlug +
-        "/license-risks/",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          finalLicenseDecision: license,
-          componentPurl: props.dependencyPurl,
-        }),
-      },
-    );
-    if (!resp.ok) {
+    try {
+      await overwriteComponentLicense(
+        {
+          organization: organizationSlug,
+          projectSlug,
+          assetSlug,
+          assetVersionSlug,
+        },
+        props.dependencyPurl,
+        license,
+      );
+    } catch {
       toast.error("Failed to correct license");
-    } else {
-      setLicense(license);
-      toast.success("Successfully corrected the license to " + license);
+      return;
     }
+    setLicense(license);
+    toast.success("Successfully corrected the license to " + license);
   };
 
   return (
@@ -246,104 +243,102 @@ const LicenseCall = (props: {
   );
 };
 
-const columnHelper = createColumnHelper<
-  ComponentPaged & { license: LicenseResponse }
+const columnHelper = createAppColumnHelper<
+  ComponentPaged & { license: License }
 >();
 
-const columnsDef: ColumnDef<
-  ComponentPaged & { license: LicenseResponse },
-  any
->[] = [
-  columnHelper.accessor("dependencyPurl", {
-    header: "Package",
-    id: "dependency_id",
-    cell: (row) => (
-      <span className="flex flex-row items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger className="flex flex-row items-center gap-2 min-w-0 w-full text-left">
-            <span className="shrink-0 mt-0.5">
-              <EcosystemImage packageName={row.getValue()} size={16} />
-            </span>
-            <span className="flex flex-col min-w-0 items-start w-full">
-              <span className="font-medium truncate w-full">
-                {beautifyPurl(row.getValue())}
+const columnsDef: TableColumnDef<ComponentPaged & { license: License }, any>[] =
+  [
+    columnHelper.accessor("dependencyPurl", {
+      header: "Package",
+      id: "dependency_id",
+      cell: (row) => (
+        <span className="flex flex-row items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger className="flex flex-row items-center gap-2 min-w-0 w-full text-left">
+              <span className="shrink-0 mt-0.5">
+                <EcosystemImage packageName={row.getValue()} size={16} />
               </span>
-              <span className="flex min-w-0 flex-row items-center gap-2 text-xs text-muted-foreground">
-                <span>{extractVersion(row.getValue())}</span>
-                {extractPurlQualifiers(row.getValue()) && (
-                  <span className="max-w-64 truncate whitespace-nowrap">
-                    {formatPurlQualifiers(row.getValue())}
-                  </span>
-                )}
+              <span className="flex flex-col min-w-0 items-start w-full">
+                <span className="font-medium truncate w-full">
+                  {beautifyPurl(row.getValue())}
+                </span>
+                <span className="flex min-w-0 flex-row items-center gap-2 text-xs text-muted-foreground">
+                  <span>{extractVersion(row.getValue())}</span>
+                  {extractPurlQualifiers(row.getValue()) && (
+                    <span className="max-w-64 truncate whitespace-nowrap">
+                      {formatPurlQualifiers(row.getValue())}
+                    </span>
+                  )}
+                </span>
               </span>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{row.getValue()}</p>
-          </TooltipContent>
-        </Tooltip>
-      </span>
-    ),
-  }),
-  columnHelper.accessor("license", {
-    header: "License",
-    id: "Dependency.license",
-    enableSorting: false,
-    cell: (row) => (
-      <LicenseCall
-        dependencyPurl={row.row.original.dependencyPurl}
-        component={row.row.original.dependency}
-        license={row.getValue()}
-        justification={""}
-      />
-    ),
-  }),
-  columnHelper.accessor("dependency.project.projectKey", {
-    header: "Repository",
-    id: "dependency_project.project_key",
-    cell: (row) =>
-      row.row.original.dependency?.project && (
-        <div>
-          <div className="mb-2">
-            <a
-              href={`//${row.getValue()}`}
-              target="_blank"
-              className="block truncate"
-            >
-              {row.getValue()}
-            </a>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{row.getValue()}</p>
+            </TooltipContent>
+          </Tooltip>
+        </span>
+      ),
+    }),
+    columnHelper.accessor("license", {
+      header: "License",
+      id: "Dependency.license",
+      enableSorting: false,
+      cell: (row) => (
+        <LicenseCall
+          dependencyPurl={row.row.original.dependencyPurl}
+          component={row.row.original.dependency}
+          license={row.getValue()}
+          justification={""}
+        />
+      ),
+    }),
+    columnHelper.accessor("dependency.project.projectKey", {
+      header: "Repository",
+      id: "dependency_project.project_key",
+      cell: (row) =>
+        row.row.original.dependency?.project && (
+          <div>
+            <div className="mb-2">
+              <a
+                href={`//${row.getValue()}`}
+                target="_blank"
+                className="block truncate"
+              >
+                {row.getValue()}
+              </a>
+            </div>
+            <Badge variant={"outline"} className="mr-1">
+              <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
+              {row.row.original.dependency.project?.starsCount}
+            </Badge>
+            <Badge variant={"outline"}>
+              <GitBranch className="mr-1 h-4 w-4 text-muted-foreground" />
+              {row.row.original.dependency.project?.forksCount}
+            </Badge>
           </div>
-          <Badge variant={"outline"} className="mr-1">
-            <StarIcon className="mr-1 h-4 w-4 text-muted-foreground" />
-            {row.row.original.dependency.project?.starsCount}
-          </Badge>
-          <Badge variant={"outline"}>
-            <GitBranch className="mr-1 h-4 w-4 text-muted-foreground" />
-            {row.row.original.dependency.project?.forksCount}
-          </Badge>
-        </div>
-      ),
-  }),
+        ),
+    }),
 
-  columnHelper.accessor("dependency.project.scoreCardScore", {
-    header: "OpenSSF Scorecard",
-    id: "dependency_project.score_card_score", // tight coupling with database and SQL-Query
-    cell: (row) => (
-      <div>{row.getValue() && <OpenSsfScore score={row.getValue()} />}</div>
-    ),
-  }),
-  columnHelper.accessor("dependency.published", {
-    header: "Published",
-    id: "dependency.published",
-    cell: (row) =>
-      row.getValue() && (
-        <div className="flex flex-row items-center gap-2">
-          <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
-          <DateString date={parseDateOnly(row.getValue())} />
-        </div>
+    columnHelper.accessor("dependency.project.scoreCardScore", {
+      header: "OpenSSF Scorecard",
+      id: "dependency_project.score_card_score", // tight coupling with database and SQL-Query
+      cell: (row) => (
+        <div>{row.getValue() && <OpenSsfScore score={row.getValue()} />}</div>
       ),
-  }),
-];
+    }),
+    columnHelper.accessor("dependency.published", {
+      header: "Published",
+      id: "dependency.published",
+      cell: (row) =>
+        row.getValue() && (
+          <div className="flex flex-row items-center gap-2">
+            <CalendarDateRangeIcon className="w-4 text-muted-foreground" />
+            <DateString date={parseDateOnly(row.getValue())} />
+          </div>
+        ),
+    }),
+  ];
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
@@ -370,16 +365,12 @@ const Index: FunctionComponent = () => {
       assetVersionSlug: string;
     };
 
-  const url =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/refs/" +
-    assetVersionSlug +
-    "/components";
+  const componentScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
 
   const params = useMemo(() => {
     const params = buildFilterSearchParams(searchParams);
@@ -394,22 +385,13 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
 
-  let { data: components, isLoading } = useSWR<Paged<ComponentPaged>>(
-    url + "?" + params.toString(),
-    fetcher,
-    {
-      keepPreviousData: true,
-    },
+  const { data: components, isLoading } = useComponentList(
+    componentScope,
+    params,
   );
-  const { data: licenses } = useSWR<LicenseResponse[]>(
-    url +
-      "/licenses" +
-      (searchParams?.has("artifact")
-        ? "?artifact=" +
-          encodeURIComponent(searchParams.get("artifact") as string)
-        : ""),
-    fetcher,
-    { keepPreviousData: true },
+  const { data: licenses } = useComponentLicenses(
+    componentScope,
+    searchParams?.get("artifact") ?? undefined,
   );
 
   const artifacts = useArtifacts();
@@ -426,18 +408,11 @@ const Index: FunctionComponent = () => {
     [licenses],
   );
 
-  if (!components) {
-    components = {
-      data: [],
-      page: 1,
-      pageSize: 25,
-      total: 0,
-    };
-  }
-
-  components.data = useMemo(
-    () =>
-      components.data.map((component) => ({
+  const componentsWithLicenses = useMemo(() => {
+    const paged = components ?? { data: [], page: 1, pageSize: 25, total: 0 };
+    return {
+      ...paged,
+      data: paged.data.map((component) => ({
         ...component,
         license: licenseMap[
           (component.dependency.license ?? "").toLowerCase()
@@ -447,17 +422,13 @@ const Index: FunctionComponent = () => {
           count: 0,
         },
       })),
-    [components, licenseMap],
-  );
+    };
+  }, [components, licenseMap]);
 
   const router = useRouter();
 
   const { table, handleFilter, removeFilter, clearAllFilters } = useTable({
-    data: (components?.data ?? []) as Array<
-      ComponentPaged & {
-        license: LicenseResponse;
-      }
-    >,
+    data: componentsWithLicenses.data,
     columnsDef,
   });
 
@@ -504,18 +475,19 @@ const Index: FunctionComponent = () => {
   const assetVersion = useActiveAssetVersion();
 
   const handleLicenseRefresh = async () => {
-    const resp = await browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/components/licenses/refresh`,
-      {
-        method: "POST",
-      },
-    );
-    if (resp.ok) {
-      toast.success("License refresh triggered");
-      router.refresh();
-    } else {
+    try {
+      await refreshComponentLicenses({
+        organization: activeOrg.slug,
+        projectSlug: project!.slug,
+        assetSlug: asset!.slug,
+        assetVersionSlug: assetVersion!.slug,
+      });
+    } catch {
       toast.error("Failed to trigger license refresh");
+      return;
     }
+    toast.success("License refresh triggered");
+    router.refresh();
   };
 
   return (
@@ -762,7 +734,7 @@ const Index: FunctionComponent = () => {
             </tbody>
           </table>
         </div>
-        {components && <CustomPagination {...components} />}
+        {components && <CustomPagination {...componentsWithLicenses} />}
         <div className="flex flex-row justify-end">
           <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
             Refresh Licenses

@@ -30,7 +30,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
-import { UserRole } from "@/types/api/api";
+import { UserRole } from "@/types/view/vuln";
 
 interface Props {
   members: Array<{

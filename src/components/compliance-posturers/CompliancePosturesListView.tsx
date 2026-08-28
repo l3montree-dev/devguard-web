@@ -5,13 +5,9 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import Page from "@/components/Page";
-import type {
-  ComplianceComponentDetailsDTO,
-  CompliancePostureWithControlDTO,
-  Paged,
-} from "@/types/api/api";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { CompliancePostureWithControlDTO } from "@/types/dto";
+import { flexRender } from "@tanstack/react-table";
+
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent, ReactNode } from "react";
@@ -25,16 +21,22 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetcher } from "@/data-fetcher/fetcher";
+import type { PostureScope } from "@/services/compliancePostureService";
+import { postureBaseUrl } from "@/services/compliancePostureService";
+import {
+  useComplianceComponents,
+  useCompliancePostures,
+} from "@/hooks/useCompliancePostures";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import useTable from "@/hooks/useTable";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
 import { Loader2, Download, Component } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import useSWR from "swr";
 import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
@@ -51,16 +53,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const columnHelper = createColumnHelper<CompliancePostureWithControlDTO>();
+const columnHelper = createAppColumnHelper<CompliancePostureWithControlDTO>();
 
 interface Props {
-  apiBaseUrl: string;
+  scope: PostureScope;
   Menu?: any[];
   Title?: ReactNode;
 }
 
 const CompliancePosturesListView: FunctionComponent<Props> = ({
-  apiBaseUrl,
+  scope,
   Menu,
   Title,
 }) => {
@@ -69,10 +71,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const asset = useActiveAsset();
   const org = useActiveOrg();
 
-  const { data: components } = useSWR<ComplianceComponentDetailsDTO[]>(
-    "/compliance-components/",
-    fetcher,
-  );
+  const { data: components } = useComplianceComponents();
 
   const componentsByControl = useMemo(() => {
     const map = new Map<
@@ -101,161 +100,170 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     return null;
   }, [searchParams]);
 
-  const columnsDef: ColumnDef<CompliancePostureWithControlDTO, any>[] = useMemo(
-    () => [
-      columnHelper.accessor("title", {
-        header: "Title",
-        id: "title",
-        enableSorting: true,
-        cell: (info) => (
-          <div className="flex flex-col">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="font-medium text-left">{info.getValue()}</span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <span className="font-normal">
-                  {info.row.original.description}
-                </span>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        ),
-      }),
-      columnHelper.accessor("framework", {
-        header: "Framework",
-        id: "framework",
-        enableSorting: true,
-        cell: (info) => (
-          <div className="flex flex-row items-center gap-2">
-            <FrameworkIcon framework={info.getValue()} />
-            <span className="whitespace-nowrap">{info.getValue()}</span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor("controlId", {
-        header: "Control ID",
-        id: "control_id",
-        enableSorting: true,
-        cell: (info) => (
-          <Badge
-            key={info.getValue()}
-            variant="outline"
-            className="whitespace-nowrap font-mono text-xs"
-          >
-            {info.getValue()}
-          </Badge>
-        ),
-      }),
-
-      columnHelper.accessor("importance", {
-        header: "Importance",
-        id: "importance",
-        cell: (info) =>
-          info.getValue() === "" ? null : (
-            <div className="flex">
-              <FlatBadge variant={importanceVariant(info.getValue())}>
-                {info.getValue()}
-              </FlatBadge>
+  const columnsDef: TableColumnDef<CompliancePostureWithControlDTO, any>[] =
+    useMemo(
+      () => [
+        columnHelper.accessor("title", {
+          header: "Title",
+          id: "title",
+          enableSorting: true,
+          cell: (info) => (
+            <div className="flex flex-col">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="font-medium text-left">
+                    {info.getValue()}
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span className="font-normal">
+                    {info.row.original.description}
+                  </span>
+                </TooltipContent>
+              </Tooltip>
             </div>
           ),
-      }),
-
-      columnHelper.accessor("securityLevel", {
-        header: "Security Level",
-        id: "security_level",
-        cell: (info) =>
-          info.getValue() === "" ? null : (
-            <div className="flex">
-              <FlatBadge variant={importanceVariant(info.getValue())}>
-                {info.getValue()}
-              </FlatBadge>
+        }),
+        columnHelper.accessor("framework", {
+          header: "Framework",
+          id: "framework",
+          enableSorting: true,
+          cell: (info) => (
+            <div className="flex flex-row items-center gap-2">
+              <FrameworkIcon framework={info.getValue()} />
+              <span className="whitespace-nowrap">{info.getValue()}</span>
             </div>
           ),
-      }),
-      columnHelper.accessor("frameworkControlId", {
-        header: "Component",
-        id: "component",
-        enableSorting: false,
-        cell: (info) => {
-          const solvingComponents = componentsByControl.get(info.getValue());
-          if (!solvingComponents?.length) {
-            return <span className="text-muted-foreground"></span>;
-          }
-          return (
-            <div className="flex flex-row flex-wrap gap-1">
-              {solvingComponents.map((c) => (
-                <Tooltip key={c.uuid}>
-                  <TooltipTrigger onClick={(e) => e.stopPropagation()}>
-                    <Badge
-                      variant="outline"
-                      className="flex flex-row items-center gap-1.5 whitespace-nowrap"
-                    >
-                      <ComplianceComponentIcon title={c.title} size="sm" />
-                      {c.title}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <span className="font-semibold">{c.title}</span>
-                    {c.description ? `: ${c.description}` : ""}
-                  </TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-          );
-        },
-      }),
-      columnHelper.accessor("mappedControls", {
-        header: "Mapped Controls",
-        id: "mapped_controls",
-        enableSorting: false,
-        cell: (info) => {
-          const controls = info.getValue() ?? [];
-          if (!controls.length) return null;
-          const sorted = (
-            activeFrameworkFilter
-              ? [...controls].sort((a, b) => {
-                  const aMatch =
-                    a.relatedFramework === activeFrameworkFilter ? -1 : 0;
-                  const bMatch =
-                    b.relatedFramework === activeFrameworkFilter ? -1 : 0;
-                  return aMatch - bMatch;
-                })
-              : controls
-          ).slice(0, 5);
-          const remaining = controls.length - sorted.length;
-          return (
-            <div className="flex flex-wrap gap-1">
-              {sorted.map(
-                (c: { relatedFramework: string; relatedControlId: string }) => {
-                  const label = `${c.relatedFramework}:${c.relatedControlId}`;
-                  const isActive =
-                    activeFrameworkFilter &&
-                    c.relatedFramework === activeFrameworkFilter;
-                  return (
-                    <Badge
-                      key={label}
-                      variant={isActive ? "secondary" : "outline"}
-                      className="whitespace-nowrap font-mono text-xs"
-                    >
-                      {label}
-                    </Badge>
-                  );
-                },
-              )}
-              {remaining > 0 && (
-                <Badge variant="outline" className="whitespace-nowrap text-xs">
-                  +{remaining} more
-                </Badge>
-              )}
-            </div>
-          );
-        },
-      }),
-    ],
+        }),
+        columnHelper.accessor("controlId", {
+          header: "Control ID",
+          id: "control_id",
+          enableSorting: true,
+          cell: (info) => (
+            <Badge
+              key={info.getValue()}
+              variant="outline"
+              className="whitespace-nowrap font-mono text-xs"
+            >
+              {info.getValue()}
+            </Badge>
+          ),
+        }),
 
-    [activeFrameworkFilter, componentsByControl],
-  );
+        columnHelper.accessor("importance", {
+          header: "Importance",
+          id: "importance",
+          cell: (info) =>
+            info.getValue() === "" ? null : (
+              <div className="flex">
+                <FlatBadge variant={importanceVariant(info.getValue())}>
+                  {info.getValue()}
+                </FlatBadge>
+              </div>
+            ),
+        }),
+
+        columnHelper.accessor("securityLevel", {
+          header: "Security Level",
+          id: "security_level",
+          cell: (info) =>
+            info.getValue() === "" ? null : (
+              <div className="flex">
+                <FlatBadge variant={importanceVariant(info.getValue())}>
+                  {info.getValue()}
+                </FlatBadge>
+              </div>
+            ),
+        }),
+        columnHelper.accessor("frameworkControlId", {
+          header: "Component",
+          id: "component",
+          enableSorting: false,
+          cell: (info) => {
+            const solvingComponents = componentsByControl.get(info.getValue());
+            if (!solvingComponents?.length) {
+              return <span className="text-muted-foreground"></span>;
+            }
+            return (
+              <div className="flex flex-row flex-wrap gap-1">
+                {solvingComponents.map((c) => (
+                  <Tooltip key={c.uuid}>
+                    <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+                      <Badge
+                        variant="outline"
+                        className="flex flex-row items-center gap-1.5 whitespace-nowrap"
+                      >
+                        <ComplianceComponentIcon title={c.title} size="sm" />
+                        {c.title}
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span className="font-semibold">{c.title}</span>
+                      {c.description ? `: ${c.description}` : ""}
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            );
+          },
+        }),
+        columnHelper.accessor("mappedControls", {
+          header: "Mapped Controls",
+          id: "mapped_controls",
+          enableSorting: false,
+          cell: (info) => {
+            const controls = info.getValue() ?? [];
+            if (!controls.length) return null;
+            const sorted = (
+              activeFrameworkFilter
+                ? [...controls].sort((a, b) => {
+                    const aMatch =
+                      a.relatedFramework === activeFrameworkFilter ? -1 : 0;
+                    const bMatch =
+                      b.relatedFramework === activeFrameworkFilter ? -1 : 0;
+                    return aMatch - bMatch;
+                  })
+                : controls
+            ).slice(0, 5);
+            const remaining = controls.length - sorted.length;
+            return (
+              <div className="flex flex-wrap gap-1">
+                {sorted.map(
+                  (c: {
+                    relatedFramework: string;
+                    relatedControlId: string;
+                  }) => {
+                    const label = `${c.relatedFramework}:${c.relatedControlId}`;
+                    const isActive =
+                      activeFrameworkFilter &&
+                      c.relatedFramework === activeFrameworkFilter;
+                    return (
+                      <Badge
+                        key={label}
+                        variant={isActive ? "secondary" : "outline"}
+                        className="whitespace-nowrap font-mono text-xs"
+                      >
+                        {label}
+                      </Badge>
+                    );
+                  },
+                )}
+                {remaining > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="whitespace-nowrap text-xs"
+                  >
+                    +{remaining} more
+                  </Badge>
+                )}
+              </div>
+            );
+          },
+        }),
+      ],
+
+      [activeFrameworkFilter, componentsByControl],
+    );
 
   const query = useMemo(() => {
     const p = buildFilterSearchParams(searchParams);
@@ -268,15 +276,10 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     return p;
   }, [searchParams]);
 
-  const { data: vulns, isLoading } = useSWR<
-    Paged<CompliancePostureWithControlDTO> & { frameworks: string[] }
-  >(apiBaseUrl + "?" + query.toString(), fetcher, { keepPreviousData: false });
-
-  const { data: stats, isLoading: statsLoading } = useSWR<{
-    open: number;
-    implemented: number;
-    notApplicable: number;
-  }>(apiBaseUrl + "stats/" + "?" + query.toString(), fetcher);
+  const {
+    postures: { data: vulns, isLoading },
+    stats: { data: stats, isLoading: statsLoading },
+  } = useCompliancePostures(scope, query);
 
   const isClosed = searchParams?.get("state") === "closed";
 
@@ -386,7 +389,9 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       <OscalDownloadModal
         open={showOscalModal}
         setOpen={setShowOscalModal}
-        oscalBaseUrl={`/api/devguard-tunnel/api/v1/` + apiBaseUrl + `oscal/`}
+        oscalBaseUrl={
+          `/api/devguard-tunnel/api/v1` + postureBaseUrl(scope) + `oscal/`
+        }
         frameworks={frameworks}
       />
       <Section

@@ -1,10 +1,10 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import React, { type FunctionComponent, useState } from "react";
+import { type FunctionComponent, useState } from "react";
 import dynamic from "next/dynamic";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogFooter } from "./ui/dialog";
 import { DialogHeader, DialogTitle } from "./ui/dialog";
@@ -100,7 +100,10 @@ const AdvisoryDialog: FunctionComponent<AdvisoryDialogProps> = ({
     parsedInitialVector?.metrics ?? {},
   );
 
-  const vectorstring = form.watch("vectorString");
+  const vectorstring = useWatch({
+    control: form.control,
+    name: "vectorString",
+  });
 
   const handleVectorChange = (val: string) => {
     form.setValue("vectorString", val, { shouldValidate: true });

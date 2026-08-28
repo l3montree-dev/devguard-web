@@ -1,6 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { patchAsset } from "@/services/assetService";
 import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 import { toast } from "@/lib/toast";
 import { useState } from "react";
@@ -9,7 +10,6 @@ import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { useActiveProject } from "../../hooks/useActiveProject";
 import { useActiveAsset } from "../../hooks/useActiveAsset";
 import { useUpdateAsset } from "../../context/AssetContext";
-import { browserApiClient } from "../../services/devGuardApi";
 
 export function usePublicSharing() {
   const org = useActiveOrg();
@@ -23,15 +23,20 @@ export function usePublicSharing() {
   const handleTogglePublic = async (value: boolean) => {
     setIsPublicLoading(true);
     try {
-      const resp = await browserApiClient(
-        `/organizations/${org.slug}/projects/${project?.slug}/assets/${asset?.slug}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ sharesInformation: value }),
-        },
-      );
-      if (resp.ok) {
-        const updated = await resp.json();
+      let updated;
+      try {
+        updated = await patchAsset(
+          {
+            organization: org.slug,
+            projectSlug: project!.slug,
+            assetSlug: asset!.slug,
+          },
+          { sharesInformation: value } as never,
+        );
+      } catch {
+        updated = null;
+      }
+      if (updated) {
         updateAsset(updated);
       } else {
         toast.error("Failed to update public access setting.");

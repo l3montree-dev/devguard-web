@@ -2,27 +2,30 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import { useRelease } from "@/hooks/useReleases";
+import { useReleaseRiskHistory } from "@/hooks/useReleaseStats";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { useOrganization } from "@/context/OrganizationContext";
 import useTable from "@/hooks/useTable";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
 import { useViewMode } from "@/hooks/useViewMode";
-import type { ReleaseDTO, RiskHistory } from "@/types/api/api";
+
+import type { ReleaseDTO, RiskHistory } from "@/types/dto";
 import { classNames } from "@/utils/common";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
+
 import "@xyflow/react/dist/style.css";
 import { groupBy } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import SortingCaret from "../../../../../../../components/common/SortingCaret";
 import { Skeleton } from "../../../../../../../components/ui/skeleton";
-import { fetcher } from "../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { RedirectorBuilder, sortRisk } from "../../../../../../../utils/view";
 import {
@@ -31,51 +34,51 @@ import {
   TabsTrigger,
 } from "../../../../../../../components/ui/tabs";
 
-const columnHelper = createColumnHelper<{
+const columnHelper = createAppColumnHelper<{
   risk: RiskHistory;
   release: ReleaseDTO;
 }>();
 
-const columnsDef: ColumnDef<{ risk: RiskHistory; release: ReleaseDTO }, any>[] =
-  [
-    columnHelper.accessor("risk.artifactName", {
-      header: "Artifact",
-      id: "artifact_name",
-      cell: (row) => (
-        <span className="flex flex-row items-start gap-2">
-          {row.getValue()}
-        </span>
-      ),
-    }),
-    columnHelper.accessor((row) => row.risk, {
-      header: "Score",
-      id: "critical",
-      cell: (row) => {
-        const mode = (row as any).mode || "risk";
-        return (
-          row.getValue() && (
-            <div className="w-fit">
-              {mode === "risk" ? (
-                <CVERainbowBadge
-                  low={row.row.original.risk.cvePurlLow}
-                  medium={row.row.original.risk.cvePurlMedium}
-                  high={row.row.original.risk.cvePurlHigh}
-                  critical={row.row.original.risk.cvePurlCritical}
-                />
-              ) : (
-                <CVERainbowBadge
-                  low={row.row.original.risk.cvePurlLowCvss}
-                  medium={row.row.original.risk.cvePurlMediumCvss}
-                  high={row.row.original.risk.cvePurlHighCvss}
-                  critical={row.row.original.risk.cvePurlCriticalCvss}
-                />
-              )}
-            </div>
-          )
-        );
-      },
-    }),
-  ];
+const columnsDef: TableColumnDef<
+  { risk: RiskHistory; release: ReleaseDTO },
+  any
+>[] = [
+  columnHelper.accessor("risk.artifactName", {
+    header: "Artifact",
+    id: "artifact_name",
+    cell: (row) => (
+      <span className="flex flex-row items-start gap-2">{row.getValue()}</span>
+    ),
+  }),
+  columnHelper.accessor((row) => row.risk, {
+    header: "Score",
+    id: "critical",
+    cell: (row) => {
+      const mode = (row as any).mode || "risk";
+      return (
+        row.getValue() && (
+          <div className="w-fit">
+            {mode === "risk" ? (
+              <CVERainbowBadge
+                low={row.row.original.risk.cvePurlLow}
+                medium={row.row.original.risk.cvePurlMedium}
+                high={row.row.original.risk.cvePurlHigh}
+                critical={row.row.original.risk.cvePurlCritical}
+              />
+            ) : (
+              <CVERainbowBadge
+                low={row.row.original.risk.cvePurlLowCvss}
+                medium={row.row.original.risk.cvePurlMediumCvss}
+                high={row.row.original.risk.cvePurlHighCvss}
+                critical={row.row.original.risk.cvePurlCriticalCvss}
+              />
+            )}
+          </div>
+        )
+      );
+    },
+  }),
+];
 
 const last3Month = new Date();
 last3Month.setMonth(last3Month.getMonth() - 3);
@@ -92,24 +95,17 @@ const Index: FunctionComponent = () => {
 
   const organization = useOrganization();
 
-  const { data: release } = useSWR<ReleaseDTO>(
-    () =>
-      releaseId
-        ? `/organizations/${organizationSlug}/projects/${projectSlug}/releases/${releaseId}`
-        : null,
-    fetcher,
-  );
+  const releaseScope = { organization: organizationSlug, projectSlug };
+  const { data: release } = useRelease(releaseScope, releaseId);
 
   // fetch all the data
-  const { data: riskHistory, isLoading: riskHistoryLoading } = useSWR<
-    RiskHistory[]
-  >(
-    () =>
-      releaseId
-        ? `/organizations/${organizationSlug}/projects/${projectSlug}/releases/${releaseId}/stats/risk-history?start=${last3Month.toISOString().split("T")[0]}&end=${new Date().toISOString().split("T")[0]}`
-        : null,
-    fetcher,
-  );
+  const { data: riskHistory, isLoading: riskHistoryLoading } =
+    useReleaseRiskHistory(
+      releaseScope,
+      releaseId,
+      last3Month.toISOString().split("T")[0],
+      new Date().toISOString().split("T")[0],
+    );
 
   const latestArtifactRisks: { risk: RiskHistory; release: ReleaseDTO }[] =
     useMemo(() => {
