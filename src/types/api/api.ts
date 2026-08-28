@@ -275,6 +275,8 @@ export interface DependencyVuln extends BaseVulnDTO {
   directDependencyFixedVersion: string | null;
   componentPurl: string;
   vulnerabilityPath: string[];
+  signature: string;
+  assetSignature: string;
 }
 
 export interface Paged<T> {
@@ -1098,6 +1100,9 @@ export type VexRuleRecommendation = {
   // if the recommendation is from your own org, the API will return the asset slug and project slug to indicate that it is not a crowdsourced recommendation
   assetSlug?: string;
   projectSlug?: string;
+
+  assetSignature?: string;
+  dependencyVulnSignature?: string;
 };
 
 // Mirrors dtos.ExternalReferenceDTO. A reference is identified by asset + url —
@@ -1106,6 +1111,8 @@ export type ExternalReference = {
   assetId: string;
   url: string;
   type: "cyclonedx" | "csaf" | "openvex" | "unknown";
+  // Number of VEX rules synced from this source into this asset.
+  vexRuleCount: number;
   error?: string | null;
 };
 

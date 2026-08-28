@@ -1,7 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import { findRecommendationForVuln } from "@/components/vex-rules/useVexRuleRecommendations";
+import type {
+  VexRuleRecommendation,
+  VulnByPackage,
+  VulnWithCVE,
+} from "@/types/api/api";
 import { classNames, stateLabels } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Row } from "@tanstack/react-table";
@@ -18,8 +23,7 @@ import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import { groupBy } from "lodash";
 import Link from "next/link";
-import { WrenchIcon } from "lucide-react";
-import { isQuickfixAvailable } from "../Quickfix";
+import { isDirectDependencyUpdateAvailable } from "../Quickfix";
 import WarningWithDescription from "../common/WarningWithDescription";
 
 interface Props {
@@ -36,6 +40,21 @@ interface Props {
     mechanicalJustification?: string;
   }) => Promise<void>;
 }
+
+const VexableBadge = () => (
+  <Tooltip>
+    <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+      <Badge variant="secondary" className="text-xs gap-1">
+        Vexable
+      </Badge>
+    </TooltipTrigger>
+    <TooltipContent className="max-w-xs">
+      A matching VEX rule recommendation exists for this vulnerability - other
+      organizations, or your own asset&apos;s history, already vexed it the same
+      way. Open it to review and apply the recommendation.
+    </TooltipContent>
+  </Tooltip>
+);
 
 const SelectionCheckbox = ({
   checked,
@@ -87,21 +106,23 @@ const CvssCell = ({ cvss }: { cvss?: number | null }) => (
   </div>
 );
 
-const WrenchIndicator = ({ message }: { message: string }) => (
+const FixableBadge = ({ message }: { message: string }) => (
   <Tooltip>
-    <TooltipTrigger className="flex" onClick={(e) => e.stopPropagation()}>
-      <WrenchIcon className="h-4 w-4 text-muted-foreground" />
+    <TooltipTrigger onClick={(e) => e.stopPropagation()}>
+      <Badge variant="secondary" className="text-xs gap-1">
+        Fixable
+      </Badge>
     </TooltipTrigger>
     <TooltipContent className="max-w-xs">{message}</TooltipContent>
   </Tooltip>
 );
 
 const QuickfixWrench = ({ vuln }: { vuln: VulnWithCVE }) => {
-  if (!isQuickfixAvailable(vuln)) {
+  if (!isDirectDependencyUpdateAvailable(vuln)) {
     return null;
   }
   return (
-    <WrenchIndicator message="A quick fix is available: this vulnerability can be resolved by a direct dependency update. Consider prioritizing it as it can be resolved faster. Open the vulnerability to see the exact upgrade command." />
+    <FixableBadge message="A quick fix is available: this vulnerability can be resolved by a direct dependency update. Consider prioritizing it as it can be resolved faster. Open the vulnerability to see the exact upgrade command." />
   );
 };
 
@@ -224,7 +245,9 @@ const VulnWithCveTableRow = ({
         <CvssCell cvss={vuln.cve?.cvss} />
       </td>
       <td className="py-3 px-4">
-        <QuickfixWrench vuln={vuln} />
+        <div className="flex items-center gap-2">
+          <QuickfixWrench vuln={vuln} />
+        </div>
       </td>
     </tr>
   );
@@ -247,9 +270,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     [row.original.vulns],
   );
   const packageHasQuickfix = useMemo(
-    () => row.original.vulns.some(isQuickfixAvailable),
+    () => row.original.vulns.some(isDirectDependencyUpdateAvailable),
     [row.original.vulns],
   );
+
   const isActivelyExploited = row.original.vulns.some(
     (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
   );
@@ -354,7 +378,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               {row.original.vulnCount}
             </Badge>
             {packageHasQuickfix && (
-              <WrenchIndicator message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
+              <FixableBadge message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
             )}
           </div>
         </td>
@@ -382,7 +406,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const pathExplosionOrOnlySinglePath =
             isPathExplosion || !hasMultiplePaths;
 
-          const cveHasQuickfix = vulns.some(isQuickfixAvailable);
+          const cveHasQuickfix = vulns.some(isDirectDependencyUpdateAvailable);
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
@@ -502,15 +526,17 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   <CvssCell cvss={sortedVulns[0]?.cve?.cvss} />
                 </td>
                 <td className="py-2 px-4">
-                  {cveHasQuickfix && (
-                    <WrenchIndicator
-                      message={
-                        pathExplosionOrOnlySinglePath
-                          ? "A quick fix is available for this vulnerability. Open it to see the exact upgrade command."
-                          : "A quick fix is available for one of this vulnerability's dependency paths. Expand it to find the affected path and the upgrade command."
-                      }
-                    />
-                  )}
+                  <div className="flex items-center gap-2">
+                    {cveHasQuickfix && (
+                      <FixableBadge
+                        message={
+                          pathExplosionOrOnlySinglePath
+                            ? "A quick fix is available for this vulnerability. Open it to see the exact upgrade command."
+                            : "A quick fix is available for one of this vulnerability's dependency paths. Expand it to find the affected path and the upgrade command."
+                        }
+                      />
+                    )}
+                  </div>
                 </td>
               </tr>
 

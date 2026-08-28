@@ -2,12 +2,18 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import CVERainbowBadge from "@/components/CVERainbowBadge";
+import { eventBus } from "@/events";
+import { useRefDistributions } from "@/hooks/useRefDistributions";
+import { toast } from "@/lib/toast";
+import type { AssetVersionDTO } from "@/types/api/api";
 import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import { TagIcon } from "@heroicons/react/24/outline";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { GitBranchIcon, TriangleAlert } from "lucide-react";
-import React, { useMemo } from "react";
-import { toast } from "@/lib/toast";
+import React from "react";
+import AuthGuard from "../../../../../../../../components/AuthGuard";
+import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import Page from "../../../../../../../../components/Page";
 import AssetTitle from "../../../../../../../../components/common/AssetTitle";
 import DateString, {
@@ -36,13 +42,7 @@ import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActive
 import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import { browserApiClient } from "../../../../../../../../services/devGuardApi";
-import type { AssetVersionDTO, RiskHistory } from "@/types/api/api";
-import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
-import { eventBus } from "@/events";
-import AuthGuard from "../../../../../../../../components/AuthGuard";
-import CVERainbowBadge from "@/components/CVERainbowBadge";
-import { useRefDistributions } from "@/hooks/useRefDistributions";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();

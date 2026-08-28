@@ -4,6 +4,7 @@
 "use client";
 
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
+import AuthGuard from "@/components/AuthGuard";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -15,36 +16,44 @@ import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { AsyncButton, Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { documentationLinks } from "@/const/documentationLinks";
-import AuthGuard from "@/components/AuthGuard";
 import {
-  useActiveAssetVersion,
-  useAssetBranchesAndTags,
+    useActiveAssetVersion,
+    useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useTable from "@/hooks/useTable";
+import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
 import type { ColumnDef } from "@tanstack/react-table";
 import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import { CircleHelp, Loader2 } from "lucide-react";
+import { CircleFadingArrowUp, CircleHelp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { toast } from "@/lib/toast";
 import useSWR from "swr";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
+import AddVexRuleDialog from "../../../../../../../../../../components/vex-rules/AddVexRuleDialog";
+import VexRuleRecommendationsTable from "../../../../../../../../../../components/vex-rules/VexRuleRecommendationsTable";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
 import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
@@ -54,6 +63,7 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
+import useVexRuleRecommendations from "../../../../../../../../../../hooks/useVexRuleRecommendations";
 
 const severityRanges: Record<string, [number | null, number | null]> = {
   low: [null, 4],
@@ -62,7 +72,7 @@ const severityRanges: Record<string, [number | null, number | null]> = {
   critical: [8.9, null],
 };
 
-const rangeFilterFields = ["CVE.cvss", "raw_risk_assessment"];
+const rangeFilterFields = ["CVE.cvss", "risk_assessment"];
 
 const columnHelper = createColumnHelper<VulnByPackage>();
 
@@ -197,6 +207,28 @@ const Index: FunctionComponent = () => {
   } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
     keepPreviousData: true,
   });
+
+  const fixableFilterParams = useMemo(() => {
+    const p = new URLSearchParams(queryWithState);
+    p.append("filterQuery[direct_dependency_fixed_version][is not null]", "1");
+    return p;
+  }, [queryWithState]);
+
+  const fixableVulnsSwrKey = useMemo(() => {
+    const p = new URLSearchParams(fixableFilterParams);
+    p.set("page", "1");
+    p.set("pageSize", "0");
+    return (
+      uri + "refs/" + assetVersionSlug + "/dependency-vulns/?" + p.toString()
+    );
+  }, [fixableFilterParams, uri, assetVersionSlug]);
+
+  const { data: fixableVulns } = useSWR<Paged<VulnByPackage>>(
+    fixableVulnsSwrKey,
+    fetcher,
+  );
+  const fixableVulnsCount = fixableVulns?.total ?? 0;
+
   const handleBulkAction = useCallback(
     async (params: {
       vulnIds: string[];
@@ -311,6 +343,22 @@ const Index: FunctionComponent = () => {
       ],
     },
     {
+      label: "Direct Dependency Fix",
+      value: "direct_dependency_fixed_version",
+      operators: [
+        { value: "is not null", label: "available" },
+        { value: "is null", label: "not available" },
+      ],
+    },
+    {
+      label: "Component Fix",
+      value: "component_fixed_version",
+      operators: [
+        { value: "is not null", label: "available" },
+        { value: "is null", label: "not available" },
+      ],
+    },
+    {
       label: "CVE",
       value: "cve_id",
       operators: [
@@ -336,7 +384,7 @@ const Index: FunctionComponent = () => {
     },
     {
       label: "Risk",
-      value: "raw_risk_assessment",
+      value: "risk_assessment",
       operators: [
         { value: "is less than" },
         { value: "is greater than" },
@@ -383,6 +431,19 @@ const Index: FunctionComponent = () => {
       handleFilter(data);
     },
     [handleFilter, params, pathname, router],
+  );
+
+  const vexRulesUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`;
+
+  const {
+    canSeeRecommendations,
+    addRuleDialogOpen,
+    rulePrefill,
+    recommendationsResponse,
+    setAddRuleDialogOpen,
+    createRuleFromRecommendation,
+  } = useVexRuleRecommendations(
+    new URLSearchParams({ page: "1", pageSize: "3" }),
   );
 
   // Compute selected open/closed IDs for batch actions
@@ -454,6 +515,70 @@ const Index: FunctionComponent = () => {
         className="mb-4 mt-4"
       >
         <div className="flex flex-1 flex-col gap-2">
+          <div className="flex flex-row gap-2">
+            {recommendationsResponse?.data && canSeeRecommendations && (
+              <div className="flex-3 relative">
+                <small className="text-xs absolute top-5 right-5">
+                  <Link
+                    href={"../../vex-rules"}
+                    className="text-xs !text-muted-foreground font-medium"
+                  >
+                    See all recommendations
+                  </Link>
+                </small>
+                <VexRuleRecommendationsTable
+                  hidePagination={true}
+                  onCreateRule={createRuleFromRecommendation}
+                  recommendations={recommendationsResponse}
+                />
+                <div className="flex flex-row items-center justify-between">
+                  <small className="text-xs text-muted-foreground -mt-2 text-right block">
+                    VEX-Rule recommendations are not scoped to a specific branch
+                    or tag out of performance reasons.
+                  </small>
+                </div>
+                <AddVexRuleDialog
+                  open={addRuleDialogOpen}
+                  onOpenChange={setAddRuleDialogOpen}
+                  baseUrl={vexRulesUrl}
+                  onCreated={() => mutateVulns()}
+                  prefill={rulePrefill}
+                />
+              </div>
+            )}
+
+            <Card className="flex-1">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex flex-row items-start justify-between">
+                  <span className="flex flex-row items-center gap-2">
+                    <CircleFadingArrowUp className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-3xl">{fixableVulnsCount}</span>
+                  </span>
+                  <Link
+                    href={`${pathname}?${fixableFilterParams.toString()}`}
+                    className="text-xs !text-muted-foreground"
+                  >
+                    See all
+                  </Link>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription>
+                  Vulnerabilities fixable by a direct dependency update. Learn
+                  how the transitive vulnerability path analysis and{" "}
+                  <Link
+                    href={documentationLinks.quickFix}
+                    target="_blank"
+                    className="underline"
+                  >
+                    Quick Fix algorithm
+                  </Link>{" "}
+                  works.
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </div>
+
           <Tabs
             value={
               params?.has("state") ? (params.get("state") as string) : "open"
