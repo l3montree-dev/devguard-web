@@ -23,8 +23,11 @@ import useAccessToken from "../hooks/useAccessToken";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
 import { createArtifact } from "@/services/artifactService";
 import { createAssetVersion } from "@/services/assetVersionService";
-import { uploadSarif, uploadVex } from "@/services/scanUploadService";
-import { multipartBrowserApiClient } from "../services/devGuardApi";
+import {
+  uploadSarif,
+  uploadSbomFile,
+  uploadVex,
+} from "@/services/scanUploadService";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
@@ -231,25 +234,15 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     origin: string;
   }) => {
     if (!sbomFileRef.current) return;
-    const formdata = new FormData();
-    formdata.append("file", sbomFileRef.current);
 
-    const resp = await multipartBrowserApiClient(
-      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${activeProject.slug}/assets/${asset!.slug}/sbom-file`,
+    const resp = await uploadSbomFile(
       {
-        method: "POST",
-        body: formdata,
-        headers: {
-          "X-Asset-Ref": params.branchOrTagName,
-          "X-Asset-Default-Branch": params.isDefault
-            ? params.branchOrTagName
-            : "",
-          "X-Tag": params.isTag ? "1" : "0",
-          "X-Artifact-Name": params.artifactName,
-          "X-Origin": params.origin,
-          "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
-        },
+        organization: decodeURIComponent(activeOrg.slug),
+        projectSlug: activeProject.slug,
+        assetSlug: asset!.slug,
       },
+      scanTarget(params),
+      sbomFileRef.current,
     );
 
     if (resp.ok) {
@@ -260,7 +253,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       // You can see we added a better error tracking in the AssetLayout to make that visible.
       // As router.push() (and not in combination with refresh) did not helped us out here we used the hard navigation here...
       // The End. And if they are not debugging version 1.0.0 release canidate a thousand they will be dead.
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination, react-hooks/immutability -- see above
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/dependency-risks?artifact=${encodeURIComponent(params.artifactName)}`;
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");

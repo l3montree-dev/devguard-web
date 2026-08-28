@@ -9,7 +9,7 @@ import type { ExternalOrg } from "@/types/view/admin";
 import InstanceSettingsCard from "@/components/admin/InstanceSettingsCard";
 import TriggerDaemonsCard from "@/components/admin/TriggerDaemonsCard";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
-import { adminBrowserApiClient } from "@/services/adminApi";
+import { fetchExternalOrgs } from "@/services/adminService";
 
 export default function AdminTools() {
   const { getSigningKey } = useInstanceAdmin();
@@ -20,14 +20,7 @@ export default function AdminTools() {
       const signingKey = getSigningKey();
       if (!signingKey) return;
       try {
-        const resp = await adminBrowserApiClient(
-          "/admin/external-orgs",
-          signingKey,
-        );
-        if (resp.ok) {
-          const data = (await resp.json()) as ExternalOrg[];
-          setExternalOrgs(data);
-        }
+        setExternalOrgs(await fetchExternalOrgs(signingKey));
       } catch {
         // non-fatal — card will render with no orgs
       }

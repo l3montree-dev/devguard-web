@@ -40,7 +40,7 @@ import type {
   InstanceUsageStatistics,
 } from "@/types/view/admin";
 
-import { adminBrowserApiClient } from "@/services/adminApi";
+import { fetchInstanceStatistics } from "@/services/adminService";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
@@ -73,20 +73,9 @@ export default forwardRef<InstanceDashboardHandle>(
 
       try {
         setLoading(true);
-        const [usageResp, vulnResp] = await Promise.all([
-          adminBrowserApiClient("/admin/statistics/usage", key),
-          adminBrowserApiClient("/admin/statistics/vulnerabilities", key),
-        ]);
-
-        if (!usageResp.ok || !vulnResp.ok) {
-          setError(
-            `Server returned ${!usageResp.ok ? usageResp.status : vulnResp.status}`,
-          );
-          return;
-        }
-
-        setUsage((await usageResp.json()) as InstanceUsageStatistics);
-        setOverview((await vulnResp.json()) as InstanceOverview);
+        const { usage, overview } = await fetchInstanceStatistics(key);
+        setUsage(usage);
+        setOverview(overview);
         setError(null);
       } catch {
         setError("Failed to fetch instance statistics.");

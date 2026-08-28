@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { apiFetch, TUNNEL_BASE_URL } from "@/services/apiClient";
 import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "@/lib/toast";
 import { useActiveAsset } from "./useActiveAsset";
@@ -72,7 +72,8 @@ export function useAutosetup(
         // eslint-disable-next-line react-hooks/immutability
         window.location.href =
           window.location.origin +
-          "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
+          TUNNEL_BASE_URL +
+          "/oauth2/gitlab/" +
           asset.externalEntityProviderId.replace("@", "") +
           "autosetup?redirectTo=" +
           encodeURIComponent(window.location.href);
@@ -112,7 +113,7 @@ export function useAutosetup(
           `&providerId=${activeOrg.externalEntityProviderId?.replace("@", "")}autosetup`;
       }
 
-      const resp = await browserApiClient(url, {
+      const resp = await apiFetch(url, {
         method: "POST",
         body: JSON.stringify({
           devguardPrivateKey: privKey,

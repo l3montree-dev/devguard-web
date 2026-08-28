@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import type { PostureScope } from "@/services/compliancePostureService";
 import { postureBaseUrl } from "@/services/compliancePostureService";
 import {
@@ -389,9 +390,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       <OscalDownloadModal
         open={showOscalModal}
         setOpen={setShowOscalModal}
-        oscalBaseUrl={
-          `/api/devguard-tunnel/api/v1` + postureBaseUrl(scope) + `oscal/`
-        }
+        oscalBaseUrl={TUNNEL_BASE_URL + postureBaseUrl(scope) + `oscal/`}
         frameworks={frameworks}
       />
       <Section

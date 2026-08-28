@@ -45,7 +45,7 @@ import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
-import { downloadFromApi } from "@/services/downloadClient";
+import { downloadFile } from "@/services/apiClient";
 import { useReleases } from "@/hooks/useReleases";
 import {
   useReleaseAverageFixingTime,
@@ -242,7 +242,7 @@ const OverviewPage = () => {
 
   const downloadSBOMReport = async () => {
     try {
-      await downloadFromApi(
+      await downloadFile(
         `/organizations/${organizationSlug}/projects/${projectSlug}/releases/${releaseId}/sbom.json/`,
         `${releaseId}.json`,
       );

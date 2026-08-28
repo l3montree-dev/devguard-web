@@ -3,7 +3,7 @@
 
 import { debounce } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { browserApiClient } from "../services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 import { useActiveOrg } from "./useActiveOrg";
 
 export const convertRepos = (repos: Array<{ label: string; id: string }>) =>
@@ -22,7 +22,7 @@ export default function useRepositorySearch(
   const search = useCallback(
     async (query: string) => {
       setSearchLoading(true);
-      const resp = await browserApiClient(
+      const resp = await apiFetch(
         "/organizations/" +
           activeOrg.slug +
           "/integrations/repositories?search=" +

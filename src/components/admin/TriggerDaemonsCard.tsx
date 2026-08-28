@@ -18,7 +18,8 @@ import { ArrowPathIcon, PlayIcon } from "@heroicons/react/20/solid";
 import { CommandLineIcon } from "@heroicons/react/24/outline";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import type { AdminDaemonSSEEvent, Daemon } from "@/types/view/admin";
-import { adminSSETrigger, AdminAPIError } from "@/services/adminApi";
+import { adminSSETrigger } from "@/services/adminApi";
+import { ApiError } from "@/services/apiClient";
 
 const daemons: Daemon[] = [
   {
@@ -126,7 +127,7 @@ export default function TriggerDaemonsCard() {
       } catch (err) {
         const message = err instanceof Error ? err.message : "unknown error";
         appendLog(daemon.id, `Error: ${message}`);
-        if (err instanceof AdminAPIError && err.status === 429) {
+        if (err instanceof ApiError && err.status === 429) {
           toast.warning(`${daemon.label}: ${message}`);
         } else {
           toast.error(`${daemon.label}: ${message}`);

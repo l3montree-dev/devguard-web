@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import type { AssetDTO } from "@/types/dto";
-import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 
 import { HttpError } from "./httpError";
 
@@ -11,7 +11,7 @@ export async function fetchAsset(
   projectSlug: string,
   assetSlug: string,
 ) {
-  const client = await getServerClientInAppRouter();
+  const client = await getServerClient();
 
   const { data, response: r } = await client.GET(
     "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}",

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { NextRequest, NextResponse } from "next/server";
-import { streamFromApi } from "@/services/streamingClient";
+import { streamFromApi } from "@/services/serverApiClient";
 
 export async function GET(request: NextRequest, ctx: any) {
   try {

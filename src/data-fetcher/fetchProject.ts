@@ -3,14 +3,14 @@
 
 import type { AssetDTO, ProjectDetailsDTO } from "@/types/dto";
 
-import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchProject(
   organizationSlug: string,
   projectSlug: string,
 ) {
-  const client = await getServerClientInAppRouter();
+  const client = await getServerClient();
 
   const { data, response: r } = await client.GET(
     "/organizations/{organization}/projects/{projectSlug}",

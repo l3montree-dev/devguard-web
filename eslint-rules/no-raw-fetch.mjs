@@ -32,7 +32,7 @@ export default createRule({
   create(context) {
     // Resolving the callee through the type checker means a renamed import
     // (`import { fetcher as f }`) is still caught and a local helper that
-    // happens to be called `fetcher` is not. `browserApiClient` is deliberately
+    // happens to be called `fetcher` is not. `apiFetch` is deliberately
     // absent: it is the sanctioned client, so calling it is not the problem.
     // Where it may not be called - straight from a view - is
     // local/no-data-fetching-in-view's business.

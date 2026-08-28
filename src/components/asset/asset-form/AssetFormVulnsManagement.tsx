@@ -22,6 +22,7 @@ import { InputWithButton } from "@/components/ui/input-with-button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useConfig } from "@/context/ConfigContext";
+import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
@@ -372,7 +373,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   const publicBadgeUrl = basePath ? `${basePath}/badges/cvss/` : undefined;
 
-  const assetApiPath = `/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`;
+  const assetApiPath = `${TUNNEL_BASE_URL}/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`;
   const badgePreviewUrl =
     selectedVersionSlug && selectedArtifact
       ? `${assetApiPath}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/badges/cvss/`

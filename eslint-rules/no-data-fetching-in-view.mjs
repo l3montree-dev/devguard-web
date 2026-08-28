@@ -49,8 +49,8 @@ export default createRule({
           return;
         }
 
-        // browserApiClient is allowed in general, but not straight from a view -
-        // hence ALL_TRANSPORTS here where no-raw-fetch uses BARE_FETCHERS.
+        // apiFetch/adminFetch are allowed in general, but not straight from a
+        // view - hence ALL_TRANSPORTS here where no-raw-fetch uses BARE_FETCHERS.
         const name = transportName(services, node, ALL_TRANSPORTS);
         if (!name) return;
         context.report({ node, messageId: "transportInView", data: { name } });

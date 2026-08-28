@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 import { createAccessToken } from "@/services/accessTokenService";
 import type {
   AccessTokenDTO,
@@ -59,7 +59,7 @@ export default function useAccessToken(
   }, [scopedAT]);
 
   const handleDeleteAccessToken = async (accessToken: AccessTokenDTO) => {
-    await browserApiClient(`${baseUrl}${accessToken.id}/`, {
+    await apiFetch(`${baseUrl}${accessToken.id}/`, {
       method: "DELETE",
     });
     setAccessTokens((prev) => prev.filter((p) => p.id !== accessToken.id));

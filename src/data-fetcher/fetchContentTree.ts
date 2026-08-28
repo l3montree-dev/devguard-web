@@ -1,12 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchContentTree(organizationSlug: string) {
   // get the devGuardApiClient
-  const client = await getServerClientInAppRouter();
+  const client = await getServerClient();
   // check if there is a slug in the query
 
   if (organizationSlug) {

@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import useSWR from "swr";
-import { browserApiClient } from "../services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 import type { InstanceInfo } from "@/types/dto";
 
 const fetcher = (url: string) =>
-  browserApiClient(url).then((res) => (res.ok ? res.json() : null));
+  apiFetch(url).then((res) => (res.ok ? res.json() : null));
 
 export const useInstanceInfo = () => {
   const { data: info } = useSWR<InstanceInfo>("/info/", fetcher);

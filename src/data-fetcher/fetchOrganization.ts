@@ -2,12 +2,12 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import type { OrganizationDetailsDTO } from "@/types/dto";
-import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchOrganization(organizationSlug: string) {
   // get the devGuardApiClient
-  const client = await getServerClientInAppRouter();
+  const client = await getServerClient();
 
   if (organizationSlug) {
     // get the organization

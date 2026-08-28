@@ -14,7 +14,7 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 
 import type { VulnEventDTO } from "@/types/view/vulnEvents";
 
@@ -29,7 +29,7 @@ const request = async (
   init: RequestInit,
   messages: { success: string; failure: string },
 ) => {
-  const resp = await browserApiClient(url, init);
+  const resp = await apiFetch(url, init);
   if (!resp.ok) {
     const msg = await resp.text();
     toast.error(`${messages.failure}: ${msg}`);
@@ -216,7 +216,7 @@ export const useAdvisory = () => {
     try {
       await mutateAdvisory(
         async (current) => {
-          const resp = await browserApiClient(`${detailURL}events/`, {
+          const resp = await apiFetch(`${detailURL}events/`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),

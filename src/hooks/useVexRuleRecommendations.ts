@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import useSWR from "swr";
-import { FetcherError, fetcher } from "@/data-fetcher/fetcher";
-import { browserApiClient } from "@/services/devGuardApi";
+import { fetcher } from "@/data-fetcher/fetcher";
+import { apiFetch, ApiError } from "@/services/apiClient";
 import type { Paged } from "@/types/view/pagination";
 import type {
   VexRulePrefill,
@@ -74,10 +74,10 @@ export function vexRuleRecommendationsURL(params: {
 
 // "No recommendation" is a 204 with no body, which the shared fetcher can't parse.
 const recommendationFetcher = async <T>(url: string): Promise<T | null> => {
-  const resp = await browserApiClient(url);
+  const resp = await apiFetch(url);
   if (resp.status === 204) return null;
   if (!resp.ok) {
-    throw new FetcherError(
+    throw new ApiError(
       "An error occurred while fetching VEX rule recommendations.",
       resp.status,
     );

@@ -3,11 +3,11 @@
 
 import type { OrganizationDTO } from "@/types/dto";
 import { uniqBy } from "lodash";
-import { getServerClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchOrgs() {
-  const client = await getServerClientInAppRouter();
+  const client = await getServerClient();
 
   const [orgs, synced] = await Promise.all([
     client.GET("/organizations"),

@@ -38,7 +38,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { UserCircle2Icon } from "lucide-react";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
-import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
+import { assignOrgAdmin, revokeOrgAdmin } from "@/services/adminService";
 import type { ExternalOrg, OrgAdmin } from "@/types/view/admin";
 
 interface Props {
@@ -97,47 +97,23 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
 
       setAssigning(true);
       try {
-        const resp = await adminBrowserApiClient(
-          `/admin/external-orgs/${encodeURIComponent(orgId)}/admins/${encodeURIComponent(email)}`,
-          signingKey,
-          {
-            method: "PUT",
-          },
-        );
+        const created = await assignOrgAdmin(signingKey, orgId, email);
 
-        if (!resp.ok) {
-          let message = `HTTP ${resp.status}`;
-          try {
-            const text = await resp.text();
-            const json = JSON.parse(text);
-            if (typeof json === "string") message = json;
-            else if (json?.message) message = json.message;
-            else if (text) message = text;
-          } catch {
-            // keep default message
-          }
-          throw new AdminAPIError(message, resp.status);
-        }
-
-        let newAdmin: OrgAdmin = {
-          id: `generated-${Date.now()}`,
-          name: email,
-          avatarUrl: null,
-          role: "admin",
-        };
-        try {
-          const data = await resp.json();
-          if (data && typeof data === "object" && "id" in data) {
-            newAdmin = {
-              id: String(data.id),
-              name: data.name ?? email,
-              avatarUrl: data.avatarUrl ?? null,
-              role: data.role ?? "admin",
+        // The handler answers 201 without a body when it has nothing new to
+        // report, so fall back to an optimistic row.
+        const newAdmin: OrgAdmin = created?.id
+          ? {
+              id: String(created.id),
+              name: created.name ?? email,
+              avatarUrl: created.avatarUrl ?? null,
+              role: created.role ?? "admin",
+            }
+          : {
+              id: `generated-${Date.now()}`,
+              name: email,
+              avatarUrl: null,
+              role: "admin",
             };
-          }
-        } catch {
-          // backend returned no JSON body — fall back to optimistic admin
-        }
 
         setOrgs((prev) =>
           prev.map((o) =>
@@ -171,27 +147,7 @@ export default function ExternalOrgAdminCard({ orgs: initialOrgs }: Props) {
 
       setRevokingId(adminId);
       try {
-        const resp = await adminBrowserApiClient(
-          `/admin/external-orgs/${encodeURIComponent(orgId)}/admins/${encodeURIComponent(adminId)}`,
-          signingKey,
-          {
-            method: "DELETE",
-          },
-        );
-
-        if (!resp.ok) {
-          let message = `HTTP ${resp.status}`;
-          try {
-            const text = await resp.text();
-            const json = JSON.parse(text);
-            if (typeof json === "string") message = json;
-            else if (json?.message) message = json.message;
-            else if (text) message = text;
-          } catch {
-            // keep default message
-          }
-          throw new AdminAPIError(message, resp.status);
-        }
+        await revokeOrgAdmin(signingKey, orgId, adminId);
 
         setOrgs((prev) =>
           prev.map((o) =>

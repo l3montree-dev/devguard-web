@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
-import { browserApiClient } from "../services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 import { convertRepos } from "./useRepositorySearch";
 import { toast } from "@/lib/toast";
 import type { ExternalTicketProvider } from "../types/common";
@@ -27,7 +27,7 @@ export default function useRepositoryConnection() {
     const fetchRepositories = async () => {
       setIsLoadingRepositories(true);
       const [repoResp] = await Promise.all([
-        browserApiClient(
+        apiFetch(
           "/organizations/" + activeOrg.slug + "/integrations/repositories",
         ),
       ]);

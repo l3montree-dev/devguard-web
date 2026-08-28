@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { streamFromApi } from "@/services/streamingClient";
+import { streamFromApi } from "@/services/serverApiClient";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, ctx: any) {

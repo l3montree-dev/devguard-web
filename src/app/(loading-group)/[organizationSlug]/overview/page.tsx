@@ -11,7 +11,7 @@ import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FetcherError } from "@/data-fetcher/fetcher";
+import { ApiError } from "@/services/apiClient";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { useAutoTour } from "@/hooks/useAutoTour";
@@ -50,7 +50,7 @@ const OrganizationOverview: FunctionComponent = () => {
     }
   };
 
-  const is404 = error instanceof FetcherError && error.status === 404;
+  const is404 = error instanceof ApiError && error.status === 404;
   const isError = !isStatisticsLoading && error && !is404;
   const isEmptyResponse =
     !!orgStatistics &&
