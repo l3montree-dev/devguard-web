@@ -5,7 +5,6 @@ import { useState } from "react";
 import useSWR from "swr";
 import { FetcherError, fetcher } from "@/data-fetcher/fetcher";
 import { browserApiClient } from "@/services/devGuardApi";
-import type { DependencyVuln } from "@/types/dto";
 import type { Paged } from "@/types/view/pagination";
 import type {
   VexRulePrefill,
