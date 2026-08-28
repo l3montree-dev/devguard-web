@@ -20,10 +20,11 @@ import { NoSymbolIcon } from "@heroicons/react/20/solid";
 import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
+import { useConfig } from "../../context/ConfigContext";
 
 export default function InstanceSettingsCard() {
   // Reuses the shared hook backing RootHeader (GET /api/v1/instance-settings/).
-  const instanceSettings = useInstanceInfo();
+  const instanceSettings = useConfig();
   const { getSigningKey } = useInstanceAdmin();
   const loading = instanceSettings === null;
   const singleOrganizationMode =
