@@ -5,9 +5,12 @@
 import React from "react";
 import { config } from "../config";
 import { NoopUpdater } from "./ClientContextWrapper";
-import type { WithUpdater } from "@/types/view/context";
+import type { InstanceSettings } from "@/types/api/api";
+import type { WithUpdater } from "../types/view/context";
 
-const ConfigContext = React.createContext<WithUpdater<typeof config>>({
+const ConfigContext = React.createContext<
+  WithUpdater<typeof config & Partial<InstanceSettings>>
+>({
   v: config,
   update: NoopUpdater,
 });

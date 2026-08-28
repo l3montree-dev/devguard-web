@@ -288,6 +288,13 @@ export interface Paged<T> {
 
 export type InstanceSettings = {
   singleOrganizationMode: boolean;
+  bearerTokenAuthDisabled: boolean;
+  gitlabOAuth2Config: GitlabOAuth2Config[];
+};
+
+export type GitlabOAuth2Config = {
+  providerID: string;
+  gitlabBaseURL: string;
 };
 export interface MinimalDependencyTree {
   nodes: string[];
