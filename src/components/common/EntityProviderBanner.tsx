@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useConfig } from "@/context/ConfigContext";
 import { useActiveAsset } from "../../hooks/useActiveAsset";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { useActiveProject } from "../../hooks/useActiveProject";
@@ -15,6 +16,7 @@ const EntityProviderBanner = () => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject();
   const activeAsset = useActiveAsset();
+  const { gitlabOAuth2Config } = useConfig();
 
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
@@ -37,7 +39,10 @@ const EntityProviderBanner = () => {
         <Link
           className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
           href={
-            providerIdToBaseURL(activeAsset.externalEntityProviderId) +
+            providerIdToBaseURL(
+              activeAsset.externalEntityProviderId,
+              gitlabOAuth2Config,
+            ) +
             `/-/p/` +
             activeAsset.externalEntityId
           }
@@ -66,7 +71,10 @@ const EntityProviderBanner = () => {
         <Link
           className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
           href={
-            providerIdToBaseURL(activeOrg.externalEntityProviderId) +
+            providerIdToBaseURL(
+              activeOrg.externalEntityProviderId,
+              gitlabOAuth2Config,
+            ) +
             `/-/g/` +
             activeProject.externalEntityId
           }
@@ -89,7 +97,10 @@ const EntityProviderBanner = () => {
       <div>
         <Link
           className="flex !text-secondary-foreground items-center justify-center gap-2 bg-secondary px-4 py-1 text-xs transition-all hover:underline text-white hover:bg-accent"
-          href={providerIdToBaseURL(organizationSlug?.replace("@", ""))}
+          href={providerIdToBaseURL(
+            organizationSlug?.replace("@", ""),
+            gitlabOAuth2Config,
+          )}
           target="_blank"
           rel="noopener noreferrer"
         >

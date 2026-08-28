@@ -11,8 +11,9 @@ import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
 import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
-import { ConfigProviderWithInstanceSettings } from "../context/ConfigProviderWithInstanceSettings";
+import { ConfigProvider } from "../context/ConfigContext";
 import { SessionProvider } from "../context/SessionContext";
+import { fetchInstanceSettings } from "../data-fetcher/fetchInstanceSettings";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
 import type { OrganizationDTO } from "../types/api/api";
@@ -73,11 +74,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ConfigProviderWithInstanceSettings>
-            <Suspense>
-              <SessionShell>{children}</SessionShell>
-            </Suspense>
-          </ConfigProviderWithInstanceSettings>
+          <Suspense>
+            <SessionShell>{children}</SessionShell>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
@@ -123,9 +122,13 @@ async function RuntimeEnvTags() {
 async function SessionShell({ children }: { children: React.ReactNode }) {
   let session: Awaited<ReturnType<typeof fetchSession>>;
   let orgs: OrganizationDTO[] = [];
+  let instanceSettings: Awaited<ReturnType<typeof fetchInstanceSettings>> = {};
 
   try {
-    session = await fetchSession();
+    [session, instanceSettings] = await Promise.all([
+      fetchSession(),
+      fetchInstanceSettings(),
+    ]);
     if (session) {
       orgs = await fetchOrgs();
     }
@@ -139,18 +142,23 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
 
   return (
     <ClientContextWrapper
-      Provider={SessionProvider}
-      value={{
-        session,
-        organizations: orgs,
-      }}
+      Provider={ConfigProvider}
+      value={{ ...config, ...instanceSettings }}
     >
-      <HashScroll />
-      <TourContextProvider>
-        <MobileGate>{children}</MobileGate>
-        <Toaster />
-        {process.env.NODE_ENV === "development" && <CSSVariableEditor />}
-      </TourContextProvider>
+      <ClientContextWrapper
+        Provider={SessionProvider}
+        value={{
+          session,
+          organizations: orgs,
+        }}
+      >
+        <HashScroll />
+        <TourContextProvider>
+          <MobileGate>{children}</MobileGate>
+          <Toaster />
+          {process.env.NODE_ENV === "development" && <CSSVariableEditor />}
+        </TourContextProvider>
+      </ClientContextWrapper>
     </ClientContextWrapper>
   );
 }
