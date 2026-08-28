@@ -5,7 +5,7 @@ import { isAdmin, isLoggedIn, isMember } from "@/hooks/useUserRole";
 import { useCurrentUserRole } from "@/hooks/useUserRole";
 import type { FunctionComponent, ReactNode } from "react";
 
-type Requirement = "loggedIn" | "member" | "admin";
+import type { Requirement } from "@/types/view/navigation";
 
 interface Props {
   require: Requirement;

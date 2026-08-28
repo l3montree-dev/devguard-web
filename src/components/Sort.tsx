@@ -15,10 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 
-export interface SortOption {
-  label: string;
-  value: string;
-}
+import type { SortOption } from "@/types/view/filter";
 
 export const buildSortQuery = (
   sortOptions: SortOption[],

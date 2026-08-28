@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import SortingCaret from "@/components/common/SortingCaret";
@@ -268,8 +271,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const { data: vulns, isLoading } = useSWR<
     Paged<CompliancePostureWithControlDTO> & { frameworks: string[] }
   >(apiBaseUrl + "?" + query.toString(), fetcher, { keepPreviousData: false });
-
-  console.log("data", vulns);
 
   const { data: stats, isLoading: statsLoading } = useSWR<{
     open: number;

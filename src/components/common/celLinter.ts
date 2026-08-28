@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { Diagnostic } from "@codemirror/lint";
 import type { EditorView } from "codemirror";
 import type {
@@ -6,15 +9,7 @@ import type {
   CompletionResult,
 } from "@codemirror/autocomplete";
 
-type TokenType =
-  "number" | "string" | "ident" | "bool" | "null" | "punct" | "eof";
-
-interface Token {
-  type: TokenType;
-  value: string;
-  start: number;
-  end: number;
-}
+import type { Token, TokenType } from "@/types/view/codeEditor";
 
 class CelSyntaxError extends Error {
   pos: number;
@@ -595,6 +590,11 @@ const VULN_FIELDS: Completion[] = [
     type: "property",
     detail: "string (RFC3339)",
   },
+  {
+    label: "lastStateChange",
+    type: "property",
+    detail: "string (RFC3339) | null",
+  },
   { label: "signature", type: "property", detail: "number" },
   { label: "assetSignature", type: "property", detail: "number" },
   { label: "message", type: "property", detail: "string | null" },
@@ -604,7 +604,7 @@ const VULN_FIELDS: Completion[] = [
     label: "componentFixedVersion",
     type: "property",
     detail: "string | null",
-    info: "The bare version of the vulnerable component itself that resolves this vuln, e.g. \"4.17.21\" - null while no fix has been published",
+    info: 'The bare version of the vulnerable component itself that resolves this vuln, e.g. "4.17.21" - null while no fix has been published',
   },
   {
     label: "directDependencyFixedVersion",
@@ -612,10 +612,7 @@ const VULN_FIELDS: Completion[] = [
     detail: "string | null",
     info: 'A purl for the direct dependency to bump instead, e.g. "pkg:npm/web@1.2.0", resolved by walking the dependency path - null while unresolved, even if componentFixedVersion is set',
   },
-  { label: "rawRiskAssessment", type: "property", detail: "number | null" },
-  { label: "effort", type: "property", detail: "number | null" },
   { label: "riskAssessment", type: "property", detail: "number | null" },
-  { label: "priority", type: "property", detail: "number | null" },
   {
     label: "artifactPurls",
     type: "property",
@@ -637,6 +634,27 @@ const TOP_LEVEL_COMPLETIONS: Completion[] = [
     detail: "(vuln, pattern) -> bool",
     info: "Matches vuln's dependency path (and artifact purls) against a path pattern",
     apply: "matchesPattern(vuln, )",
+  },
+  {
+    label: "now",
+    type: "function",
+    detail: "() -> timestamp",
+    info: "Returns the current time in RFC3339 format, e.g. 2023-01-02T15:04:05Z",
+    apply: "now()",
+  },
+  {
+    label: "timestamp",
+    type: "function",
+    detail: "(string) -> timestamp",
+    info: 'Parses a timestamp string in RFC3339 format, e.g. timestamp("2023-01-02T15:04:05Z")',
+    apply: 'timestamp("")',
+  },
+  {
+    label: "duration",
+    type: "function",
+    detail: "(string) -> duration",
+    info: 'Parses a duration string, e.g. duration("72h")',
+    apply: 'duration("")',
   },
   {
     label: "matchesPurl",

@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import type { ProjectDTO } from "@/types/api/api";
 import { classNames } from "@/utils/common";
@@ -97,5 +100,3 @@ export const ProjectDangerZone: FunctionComponent<Props> = ({
     </DangerZone>
   );
 };
-
-export default ProjectDangerZone;

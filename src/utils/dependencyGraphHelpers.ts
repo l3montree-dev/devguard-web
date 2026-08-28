@@ -1,17 +1,5 @@
-// Copyright (C) 2024 Tim Bastin, l3montree GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import dagre, { graphlib } from "@dagrejs/dagre";
 import {
@@ -19,15 +7,14 @@ import {
   type DependencyVuln,
   type MinimalDependencyTree,
 } from "../types/api/api";
+import type {
+  EdgeMaps,
+  ViewDependencyTreeNode,
+} from "../types/view/dependencyGraph";
 // Pagination settings
 export const MAX_CHILDREN_PER_PAGE = 50;
 export const INITIAL_CHILDREN_TO_SHOW = 20;
 export const MIN_VISIBLE_NODES = 2000;
-
-export interface EdgeMaps {
-  childToParentEdges: Map<string, Array<{ parent: string; edgeId: string }>>;
-  parentToChildEdges: Map<string, Array<{ child: string; edgeId: string }>>;
-}
 
 const isInfoSource = (name: string) => {
   return (
@@ -193,24 +180,6 @@ export const addRecursive = (
       riskMap.set(loadMoreId, 0);
     }
   }
-};
-
-const percentile = (p: number, values: number[]) => {
-  if (values.length === 0) return 0;
-
-  const sorted = [...values].sort((a, b) => a - b);
-
-  const idx = (sorted.length - 1) * p;
-
-  const lower = Math.floor(idx);
-  const upper = Math.ceil(idx);
-
-  if (lower === upper) {
-    return sorted[lower];
-  }
-
-  const weight = idx - lower;
-  return sorted[lower] * (1 - weight) + sorted[upper] * weight;
 };
 
 export const getLayoutedElements = (
@@ -600,31 +569,6 @@ export const propagateHighlighting = (
 };
 
 /**
- * Calculates percentile values from an array of numbers
- */
-export const getPercentile = (values: number[], p: number): number => {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const index = Math.ceil((p / 100) * sorted.length) - 1;
-  return sorted[Math.max(0, index)];
-};
-
-/**
- * Classifies impact level based on percentile thresholds
- */
-export const classifyImpactLevel = (
-  value: number,
-  p90: number,
-  p75: number,
-  p50: number,
-): "critical" | "high" | "medium" | "low" => {
-  if (value >= p90) return "critical";
-  if (value >= p75) return "high";
-  if (value >= p50) return "medium";
-  return "low";
-};
-
-/**
  * Propagates risk upward through the dependency tree
  */
 const propagateRiskUpward = (
@@ -789,20 +733,6 @@ export const convertPathsToTree = (
 
   return root;
 };
-
-export interface ViewDependencyTreeNode extends Omit<
-  DependencyTreeNode,
-  "children"
-> {
-  id: string;
-  risk: number;
-  parents: Array<ViewDependencyTreeNode>;
-  children: ViewDependencyTreeNode[];
-  nodeType: "root" | "artifact" | "component" | "infosource";
-  infoSourceType?: "sbom" | "csaf" | "vex";
-  // Optional flag that marks nodes participating in a cycle. Used to avoid infinite recursion and for UI highlighting.
-  hasCycle?: boolean;
-}
 
 export function minimalTreeToViewDependencyTreeNode(
   tree?: MinimalDependencyTree,

@@ -4,11 +4,7 @@
 import Section from "@/components/common/Section";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import SeverityCard from "@/components/SeverityCard";
-import type {
-  OrgOverview,
-  ReleaseRiskHistory,
-  RiskHistory,
-} from "@/types/api/api";
+import type { OrgOverview, ReleaseRiskHistory } from "@/types/api/api";
 import MostUsedComponents from "./MostUsedComponents";
 import MostCommonCVEs from "./MostCommonCVEs";
 

@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { TourCard } from "@/components/common/tours/TourCard";
@@ -5,11 +8,7 @@ import { TourProvider, useTour } from "@reactour/tour";
 import type { StepType } from "@reactour/tour";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-interface TourContextType {
-  registerSteps: (steps: StepType[]) => void;
-  openTour: () => void;
-  hasSteps: boolean;
-}
+import type { TourContextType } from "@/types/view/tour";
 
 const TourContext = React.createContext<TourContextType>({
   registerSteps: () => {},

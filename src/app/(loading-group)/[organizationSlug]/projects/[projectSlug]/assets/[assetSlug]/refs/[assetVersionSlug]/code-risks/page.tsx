@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import SortingCaret from "@/components/common/SortingCaret";
@@ -45,10 +48,6 @@ import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
-
-interface Props {
-  vulns: Paged<FirstPartyVuln>;
-}
 
 const columnHelper = createColumnHelper<FirstPartyVuln>();
 
@@ -154,7 +153,6 @@ const Index: FunctionComponent = () => {
   const {
     data: vulns,
     isLoading,
-    error,
     mutate: mutateVulns,
   } = useSWR<Paged<FirstPartyVuln>>(
     uri +

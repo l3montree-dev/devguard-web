@@ -5,7 +5,7 @@
 
 import { documentationLinks } from "@/const/documentationLinks";
 import { useConfig } from "@/context/ConfigContext";
-import { useInstanceSettings } from "@/hooks/useInstanceSettings";
+import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import { classNames } from "@/utils/common";
 import Link from "next/link";
 
@@ -18,7 +18,7 @@ interface Props {
 
 export default function Footer({ variant = "auth" }: Props) {
   const config = useConfig();
-  const instanceSettings = useInstanceSettings();
+  const instanceInfo = useInstanceInfo();
   const isApp = variant === "app";
 
   return (
@@ -95,8 +95,8 @@ export default function Footer({ variant = "auth" }: Props) {
         </p>
         <p className={"text-balance sm:inline"}>
           Web-Version: {process.env.NEXT_PUBLIC_VERSION ?? "dev"}
-          {instanceSettings?.apiVersion &&
-            ` · API-Version ${instanceSettings.apiVersion}`}
+          {instanceInfo?.apiVersion &&
+            ` · API-Version ${instanceInfo.apiVersion}`}
         </p>
       </div>
     </footer>

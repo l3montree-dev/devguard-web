@@ -3,16 +3,7 @@
 
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import useAccessToken from "@/hooks/useAccessToken";
 import Link from "next/link";
@@ -94,30 +85,5 @@ export function EssentialProjectConfigContent({
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-export function EssentialProjectConfigDrawer(props: ContentProps) {
-  return (
-    <Drawer direction="right">
-      <DrawerTrigger asChild>
-        <Button variant="outline">Go to Essential Project Settings</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="border-b">
-          <DrawerTitle>Essential Project Config</DrawerTitle>
-        </DrawerHeader>
-        <div className="overflow-y-auto px-4 pb-4 mt-4">
-          <EssentialProjectConfigContent {...props} />
-        </div>
-        <div className="p-4 border-t">
-          <DrawerClose asChild>
-            <Button variant="outline" className="w-full">
-              Close
-            </Button>
-          </DrawerClose>
-        </div>
-      </DrawerContent>
-    </Drawer>
   );
 }

@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { expect } from "@playwright/test";
 import { test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";

@@ -1,8 +1,11 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { filterForm2Query, sortingState2Query } from "@/services/filter";
-import type { FilterForm } from "@/services/filter";
+import type { FilterForm } from "@/types/view/filter";
 import type { OnChangeFn, SortingState, Updater } from "@tanstack/react-table";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function useFilter() {
   const router = useRouter();

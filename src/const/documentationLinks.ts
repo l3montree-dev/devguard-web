@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 export const documentationLinks = {
   docsIntroduction: "https://devguard.org/introduction",
-  sbomExplaining: "https://docs.devguard.org/explanations/compliance/sbom-standards/",
+  sbomExplaining:
+    "https://docs.devguard.org/explanations/compliance/sbom-standards/",
   vexExplaining:
     "https://docs.devguard.org/explanations/vulnerability-management/what-is-vex/",
   vexRecommendationWhitepaper:
@@ -21,4 +22,6 @@ export const documentationLinks = {
     `https://docs.devguard.org/vulnerability-database/${cveId}/`,
   packageInspector: (purl: string) =>
     `https://docs.devguard.org/package-inspector/${encodeURIComponent(purl)}`,
+  quickFix:
+    "https://docs.devguard.org/explanations/supply-chain-security/transitive-vulnerability-path-analysis/#transitive-vulnerability-path-analysis-the-quickfix-algorithm",
 };

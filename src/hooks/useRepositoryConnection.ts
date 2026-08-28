@@ -1,5 +1,7 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useEffect, useState } from "react";
-import type { AssetDTO } from "../types/api/api";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { browserApiClient } from "../services/devGuardApi";

@@ -147,11 +147,6 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BUILD_YEAR: String(new Date().getFullYear()),
   },
-  turbopack: {
-    resolveAlias: {
-      istextorbinary: "./src/lib/istextorbinary-wrapper.js",
-    },
-  },
   experimental: {
     turbopackModuleIds: "deterministic",
     turbopackFileSystemCacheForDev: true,

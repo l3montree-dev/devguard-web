@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 // Copyright (C) 2025 Lars Hermges, l3montree GmbH.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -121,7 +124,7 @@ const AutomatedIntegrationSlide: FunctionComponent<
           variant={"secondary"}
           id="automated-integration-back-to-selection"
           onClick={() => api?.scrollTo(prevIndex)}
-          >
+        >
           Back
         </Button>
         <Button id="automated-integration-continue" onClick={onClose}>

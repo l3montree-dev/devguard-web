@@ -8,7 +8,6 @@ import type { Diagnostic } from "@codemirror/lint";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { browserApiClient } from "@/services/devGuardApi";
-import { Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/lib/toast";
 import useSWR from "swr";

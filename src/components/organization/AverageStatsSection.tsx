@@ -15,15 +15,7 @@ export interface AverageStatsSectionProps {
   orgStatistics: OrgOverview | undefined;
 }
 
-type Severity = "critical" | "high" | "medium" | "low";
-
-interface SeverityRemediation {
-  variant: Severity;
-  remediationRisk: number | undefined;
-  remediationCvss: number | undefined;
-  openRisk: number | undefined;
-  openCvss: number | undefined;
-}
+import type { SeverityRemediation } from "@/types/view/organization";
 
 export default function AverageStatsSection({
   mode,
@@ -68,6 +60,14 @@ export default function AverageStatsSection({
       openCvss: remediation?.lowCVSSOpen,
     },
   ];
+
+  const hasData =
+    isStatisticsLoading ||
+    Object.values(orgStatistics?.vulnEventAverage ?? {}).some(
+      (value) => Number(value) > 0,
+    );
+
+  if (!hasData) return null;
 
   return (
     <Section

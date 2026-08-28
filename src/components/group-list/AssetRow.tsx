@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { CodeBracketSquareIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import type { ComponentPropsWithoutRef, FunctionComponent } from "react";

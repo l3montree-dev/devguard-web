@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import type { ColumnDef, TableOptions } from "@tanstack/react-table";
 import useFilter from "./useFilter";

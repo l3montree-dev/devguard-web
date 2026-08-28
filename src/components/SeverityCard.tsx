@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import Link from "next/link";
 import type { FunctionComponent } from "react";
 import { useActiveAsset } from "../hooks/useActiveAsset";
@@ -15,7 +18,7 @@ import {
 } from "./ui/card";
 import { Skeleton } from "./ui/skeleton";
 import { useSearchParams } from "next/navigation";
-import { WrenchIcon } from "lucide-react";
+import { CircleFadingArrowUp } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
@@ -138,7 +141,7 @@ const SeverityCard: FunctionComponent<Props> = ({
                   className="p-1 border-none text-xs font-medium pr-2 m-0"
                   variant={"secondary"}
                 >
-                  <WrenchIcon className="h-3.5 text-muted-foreground w-3.5 mr-1" />
+                  <CircleFadingArrowUp className="h-3.5 text-muted-foreground w-3.5 mr-1" />
                   <span>{fixableAmount}</span>
                 </Badge>
               </TooltipTrigger>

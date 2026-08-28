@@ -1,6 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import type { VexRuleEffect, VexRuleVulnContext } from "@/types/view/vexRules";
 import { beautifyPurl } from "@/utils/common";
 
 // Anchors a pattern at the root of every artifact.
@@ -8,36 +9,10 @@ const ROOT_TOKEN = "ROOT";
 // Matches zero or more path segments.
 const WILDCARD_TOKEN = "*";
 
-export interface VexRuleVulnContext {
-  cveID: string | null;
-  componentPurl: string;
-  // Ordered purls from the direct dependency down to the vulnerable component.
-  vulnerabilityPath: string[];
-  // Application / asset name rendered as the first (root) node.
-  rootName: string;
-}
-
 /**
  * What to render for a rule/vulnerability pair. A new expression shape gets a new
  * type here plus a branch in the renderer.
  */
-type VexRuleEffectType =
-  | "pathCut"
-  | "pathIntact"
-  | "attributeMatch"
-  | "attributeMiss"
-  | "indeterminate";
-
-export interface VexRuleEffect {
-  type: VexRuleEffectType;
-  // Whether the rule applies to this vulnerability; null when indeterminate.
-  applies: boolean | null;
-  // Index into `vulnerabilityPath` of the first node the rule dismisses. The cut
-  // sits on the edge entering that node; -1 when the rule cuts nothing.
-  cutIndex: number;
-  // Which attribute an `attributeMatch` / `attributeMiss` was decided on.
-  matchedOn?: { field: "cveId" | "componentPurl"; value: string };
-}
 
 const INDETERMINATE: VexRuleEffect = {
   type: "indeterminate",
@@ -257,10 +232,6 @@ function attributeEffect(
 const IDENTIFIER_PATTERN = /vuln\.(?:cveId|cve\.cve)\s*==\s*["']([^"']+)["']/;
 
 /** The advisory a rule pins itself to (CVE-… / GHSA-…), if it does. */
-export function extractVulnIdentifier(cel: string): string | null {
-  return stripCelComments(cel).match(IDENTIFIER_PATTERN)?.[1] ?? null;
-}
-
 function matchAttribute(
   expr: string,
   vuln: VexRuleVulnContext,

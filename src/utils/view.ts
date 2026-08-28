@@ -1,16 +1,5 @@
-// Copyright (C) 2024 Tim Bastin, l3montree GmbH
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import type {
   AssetDTO,
@@ -23,8 +12,8 @@ import type {
 } from "@/types/api/api";
 import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
-import { config } from "../config";
-import { getUserFullName, type User } from "@/types/auth";
+import type { User } from "@/types/auth";
+import { getUserFullName } from "@/utils/auth";
 export const eventMessages = (event: VulnEventDTO) => {
   switch (event.type) {
     case "mitigate":
@@ -343,54 +332,6 @@ export const findUser = (
   };
 };
 
-// A simple hash function to convert the project ID to a consistent integer
-export const hashCode = (str: string) => {
-  return Array.from(str).reduce((acc, char) => {
-    return char.charCodeAt(0) + ((acc << 5) - acc);
-  }, 0);
-};
-
-const colors = [
-  "#fbbd25",
-  "#ffca5b",
-  "#ffd785",
-  "#ffe4ae",
-  "#fff1d6",
-  "#ffffff",
-  "#dfddfc",
-  "#bcbdf9",
-  "#979ef5",
-  "#6c7ff0",
-  "#2563eb",
-];
-
-// Generate HSL color
-export const generateColor = (str: string) => {
-  const hash = Math.abs(hashCode(str));
-
-  return colors[hash % colors.length];
-};
-
-export const withMockFixableRiskHistory = (
-  data: RiskHistory[],
-): RiskHistory[] => {
-  return data.map((entry) => ({
-    ...entry,
-    fixableLow: entry.fixableLow ?? 2,
-    fixableMedium: entry.fixableMedium ?? 7,
-    fixableHigh: entry.fixableHigh ?? entry.high * 9,
-    fixableCritical: entry.fixableCritical ?? entry.critical * 15,
-    cvePurlFixableLow:
-      entry.cvePurlFixableLow ?? Math.floor(entry.cvePurlLow / 2),
-    cvePurlFixableMedium:
-      entry.cvePurlFixableMedium ?? Math.floor(entry.cvePurlMedium / 4),
-    cvePurlFixableHigh:
-      entry.cvePurlFixableHigh ?? Math.floor(entry.cvePurlHigh / 3),
-    cvePurlFixableCritical:
-      entry.cvePurlFixableCritical ?? Math.floor(entry.cvePurlCritical / 2),
-  }));
-};
-
 export const reduceRiskHistories = (
   histories: RiskHistory[][],
 ): Array<ReleaseRiskHistory> => {
@@ -445,9 +386,7 @@ export const generateNewSecret = (): string => {
   return crypto.randomUUID();
 };
 
-export interface ContentTreeElement extends ProjectDTO {
-  assets: Array<AssetDTO>;
-}
+import type { ContentTreeElement } from "@/types/view/context";
 
 export const normalizeContentTree = (
   contentTree: Array<ContentTreeElement>,
@@ -472,10 +411,6 @@ export const normalizeContentTree = (
 
   return assetMap;
 };
-
-export interface ThemeConfig {
-  config: typeof config;
-}
 
 export class RedirectorBuilder {
   private organizationSlug?: string;

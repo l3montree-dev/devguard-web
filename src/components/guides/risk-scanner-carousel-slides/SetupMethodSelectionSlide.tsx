@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { SparklesIcon } from "@heroicons/react/20/solid";
 import { FlaskConical } from "lucide-react";
 import type { FunctionComponent } from "react";

@@ -4,11 +4,9 @@
 
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import DynamicHeader from "./DynamicHeader";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 export default function OrgHeader() {
   const menu = useOrganizationMenu();
-  const activeOrg = useActiveOrg();
 
   return <DynamicHeader z={2} Title={null} menu={menu} />;
 }

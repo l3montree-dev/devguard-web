@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import React, { useState } from "react";
 import type { Policy } from "../../types/api/api";
 import {
@@ -12,7 +15,7 @@ import PolicyDialog from "../PolicyDialog";
 import { Badge } from "../ui/badge";
 import { buttonVariants } from "../ui/button";
 
-export const PolicyListItem = ({
+const PolicyListItem = ({
   policy,
   onPolicyUpdate,
   onPolicyDelete,

@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import {
@@ -14,7 +17,14 @@ import {
   type FunctionComponent,
 } from "react";
 import PathEdge from "./PathEdge";
-import PathNode, { type PathNodeRole } from "./PathNode";
+import PathNode from "./PathNode";
+import type {
+  Item,
+  NodeRect,
+  PathNodeRole,
+  Point,
+  Row,
+} from "@/types/view/riskHandling";
 
 interface PathToComponentProps {
   // Purls of the artifacts this vulnerability was found in - a vuln can show up
@@ -30,15 +40,6 @@ interface PathToComponentProps {
   // Called with the clicked edge's index — i.e. the index into `path` of the
   // edge's child node, so the caller can build a rule for that sub-path.
   onCallClick?: (edgeIndex: number) => void;
-}
-
-type Point = [number, number];
-
-interface NodeRect {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
 }
 
 // Builds an orthogonal path string with rounded corners through the points.
@@ -70,14 +71,6 @@ const buildLinePath = (rects: NodeRect[]): string => {
   if (rects.length < 2) return "";
 
   const tolerance = 12;
-  interface Row {
-    top: number;
-    bottom: number;
-    left: number;
-    right: number;
-    centerYSum: number;
-    count: number;
-  }
   const rows: Row[] = [];
   for (const r of rects) {
     const centerY = r.top + r.height / 2;
@@ -128,11 +121,6 @@ const buildLinePath = (rects: NodeRect[]): string => {
 
   return roundedPath(points, 12);
 };
-
-type Item =
-  | { key: string; kind: "roots"; labels: string[] }
-  | { key: string; kind: "node"; label: string; role: PathNodeRole }
-  | { key: string; kind: "edge"; index: number };
 
 const PathToComponent: FunctionComponent<PathToComponentProps> = ({
   rootNames,

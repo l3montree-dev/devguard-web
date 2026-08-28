@@ -6,14 +6,7 @@
  * the running instance version (a `git describe` string like "v1.0.1-4-g93f141ee").
  */
 
-export interface VersionCheckResult {
-  /** The latest release tag from GitHub, e.g. "v1.2.0" */
-  latestVersion: string;
-  /** The release URL on GitHub */
-  latestUrl: string;
-  /** Whether the running version is behind the latest release */
-  updateAvailable: boolean;
-}
+import type { VersionCheckResult } from "@/types/view/admin";
 
 export function withVPrefix(version: string): string {
   return /^v/i.test(version) ? version : `v${version}`;

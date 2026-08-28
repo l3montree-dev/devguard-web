@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -65,7 +68,7 @@ const MostVulnerableList: FunctionComponent<Props> = ({
   }
 
   return (
-    <Card>
+    <Card className="flex flex-1 flex-col">
       <CardHeader>
         <CardTitle className="text-base">{title}</CardTitle>
         <CardDescription className="text-sm">

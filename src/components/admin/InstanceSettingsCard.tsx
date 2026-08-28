@@ -17,13 +17,13 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { NoSymbolIcon } from "@heroicons/react/20/solid";
-import { useInstanceSettings } from "@/hooks/useInstanceSettings";
+import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
 
 export default function InstanceSettingsCard() {
   // Reuses the shared hook backing RootHeader (GET /api/v1/instance-settings/).
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useInstanceInfo();
   const { getSigningKey } = useInstanceAdmin();
   const loading = instanceSettings === null;
   const singleOrganizationMode =

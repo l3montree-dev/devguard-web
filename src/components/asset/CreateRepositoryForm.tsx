@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import {
   Card,
   CardContent,
@@ -20,7 +23,8 @@ import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { GroupStructureFlowchart } from "../project/GroupStructureFlowchart";
 import { Button } from "../ui/button";
-import AssetForm, { type AssetFormValues } from "./AssetForm";
+import AssetForm from "./AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 
 const defaultTitle = "Create new repository";
 const defaultDescription =
@@ -127,5 +131,3 @@ export const CreateRepositoryForm: FunctionComponent<Props> = ({
     </Dialog>
   );
 };
-
-export default CreateRepositoryForm;

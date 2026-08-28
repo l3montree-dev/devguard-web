@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
 import {
@@ -15,14 +18,8 @@ import { UserRole } from "@/types/api/api";
 import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../context/AssetContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
-import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+
 import { useActiveProject } from "../hooks/useActiveProject";
 import { MultiselectCombobox } from "./common/MultiselectCombobox";
 

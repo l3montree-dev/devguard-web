@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import Page from "@/components/Page";
@@ -15,8 +18,7 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import type { FunctionComponent } from "react";
+import { useState } from "react";
 import Markdown from "@/components/common/Markdown";
 
 import { Badge } from "@/components/ui/badge";

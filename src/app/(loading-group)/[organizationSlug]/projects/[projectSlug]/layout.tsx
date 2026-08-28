@@ -1,9 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import ProjectHeader from "@/components/common/ProjectHeader";
 import React, { Suspense } from "react";
 import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 import { ProjectProvider } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
-import { handleHttpError } from "../../../../../data-fetcher/handle-http-error";
+import { handleHttpError } from "../../../../../data-fetcher/handleHttpError";
 
 export default function ProjectLayout({
   // Layouts must accept a children prop.

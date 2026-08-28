@@ -6,5 +6,3 @@ export { OryInput } from "./OryInput";
 export { OryRegistrationInput } from "./OryRegistrationInput";
 export { OryCodeInput } from "./OryCodeInput";
 export { OryCheckbox } from "./OryCheckbox";
-export { OryImage } from "./OryImage";
-export { OryLabel } from "./OryLabel";

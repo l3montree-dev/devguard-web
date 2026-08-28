@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AdvisoryFormData } from "@/components/AdvisoryDialog";
+import type { AdvisoryFormData } from "@/types/view/advisory";
 import { useSession } from "@/context/SessionContext";
 import { fetcher } from "@/data-fetcher/fetcher";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
@@ -21,11 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import useSWR, { mutate } from "swr";
 
-export interface AdvisoryEventSubmit {
-  status?: VulnEventDTO["type"];
-  justification?: string;
-  mechanicalJustification?: string;
-}
+import type { AdvisoryEventSubmit } from "@/types/view/advisory";
 
 const request = async (
   url: string,

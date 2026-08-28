@@ -1,17 +1,6 @@
-// Copyright (C) 2023 Sebastian Kawelke, l3montree UG (haftungsbeschraenkt)
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Affero General Public License as
-// published by the Free Software Foundation, either version 3 of the
-// License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Affero General Public License for more details.
-//
-// You should have received a copy of the GNU Affero General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import OrgRegisterForm from "@/components/OrgRegister";
@@ -19,7 +8,7 @@ import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useInstanceSettings } from "@/hooks/useInstanceSettings";
+import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 
 const Lanyard = dynamic(
   () => import("@/components/misc/Lanyard").then((mod) => mod.default),
@@ -28,7 +17,7 @@ const Lanyard = dynamic(
 
 export default function SetupOrg() {
   const session = useSession();
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useInstanceInfo();
 
   const lanyardKey = usePathname() ?? "setup";
 

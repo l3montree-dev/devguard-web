@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { useState } from "react";
@@ -19,11 +22,6 @@ export const dismissAllTours = () => {
   ALL_TOUR_KEYS.forEach((key) => {
     localStorage.setItem(storageKey(key), "true");
   });
-};
-
-export const hasTourSeen = (tourKey: string): boolean => {
-  if (typeof window === "undefined") return false;
-  return localStorage.getItem(storageKey(tourKey)) === "true";
 };
 
 export function useTourSeen(tourKey: string) {

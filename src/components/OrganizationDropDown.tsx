@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +38,7 @@ import {
 } from "./ui/dropdown-menu";
 import { useSession, useUpdateSession } from "../context/SessionContext";
 import { useActiveOrg } from "../hooks/useActiveOrg";
-import { useInstanceSettings } from "../hooks/useInstanceSettings";
+import { useInstanceInfo } from "../hooks/useInstanceSettings";
 import { truncateMiddle } from "@/utils/common";
 
 const activeOrgName = (name: string, slug: string) => {
@@ -54,7 +57,7 @@ const OrganizationDropDown = () => {
 
   const user = useCurrentUser();
   const router = useRouter();
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useInstanceInfo();
 
   const lastActiveOrg = localStorage.getItem("lastActiveOrg");
 

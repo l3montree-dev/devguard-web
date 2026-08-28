@@ -1,11 +1,11 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import CopyCode from "@/components/common/CopyCode";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import Purl from "@/components/common/Purl";
-import type {
-  DependencyVuln,
-  DetailedDependencyVulnDTO,
-} from "@/types/api/api";
-import { extractVersion, isValidPackagePurl } from "@/utils/common";
+import type { DetailedDependencyVulnDTO } from "@/types/api/api";
+import { isValidPackagePurl } from "@/utils/common";
 import { Wrench } from "lucide-react";
 import { PackageURL } from "packageurl-js";
 import type { FunctionComponent } from "react";
@@ -41,10 +41,7 @@ function renderQuickFixText(
   }
 }
 
-type QuickfixVuln = Pick<
-  DependencyVuln,
-  "directDependencyFixedVersion" | "componentFixedVersion" | "vulnerabilityPath"
->;
+import type { QuickfixVuln } from "@/types/view/asset";
 
 export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   if (!vuln.directDependencyFixedVersion && vuln.componentFixedVersion) {
@@ -58,13 +55,21 @@ export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   return vuln.directDependencyFixedVersion;
 }
 
-export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
+export function isDirectDependencyUpdateAvailable(vuln: QuickfixVuln): boolean {
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
+
   return (
     fixedVersionPurl !== null &&
     ecosystemUpdate !== "" &&
     vuln.vulnerabilityPath.length > 0
+  );
+}
+
+export function isTransitiveUpdateFixAvailable(vuln: QuickfixVuln): boolean {
+  return (
+    vuln.componentFixedVersion !== null &&
+    vuln.componentFixedVersion !== undefined
   );
 }
 

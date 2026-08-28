@@ -1,10 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import Image, { type ImageProps } from "next/image";
 import { useEffect, useRef, useState, type FC } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { Root } from "@radix-ui/react-portal";
-import { XCircleIcon } from "@heroicons/react/20/solid";
 
 function getImageSrc(src: ImageProps["src"]): string {
   if (typeof src === "string") {
@@ -51,7 +53,7 @@ const Zoomable = (props: {
 
 export const ImageZoom: FC<ImageProps> = (props) => {
   const imgRef = useRef<HTMLImageElement>(null!);
-  const [isInsideAnchor, setIsInsideAnchor] = useState(false);
+  const [isInsideAnchor] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const img = (

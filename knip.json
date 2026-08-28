@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "tags": ["-lintignore"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreFiles": ["public/**", "e2e/src/devguard-auth-setup.ts"],
+  "ignoreDependencies": [
+    "sharp",
+    "@typescript/native",
+    "@typescript/typescript6"
+  ],
+  "ignoreIssues": {
+    "src/types/api/**": ["exports", "types", "enumMembers"],
+    "src/components/ui/**": ["exports", "types", "duplicates"]
+  }
+}

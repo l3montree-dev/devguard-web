@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { envConfig, LoggingAnalyzer } from "../utils";
@@ -103,7 +106,7 @@ export class DevGuardPOM {
   }
 
   async loadAndRegister() {
-    await this.loadDevGuard(); 
+    await this.loadDevGuard();
     await this.registerNewUser();
   }
 

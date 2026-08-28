@@ -1,10 +1,7 @@
-export type CvssMetric = {
-  key: string;
-  label: string;
-  group?: string;
-  options: { v: string; l: string }[];
-  description?: string;
-};
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+import type { CvssMetric } from "@/types/view/cvss";
 
 export const CVSS31_METRICS: CvssMetric[] = [
   {
@@ -17,7 +14,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "P", l: "Physical" },
     ],
     description:
-      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
+      "Where does the attacker have to be? Network means reachable over the internet, Adjacent only from the same network segment, Local requires a shell or session on the machine, Physical means standing in front of it.",
   },
   {
     key: "AC",
@@ -27,7 +24,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
+      "How much has to go right for the attacker? Low means the exploit just works. High means they first have to beat a protection, e.g. leak a key, guess a random value or win a race.",
   },
   {
     key: "PR",
@@ -38,7 +35,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric describes the level of privileges an attacker must possess prior to successfully exploiting the vulnerability. The method by which the attacker obtains privileged credentials prior to the attack (e.g., free trial accounts), is outside the scope of this metric. Generally, self-service provisioned accounts do not constitute a privilege requirement if the attacker can grant themselves privileges as part of the attack.",
+      "What account does the attacker need before the attack? None means anonymous, Low means any normal user account, High means admin or service-level rights.",
   },
   {
     key: "UI",
@@ -48,7 +45,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "R", l: "Required" },
     ],
     description:
-      "This metric captures the requirement for a human user, other than the attacker, to participate in the successful compromise of the vulnerable system. This metric determines whether the vulnerability can be exploited solely at the will of the attacker, or whether a separate user (or user-initiated process) must participate in some manner.",
+      "Does someone else have to help, without knowing it? None means the attacker acts alone. Required means a user must do something first, e.g. click a link or open a file.",
   },
   {
     key: "S",
@@ -58,7 +55,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "C", l: "Changed" },
     ],
     description:
-      "Does a successful attack impact a component other than the vulnerable component? If so, the Base Score increases and the Confidentiality, Integrity and Authentication metrics should be scored relative to the impacted component.",
+      "Does the damage stay inside the affected component? Unchanged means it does. Changed means it spills over, e.g. code escapes a container and hits the host.",
   },
   {
     key: "C",
@@ -69,7 +66,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric measures the impact to the confidentiality of the information resources managed by a software component due to a successfully exploited vulnerability. Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones.",
+      "How much data can the attacker read? None means nothing. Low means limited or non-critical data. High means everything relevant, e.g. the full user database.",
   },
   {
     key: "I",
@@ -80,7 +77,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric measures the impact to integrity of a successfully exploited vulnerability. Integrity refers to the trustworthiness and veracity of information.",
+      "How much can the attacker change? None means nothing. Low means limited edits. High means arbitrary changes, e.g. modifying prices or granting themselves admin.",
   },
   {
     key: "A",
@@ -91,7 +88,7 @@ export const CVSS31_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric measures the impact to the availability of the impacted component resulting from a successfully exploited vulnerability. It refers to the loss of availability of the impacted component itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of an impacted component.",
+      "Can the attacker take the service down? None means no. Low means slowdowns or short interruptions. High means a full outage, e.g. crashing the service or filling the disk.",
   },
 ];
 
@@ -106,7 +103,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "P", l: "Physical" },
     ],
     description:
-      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
+      "Where does the attacker have to be? Network means reachable over the internet, Adjacent only from the same network segment, Local requires a shell or session on the machine, Physical means standing in front of it.",
   },
   {
     key: "AC",
@@ -116,7 +113,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric reflects the context by which vulnerability exploitation is possible. This metric value (and consequently the resulting severity) will be larger the more remote (logically, and physically) an attacker can be in order to exploit the vulnerable system. The assumption is that the number of potential attackers for a vulnerability that could be exploited from across a network is larger than the number of potential attackers that could exploit a vulnerability requiring physical access to a device, and therefore warrants a greater severity.",
+      "Does the attacker have to defeat a protection first? Low means no. High means yes, e.g. bypassing ASLR or leaking a secret token before the exploit works.",
   },
   {
     key: "AT",
@@ -126,7 +123,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "P", l: "Present" },
     ],
     description:
-      "This metric captures the prerequisite deployment and execution conditions or variables of the vulnerable system that enable the attack. These differ from security-enhancing techniques/technologies (ref Attack Complexity) as the primary purpose of these conditions is not to explicitly mitigate attacks, but rather, emerge naturally as a consequence of the deployment and execution of the vulnerable system.",
+      "Does the system have to be in a special state? None means it always works. Present means specific conditions must exist, e.g. a certain config enabled or a race window being hit.",
   },
   {
     key: "PR",
@@ -137,7 +134,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "H", l: "High" },
     ],
     description:
-      "This metric describes the level of privileges an attacker must possess prior to successfully exploiting the vulnerability. The method by which the attacker obtains privileged credentials prior to the attack (e.g., free trial accounts), is outside the scope of this metric. Generally, self-service provisioned accounts do not constitute a privilege requirement if the attacker can grant themselves privileges as part of the attack.",
+      "What account does the attacker need before the attack? None means anonymous, Low means any normal user account, High means admin or service-level rights.",
   },
   {
     key: "UI",
@@ -148,7 +145,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "A", l: "Active" },
     ],
     description:
-      "This metric captures the requirement for a human user, other than the attacker, to participate in the successful compromise of the vulnerable system. This metric determines whether the vulnerability can be exploited solely at the will of the attacker, or whether a separate user (or user-initiated process) must participate in some manner.",
+      "Does someone else have to help, without knowing it? None means the attacker acts alone. Passive means a user just has to use the system normally. Active means they must do something specific, e.g. click a link.",
   },
   {
     key: "VC",
@@ -160,7 +157,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "N", l: "None" },
     ],
     description:
-      "This metric measures the impact to the confidentiality of the information managed by the VULNERABLE SYSTEM due to a successfully exploited vulnerability. Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones.",
+      "How much data can the attacker read on the affected system itself? None means nothing. Low means limited data. High means everything relevant, e.g. the full user database.",
   },
   {
     key: "VI",
@@ -172,7 +169,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "N", l: "None" },
     ],
     description:
-      "This metric measures the impact to integrity of a successfully exploited vulnerability. Integrity refers to the trustworthiness and veracity of information. Integrity of the VULNERABLE SYSTEM is impacted when an attacker makes unauthorized modification of system data. Integrity is also impacted when a system user can repudiate critical actions taken in the context of the system (e.g. due to insufficient logging).",
+      "How much can the attacker change on the affected system itself? None means nothing. Low means limited edits. High means arbitrary changes, e.g. modifying prices or granting themselves admin.",
   },
   {
     key: "VA",
@@ -184,7 +181,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "N", l: "None" },
     ],
     description:
-      "This metric measures the impact to the availability of the VULNERABLE SYSTEM resulting from a successfully exploited vulnerability. While the Confidentiality and Integrity impact metrics apply to the loss of confidentiality or integrity of data (e.g., information, files) used by the system, this metric refers to the loss of availability of the impacted system itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of a system.",
+      "Can the attacker take the affected system down? None means no. Low means slowdowns or short interruptions. High means a full outage, e.g. crashing the service or filling the disk.",
   },
   {
     key: "SC",
@@ -196,7 +193,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "N", l: "None" },
     ],
     description:
-      "This metric measures the impact to the confidentiality of the information managed by the SUBSEQUENT SYSTEM due to a successfully exploited vulnerability. Confidentiality refers to limiting information access and disclosure to only authorized users, as well as preventing access by, or disclosure to, unauthorized ones.",
+      "How much data can the attacker read on other systems behind it? None means the damage stays local. High means they reach connected systems, e.g. a shared database or an internal API.",
   },
   {
     key: "SI",
@@ -208,7 +205,7 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "N", l: "None" },
     ],
     description:
-      "This metric measures the impact to integrity of a successfully exploited vulnerability. Integrity refers to the trustworthiness and veracity of information. Integrity of the SUBSEQUENT SYSTEM is impacted when an attacker makes unauthorized modification of system data. Integrity is also impacted when a system user can repudiate critical actions taken in the context of the system (e.g. due to insufficient logging).",
+      "How much can the attacker change on other systems behind it? None means the damage stays local. High means they can modify data elsewhere, e.g. push to a shared queue or alter records in another service.",
   },
   {
     key: "SA",
@@ -220,9 +217,72 @@ export const CVSS40_METRICS: CvssMetric[] = [
       { v: "N", l: "None" },
     ],
     description:
-      "This metric measures the impact to the availability of the SUBSEQUENT SYSTEM resulting from a successfully exploited vulnerability. While the Confidentiality and Integrity impact metrics apply to the loss of confidentiality or integrity of data (e.g., information, files) used by the system, this metric refers to the loss of availability of the impacted system itself, such as a networked service (e.g., web, database, email). Since availability refers to the accessibility of information resources, attacks that consume network bandwidth, processor cycles, or disk space all impact the availability of a system.",
+      "Can the attacker take other systems behind it down? None means the damage stays local. High means connected systems go down too, e.g. exhausting a shared database or cluster node.",
   },
 ];
+
+const MODIFIED_METRIC_FIELDS: Record<string, string> = {
+  AV: "modifiedAttackVector",
+  AC: "modifiedAttackComplexity",
+  PR: "modifiedPrivilegesRequired",
+  S: "modifiedScope",
+  UI: "modifiedUserInteraction",
+  C: "modifiedConfidentiality",
+  I: "modifiedIntegrity",
+  A: "modifiedAvailability",
+};
+
+const MODIFIED_METRIC_DESCRIPTIONS: Record<string, string> = {
+  AV: "Where does this asset actually live? Network means reachable from the public internet, Adjacent means internal network only, Local means a restricted segment where an attacker already needs a session, Physical means airgapped or on-site access only.",
+  AC: "Are there compensating controls in front of this asset that make exploitation harder than in the generic case, e.g. a WAF, network segmentation or rate limiting? If yes, choose High.",
+  AT: "Does reaching this asset depend on conditions that are not always met, e.g. a feature flag, a specific deployment or a maintenance window? If yes, choose Present.",
+  PR: "What is the minimum privilege needed just to reach this asset? None means anonymous access, Low means any logged-in user, High means admin or MFA-gated access.",
+  UI: "Does a user of this asset have to act before an attack works, e.g. open a link or upload a file? If nobody has to be involved, choose None.",
+  S: "If this asset is compromised, can it be used to pivot to other systems, e.g. via shared credentials, the same host or cluster, or broad IAM permissions? If yes, choose Changed.",
+  C: "How sensitive is the data this asset holds? High means critical data such as personal data, credentials or secrets. None means it holds nothing worth reading.",
+  I: "How bad is it if data in this asset is manipulated? High means changes have real consequences, e.g. billing, access rights or audit trails. None means changes do not matter.",
+  A: "How bad is downtime for this asset? High means the business stops, e.g. a production service. None means nobody notices if it is offline.",
+};
+
+function modifiedMetricsForAsset(
+  metrics: CvssMetric[],
+  keys: string[],
+): CvssMetric[] {
+  return keys.map((key) => {
+    const base = metrics.find((m) => m.key === key);
+    if (!base) throw new Error(`unknown cvss metric: ${key}`);
+    const plainKey = key.replace(/^V/, "");
+    return {
+      ...base,
+      key: `M${base.key}`,
+      field: MODIFIED_METRIC_FIELDS[plainKey],
+      description: MODIFIED_METRIC_DESCRIPTIONS[plainKey] ?? base.description,
+      label: `Modified ${base.label}`,
+      options: [
+        { v: "X", l: "Not Defined" },
+        ...base.options.map((o) => ({ ...o, v: o.l.toLowerCase() })),
+      ],
+    };
+  });
+}
+
+export const CVSS31_MODIFIED_METRICS = modifiedMetricsForAsset(CVSS31_METRICS, [
+  "AV",
+  "AC",
+  "PR",
+  "S",
+  "UI",
+  "C",
+  "I",
+  "A",
+]);
+
+export const CVSS40_MODIFIED_METRICS = modifiedMetricsForAsset(
+  CVSS40_METRICS.map((m) =>
+    m.key === "UI" ? CVSS31_METRICS.find((x) => x.key === "UI")! : m,
+  ),
+  ["AV", "AC", "PR", "UI", "VC", "VI", "VA"],
+);
 
 export function scoreToSeverity(score: number): string {
   if (score === 0) return "None";

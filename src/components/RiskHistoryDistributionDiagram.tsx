@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import {
   Card,
   CardContent,
@@ -40,6 +43,12 @@ export function RiskHistoryDistributionDiagram({
         <CardTitle className="text-base">
           {mode === "risk" ? "Risk" : "CVSS"} Distribution Trend
         </CardTitle>
+        <CardDescription>
+          How the number of vulnerabilities per{" "}
+          {mode === "risk" ? "risk" : "CVSS"} severity develops over time.
+          {data.length < 3 &&
+            " At least 3 days of data are needed for a more meaningful trend."}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -106,15 +115,17 @@ export function RiskHistoryDistributionDiagram({
                       day: "numeric",
                     })
                   }
-                  content={
+                  content={({ content, ...props }) => (
                     <ChartTooltipContent
+                      {...props}
+                      payload={[...(props.payload ?? [])].reverse()}
                       indicator="dot"
                       className="bg-background"
                     />
-                  }
+                  )}
                 />
                 <defs>
-                  {["critical", "high", "medium", "low"].map((level, i) => {
+                  {["critical", "high", "medium", "low"].map((level) => {
                     const sev = level.toUpperCase();
                     return (
                       <linearGradient
@@ -140,10 +151,10 @@ export function RiskHistoryDistributionDiagram({
                   })}
                 </defs>
                 {[
-                  { dataKey: "cvePurlCritical", severity: "critical" },
-                  { dataKey: "cvePurlHigh", severity: "high" },
-                  { dataKey: "cvePurlMedium", severity: "medium" },
                   { dataKey: "cvePurlLow", severity: "low" },
+                  { dataKey: "cvePurlMedium", severity: "medium" },
+                  { dataKey: "cvePurlHigh", severity: "high" },
+                  { dataKey: "cvePurlCritical", severity: "critical" },
                 ].map(({ dataKey, severity }) => (
                   <Area
                     key={dataKey}

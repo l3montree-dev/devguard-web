@@ -1,13 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
 import { useState } from "react";
 import type { ReactNode, ComponentType } from "react";
 
-export type WithUpdater<T> = { v: T } & {
-  update: (newValue: T | ((prev: T) => T)) => void;
-};
-
-export type WithoutUpdater<T> = Omit<T, "update">;
+import type { WithUpdater } from "@/types/view/context";
 
 export const NoopUpdater = () => {};
 interface ClientContextWrapperProps<T = any> {
@@ -22,6 +21,7 @@ export function ClientContextWrapper<T>({
   value,
 }: ClientContextWrapperProps<T>) {
   const [state, update] = useState(value);
+
   return (
     <Provider
       value={
@@ -33,26 +33,5 @@ export function ClientContextWrapper<T>({
     >
       {children}
     </Provider>
-  );
-}
-
-export type ProviderValue<T> =
-  T extends ComponentType<{ value: infer V; children: ReactNode }> ? V : never;
-
-export interface ProviderConfig<T = any> {
-  Provider: ComponentType<{ value: T; children: ReactNode }>;
-  value: T;
-}
-
-export function MultiContextWrapper({
-  children,
-  providers,
-}: {
-  children: ReactNode;
-  providers: ProviderConfig[];
-}) {
-  return providers.reduceRight(
-    (acc, { Provider, value }) => <Provider value={value}>{acc}</Provider>,
-    children,
   );
 }

@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { getUserFullName, type User } from "@/types/auth";
+import type { User } from "@/types/auth";
+import { getUserFullName } from "@/utils/auth";
 
 export default function LoggedInAs({ user }: { user: User }) {
   return (

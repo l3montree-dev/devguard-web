@@ -17,7 +17,7 @@ import Image from "next/image";
 import type { FunctionComponent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { createUpdateHandler } from "../AssetForm";
-import type { AssetFormValues } from "../AssetForm";
+import type { AssetFormValues } from "@/types/view/asset";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;

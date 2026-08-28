@@ -1,11 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { browserApiClient } from "@/services/devGuardApi";
 import { createAccessToken as createAccessToken } from "@/services/accessTokenService";
 import type {
-  AsymmetricAccessTokenDTO as AsymmetricAccessTokenDTO,
   AccessTokenDTO as AccessTokenDTO,
   SeeOncePatWithBearerToken as SeeOnceATWithBearerToken,
   SeeOncePatWithPrivKey as SeeOnceATWithPrivKey,
-  SymmetricAccessTokenDTO as SymmetricAccessTokenDTO,
 } from "@/types/api/api";
 import { EventEmitter } from "events";
 import { findLast, uniqBy } from "lodash";
@@ -15,11 +16,7 @@ import useScopedAccessToken from "./useScopedAccessToken";
 const hasPrivKey = (pat: Token): pat is SeeOnceATWithPrivKey =>
   "privKey" in pat && Boolean(pat.privKey);
 
-type Token =
-  | AsymmetricAccessTokenDTO
-  | SymmetricAccessTokenDTO
-  | SeeOnceATWithPrivKey
-  | SeeOnceATWithBearerToken;
+import type { Token } from "@/types/view/accessToken";
 // this is needed if the useAccessToken hook is used in multiple components, so that they can all listen to the same event emitter for new ATs
 // otherwise the second useAccessToken hook would not be aware of the new AT created in the first hook, and would not update its state accordingly
 const newATEventEmitter = new EventEmitter();

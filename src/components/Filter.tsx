@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import { useSearchParams } from "next/navigation";
-import type { FilterForm } from "@/services/filter";
+import type { FilterForm } from "@/types/view/filter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,12 +27,7 @@ import { ChevronLeftIcon, FilterIcon, SearchIcon, XIcon } from "lucide-react";
 
 const MIN_SEARCH_LENGTH = 3;
 
-interface FilterOption {
-  label: string;
-  value: string;
-  operators: Array<{ value: string; label?: string }>;
-  filterValues?: Array<{ value: string; label?: string }>;
-}
+import type { FilterOption, Step } from "@/types/view/filter";
 
 interface Props {
   options: FilterOption[];
@@ -45,8 +40,6 @@ interface Props {
     placeholder?: string;
   };
 }
-
-type Step = "label" | "operator" | "value";
 
 const Filter: FunctionComponent<Props> = ({
   options,
@@ -95,6 +88,9 @@ const Filter: FunctionComponent<Props> = ({
   const showFilterValues =
     selectedOption?.filterValues &&
     (selectedOperator === "is" || selectedOperator === "is not");
+
+  const isNullOperator = (operator: string) =>
+    operator === "is null" || operator === "is not null";
 
   const filteredOptions = inputQuery
     ? options.filter((o) =>
@@ -363,6 +359,13 @@ const Filter: FunctionComponent<Props> = ({
                       {v.label ?? v.value}
                     </button>
                   ))
+                ) : isNullOperator(selectedOperator) ? (
+                  <Button
+                    className="mx-3 mb-3 w-[calc(100%-1.5rem)]"
+                    onClick={() => handleApplyValue("1")}
+                  >
+                    Apply filter
+                  </Button>
                 ) : (
                   <div className="px-3 pb-3 flex items-center gap-2">
                     <Input
@@ -453,7 +456,7 @@ const Filter: FunctionComponent<Props> = ({
                   ))}
                 </SelectContent>
               </Select>
-            ) : (
+            ) : isNullOperator(filterOperator) ? null : (
               <Input
                 data-testid="filter-value-input"
                 placeholder="Value"
@@ -489,7 +492,11 @@ const Filter: FunctionComponent<Props> = ({
                 variant="ghost"
                 size="sm"
                 onClick={handleApplyFilter}
-                disabled={!filterField || !filterOperator || !filterValueInput}
+                disabled={
+                  !filterField ||
+                  !filterOperator ||
+                  (!filterValueInput && !isNullOperator(filterOperator))
+                }
               >
                 Apply
               </Button>

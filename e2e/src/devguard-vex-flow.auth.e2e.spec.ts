@@ -17,16 +17,14 @@ test.describe("DevGuard handle vuln flows", () => {
     ({ groupName } = await devguardPOM.createTestOrganizationGroupAndRepo());
   });
 
-  test("test sbom upload to path vexxing and verification of vex rule", async ({
-    page,
-  }, testInfo) => {
+  test("test sbom upload to path vexxing and verification of vex rule", async ({}, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM.vuln().markEdgeAsDoesNotCallVulnerableFunction(testInfo);
     await devguardPOM.vuln().verifyVEXRule();
   });
 
-  test("test to download vex", async ({ page }, testInfo) => {
+  test("test to download vex", async ({}, testInfo) => {
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();
     await devguardPOM
@@ -62,9 +60,7 @@ test.describe("DevGuard handle vuln flows", () => {
     await devguardPOM.vuln().deleteFirstVexRule(testInfo);
   });
 
-  test("test vex rule recommendation on a second asset with the same sbom", async ({
-    page,
-  }, testInfo) => {
+  test("test vex rule recommendation on a second asset with the same sbom", async ({}, testInfo) => {
     // First asset: upload the SBOM and assess the vulnerability as a false positive.
     await devguardPOM.setupSbomUpload();
     await devguardPOM.vuln().openFirstAffectedComponent();

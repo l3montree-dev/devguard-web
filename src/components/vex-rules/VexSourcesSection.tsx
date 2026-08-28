@@ -4,32 +4,93 @@
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
-import Alert from "@/components/common/Alert";
+import CustomPagination from "@/components/common/CustomPagination";
+import EmptyParty from "@/components/common/EmptyParty";
+import SortingCaret from "@/components/common/SortingCaret";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import useTable from "@/hooks/useTable";
 import { toast } from "@/lib/toast";
-import { classNames } from "@/utils/common";
 import { browserApiClient } from "@/services/devGuardApi";
+import type { ExternalReference, Paged } from "@/types/api/api";
+import { classNames } from "@/utils/common";
+import type { ColumnDef } from "@tanstack/react-table";
+import { createColumnHelper, flexRender } from "@tanstack/react-table";
 import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
-import {
-  SOURCE_TYPE_LABEL,
-  useVexSources,
-  type VexSource,
-} from "./useVexSources";
 
-interface VexSourcesSectionProps {
+
+export type VexSourceType = "cyclonedx" | "csaf" | "openvex";
+export const isVexSourceType = (type: string): type is VexSourceType =>
+  type === "cyclonedx" || type === "csaf" || type === "openvex";
+
+export type VexSource = ExternalReference & { type: VexSourceType };
+
+export const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
+  cyclonedx: "CycloneDX VEX",
+  csaf: "CSAF",
+  openvex: "OpenVEX",
+};
+
+interface VexSourcesTableProps {
+  sources: Paged<VexSource>;
+  // API base of this asset's external references, e.g. /organizations/o/.../external-references
+  apiUrl: string;
+  isLoading?: boolean;
+  onMutate: () => void;
   // Opens the dialog that adds a VEX file or source URL.
   onAddSource: () => void;
 }
 
+const columnHelper = createColumnHelper<VexSource>();
+
+const columnsDef: ColumnDef<VexSource, any>[] = [
+  {
+    ...columnHelper.accessor("type", {
+      header: "Type",
+      id: "type",
+      enableSorting: true,
+    }),
+  },
+  {
+    ...columnHelper.accessor("url", {
+      header: "URL",
+      id: "url",
+      enableSorting: true,
+    }),
+  },
+  {
+    ...columnHelper.accessor("vexRuleCount", {
+      header: "VEX rules",
+      id: "vex_rule_count",
+      enableSorting: true,
+    }),
+  },
+  {
+    ...columnHelper.display({
+      header: "",
+      id: "actions",
+      enableSorting: false,
+    }),
+  },
+];
+
 /** Upstream URLs this repository syncs rules from. */
-const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
+const VexSourcesTable: FunctionComponent<VexSourcesTableProps> = ({
+  sources,
+  apiUrl,
+  isLoading,
+  onMutate,
   onAddSource,
 }) => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [deletingUrl, setDeletingUrl] = useState<string | null>(null);
-  const { sources, apiUrl, error, isLoading, mutate } = useVexSources();
+
+  const { table } = useTable({
+    columnsDef,
+    data: sources.data,
+  });
 
   // The endpoint takes no source: it re-syncs all of them, hence one button.
   const handleSyncAll = async () => {
@@ -40,7 +101,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
       });
       if (!response.ok) throw new Error(response.statusText);
       toast.success("Syncing all upstream VEX sources");
-      mutate();
+      onMutate();
     } catch {
       toast.error("Failed to trigger sync");
     } finally {
@@ -57,7 +118,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
       );
       if (!response.ok) throw new Error(response.statusText);
       toast.success(`Removed ${source.url}`);
-      mutate();
+      onMutate();
     } catch {
       toast.error("Failed to remove VEX source");
     } finally {
@@ -65,58 +126,112 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
     }
   };
 
-  if (error) {
-    return (
-      <p className="text-sm text-destructive">Failed to load VEX sources</p>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4">
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Loading sources...</p>
-      ) : sources.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No upstream sources configured...
-        </p>
-      ) : (
-        <ul className="flex flex-col divide-y rounded-lg border">
-          {sources.map((source, index) => (
-            <li
-              key={source.url}
-              data-testid="vex-source-row"
-              className={classNames(
-                "flex flex-row items-center justify-between gap-3 p-3",
-                index % 2 !== 0 && "bg-card/50",
-              )}
-            >
-              <div className="flex min-w-0 flex-row items-center gap-3">
-                <Badge variant="outline" className="shrink-0">
-                  {SOURCE_TYPE_LABEL[source.type]}
-                </Badge>
-                <span className="truncate font-mono text-xs text-muted-foreground">
-                  {source.url}
-                </span>
-              </div>
-              <AuthGuard require="member">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  data-testid="vex-source-remove-button"
-                  aria-label={`Remove ${source.url}`}
-                  disabled={deletingUrl === source.url}
-                  onClick={() => handleDelete(source)}
-                >
-                  {deletingUrl === source.url ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  )}
-                </Button>
-              </AuthGuard>
-            </li>
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-full" />
           ))}
-        </ul>
+        </div>
+      ) : sources.data.length === 0 ? (
+        <EmptyParty
+          title="No upstream sources configured."
+          description="Add a VEX file or a URL that carries VEX/CSAF data for the components you use. Syncing a source creates the rules listed in the VEX rules tab."
+        />
+      ) : (
+        <div className="overflow-hidden rounded-lg border">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-card text-foreground">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header, i) => (
+                      <th
+                        key={header.id}
+                        className={classNames(
+                          "whitespace-nowrap p-4 text-left font-medium",
+                          header.column.columnDef.enableSorting &&
+                            "cursor-pointer",
+                          i === headerGroup.headers.length - 1 && "w-12",
+                        )}
+                        onClick={
+                          header.column.columnDef.enableSorting
+                            ? header.column.getToggleSortingHandler()
+                            : undefined
+                        }
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div className="flex flex-row items-center gap-2">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                            {header.column.columnDef.enableSorting && (
+                              <SortingCaret
+                                sortDirection={header.column.getIsSorted()}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="text-foreground">
+                {table.getRowModel().rows.map((row, index) => {
+                  const source = row.original;
+                  return (
+                    <tr
+                      data-testid="vex-source-row"
+                      key={source.url}
+                      className={classNames(
+                        "border-b transition-colors last:border-0",
+                        index % 2 !== 0 && "bg-card/50",
+                      )}
+                    >
+                      <td className="whitespace-nowrap p-4">
+                        <Badge variant="outline">
+                          {SOURCE_TYPE_LABEL[source.type]}
+                        </Badge>
+                      </td>
+                      <td className="max-w-[420px] p-4">
+                        <span className="block truncate font-mono text-xs text-muted-foreground">
+                          {source.url}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <Badge variant="secondary">{source.vexRuleCount}</Badge>
+                      </td>
+                      <td className="p-4">
+                        <AuthGuard require="member">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            data-testid="vex-source-remove-button"
+                            aria-label={`Remove ${source.url}`}
+                            disabled={deletingUrl === source.url}
+                            onClick={() => handleDelete(source)}
+                          >
+                            {deletingUrl === source.url ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            )}
+                          </Button>
+                        </AuthGuard>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <div className="mt-4">
+              {sources && <CustomPagination {...sources} />}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Adding works without sources, syncing does not. */}
@@ -131,7 +246,7 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
             <Plus className="mr-2 h-4 w-4" />
             Add source
           </Button>
-          {sources.length > 0 && (
+          {sources.data.length > 0 && (
             <Button
               variant="secondary"
               size="sm"
@@ -153,4 +268,4 @@ const VexSourcesSection: FunctionComponent<VexSourcesSectionProps> = ({
   );
 };
 
-export default VexSourcesSection;
+export default VexSourcesTable;

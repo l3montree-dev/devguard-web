@@ -22,9 +22,7 @@ import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import LoggedInAs from "@/components/misc/LoggedInAs";
 import { extractInvitationCode } from "@/utils/url";
 
-interface InvitationFormValues {
-  "invitation-url": string;
-}
+import type { InvitationFormValues } from "@/types/view/invitation";
 
 const AcceptInvitation = () => {
   const user = useCurrentUser();

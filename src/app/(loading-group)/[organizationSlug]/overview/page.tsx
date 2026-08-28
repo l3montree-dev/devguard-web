@@ -1,6 +1,9 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 "use client";
 
-import { orgOverviewTourSteps } from "@/components/common/tours/org-overview-tour";
+import { orgOverviewTourSteps } from "@/components/common/tours/orgOverviewTour";
 import AverageStatsSection from "@/components/organization/AverageStatsSection";
 import OrganizationCompositionSection from "@/components/organization/OrganizationCompositionSection";
 import TotalVulnerabilitiesSection from "@/components/organization/TotalVulnerabilitiesSection";
