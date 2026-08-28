@@ -27,7 +27,6 @@ import { LinkIcon } from "@heroicons/react/24/outline";
 import { Loader2, CloudUpload } from "lucide-react";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { createExternalReference } from "@/services/externalReferenceService";
-import { useVexSources } from "@/components/vex-rules/useVexSources";
 import { toast } from "@/lib/toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "../FileUpload";
@@ -40,12 +39,15 @@ interface VexUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpload: (params: { file: File }) => Promise<void>;
+  // the page owns the sources list, so it revalidates it
+  onSourceAdded: () => void;
 }
 
 const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   open,
   onOpenChange,
   onUpload,
+  onSourceAdded,
 }) => {
   const params = useDecodedParams();
   const { organizationSlug, projectSlug, assetSlug } = params;
@@ -69,7 +71,6 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
   // Only for its mutate: revalidating this key refreshes the sources list on the
   // VEX rules page once a source is added here.
-  const { mutate: refsMutate } = useVexSources();
 
   const vexDropzone = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -122,7 +123,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
       toast.success("VEX source added successfully");
       setNewVexUrl("");
-      refsMutate();
+      onSourceAdded();
     } catch (error) {
       toast.error("Failed to add VEX source");
     } finally {
@@ -144,7 +145,7 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
       } as never);
       toast.success("CSAF source added successfully");
       setNewCsafUrl("");
-      refsMutate();
+      onSourceAdded();
     } catch (error) {
       toast.error("Failed to add CSAF source");
     } finally {

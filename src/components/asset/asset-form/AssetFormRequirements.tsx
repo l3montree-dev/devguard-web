@@ -120,7 +120,7 @@ const EnableExposureMetrics: FunctionComponent<Props> = ({ form }) => {
                 results in different assets.
                 {enableExposureMetrics && (
                   <div className="mt-6 space-y-6">
-                    <div className="flex flex-col gap-3 rounded-lg border p-4">
+                    <div className="flex flex-col gap-3 p-4">
                       <Tabs
                         value={cvssVersion}
                         onValueChange={(v) =>

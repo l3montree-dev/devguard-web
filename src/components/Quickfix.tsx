@@ -55,13 +55,22 @@ export function getFixedVersionPurl(vuln: QuickfixVuln): string | null {
   return vuln.directDependencyFixedVersion;
 }
 
-export function isQuickfixAvailable(vuln: QuickfixVuln): boolean {
+export function isDirectDependencyUpdateAvailable(vuln: QuickfixVuln): boolean {
   const fixedVersionPurl = getFixedVersionPurl(vuln);
   const ecosystemUpdate = renderQuickFixText(fixedVersionPurl);
+
   return (
     fixedVersionPurl !== null &&
     ecosystemUpdate !== "" &&
     vuln.vulnerabilityPath.length > 0
+  );
+}
+
+/** @lintignore - not wired up yet. */
+export function isTransitiveUpdateFixAvailable(vuln: QuickfixVuln): boolean {
+  return (
+    vuln.componentFixedVersion !== null &&
+    vuln.componentFixedVersion !== undefined
   );
 }
 

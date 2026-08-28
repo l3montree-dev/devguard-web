@@ -4,6 +4,30 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.13.0] — 2026-08-24
+
+### Added
+
+- **Per-asset exposure metrics** — exposure metrics (e.g. reachability/exposure inputs used in risk scoring) can now be configured per asset, moved from the vulnerability management settings into the security requirements form
+- **Playwright docs coverage for webhooks and VEX rules** — added end-to-end tests that also regenerate the documentation screenshots for the custom webhook flow and for reopening VEX rules
+
+### Fixed
+
+- **`isFixed` bug** — corrected an issue with how a vulnerability's fixed status was determined/displayed
+- **EUVD alias links** — EUVD aliases now link to ENISA instead of a broken/incorrect target
+- **Affected component typing** — fixed incorrect typing for affected components that could cause rendering issues
+- **CEL linter** — fixed issues in the CEL expression linter used for VEX rules
+- **`@`-organization redirects** — redirecting to organizations prefixed with `@` now uses `%40` encoding, avoiding an unnecessary hard page refresh
+- **CVSS example texts** — corrected example texts shown in the CVSS scoring helper
+- **Loading states** — asset, asset-version, and project layouts are now wrapped in Suspense with proper loading fallbacks; added a missing loading page for user settings
+
+### Changed
+
+- **Compliance framework select** — simplified further, removing redundant logic from the compliance postures list view
+- **Large dead-code cleanup** — removed a substantial amount of unused components, hooks, and utilities (including old Three.js decorative components, unused UI primitives, and unused service/helper functions), reducing bundle size and maintenance surface
+
+---
+
 ## [v1.12.4] — 2026-08-19
 
 ### Added

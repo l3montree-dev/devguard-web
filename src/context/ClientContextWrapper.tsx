@@ -21,6 +21,7 @@ export function ClientContextWrapper<T>({
   value,
 }: ClientContextWrapperProps<T>) {
   const [state, update] = useState(value);
+
   return (
     <Provider
       value={

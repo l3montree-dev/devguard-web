@@ -16,7 +16,7 @@ import {
   CollapsibleTrigger,
 } from "../ui/collapsible";
 import { Input } from "../ui/input";
-import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
+import { useVexRuleMatchCount } from "@/hooks/useVexRuleMatchCount";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
 import { analyzeVexRuleEffect, resolveCut } from "./vexRuleParser";
 import type {

@@ -1,7 +1,18 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-export const providerIdToBaseURL = (provider?: string) => {
+import type { GitlabOAuth2Config } from "@/types/dto";
+
+export const providerIdToBaseURL = (
+  provider?: string,
+  gitlabOAuth2Config?: GitlabOAuth2Config[],
+) => {
+  const oauthConfig = gitlabOAuth2Config?.find(
+    (oauthConf) => provider === oauthConf.providerID,
+  );
+  if (oauthConfig) {
+    return oauthConfig.gitlabBaseURL;
+  }
   if (provider === "gitlab") {
     return "https://gitlab.com";
   } else if (provider === "opencode") {

@@ -61,6 +61,14 @@ export default function AverageStatsSection({
     },
   ];
 
+  const hasData =
+    isStatisticsLoading ||
+    Object.values(orgStatistics?.vulnEventAverage ?? {}).some(
+      (value) => Number(value) > 0,
+    );
+
+  if (!hasData) return null;
+
   return (
     <Section
       forceVertical

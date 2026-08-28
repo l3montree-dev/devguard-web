@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import CVERainbowBadge from "@/components/CVERainbowBadge";
+import { useRefDistributions } from "@/hooks/useRefDistributions";
+import { toast } from "@/lib/toast";
 import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import { TagIcon } from "@heroicons/react/24/outline";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { GitBranchIcon, TriangleAlert } from "lucide-react";
 import React from "react";
-import { toast } from "@/lib/toast";
 import Page from "../../../../../../../../components/Page";
 import AssetTitle from "../../../../../../../../components/common/AssetTitle";
 import DateString, {
@@ -124,6 +126,9 @@ const RefsPage = () => {
       toast.error("Failed to update default ref");
     }
   };
+
+  const { distributionByRef } = useRefDistributions();
+
   return (
     <Page
       Menu={assetMenu}
@@ -149,7 +154,9 @@ const RefsPage = () => {
               <thead className="border-b bg-card text-foreground">
                 <tr>
                   <th className="p-4 text-left">Name</th>
+                  <th className="p-4 text-left" />
                   <th className="p-4 text-left">Last scan received</th>
+                  <th className="p-4 text-left">CVSS Exposure</th>
                   <th className="p-4 text-left" />
                 </tr>
               </thead>
@@ -178,8 +185,16 @@ const RefsPage = () => {
                         {tag.name}
                       </Badge>
                     </td>
+                    <td className="px-4 py-2" />
                     <td className="px-4 py-2">
                       <DateString date={parseDateOnly(tag.lastAccessedAt)} />
+                    </td>
+                    <td className="px-4 py-2">
+                      {distributionByRef[tag.name] && (
+                        <span>
+                          <CVERainbowBadge {...distributionByRef[tag.name]} />
+                        </span>
+                      )}
                     </td>
                     <AuthGuard require="admin">
                       <td className="px-4 py-2 flex flex-row justify-end">
@@ -224,6 +239,7 @@ const RefsPage = () => {
                   <th className="p-4 text-left">Name</th>
                   <th className="p-4 text-left">Default</th>
                   <th className="p-4 text-left">Last scan received</th>
+                  <th className="p-4 text-left">CVSS Exposure</th>
                   <th className="p-4 text-left" />
                 </tr>
               </thead>
@@ -259,6 +275,15 @@ const RefsPage = () => {
                     </td>
                     <td className="px-4 py-2">
                       <DateString date={parseDateOnly(branch.lastAccessedAt)} />
+                    </td>
+                    <td className="px-4 py-2">
+                      {distributionByRef[branch.name] && (
+                        <span>
+                          <CVERainbowBadge
+                            {...distributionByRef[branch.name]}
+                          />
+                        </span>
+                      )}
                     </td>
                     <AuthGuard require="admin">
                       <td className="px-4 py-2 flex flex-row justify-end">

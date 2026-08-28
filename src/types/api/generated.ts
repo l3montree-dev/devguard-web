@@ -1917,7 +1917,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["shared.InstanceSettings"];
+            "application/json": components["schemas"]["dtos.InstanceSettingsDTO"];
           };
         };
       };
@@ -15587,6 +15587,10 @@ export interface components {
       obfuscatedToken: string;
       url: string;
     };
+    "dtos.GitlabOauth2ConfigDTO": {
+      gitlabBaseURL: string;
+      providerID: string;
+    };
     "dtos.InfoResponse": {
       build: components["schemas"]["dtos.BuildInfo"];
       database: components["schemas"]["dtos.DatabaseInfo"];
@@ -15600,6 +15604,11 @@ export interface components {
       topCVEs: components["schemas"]["dtos.CVEOccurrence"][];
       topComponents: components["schemas"]["dtos.ComponentOccurrenceAcrossInstance"][];
       topVulnerableProjects: components["schemas"]["dtos.ProjectVulnDistribution"][];
+    };
+    "dtos.InstanceSettingsDTO": {
+      bearerTokenAuthDisabled: boolean;
+      gitlabOAuth2Config: components["schemas"]["dtos.GitlabOauth2ConfigDTO"][];
+      singleOrganizationMode: boolean;
     };
     "dtos.InstanceUsageStatistics": Record<string, never>;
     /** @enum {string} */
@@ -17161,12 +17170,24 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000

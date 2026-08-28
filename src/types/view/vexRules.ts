@@ -36,7 +36,10 @@ export interface VexRuleEffect {
   matchedOn?: { field: "cveId" | "componentPurl"; value: string };
 }
 
-export type VexSourceType = "cyclonedx" | "csaf";
+export type VexSourceType = "cyclonedx" | "csaf" | "openvex";
+
+export const isVexSourceType = (type: string): type is VexSourceType =>
+  type === "cyclonedx" || type === "csaf" || type === "openvex";
 
 export type VexSource = ExternalReference & { type: VexSourceType };
 
@@ -51,11 +54,6 @@ export interface VexRuleMatchCount {
   // How many vulnerabilities of this asset the expression matches; null while
   // unknown (empty, invalid or not yet tested).
   matchCount: number | null;
-}
-
-export interface RecommendationEntry {
-  vulnID: string;
-  recommendation: VexRuleRecommendation;
 }
 
 export type EditableRule = Pick<

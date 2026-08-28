@@ -28,7 +28,7 @@ import VexRuleRecommendationCard from "@/components/vex-rules/VexRuleRecommendat
 import {
   vexRuleRecommendationsURL,
   useVexRuleRecommendation,
-} from "@/components/vex-rules/useVexRuleRecommendations";
+} from "@/hooks/useVexRuleRecommendations";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";

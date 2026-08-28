@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FlaskConical } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
-import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
+import { useVexRuleMatchCount } from "@/hooks/useVexRuleMatchCount";
 import type { AssetScope } from "@/services/vexRuleService";
 
 // The shapes rules are usually written in.
