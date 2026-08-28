@@ -8,7 +8,7 @@ import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useInstanceSettings } from "@/hooks/useInstanceSettings";
+import { useConfig } from "../../../context/ConfigContext";
 
 const Lanyard = dynamic(
   () => import("@/components/misc/Lanyard").then((mod) => mod.default),
@@ -17,7 +17,7 @@ const Lanyard = dynamic(
 
 export default function SetupOrg() {
   const session = useSession();
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useConfig();
 
   const lanyardKey = usePathname() ?? "setup";
 

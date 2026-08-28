@@ -8,7 +8,7 @@ export const readSessionStorage = (key: string) => {
   try {
     return sessionStorage.getItem(key);
   } catch (error) {
-    console.error(`cannot read sessionStorage key ${key}`, error);
+    console.error("cannot read sessionStorage key", key, error);
     return null;
   }
 };
@@ -17,7 +17,7 @@ export const writeSessionStorage = (key: string, value: string) => {
   try {
     sessionStorage.setItem(key, value);
   } catch (error) {
-    console.error(`cannot write sessionStorage key ${key}`, error);
+    console.error("cannot write sessionStorage key", key, error);
   }
 };
 
@@ -25,6 +25,6 @@ export const removeSessionStorage = (key: string) => {
   try {
     sessionStorage.removeItem(key);
   } catch (error) {
-    console.error(`cannot remove sessionStorage key ${key}`, error);
+    console.error("cannot remove sessionStorage key", key, error);
   }
 };

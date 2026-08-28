@@ -16,10 +16,14 @@
 "use client";
 
 import type { OrganizationDTO } from "@/types/dto";
+import { truncateMiddle } from "@/utils/common";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { Loader2, PlusIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useConfig } from "../context/ConfigContext";
+import { useSession } from "../context/SessionContext";
+import { useActiveOrg } from "../hooks/useActiveOrg";
 import GitProviderIcon from "./GitProviderIcon";
 import { Badge } from "./ui/badge";
 import {
@@ -31,12 +35,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { useSession } from "../context/SessionContext";
-import { useActiveOrg } from "../hooks/useActiveOrg";
-import { useInstanceSettings } from "../hooks/useInstanceSettings";
 import { useOrgSync } from "../hooks/useOrgSync";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { truncateMiddle } from "@/utils/common";
 
 const activeOrgName = (name: string, slug: string) => {
   if (slug === "@opencode") {
@@ -50,7 +50,7 @@ const activeOrgName = (name: string, slug: string) => {
 const OrganizationDropDown = () => {
   const orgs = useSession().organizations;
   const router = useRouter();
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useConfig();
 
   const [lastActiveOrg] = useLocalStorage("lastActiveOrg");
 

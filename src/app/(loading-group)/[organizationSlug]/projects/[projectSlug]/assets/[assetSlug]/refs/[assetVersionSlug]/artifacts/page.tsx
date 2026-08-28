@@ -90,6 +90,13 @@ const Artifacts = () => {
       assetVersionSlug: string;
     };
 
+  const versionScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
+
   const openCreateDialog = () => {
     setDialogState({
       isOpen: true,
@@ -144,13 +151,6 @@ const Artifacts = () => {
     }
   };
 
-  const versionScope = {
-    organization: organizationSlug,
-    projectSlug,
-    assetSlug,
-    assetVersionSlug,
-  };
-
   const handleDelete = async () => {
     if (deleteDialogOpen) {
       try {
@@ -188,8 +188,15 @@ const Artifacts = () => {
   const createArtifact = async (data: ArtifactRequest): Promise<boolean> => {
     let newArtifact;
     try {
-      newArtifact = await createArtifactRequest(versionScope, data);
+      newArtifact = await createArtifactRequest(versionScope, {
+        artifactName: data.artifactName,
+        informationSources: data.informationSources || [],
+      });
     } catch (error) {
+      if ((error as { status?: number }).status === 409) {
+        toast.error("Artifact name already used.");
+        return false;
+      }
       toast.error("Failed to create artifact: " + String(error));
       return false;
     }
@@ -208,7 +215,10 @@ const Artifacts = () => {
   ): Promise<boolean> => {
     let resp;
     try {
-      resp = await updateArtifactRequest(versionScope, artifact);
+      resp = await updateArtifactRequest(versionScope, {
+        artifactName: artifact.artifactName,
+        informationSources: artifact.informationSources || [],
+      });
     } catch (error) {
       toast.error("Failed to update artifact: " + String(error));
       return false;
@@ -277,7 +287,10 @@ const Artifacts = () => {
       );
 
       // Only include artifacts that have sources being deleted
-      if (remainingSources.length !== artifactSources.length) {
+      if (
+        remainingSources.length !== artifactSources.length ||
+        urlsToDelete.includes(`artifact:${artifact.artifactName}`)
+      ) {
         artifactUpdates.push({
           artifactName: artifact.artifactName,
           remainingSources,
@@ -286,31 +299,54 @@ const Artifacts = () => {
     }
 
     if (artifactUpdates.length === 0) {
-      toast.info("No sources to delete");
+      toast.info("Nothing to delete");
       return;
     }
 
-    toast.info(`Deleting ${urlsToDelete.length} SBOM source(s)...`);
+    toast.info(`Deleting ${artifactUpdates.length} artifact(s)...`);
 
-    let successCount = 0;
-    let errorCount = 0;
+    const results = await Promise.all(
+      artifactUpdates.map(async ({ artifactName, remainingSources }) => {
+        // an artifact whose last source is removed is deleted outright
+        const deleted = remainingSources.length === 0;
 
-    for (const { artifactName, remainingSources } of artifactUpdates) {
-      try {
-        await updateArtifactRequest(versionScope, {
-          artifactName,
-          informationSources: remainingSources,
-        });
-        successCount++;
-      } catch (error) {
-        errorCount++;
-        console.error("Error updating artifact:", artifactName, error);
-      }
+        try {
+          if (deleted) {
+            await deleteArtifactRequest(versionScope, artifactName);
+          } else {
+            await updateArtifactRequest(versionScope, {
+              artifactName,
+              informationSources: remainingSources,
+            });
+          }
+          return { artifactName, ok: true, deleted };
+        } catch (error) {
+          console.error("Error updating artifact:", artifactName, error);
+          return { artifactName, ok: false, deleted };
+        }
+      }),
+    );
+
+    const successCount = results.filter((r) => r.ok).length;
+    const errorCount = results.length - successCount;
+    const deletedArtifactNames = results
+      .filter((r) => r.ok && r.deleted)
+      .map((r) => r.artifactName);
+
+    if (deletedArtifactNames.length > 0) {
+      updateAssetVersionState((prev) => ({
+        ...prev!,
+        artifacts: prev!.artifacts.filter(
+          (a) => !deletedArtifactNames.includes(a.artifactName),
+        ),
+      }));
     }
 
     if (successCount > 0) {
       toast.success(
-        `Successfully removed sources from ${successCount} artifact(s)`,
+        deletedArtifactNames.length > 0
+          ? `Successfully deleted ${deletedArtifactNames.length} artifact(s)`
+          : `Successfully removed sources from ${successCount} artifact(s)`,
       );
       mutate();
     }
@@ -375,7 +411,7 @@ const Artifacts = () => {
                               <td colSpan={3} className="px-4 py-2">
                                 <div className="flex flex-row items-center justify-between">
                                   <span className="text-sm mr-2">
-                                    {selectedSourceUrls.size} SBOM source
+                                    {selectedSourceUrls.size} item
                                     {selectedSourceUrls.size !== 1
                                       ? "s"
                                       : ""}{" "}

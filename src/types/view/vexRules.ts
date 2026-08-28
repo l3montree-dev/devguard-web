@@ -1,13 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import type { checkCelSyntax } from "@/components/common/celLinter";
 import type { components } from "@/types/api/generated";
 import type { ExternalReference } from "@/types/dto";
-
-type S = components["schemas"];
 import type { MechanicalJustificationType } from "@/types/view/vuln";
 
-import type { checkCelSyntax } from "@/components/common/celLinter";
+type S = components["schemas"];
 
 export interface VexRuleVulnContext {
   cveID: string | null;

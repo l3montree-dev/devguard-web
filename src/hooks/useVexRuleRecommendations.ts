@@ -86,62 +86,6 @@ const recommendationFetcher = async <T>(url: string): Promise<T | null> => {
   return resp.json();
 };
 
-/** @lintignore - scaffolding for VEX recommendations on risk rows; not wired up yet. */
-export function indexVexRuleRecommendationsBySignature(
-  recommendations: VexRuleRecommendation[],
-): Map<string, VexRuleRecommendation> {
-  const bySignature = new Map<string, VexRuleRecommendation>();
-  for (const recommendation of recommendations) {
-    const signature =
-      recommendation.dependencyVulnSignature ?? recommendation.assetSignature;
-    if (signature) {
-      bySignature.set(signature, recommendation);
-    }
-  }
-  return bySignature;
-}
-
-/** Looks up the recommendation matching a vuln in a signature index built by
- * indexVexRuleRecommendationsBySignature, or undefined if there is none.
- * @lintignore - scaffolding for VEX recommendations on risk rows; not wired up yet. */
-export function findRecommendationForVuln(
-  bySignature: Map<string, VexRuleRecommendation>,
-  vuln: Pick<DependencyVuln, "signature" | "assetSignature">,
-): VexRuleRecommendation | undefined {
-  return (
-    bySignature.get(vuln.signature) ?? bySignature.get(vuln.assetSignature)
-  );
-}
-
-const ALL_RECOMMENDATIONS_PAGE_SIZE = "10000";
-
-/** All VEX rule recommendations for an asset, unpaginated.
- * @lintignore - scaffolding for VEX recommendations on risk rows; not wired up yet. */
-export function useAllVexRuleRecommendations(
-  params: {
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-  } | null,
-) {
-  const url = params ? vexRuleRecommendationsURL(params) : null;
-  const { data, error, isLoading } = useSWR<Paged<VexRuleRecommendation>>(
-    url
-      ? `${url}/?${new URLSearchParams({
-          page: "1",
-          pageSize: ALL_RECOMMENDATIONS_PAGE_SIZE,
-        }).toString()}`
-      : null,
-    fetcher,
-  );
-
-  return {
-    data,
-    error,
-    isLoading,
-  };
-}
-
 /** The recommendation for a single vulnerability, or null if there is none. */
 export function useVexRuleRecommendation(
   baseUrl: string | null,

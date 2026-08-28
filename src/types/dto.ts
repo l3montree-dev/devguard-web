@@ -53,3 +53,8 @@ export type MinimalDependencyTree = Schemas["normalize.MinimalTree"];
 export type Relationship = Schemas["dtos.RelationshipDTO"];
 export type RemediationTypeUsage = Schemas["dtos.RemediationTypeDistribution"];
 export type WebhookDTO = Schemas["dtos.WebhookIntegrationDTO"];
+export type InstanceInfo = Omit<Schemas["dtos.InfoResponse"], "database"> & {
+  database: Omit<Schemas["dtos.DatabaseInfo"], "vulndbVersion"> & {
+    vulndbVersion?: string;
+  };
+};

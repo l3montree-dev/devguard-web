@@ -3,11 +3,11 @@
 "use client";
 
 import { CogIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { useInstanceSettings } from "@/hooks/useInstanceSettings";
 import DynamicHeader from "./DynamicHeader";
+import { useConfig } from "../../context/ConfigContext";
 
 export default function RootHeader() {
-  const instanceSettings = useInstanceSettings();
+  const instanceSettings = useConfig();
 
   const menu = [
     ...(!instanceSettings?.singleOrganizationMode

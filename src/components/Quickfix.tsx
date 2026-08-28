@@ -66,14 +66,6 @@ export function isDirectDependencyUpdateAvailable(vuln: QuickfixVuln): boolean {
   );
 }
 
-/** @lintignore - not wired up yet. */
-export function isTransitiveUpdateFixAvailable(vuln: QuickfixVuln): boolean {
-  return (
-    vuln.componentFixedVersion !== null &&
-    vuln.componentFixedVersion !== undefined
-  );
-}
-
 const Quickfix: FunctionComponent<{ vuln: DetailedDependencyVulnDTO }> = ({
   vuln,
 }) => {

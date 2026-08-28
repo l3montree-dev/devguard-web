@@ -10,7 +10,7 @@ export const readLocalStorage = (key: string) => {
   try {
     return localStorage.getItem(key);
   } catch (error) {
-    console.error(`cannot read localStorage key ${key}`, error);
+    console.error("cannot read localStorage key", key, error);
     return null;
   }
 };
@@ -19,7 +19,7 @@ export const writeLocalStorage = (key: string, value: string) => {
   try {
     localStorage.setItem(key, value);
   } catch (error) {
-    console.error(`cannot write localStorage key ${key}`, error);
+    console.error("cannot write localStorage key", key, error);
   }
 };
 
@@ -27,7 +27,7 @@ export const removeLocalStorage = (key: string) => {
   try {
     localStorage.removeItem(key);
   } catch (error) {
-    console.error(`cannot remove localStorage key ${key}`, error);
+    console.error("cannot remove localStorage key", key, error);
   }
 };
 
