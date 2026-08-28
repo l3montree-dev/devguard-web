@@ -35,7 +35,7 @@ import { TooltipTrigger } from "@radix-ui/react-tooltip";
 import { LinkBreak2Icon } from "@radix-ui/react-icons";
 import { groupBy } from "lodash";
 import Link from "next/link";
-import { isQuickfixAvailable } from "../Quickfix";
+import { isDirectDependencyUpdateAvailable } from "../Quickfix";
 import WarningWithDescription from "../common/WarningWithDescription";
 
 interface Props {
@@ -51,8 +51,6 @@ interface Props {
     justification: string;
     mechanicalJustification?: string;
   }) => Promise<void>;
-  // Signature -> recommendation lookup, see indexVexRuleRecommendationsBySignature.
-  recommendationsBySignature: Map<string, VexRuleRecommendation>;
 }
 
 const VexableBadge = () => (
@@ -132,7 +130,7 @@ const FixableBadge = ({ message }: { message: string }) => (
 );
 
 const QuickfixWrench = ({ vuln }: { vuln: VulnWithCVE }) => {
-  if (!isQuickfixAvailable(vuln)) {
+  if (!isDirectDependencyUpdateAvailable(vuln)) {
     return null;
   }
   return (
@@ -146,14 +144,12 @@ const VulnWithCveTableRow = ({
   selectable,
   selected,
   onToggle,
-  hasRecommendation,
 }: {
   vuln: VulnWithCVE;
   href: string;
   selectable: boolean;
   selected: boolean;
   onToggle: () => void;
-  hasRecommendation: boolean;
 }) => {
   const isMemberRole = isMember(useCurrentUserRole());
   const router = useRouter();
@@ -263,7 +259,6 @@ const VulnWithCveTableRow = ({
       <td className="py-3 px-4">
         <div className="flex items-center gap-2">
           <QuickfixWrench vuln={vuln} />
-          {hasRecommendation && <VexableBadge />}
         </div>
       </td>
     </tr>
@@ -276,7 +271,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
-  recommendationsBySignature,
 }) => {
   const isMemberRole = isMember(useCurrentUserRole());
   const [isPackageOpen, setIsPackageOpen] = useState(false);
@@ -288,16 +282,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     [row.original.vulns],
   );
   const packageHasQuickfix = useMemo(
-    () => row.original.vulns.some(isQuickfixAvailable),
+    () => row.original.vulns.some(isDirectDependencyUpdateAvailable),
     [row.original.vulns],
   );
-  const packageHasRecommendation = useMemo(
-    () =>
-      row.original.vulns.some((v) =>
-        findRecommendationForVuln(recommendationsBySignature, v),
-      ),
-    [row.original.vulns, recommendationsBySignature],
-  );
+
   const isActivelyExploited = row.original.vulns.some(
     (v) => v.cve?.cisaExploitAdd || v.cve?.euvdExploitAdd,
   );
@@ -404,7 +392,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             {packageHasQuickfix && (
               <FixableBadge message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
             )}
-            {packageHasRecommendation && <VexableBadge />}
           </div>
         </td>
       </tr>
@@ -431,10 +418,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const pathExplosionOrOnlySinglePath =
             isPathExplosion || !hasMultiplePaths;
 
-          const cveHasQuickfix = vulns.some(isQuickfixAvailable);
-          const cveHasRecommendation = vulns.some((v) =>
-            findRecommendationForVuln(recommendationsBySignature, v),
-          );
+          const cveHasQuickfix = vulns.some(isDirectDependencyUpdateAvailable);
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
@@ -564,7 +548,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         }
                       />
                     )}
-                    {cveHasRecommendation && <VexableBadge />}
                   </div>
                 </td>
               </tr>
@@ -581,12 +564,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     selectable={vuln.state !== "fixed"}
                     selected={selectedVulnIds.has(vuln.id)}
                     onToggle={() => onToggleVuln(vuln.id)}
-                    hasRecommendation={Boolean(
-                      findRecommendationForVuln(
-                        recommendationsBySignature,
-                        vuln,
-                      ),
-                    )}
                   />
                 ))}
             </React.Fragment>

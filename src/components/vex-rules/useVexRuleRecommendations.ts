@@ -34,7 +34,6 @@ const recommendationFetcher = async <T>(url: string): Promise<T | null> => {
   return resp.json();
 };
 
-
 export function indexVexRuleRecommendationsBySignature(
   recommendations: VexRuleRecommendation[],
 ): Map<string, VexRuleRecommendation> {
@@ -82,8 +81,7 @@ export function useAllVexRuleRecommendations(
   );
 
   return {
-    recommendations: data?.data ?? [],
-    total: data?.total,
+    data,
     error,
     isLoading,
   };

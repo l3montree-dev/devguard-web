@@ -74,112 +74,114 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
 
   return (
     <>
-      <div className="overflow-hidden rounded-lg border">
+      <div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-card text-foreground">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header, i) => (
-                    <th
-                      key={header.id}
-                      className={classNames(
-                        "whitespace-nowrap p-4 text-left font-medium",
-                        header.column.columnDef.enableSorting &&
-                          "cursor-pointer",
-                        i === headerGroup.headers.length - 1 && "w-12",
-                      )}
-                      onClick={
-                        header.column.columnDef.enableSorting
-                          ? header.column.getToggleSortingHandler()
-                          : undefined
-                      }
-                    >
-                      {header.isPlaceholder ? null : (
-                        <div className="flex flex-row items-center gap-2">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                          {header.column.columnDef.enableSorting && (
-                            <SortingCaret
-                              sortDirection={header.column.getIsSorted()}
-                            />
-                          )}
-                        </div>
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody className="text-foreground">
-              {isLoading
-                ? Array.from({ length: 5 }).map((_, row) => (
-                    <tr
-                      key={row}
-                      className={classNames(
-                        "border-b last:border-0",
-                        row % 2 !== 0 && "bg-card/50",
-                      )}
-                    >
-                      {columnsDef.map((_column, cell) => (
-                        <td key={cell} className="p-4">
-                          <Skeleton className="h-4 w-full" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                : table.getRowModel().rows.map((row, index) => {
-                    const rule = row.original;
-                    return (
-                      <tr
-                        data-testid="vex-rule-row"
-                        key={rule.id}
-                        onClick={() => setSelectedRule(rule)}
+          <div className="overflow-hidden rounded-lg border">
+            <table className="w-full text-sm">
+              <thead className="border-b bg-card text-foreground">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header, i) => (
+                      <th
+                        key={header.id}
                         className={classNames(
-                          "cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50",
-                          index % 2 !== 0 && "bg-card/50",
+                          "whitespace-nowrap p-4 text-left font-medium",
+                          header.column.columnDef.enableSorting &&
+                            "cursor-pointer",
+                          i === headerGroup.headers.length - 1 && "w-12",
+                        )}
+                        onClick={
+                          header.column.columnDef.enableSorting
+                            ? header.column.getToggleSortingHandler()
+                            : undefined
+                        }
+                      >
+                        {header.isPlaceholder ? null : (
+                          <div className="flex flex-row items-center gap-2">
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                            {header.column.columnDef.enableSorting && (
+                              <SortingCaret
+                                sortDirection={header.column.getIsSorted()}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody className="text-foreground">
+                {isLoading
+                  ? Array.from({ length: 5 }).map((_, row) => (
+                      <tr
+                        key={row}
+                        className={classNames(
+                          "border-b last:border-0",
+                          row % 2 !== 0 && "bg-card/50",
                         )}
                       >
-                        <td className="max-w-[420px] p-4">
-                          <span className="block truncate font-medium">
-                            {rule.title || rule.cveId || "Untitled rule"}
-                          </span>
-                          {rule.justification && (
-                            <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                              {rule.justification}
-                            </span>
-                          )}
-                        </td>
-                        <td className="p-4">
-                          <VexRuleSourceBadge vexSource={rule.vexSource} />
-                        </td>
-                        <td className="p-4">
-                          <VexRuleResult
-                            eventType={rule.eventType}
-                            mechanicalJustification={
-                              rule.mechanicalJustification
-                            }
-                          />
-                        </td>
-                        {/* The row itself opens the dialog, so the menu keeps its
-                            clicks to itself. */}
-                        <td
-                          className="p-4"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <VexRuleActionsCell
-                            deleteUrl={`${urlBase}/${rule.id}`}
-                            onEdit={() => setSelectedRule(rule)}
-                            onDeleted={onMutate}
-                          />
-                        </td>
+                        {columnsDef.map((_column, cell) => (
+                          <td key={cell} className="p-4">
+                            <Skeleton className="h-4 w-full" />
+                          </td>
+                        ))}
                       </tr>
-                    );
-                  })}
-            </tbody>
-          </table>
+                    ))
+                  : table.getRowModel().rows.map((row, index) => {
+                      const rule = row.original;
+                      return (
+                        <tr
+                          data-testid="vex-rule-row"
+                          key={rule.id}
+                          onClick={() => setSelectedRule(rule)}
+                          className={classNames(
+                            "cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50",
+                            index % 2 !== 0 && "bg-card/50",
+                          )}
+                        >
+                          <td className="max-w-[420px] p-4">
+                            <span className="block truncate font-medium">
+                              {rule.title || rule.cveId || "Untitled rule"}
+                            </span>
+                            {rule.justification && (
+                              <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                                {rule.justification}
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-4">
+                            <VexRuleSourceBadge vexSource={rule.vexSource} />
+                          </td>
+                          <td className="p-4">
+                            <VexRuleResult
+                              eventType={rule.eventType}
+                              mechanicalJustification={
+                                rule.mechanicalJustification
+                              }
+                            />
+                          </td>
+                          {/* The row itself opens the dialog, so the menu keeps its
+                            clicks to itself. */}
+                          <td
+                            className="p-4"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <VexRuleActionsCell
+                              deleteUrl={`${urlBase}/${rule.id}`}
+                              onEdit={() => setSelectedRule(rule)}
+                              onDeleted={onMutate}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+              </tbody>
+            </table>
+          </div>
           <div className="mt-4">{rules && <CustomPagination {...rules} />}</div>
         </div>
       </div>

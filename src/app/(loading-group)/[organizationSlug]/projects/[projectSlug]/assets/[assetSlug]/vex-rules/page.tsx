@@ -6,27 +6,30 @@ import { DocDrawer } from "@/components/common/DocDrawer";
 import EmptyParty from "@/components/common/EmptyParty";
 import Err from "@/components/common/Err";
 import Section from "@/components/common/Section";
+import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Filter from "@/components/Filter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AddVexRuleDialog from "@/components/vex-rules/AddVexRuleDialog";
 import CelPlayground from "@/components/vex-rules/CelPlayground";
+import { vexRuleRecommendationsURL } from "@/components/vex-rules/useVexRuleRecommendations";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
 import VexRuleRecommendationsTable from "@/components/vex-rules/VexRuleRecommendationsTable";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
-import { vexRuleRecommendationsURL } from "@/components/vex-rules/useVexRuleRecommendations";
 import VexSourcesTable, {
   isVexSourceType,
   type VexSource,
 } from "@/components/vex-rules/VexSourcesSection";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
 import { fetcher } from "@/data-fetcher/fetcher";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
+import useFilter from "@/hooks/useFilter";
+import useRouterQuery from "@/hooks/useRouterQuery";
+import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/lib/toast";
 import { browserApiClient } from "@/services/devGuardApi";
 import type {
@@ -37,14 +40,11 @@ import type {
   VexRuleRecommendation,
 } from "@/types/api/api";
 import { buildFilterSearchParams } from "@/utils/url";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
 import useSWR from "swr";
-import Link from "next/link";
-import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
-import useFilter from "@/hooks/useFilter";
-import useRouterQuery from "@/hooks/useRouterQuery";
-import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
+import useVexRuleRecommendations from "../../../../../../../../hooks/useVexRuleRecommendations";
 
 const sourcesFilterOptions = [
   {
@@ -138,17 +138,15 @@ const filterOptions = [
 const VexRulesPage: FunctionComponent = () => {
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-  const [addRuleDialogOpen, setAddRuleDialogOpen] = useState(false);
-  const [rulePrefill, setRulePrefill] = useState<VexRulePrefill>();
 
   const searchParams = useSearchParams();
   const handleSearch = useDebouncedQuerySearch();
   const { handleFilter, removeFilter, clearAllFilters } = useFilter();
   const pushQuery = useRouterQuery();
-  const currentUserRole = useCurrentUserRole();
-  const canSeeRecommendations = isMember(currentUserRole);
+
   const activeTab = searchParams?.get("tab") ?? "rules";
   const assetMenu = useAssetMenu();
+
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -201,6 +199,17 @@ const VexRulesPage: FunctionComponent = () => {
     mutate();
   };
 
+  const {
+    setRulePrefill,
+    canSeeRecommendations,
+    addRuleDialogOpen,
+    rulePrefill,
+    recommendationsResponse,
+    isRecommendationsLoading,
+    setAddRuleDialogOpen,
+    createRuleFromRecommendation,
+  } = useVexRuleRecommendations(recommendationsQuery);
+
   const openCreateDialog = (celExpression?: string) => {
     setRulePrefill(celExpression ? { celExpression } : undefined);
     setAddRuleDialogOpen(true);
@@ -240,33 +249,6 @@ const VexRulesPage: FunctionComponent = () => {
         reset[key] = undefined;
     });
     pushQuery({ ...reset, tab });
-  };
-
-  const recommendationsUrl = vexRuleRecommendationsURL({
-    organizationSlug,
-    projectSlug,
-    assetSlug,
-  });
-  const { data: recommendationsResponse, isLoading: isRecommendationsLoading } =
-    useSWR<Paged<VexRuleRecommendation>>(
-      canSeeRecommendations
-        ? `${recommendationsUrl}/?${recommendationsQuery.toString()}`
-        : null,
-      fetcher,
-    );
-  const recommendations = recommendationsResponse?.data ?? [];
-
-  const createRuleFromRecommendation = (
-    recommendation: VexRuleRecommendation,
-  ) => {
-    setRulePrefill({
-      celExpression: recommendation.celExpression,
-      justification: recommendation.justification,
-      mechanicalJustification: recommendation.mechanicalJustification,
-      wasRecommended: true,
-      title: recommendation.title,
-    });
-    setAddRuleDialogOpen(true);
   };
 
   if (isLoading && !vexRulesResponse) {
@@ -451,7 +433,8 @@ const VexRulesPage: FunctionComponent = () => {
                   }}
                 />
               </div>
-              {recommendations.length === 0 && !isRecommendationsLoading ? (
+              {recommendationsResponse?.data.length === 0 &&
+              !isRecommendationsLoading ? (
                 <EmptyParty
                   title="No recommendations yet."
                   description="Recommendations appear once other DevGuard users or upstream sources have assessed vulnerabilities that also show up in this repository."
