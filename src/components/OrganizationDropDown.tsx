@@ -183,7 +183,7 @@ const OrganizationDropDown = () => {
                             }
                           />
                         </div>
-                        {o.name}
+                        {truncateMiddle(o.name, 35)}
                       </DropdownMenuItem>
                     ))}
                 </>
