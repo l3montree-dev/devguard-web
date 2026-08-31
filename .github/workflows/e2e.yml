@@ -10,6 +10,10 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
 
     steps:
       - name: Checkout
@@ -79,4 +83,4 @@ jobs:
             -e CI=true \
             -e HOME=/tmp \
             mcr.microsoft.com/playwright:v1.62.0-noble@sha256:baed2032d533817f3dbe6425de795788430ba345e819a1201337009ba17c9d07 \
-            npm run e2e
+            npm run e2e -- --shard=${{ matrix.shard }}/${{ strategy.job-total }}
