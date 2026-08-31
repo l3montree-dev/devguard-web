@@ -17,7 +17,7 @@ services:
     tmpfs: /run/postgresql:rw,uid=999,gid=999
 
   kratos-migrate:
-    image: oryd/kratos:v25.4.0-distroless@sha256:368667ee3713797f86ddec669c36751f6484c7d675c78fd27c795b2e79271c31
+    image: ghcr.io/l3montree-dev/devguard/kratos:main@sha256:2f017b794be105772a0cea932bf0d7fe893dc3f215c27360d6f7fc1abb80756a
     depends_on:
       postgresql:
         condition: service_healthy
@@ -30,7 +30,7 @@ services:
     command: -c /etc/config/kratos/kratos.yml migrate sql -e --yes
 
   kratos:
-    image: oryd/kratos:v25.4.0-distroless@sha256:368667ee3713797f86ddec669c36751f6484c7d675c78fd27c795b2e79271c31
+    image: ghcr.io/l3montree-dev/devguard/kratos:main@sha256:2f017b794be105772a0cea932bf0d7fe893dc3f215c27360d6f7fc1abb80756a
     depends_on:
       postgresql:
         condition: service_healthy
