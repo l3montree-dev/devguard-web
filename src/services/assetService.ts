@@ -19,8 +19,6 @@ export const patchAsset = async (
       "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}",
       {
         params: { path: scope },
-        // swag's --requiredByDefault marks every patch field required, but a
-        // PATCH body is partial by definition (the Go struct uses pointers).
         body: body as components["schemas"]["dtos.AssetPatchRequest"],
       },
     ),

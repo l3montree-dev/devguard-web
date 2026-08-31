@@ -3,22 +3,12 @@
 
 import createClient from "openapi-fetch";
 import type { Client } from "openapi-fetch";
-
-import { config } from "@/config";
 import { signAdminRequest } from "@/services/adminRequestSigning";
 import type { paths } from "@/types/api/generated";
 
 export type DevGuardClient = Client<paths>;
 
-// The browser never reaches the API host directly - it goes through the tunnel
-// route (src/pages/api/devguard-tunnel/[...path].ts), which attaches the Ory
-// session. Exported because a few browser-navigable URLs (oauth2 redirects,
-// badge <img> sources) need the string itself rather than a request.
 export const TUNNEL_BASE_URL = "/api/devguard-tunnel/api/v1";
-
-// Server side there is no tunnel: DEVGUARD_API_URL is not exposed to the
-// browser bundle, so this is read lazily.
-const directBaseUrl = () => config.devGuardApiUrl + "/api/v1";
 
 export class ApiError extends Error {
   readonly status: number;
@@ -30,8 +20,6 @@ export class ApiError extends Error {
   }
 }
 
-// Turns a failed response into a readable message. The Echo error handler sends
-// `he.Message` as JSON: either a bare string or an object with a `message`.
 export const readErrorMessage = async (resp: Response): Promise<string> => {
   const fallback = resp.statusText || `HTTP ${resp.status}`;
   const text = await resp.text().catch(() => "");
@@ -40,12 +28,9 @@ export const readErrorMessage = async (resp: Response): Promise<string> => {
     const json = JSON.parse(text);
     return (typeof json === "string" ? json : json?.message) || fallback;
   } catch {
-    // Not JSON - use the raw body only if it is short enough to be a message.
     return (text.length < 500 && text) || fallback;
   }
 };
-
-// --- typed clients: the default way to reach the API ---
 
 export const browserClient: DevGuardClient = createClient<paths>({
   baseUrl: TUNNEL_BASE_URL,
@@ -53,21 +38,7 @@ export const browserClient: DevGuardClient = createClient<paths>({
   headers: { "Content-Type": "application/json" },
 });
 
-// For server components and route handlers, which carry the Ory session cookie
-// themselves. Prefer getServerClient() from serverApiClient.ts.
-export const serverClient = (
-  orySessionCookie: string | undefined,
-): DevGuardClient =>
-  createClient<paths>({
-    baseUrl: directBaseUrl(),
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      Cookie: `ory_kratos_session=${orySessionCookie}`,
-    },
-  });
-
-// Instance admin auth is signature based, never cookie based.
+// Instance admin auth is signature based, not cookie based.
 export const adminClient = (key: CryptoKey): DevGuardClient => {
   const client = createClient<paths>({
     baseUrl: TUNNEL_BASE_URL,
@@ -149,9 +120,7 @@ export const adminFetch = async (
 
 const DOWNLOAD_TIMEOUT_MS = 60 * 8 * 1000;
 
-// Saves an API response as a file (SBOM/VEX documents, PDF reports). Not the
-// generated client: openapi-fetch parses the body by content type, while a
-// download needs the untouched blob.
+// Saves an API response as a file (SBOM/VEX documents, PDF reports).
 export const downloadFile = async (path: string, fileName: string) => {
   const response = await apiFetch(path, {
     method: "GET",
