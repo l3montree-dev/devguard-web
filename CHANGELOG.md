@@ -4,6 +4,31 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.13.1] — 2026-08-31
+
+### Added
+
+- **VEX rule recommendations on dependency risks** — the dependency risks page now surfaces VEX rule recommendations, with a "Fixable" badge (replacing the quickfix wrench icon) and filters for direct/component-fixed status
+- **VEX rules table** — the VEX rule recommendations and upstream VEX sources tables gained filtering, sorting, search, and pagination
+- **Per-branch CVE rainbow** — every branch now shows its own CVE rainbow badge (moved from the branch selector to the branches page) for a clearer overview of which branches are unsecured
+- **Affected branches/tags on asset overview** — the asset overview page now shows cards listing affected branches and tags
+- **API version in footer** — the footer now shows the API version and was unified across pages; added a notice for the initial vulndb import
+
+### Fixed
+
+- **Manage artifacts** — fixed issues with the manage-artifacts flow
+- **Organization overview** — fixed edge cases in the org overview, including exposure metric borders and filtering by type
+- **Instance base URL** — the correct base URL is now fetched and displayed, sourced server-side via a new `useInstanceInfo`/`useConfig` hook instead of being derived client-side
+- **Table alignment** — asset/branch tables were aligned and a CVSS column was added
+
+### Changed
+
+- **Dead-code cleanup** — removed unused constants, components, and dependencies; added ESLint rules, a knip config, and a dead-code CI check; ensured SPDX license headers across the codebase
+- **CI** — removed an unused scheduled CI job
+- **Naming and typing** — reworked internal naming conventions and restructured shared types
+
+---
+
 ## [v1.13.0] — 2026-08-24
 
 ### Added
