@@ -6,8 +6,8 @@ import React from "react";
 import { toast } from "@/lib/toast";
 import { useUpdateAsset } from "../../../context/AssetContext";
 import useDecodedParams from "../../../hooks/useDecodedParams";
-import { browserApiClient } from "../../../services/devGuardApi";
-import type { AssetDTO } from "../../../types/api/api";
+import { patchAsset } from "@/services/assetService";
+import type { AssetDTO } from "@/types/dto";
 import { classNames } from "../../../utils/common";
 import { AsyncButton } from "../../ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "../../ui/card";
@@ -34,17 +34,18 @@ const UpdateRepositoryProviderSlide = ({ api, nextIndex }: Props) => {
 
   const handleProviderUpdate = async () => {
     // update the asset provider
-    const resp = await browserApiClient(
-      `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({ repositoryProvider: selectedProvider }),
-      },
-    );
+    let updatedAsset;
+    try {
+      updatedAsset = await patchAsset(
+        { organization: organizationSlug, projectSlug, assetSlug },
+        { repositoryProvider: selectedProvider } as never,
+      );
+    } catch {
+      updatedAsset = null;
+    }
 
-    if (resp.ok) {
-      const updatedAsset = await resp.json();
-      updateAsset(updatedAsset); // this should move slides on its own - sideeffect
+    if (updatedAsset) {
+      updateAsset(updatedAsset as never); // this should move slides on its own - sideeffect
       toast.success("Repository provider updated successfully");
       api?.scrollTo(nextIndex); // scroll to next slide
     } else {

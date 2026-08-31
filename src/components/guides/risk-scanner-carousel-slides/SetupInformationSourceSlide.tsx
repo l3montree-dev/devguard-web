@@ -4,10 +4,10 @@
 import { Button } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { ArtifactCreateUpdateRequest } from "@/types/api/api";
+import type { ArtifactRequest } from "@/services/artifactService";
 import { useEffect } from "react";
 import type { FunctionComponent } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "@/lib/toast";
 import ArtifactForm from "../../common/ArtifactForm";
 import { Form } from "../../ui/form";
@@ -30,14 +30,17 @@ interface SetupInformationSourceSlideProps {
 export const SetupInformationSourceSlide: FunctionComponent<
   SetupInformationSourceSlideProps
 > = ({ api, onInformationSourceSetup, prevIndex }) => {
-  const form = useForm<ArtifactCreateUpdateRequest>({
+  const form = useForm<ArtifactRequest>({
     defaultValues: {
       artifactName: "",
       informationSources: [],
     },
   });
 
-  const sources = form.watch("informationSources");
+  const sources = useWatch({
+    control: form.control,
+    name: "informationSources",
+  });
   // this is necessary since we sometimes add a purl and thus the form object changes
   // we do this dynamically in the artifact form itself.
   const sourceURLs = sources.reduce((acc, curr) => acc + curr.url, "");
@@ -47,7 +50,7 @@ export const SetupInformationSourceSlide: FunctionComponent<
     api?.reInit();
   }, [api, sourceURLs, errorFields]);
 
-  const handleSubmit = async (data: ArtifactCreateUpdateRequest) => {
+  const handleSubmit = async (data: ArtifactRequest) => {
     if (data.informationSources.length === 0) {
       toast.error("Please add at least one information source URL.");
       return;

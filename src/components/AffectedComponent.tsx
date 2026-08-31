@@ -1,24 +1,19 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type {
-  DetailedDependencyVulnDTO,
-  PURLInspectResponse,
-} from "@/types/api/api";
+import { usePurlInspect } from "@/hooks/useComponents";
+import type { DetailedDependencyVulnDTO } from "@/types/view/vulnEvents";
 import {
   beautifyPurl,
   extractVersion,
   getVulnerabilitySourceUrl,
 } from "@/utils/common";
-import { useMemo, type FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
-
 import { DocDrawer } from "@/components/common/DocDrawer";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
-import useSWR from "swr";
 import {
   Collapsible,
   CollapsibleContent,
@@ -30,15 +25,7 @@ const AffectedComponentDetails: FunctionComponent<{
 }> = ({ vuln }) => {
   const purl = vuln.componentPurl;
 
-  const url = useMemo(
-    () => (purl ? `/vulndb/purl-inspect/${encodeURIComponent(purl)}` : null),
-    [purl],
-  );
-
-  const { data, isLoading, error } = useSWR<PURLInspectResponse>(url, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-  });
+  const { data, isLoading, error } = usePurlInspect(purl ?? undefined);
 
   if (isLoading) {
     return (

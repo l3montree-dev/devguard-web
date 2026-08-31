@@ -1,22 +1,28 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { browserApiClient } from "@/services/devGuardApi";
-import { createAccessToken as createAccessToken } from "@/services/accessTokenService";
+import { apiFetch } from "@/services/apiClient";
+import { createAccessToken } from "@/services/accessTokenService";
 import type {
-  AccessTokenDTO as AccessTokenDTO,
+  AccessTokenDTO,
   SeeOncePatWithBearerToken as SeeOnceATWithBearerToken,
   SeeOncePatWithPrivKey as SeeOnceATWithPrivKey,
-} from "@/types/api/api";
+  Token,
+} from "@/types/view/accessToken";
+
 import { EventEmitter } from "events";
 import { findLast, uniqBy } from "lodash";
 import { useEffect, useState } from "react";
 import useScopedAccessToken from "./useScopedAccessToken";
+import {
+  readSessionStorage,
+  removeSessionStorage,
+  writeSessionStorage,
+} from "./useSessionStorage";
 
 const hasPrivKey = (pat: Token): pat is SeeOnceATWithPrivKey =>
   "privKey" in pat && Boolean(pat.privKey);
 
-import type { Token } from "@/types/view/accessToken";
 // this is needed if the useAccessToken hook is used in multiple components, so that they can all listen to the same event emitter for new ATs
 // otherwise the second useAccessToken hook would not be aware of the new AT created in the first hook, and would not update its state accordingly
 const newATEventEmitter = new EventEmitter();
@@ -39,7 +45,7 @@ export default function useAccessToken(
       setAccessTokens((prev) => uniqBy([...prev, accessToken], "fingerprint"));
     };
 
-    const stored = sessionStorage.getItem(scopedAT);
+    const stored = readSessionStorage(scopedAT);
     if (stored) {
       const parsed = JSON.parse(stored) as
         SeeOnceATWithPrivKey | SeeOnceATWithBearerToken;
@@ -53,16 +59,16 @@ export default function useAccessToken(
   }, [scopedAT]);
 
   const handleDeleteAccessToken = async (accessToken: AccessTokenDTO) => {
-    await browserApiClient(`${baseUrl}${accessToken.id}/`, {
+    await apiFetch(`${baseUrl}${accessToken.id}/`, {
       method: "DELETE",
     });
     setAccessTokens((prev) => prev.filter((p) => p.id !== accessToken.id));
-    const storedAccessToken = sessionStorage.getItem(scopedAT);
+    const storedAccessToken = readSessionStorage(scopedAT);
     if (
       storedAccessToken &&
       JSON.parse(storedAccessToken).id === accessToken.id
     ) {
-      sessionStorage.removeItem(scopedAT);
+      removeSessionStorage(scopedAT);
     }
   };
 
@@ -93,7 +99,7 @@ export default function useAccessToken(
     const accessToken = await createAccessToken(data, baseUrl);
 
     setAccessTokens((prev) => [...prev, accessToken]);
-    sessionStorage.setItem(scopedAT, JSON.stringify(accessToken));
+    writeSessionStorage(scopedAT, JSON.stringify(accessToken));
     newATEventEmitter.emit(scopedAT, accessToken);
     return accessToken;
   }

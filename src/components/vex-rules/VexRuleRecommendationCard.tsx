@@ -6,7 +6,7 @@
 import CelCodeBlock from "@/components/common/CelCodeBlock";
 import { Button } from "@/components/ui/button";
 import { documentationLinks } from "@/const/documentationLinks";
-import type { VexRuleRecommendation } from "@/types/api/api";
+
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { Users } from "lucide-react";
@@ -14,6 +14,7 @@ import Link from "next/link";
 import type { FunctionComponent } from "react";
 import VexRuleResult from "./VexRuleResult";
 import { Badge } from "../ui/badge";
+import type { VexRuleRecommendation } from "@/types/view/vexRules";
 
 const VERIFIED_CONFIDENCE = 1;
 

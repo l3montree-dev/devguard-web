@@ -18,6 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import type { InstanceOverview } from "@/types/dto";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getSeverityClassNames } from "@/components/common/Severity";
@@ -35,15 +36,15 @@ import {
   UsersIcon,
 } from "@heroicons/react/20/solid";
 import type {
-  InstanceOverview,
+  InstanceDashboardHandle,
   InstanceUsageStatistics,
-} from "@/types/api/api";
-import { adminBrowserApiClient } from "@/services/adminApi";
+} from "@/types/view/admin";
+
+import { fetchInstanceStatistics } from "@/services/adminService";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
 import MostCommonCVEs from "@/components/organization/MostCommonCVEs";
 import MostUsedComponents from "@/components/organization/MostUsedComponents";
 import AverageOpenCodeRisks from "@/components/organization/AverageOpenCodeRisks";
-import type { InstanceDashboardHandle } from "@/types/view/admin";
 
 const formatAvg = (n: number | undefined) =>
   (n ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -72,20 +73,9 @@ export default forwardRef<InstanceDashboardHandle>(
 
       try {
         setLoading(true);
-        const [usageResp, vulnResp] = await Promise.all([
-          adminBrowserApiClient("/admin/statistics/usage", key),
-          adminBrowserApiClient("/admin/statistics/vulnerabilities", key),
-        ]);
-
-        if (!usageResp.ok || !vulnResp.ok) {
-          setError(
-            `Server returned ${!usageResp.ok ? usageResp.status : vulnResp.status}`,
-          );
-          return;
-        }
-
-        setUsage((await usageResp.json()) as InstanceUsageStatistics);
-        setOverview((await vulnResp.json()) as InstanceOverview);
+        const { usage, overview } = await fetchInstanceStatistics(key);
+        setUsage(usage);
+        setOverview(overview);
         setError(null);
       } catch {
         setError("Failed to fetch instance statistics.");

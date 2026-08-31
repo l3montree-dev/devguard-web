@@ -20,7 +20,7 @@ import { CheckCircleIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { type FunctionComponent } from "react";
-import type { AssetDTO } from "../../../types/api/api";
+import type { AssetDTO } from "@/types/dto";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";

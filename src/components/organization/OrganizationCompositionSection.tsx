@@ -6,7 +6,6 @@ import MostUsedEcosystems from "@/components/organization/MostUsedEcosystems";
 import StructureCard from "@/components/organization/StructureCard";
 import MostVulnerableList from "@/components/organization/MostVulnerableList";
 import DependencyAge from "@/components/organization/DependencyAge";
-import type { OrgOverview } from "@/types/api/api";
 
 export interface OrganizationCompositionSectionProps {
   mode: "risk" | "cvss";
@@ -15,6 +14,7 @@ export interface OrganizationCompositionSectionProps {
 }
 
 import type { StructureColumn } from "@/types/view/organization";
+import type { OrgOverview } from "@/types/dto";
 
 export default function OrganizationCompositionSection({
   mode,

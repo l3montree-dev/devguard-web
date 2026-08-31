@@ -6,6 +6,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import Image from "next/image";
 import Link from "next/link";
 import { use } from "react";
@@ -19,7 +20,8 @@ export default function OAuth2ErrorPage({
 
   const providerId = decodeURIComponent(organizationSlug).replace("@", "");
   const reauthorizeUrl =
-    "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
+    TUNNEL_BASE_URL +
+    "/oauth2/gitlab/" +
     providerId +
     "?redirectTo=" +
     encodeURIComponent("/" + organizationSlug);

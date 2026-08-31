@@ -7,10 +7,10 @@ import CodeEditor from "@/components/common/CodeEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { browserApiClient } from "@/services/devGuardApi";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { ProxyScope } from "@/hooks/useDependencyProxy";
+import { useDependencyProxy } from "@/hooks/useDependencyProxy";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import { InputWithButton } from "../ui/input-with-button";
 import type { Diagnostic } from "@codemirror/lint";
 import Section from "./Section";
@@ -165,34 +165,11 @@ const getEcosystemContent = (key: string, url: string) => {
 };
 
 interface Props {
-  baseUrl: string | null;
+  scope: ProxyScope | null;
 }
 
-const DependencyProxyConfigs = ({ baseUrl }: Props) => {
-  const configUrl = baseUrl
-    ? baseUrl + "/config-files/dependency-proxy-configs"
-    : null;
-
-  const { data, mutate } = useSWR<DependencyProxyConfig | null>(
-    configUrl,
-    async (url: string) => {
-      const response = await browserApiClient(url);
-      if (response.status === 404) return null;
-      if (!response.ok)
-        throw new Error("Failed to fetch dependency proxy settings");
-      return response.json();
-    },
-  );
-
-  //get the proxy urls
-  const { data: proxyUrls } = useSWR<Record<string, string>>(
-    baseUrl ? baseUrl + "/dependency-proxy-urls" : null,
-    async (url: string) => {
-      const response = await browserApiClient(url);
-      if (!response.ok) throw new Error("Failed to fetch proxy urls");
-      return response.json();
-    },
-  );
+const DependencyProxyConfigs = ({ scope }: Props) => {
+  const { config: data, proxyUrls, saveConfig } = useDependencyProxy(scope);
 
   const [rulesText, setRulesText] = useState("");
   const [minReleaseAge, setMinReleaseAge] = useState(
@@ -202,9 +179,11 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   const [isSaving, setIsSaving] = useState(false);
   const [rulesHelpOpen, setRulesHelpOpen] = useState(false);
   const [rulesCheckerOpen, setRulesCheckerOpen] = useState(false);
-  const initializedForUrl = useRef<string | null | undefined>(undefined);
+  const scopeKey = scope ? JSON.stringify(scope) : null;
+  const initializedForScope = useRef<string | null | undefined>(undefined);
 
-  const [selectedProxyTab, setSelectedProxyTab] = useState("");
+  const [proxyTab, setSelectedProxyTab] = useState("");
+  const selectedProxyTab = proxyTab || Object.keys(proxyUrls ?? {})[0] || "";
 
   const [checkerRulesText, setCheckerRulesText] = useState(
     "# Example package URLs to test against the rules: \n" +
@@ -216,30 +195,22 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
       "\n" +
       "pkg:go/github.com/lodash/lodash@v1.0.0",
   );
-  const [checkResults, setCheckResults] = useState<CheckResult[]>([]);
+  const checkResults: CheckResult[] = useMemo(
+    () =>
+      checkerRulesText.trim()
+        ? checkRulesAgainstPackages(rulesText, checkerRulesText)
+        : [],
+    [rulesText, checkerRulesText],
+  );
 
   useEffect(() => {
-    if (checkerRulesText.trim()) {
-      setCheckResults(checkRulesAgainstPackages(rulesText, checkerRulesText));
-    } else {
-      setCheckResults([]);
-    }
-  }, [rulesText, checkerRulesText]);
-
-  useEffect(() => {
-    if (data !== undefined && initializedForUrl.current !== configUrl) {
+    if (data !== undefined && initializedForScope.current !== scopeKey) {
       const config = data ?? defaultConfig;
       setRulesText(config.rules);
       setMinReleaseAge(config.minReleaseAge);
-      initializedForUrl.current = configUrl;
+      initializedForScope.current = scopeKey;
     }
-  }, [data, configUrl]);
-
-  useEffect(() => {
-    if (proxyUrls && !selectedProxyTab) {
-      setSelectedProxyTab(Object.keys(proxyUrls)[0] ?? "");
-    }
-  }, [proxyUrls, selectedProxyTab]);
+  }, [data, scopeKey]);
 
   const handleEditorValidation = (
     isValid: boolean,
@@ -257,26 +228,19 @@ const DependencyProxyConfigs = ({ baseUrl }: Props) => {
   };
 
   const handleSave = async () => {
-    if (!configUrl) return;
-    const config: DependencyProxyConfig = {
-      rules: rulesText,
-      minReleaseAge: minReleaseAge,
-    };
+    if (!scope) return;
     setIsSaving(true);
-    const resp = await browserApiClient(configUrl, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(config),
-    });
-    setIsSaving(false);
-    if (!resp.ok) {
+    try {
+      await saveConfig({ rules: rulesText, minReleaseAge });
+    } catch {
       setCodeError("Failed to save dependency proxy settings");
       toast.error("Failed to save dependency proxy settings");
       return;
+    } finally {
+      setIsSaving(false);
     }
     setCodeError(null);
     toast.success("Settings saved");
-    mutate(config);
   };
 
   return (

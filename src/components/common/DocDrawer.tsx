@@ -12,8 +12,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import Markdown from "./Markdown";
-
-const mdxCache = new Map<string, string>();
+import { useMdxDoc } from "@/hooks/useMdxDoc";
 
 export interface DocDrawerProps {
   triggerLabel: string;
@@ -28,47 +27,11 @@ export function DocDrawer({
   mdxUrl,
   docsUrl,
 }: DocDrawerProps) {
-  const [content, setContent] = useState<string | null>(null);
-  const [error, setError] = useState(false);
-  const [fetched, setFetched] = useState(false);
+  const [opened, setOpened] = useState(false);
+  const { content, error } = useMdxDoc(opened ? mdxUrl : null);
 
   function handleOpenChange(open: boolean) {
-    if (!open || fetched) return;
-    setFetched(true);
-
-    if (mdxCache.has(mdxUrl)) {
-      setContent(mdxCache.get(mdxUrl)!);
-      return;
-    }
-
-    fetch(mdxUrl)
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`Failed to load: ${res.status}`);
-        const text = await res.text();
-        return (
-          text
-            // strip frontmatter
-            .replace(/^---\n[\s\S]*?\n---\n/, "")
-            // strip import statements (including multiline)
-            .replace(/^import\s+[\s\S]*?from\s+['"][^'"]*['"];?\n/gm, "")
-            // remove tooltip/popover content blocks entirely (hidden tooltip text)
-            .replace(/<TooltipContent[^>]*>[\s\S]*?<\/TooltipContent>/g, "")
-            .replace(/<PopoverContent[^>]*>[\s\S]*?<\/PopoverContent>/g, "")
-            // strip all remaining JSX component tags (PascalCase), keep inner content
-            .replace(/<\/?[A-Z][a-zA-Z]*(?:\s[^>]*)?\s*\/?>/g, "")
-            // strip plain span tags (keep text content)
-            .replace(/<\/?span[^>]*>/g, "")
-            // remove className and other JSX props from plain HTML tags
-            .replace(/\s+className="[^"]*"/g, "")
-            // collapse multiple blank lines
-            .replace(/\n{3,}/g, "\n\n")
-        );
-      })
-      .then((parsed) => {
-        mdxCache.set(mdxUrl, parsed);
-        setContent(parsed);
-      })
-      .catch(() => setError(true));
+    if (open) setOpened(true);
   }
 
   return (

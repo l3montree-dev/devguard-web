@@ -5,7 +5,6 @@
 
 import Page from "@/components/Page";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
-import type { Paged, VulnEventDTO } from "@/types/api/api";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -13,8 +12,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import VulnEventItem from "@/components/VulnEventItem";
 import Section from "@/components/common/Section";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
+import { useVulnEventsPage } from "@/hooks/useAssetVersionStats";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
@@ -25,19 +23,19 @@ const Index = () => {
   const searchParams = useSearchParams();
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
 
-  // Build the API URL
-  let url = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}`;
-  if (assetVersionSlug) {
-    url += `/refs/${assetVersionSlug}`;
-  }
-  url += `/events/?${searchParams?.toString() || ""}`;
-
-  // Fetch events data using SWR
   const {
     data: events,
     error,
     isLoading,
-  } = useSWR<Paged<VulnEventDTO>>(url, fetcher);
+  } = useVulnEventsPage(
+    {
+      organization: organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    },
+    searchParams?.toString() || "",
+  );
 
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();

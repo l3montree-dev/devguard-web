@@ -14,7 +14,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { classNames } from "@/utils/common";
-import type { VulnEventDTO } from "@/types/api/api";
+import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { getSeverityClassNames } from "../common/Severity";
 import useRouterQuery from "@/hooks/useRouterQuery";
 

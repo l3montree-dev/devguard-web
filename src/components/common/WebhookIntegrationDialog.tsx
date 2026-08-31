@@ -1,11 +1,20 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import type { WebhookDTO } from "@/types/dto";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useLoader } from "@/hooks/useLoader";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { WebhookDTO } from "@/types/api/api";
+import type {
+  WebhookScope,
+  WebhookUpdateRequest,
+} from "@/services/webhookService";
+import {
+  saveWebhook,
+  testWebhook,
+  updateWebhook,
+} from "@/services/webhookService";
+
 import React, {
   type FunctionComponent,
   type ReactNode,
@@ -45,6 +54,9 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 import { generateNewSecret } from "../../utils/view";
 
+// the create/update requests carry the secret; the response never echoes it
+type WebhookFormValues = WebhookUpdateRequest;
+
 interface Props {
   Button?: ReactNode;
   onNewIntegration: (integration: WebhookDTO) => void;
@@ -63,7 +75,8 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   open: controlledOpen,
   onOpenChange,
 }) => {
-  const form = useForm<WebhookDTO>({
+  // the server never echoes the secret back, so it only exists on the form
+  const form = useForm<WebhookFormValues>({
     defaultValues: initialValues || {
       name: "",
       description: "",
@@ -98,19 +111,13 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
   const setOpen = onOpenChange ?? setInternalOpen;
   const [testLoading, setTestLoading] = React.useState(false);
 
-  const method = initialValues ? "PUT" : "POST";
-
-  let url =
-    "/organizations/" + activeOrg.slug + "/integrations/webhook/test-and-save/";
-
-  if (projectWebhook) {
-    url =
-      "/organizations/" +
-      activeOrg.slug +
-      "/projects/" +
-      project.slug +
-      "/integrations/webhook/test-and-save/";
-  }
+  const webhookScope: WebhookScope = projectWebhook
+    ? {
+        level: "project",
+        organization: activeOrg.slug,
+        projectSlug: project.slug,
+      }
+    : { level: "organization", organization: activeOrg.slug };
 
   const handleSubmit = async (params: {
     id?: string;
@@ -121,31 +128,31 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
     sbomEnabled: boolean;
     vulnEnabled: boolean;
   }) => {
-    const res = await browserApiClient(url, {
-      method: method,
-      body: JSON.stringify({
-        ...params,
-        id: initialValues?.id,
-      }),
-    });
-    if (res.ok) {
-      const integration = await res.json();
-      onNewIntegration(integration);
-      setOpen(false);
-
-      form.reset({
-        name: "",
-        description: "",
-        url: "",
-        secret: "",
-        sbomEnabled: false,
-        vulnEnabled: false,
-      });
-    } else {
+    let integration;
+    try {
+      integration = initialValues?.id
+        ? await updateWebhook(webhookScope, initialValues.id, {
+            ...params,
+            id: initialValues.id,
+          } as never)
+        : await saveWebhook(webhookScope, params as never);
+    } catch {
       toast.error(
         "Something went wrong while testing the webhook. Please check the URL and token.",
       );
+      return;
     }
+
+    onNewIntegration(integration as never);
+    setOpen(false);
+    form.reset({
+      name: "",
+      description: "",
+      url: "",
+      secret: "",
+      sbomEnabled: false,
+      vulnEnabled: false,
+    });
   };
 
   const triggerTest = async (
@@ -154,26 +161,19 @@ export const WebhookIntegrationDialog: FunctionComponent<Props> = ({
     setTestLoading(true);
     const url = form.getValues("url");
     const secret = form.getValues("secret");
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/webhook/test/",
-      {
-        body: JSON.stringify({
-          url,
-          secret,
-          payloadType: type,
-        }),
-        method: "POST",
-      },
-    );
-
-    setTestLoading(false);
-
-    if (!resp.ok) {
+    try {
+      await testWebhook(webhookScope, {
+        url,
+        secret,
+        payloadType: type,
+      } as never);
+    } catch {
       toast.error(
         "Failed to send test payload. Please check the URL and secret.",
       );
-
-      return resp;
+      return;
+    } finally {
+      setTestLoading(false);
     }
 
     toast.success("Test payload sent successfully!");

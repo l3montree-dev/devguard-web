@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "../context/SessionContext";
 import { useEffect } from "react";
 import PageSkeleton from "../components/PageSkeleton";
+import { readLocalStorage } from "@/hooks/useLocalStorage";
 
 const Index = () => {
   const { session, organizations } = useSession();
@@ -26,7 +27,7 @@ const Index = () => {
       return;
     }
 
-    const lastActiveOrg = localStorage.getItem("lastActiveOrg");
+    const lastActiveOrg = readLocalStorage("lastActiveOrg");
     const target =
       lastActiveOrg && organizations.some((org) => org.slug === lastActiveOrg)
         ? lastActiveOrg

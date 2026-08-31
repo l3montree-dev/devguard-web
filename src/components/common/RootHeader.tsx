@@ -3,7 +3,6 @@
 "use client";
 
 import { CogIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import DynamicHeader from "./DynamicHeader";
 import { useConfig } from "../../context/ConfigContext";
 

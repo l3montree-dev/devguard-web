@@ -28,13 +28,7 @@ export default function RootNodeSelector() {
   const artifactName = searchParams?.get("artifact") ?? "";
   const rootNodeParam = searchParams?.get("origin");
 
-  const [selectedRootNode, setSelectedRootNode] = useState(
-    getRootNodeName(rootNodeParam),
-  );
-
-  useEffect(() => {
-    setSelectedRootNode(getRootNodeName(rootNodeParam));
-  }, [rootNodeParam]);
+  const selectedRootNode = getRootNodeName(rootNodeParam);
 
   const prevArtifactNameRef = useRef<string | undefined>(undefined);
 
@@ -46,7 +40,6 @@ export default function RootNodeSelector() {
   const handleSelect = useCallback(
     (url?: string) => {
       pushQueryParameter({ origin: url });
-      setSelectedRootNode(getRootNodeName(url));
       setOpen(false);
     },
     [pushQueryParameter],

@@ -10,22 +10,20 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import useTable from "@/hooks/useTable";
+import useTable, { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { ExternalReference, Paged } from "@/types/api/api";
+import type { AssetScope } from "@/services/vexRuleService";
+import {
+  deleteExternalReference,
+  syncExternalReferences,
+} from "@/services/externalReferenceService";
+import type { VexSource, VexSourceType } from "@/types/view/vexRules";
+import type { Paged } from "@/types/view/pagination";
 import { classNames } from "@/utils/common";
-import type { ColumnDef } from "@tanstack/react-table";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 import { Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
-
-
-export type VexSourceType = "cyclonedx" | "csaf" | "openvex";
-export const isVexSourceType = (type: string): type is VexSourceType =>
-  type === "cyclonedx" || type === "csaf" || type === "openvex";
-
-export type VexSource = ExternalReference & { type: VexSourceType };
 
 export const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
   cyclonedx: "CycloneDX VEX",
@@ -35,17 +33,16 @@ export const SOURCE_TYPE_LABEL: Record<VexSourceType, string> = {
 
 interface VexSourcesTableProps {
   sources: Paged<VexSource>;
-  // API base of this asset's external references, e.g. /organizations/o/.../external-references
-  apiUrl: string;
+  scope: AssetScope;
   isLoading?: boolean;
   onMutate: () => void;
   // Opens the dialog that adds a VEX file or source URL.
   onAddSource: () => void;
 }
 
-const columnHelper = createColumnHelper<VexSource>();
+const columnHelper = createAppColumnHelper<VexSource>();
 
-const columnsDef: ColumnDef<VexSource, any>[] = [
+const columnsDef: TableColumnDef<VexSource, any>[] = [
   {
     ...columnHelper.accessor("type", {
       header: "Type",
@@ -79,7 +76,7 @@ const columnsDef: ColumnDef<VexSource, any>[] = [
 /** Upstream URLs this repository syncs rules from. */
 const VexSourcesTable: FunctionComponent<VexSourcesTableProps> = ({
   sources,
-  apiUrl,
+  scope,
   isLoading,
   onMutate,
   onAddSource,
@@ -96,10 +93,7 @@ const VexSourcesTable: FunctionComponent<VexSourcesTableProps> = ({
   const handleSyncAll = async () => {
     setIsSyncing(true);
     try {
-      const response = await browserApiClient(`${apiUrl}/sync/`, {
-        method: "POST",
-      });
-      if (!response.ok) throw new Error(response.statusText);
+      await syncExternalReferences(scope);
       toast.success("Syncing all upstream VEX sources");
       onMutate();
     } catch {
@@ -112,11 +106,7 @@ const VexSourcesTable: FunctionComponent<VexSourcesTableProps> = ({
   const handleDelete = async (source: VexSource) => {
     setDeletingUrl(source.url);
     try {
-      const response = await browserApiClient(
-        `${apiUrl}/${encodeURIComponent(source.url)}`,
-        { method: "DELETE" },
-      );
-      if (!response.ok) throw new Error(response.statusText);
+      await deleteExternalReference(scope, source.url);
       toast.success(`Removed ${source.url}`);
       onMutate();
     } catch {

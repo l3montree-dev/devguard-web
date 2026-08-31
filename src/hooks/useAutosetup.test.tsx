@@ -5,11 +5,12 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { toast } from "sonner";
 
 import { TOASTER_ID } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 import { useAutosetup } from "./useAutosetup";
 
-jest.mock("@/services/devGuardApi", () => ({
-  browserApiClient: jest.fn(),
+jest.mock("@/services/apiClient", () => ({
+  ...jest.requireActual("@/services/apiClient"),
+  apiFetch: jest.fn(),
 }));
 
 jest.mock("sonner", () => ({
@@ -53,7 +54,7 @@ describe("useAutosetup", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     onCreateAccessToken.mockResolvedValue({ privKey: "secret" });
-    (browserApiClient as jest.Mock).mockResolvedValue({ ok: false });
+    (apiFetch as jest.Mock).mockResolvedValue({ ok: false });
   });
 
   it("stops loading when autosetup request fails", async () => {

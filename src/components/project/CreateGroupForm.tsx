@@ -16,8 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import type { ProjectDTO } from "@/types/api/api";
-import type { CreateProjectReq } from "@/types/api/req";
+import type { ProjectDTO } from "@/types/dto";
+import type { ProjectCreateRequest } from "@/services/projectService";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { Button } from "../ui/button";
@@ -29,7 +29,7 @@ const defaultDescription =
   "Groups help to organize your software projects. For example, you can make a group per software project, and then split the frontend and backend into individual subgroups.";
 
 interface Props {
-  onSubmit: (req: CreateProjectReq) => Promise<void>;
+  onSubmit: (req: ProjectCreateRequest) => Promise<void>;
   // "dialog" renders the form inside a modal controlled by open/setOpen
   // "inline" renders it inside a card, used when there is no group yet
   variant: "dialog" | "inline";

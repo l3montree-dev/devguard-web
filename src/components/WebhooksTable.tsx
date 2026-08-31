@@ -3,11 +3,13 @@
 
 "use client";
 
+import type { WebhookDTO } from "@/types/dto";
 import Alert from "@/components/common/Alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { WebhookDTO } from "@/types/api/api";
+import type { WebhookScope } from "@/services/webhookService";
+import { deleteWebhook } from "@/services/webhookService";
+
 import { classNames } from "@/utils/common";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
@@ -22,8 +24,7 @@ import {
 
 interface Props {
   webhooks: WebhookDTO[];
-  // API base of these webhooks, e.g. /organizations/o/integrations/webhook
-  urlBase: string;
+  scope: WebhookScope;
   onUpdateWebhook: (integration: WebhookDTO) => void;
   onDeleted: (id: string) => void;
   projectWebhook: boolean;
@@ -39,7 +40,7 @@ const triggerEvents = (webhook: WebhookDTO) =>
 
 const WebhooksTable: FunctionComponent<Props> = ({
   webhooks,
-  urlBase,
+  scope,
   onUpdateWebhook,
   onDeleted,
   projectWebhook,
@@ -47,12 +48,10 @@ const WebhooksTable: FunctionComponent<Props> = ({
 }) => {
   const [editing, setEditing] = useState<WebhookDTO | null>(null);
 
-  const deleteWebhook = async (id: string) => {
-    const res = await browserApiClient(urlBase + "/" + id, {
-      method: "DELETE",
-    });
-
-    if (!res.ok) {
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteWebhook(scope, id);
+    } catch {
       toast.error("Failed to delete webhook");
       return;
     }
@@ -153,7 +152,7 @@ const WebhooksTable: FunctionComponent<Props> = ({
                             Edit
                           </DropdownMenuItem>
                           <Alert
-                            onConfirm={() => deleteWebhook(webhook.id)}
+                            onConfirm={() => handleDelete(webhook.id)}
                             title="Delete webhook"
                             description="DevGuard will stop sending notifications to this URL. This cannot be undone."
                           >
@@ -184,7 +183,7 @@ const WebhooksTable: FunctionComponent<Props> = ({
           initialValues={editing}
           onNewIntegration={onUpdateWebhook}
           onDeleteWebhook={async (id) => {
-            await deleteWebhook(id);
+            await handleDelete(id);
             setEditing(null);
           }}
           projectWebhook={projectWebhook}

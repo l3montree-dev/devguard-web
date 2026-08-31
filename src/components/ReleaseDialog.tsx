@@ -1,15 +1,13 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import type { ReleaseItem } from "@/types/view/release";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useMemo, useState } from "react";
 import { useActiveProject } from "../hooks/useActiveProject";
-import type {
-  ArtifactDTO,
-  CandidatesDTO,
-  ReleaseDTO,
-  ReleaseItem,
-} from "../types/api/api";
+
+import type { ArtifactDTO, CandidatesDTO, ReleaseDTO } from "@/types/dto";
+
 import { type Modify } from "../types/common";
 import { Combobox } from "./common/Combobox";
 import Section from "./common/Section";

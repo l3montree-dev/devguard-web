@@ -10,6 +10,10 @@ import * as Sentry from "@sentry/nextjs";
 import { useEffect, useState } from "react";
 import { useConfig } from "@/context/ConfigContext";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import {
+  readSessionStorage,
+  writeSessionStorage,
+} from "@/hooks/useSessionStorage";
 import { getUserFullName } from "@/utils/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CopyCode from "@/components/common/CopyCode";
@@ -61,7 +65,7 @@ export default function ErrPage(props: ErrPageProps) {
   const [autoReloadEligible] = useState(
     () =>
       typeof window !== "undefined" &&
-      Date.now() - Number(sessionStorage.getItem(AUTO_RELOAD_KEY) || 0) >
+      Date.now() - Number(readSessionStorage(AUTO_RELOAD_KEY) || 0) >
         AUTO_RELOAD_COOLDOWN_MS,
   );
 
@@ -73,7 +77,7 @@ export default function ErrPage(props: ErrPageProps) {
       setAutoReloadSecondsLeft((s) => (s === null ? s : s - 1));
     }, 1000);
     const timeout = setTimeout(() => {
-      sessionStorage.setItem(AUTO_RELOAD_KEY, String(Date.now()));
+      writeSessionStorage(AUTO_RELOAD_KEY, String(Date.now()));
       window.location.reload();
     }, AUTO_RELOAD_DELAY_SECONDS * 1000);
 

@@ -28,7 +28,7 @@ import VexRuleRecommendationCard from "@/components/vex-rules/VexRuleRecommendat
 import {
   vexRuleRecommendationsURL,
   useVexRuleRecommendation,
-} from "@/components/vex-rules/useVexRuleRecommendations";
+} from "@/hooks/useVexRuleRecommendations";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -39,12 +39,17 @@ import { usePageTour } from "@/hooks/usePageTour";
 import { useTourSeen } from "@/hooks/useTourSeen";
 import { isMember, useCurrentUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
+import {
+  createDependencyVulnEvent,
+  mitigateDependencyVuln,
+} from "@/services/vulnService";
+import { useDependencyVuln, usePathToComponent } from "@/hooks/useVulnDetail";
 import type {
   DetailedDependencyVulnDTO,
-  VexRulePrefill,
   VulnEventDTO,
-} from "@/types/api/api";
+} from "@/types/view/vulnEvents";
+
+import type { VexRulePrefill } from "@/types/view/vexRules";
 import { formatDate } from "@/utils/format";
 import { beautifyPurl, purlWithVersion } from "@/utils/common";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
@@ -54,7 +59,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
 import AffectedComponentDetails from "../../../../../../../../../../../components/AffectedComponent";
 import ArtifactBadge from "../../../../../../../../../../../components/ArtifactBadge";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
@@ -65,7 +69,6 @@ import Markdown from "../../../../../../../../../../../components/common/Markdow
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
-import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 
@@ -137,23 +140,14 @@ const Index: FunctionComponent = () => {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
     useDecodedParams();
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/refs/" +
-    assetVersionSlug +
-    "/dependency-vulns/" +
-    vulnId;
+  const vulnScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
 
-  const {
-    data: vuln,
-    mutate,
-    error,
-  } = useSWR<DetailedDependencyVulnDTO>(uri, fetcher);
+  const { data: vuln, mutate, error } = useDependencyVuln(vulnScope, vulnId);
 
   // What other DevGuard organizations already decided about this vulnerability.
   const { recommendation } = useVexRuleRecommendation(
@@ -202,13 +196,9 @@ const Index: FunctionComponent = () => {
     ? " pointer-events-none select-none blur-[1px] opacity-50 transition"
     : "";
 
-  const { data: graphResponse, isLoading: graphLoading } = useSWR<
-    Array<Array<string>>
-  >(
-    vuln
-      ? `/organizations/${activeOrg.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/path-to-component/?purl=${encodeURIComponent(vuln.componentPurl)}`
-      : null,
-    fetcher,
+  const { data: graphResponse, isLoading: graphLoading } = usePathToComponent(
+    vulnScope,
+    vuln?.componentPurl,
   );
 
   const handleGraphReady = useCallback(() => {
@@ -305,53 +295,13 @@ const Index: FunctionComponent = () => {
 
     const mutatePromise = mutate(
       async (prev) => {
-        let json: any;
-        if (data.status === "mitigate") {
-          const resp = await browserApiClient(
-            "/organizations/" +
-              activeOrg.slug +
-              "/projects/" +
-              project.slug +
-              "/assets/" +
-              asset.slug +
-              "/refs/" +
-              assetVersion?.slug +
-              "/dependency-vulns/" +
-              vuln.id +
-              "/mitigate",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                comment: data.justification,
-              }),
-            },
-          );
-          json = await resp.json();
-        } else {
-          const resp = await browserApiClient(
-            "/organizations/" +
-              activeOrg.slug +
-              "/projects/" +
-              project.slug +
-              "/assets/" +
-              asset.slug +
-              "/refs/" +
-              assetVersion?.slug +
-              "/dependency-vulns/" +
+        const json = (await (data.status === "mitigate"
+          ? mitigateDependencyVuln(vulnScope, vuln.id, data.justification ?? "")
+          : createDependencyVulnEvent(
+              vulnScope,
               vuln.id,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
-        }
+              data as never,
+            ))) as unknown as DetailedDependencyVulnDTO;
 
         if (!json.events) {
           toast("Failed to update vulnerability", {
@@ -362,7 +312,9 @@ const Index: FunctionComponent = () => {
         return {
           ...prev,
           ...json,
-          events: prev?.events.concat([json.events.slice(-1)[0]]),
+          events: prev
+            ? prev.events.concat([json.events.slice(-1)[0]])
+            : json.events,
         };
       },
       {
@@ -739,7 +691,11 @@ const Index: FunctionComponent = () => {
       <AddVexRuleDialog
         open={addVexRuleDialogOpen}
         onOpenChange={setAddVexRuleDialogOpen}
-        baseUrl={`/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`}
+        scope={{
+          organization: organizationSlug,
+          projectSlug,
+          assetSlug,
+        }}
         onCreated={() => mutate()}
         prefill={vexRulePrefill}
         // A prefilled expression means the effect matters more than the editor.

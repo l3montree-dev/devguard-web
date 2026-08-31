@@ -16,7 +16,7 @@ import {
 import { CarouselItem } from "@/components/ui/carousel";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { classNames } from "@/utils/common";
-import type { AssetDTO } from "@/types/api/api";
+import type { AssetDTO } from "@/types/dto";
 import { LinkIcon } from "@heroicons/react/24/outline";
 
 interface SetupMethodSelectionSlideProps {

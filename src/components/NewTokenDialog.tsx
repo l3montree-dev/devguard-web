@@ -4,7 +4,7 @@
 import type {
   SeeOncePatWithBearerToken,
   SeeOncePatWithPrivKey,
-} from "@/types/api/api";
+} from "@/types/view/accessToken";
 import type { FunctionComponent } from "react";
 import Callout from "./common/Callout";
 import CopyInput from "./common/CopyInput";

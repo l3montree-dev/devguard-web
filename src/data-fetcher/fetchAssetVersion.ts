@@ -1,8 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AssetVersionDTO } from "@/types/api/api";
-import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import type { AssetVersionDTO } from "@/types/dto";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchAssetVersion(
@@ -11,11 +11,21 @@ export async function fetchAssetVersion(
   assetSlug: string,
   assetVersionSlug: string,
 ) {
-  const devGuardApiClient = await getApiClientInAppRouter();
+  const client = await getServerClient();
 
-  const url = `/organizations/${decodeURIComponent(orgSlug)}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}`;
-
-  const r = await devGuardApiClient(url);
+  const { data, response: r } = await client.GET(
+    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/",
+    {
+      params: {
+        path: {
+          organization: decodeURIComponent(orgSlug),
+          projectSlug,
+          assetSlug,
+          assetVersionSlug,
+        },
+      },
+    },
+  );
 
   if (!r.ok) {
     throw new HttpError("Asset version not found", {
@@ -27,6 +37,6 @@ export async function fetchAssetVersion(
     });
   }
   // parse the organization
-  const assetVersion: AssetVersionDTO = await r.json();
+  const assetVersion = data as AssetVersionDTO;
   return assetVersion;
 }

@@ -1,6 +1,7 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { useArtifacts } from "@/hooks/useArtifacts";
 import ListItem from "@/components/common/ListItem";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AsyncButton, Button } from "@/components/ui/button";
@@ -21,14 +22,13 @@ import { InputWithButton } from "@/components/ui/input-with-button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useConfig } from "@/context/ConfigContext";
-import { fetcher } from "@/data-fetcher/fetcher";
+import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 import { AlertTriangle, ChevronDown } from "lucide-react";
 import React, { type FunctionComponent, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import useSWR from "swr";
 import { createUpdateHandler } from "../AssetForm";
 import type { AssetFormValues } from "@/types/view/asset";
 import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
@@ -326,11 +326,14 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
   const orgSlug = org.slug;
   const projectSlug = project?.slug;
   const assetSlug = asset?.slug;
-  const { data: artifacts } = useSWR<ArtifactDTO[]>(
-    selectedVersionSlug && assetSlug && projectSlug
-      ? `/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${selectedVersionSlug}/artifacts`
-      : null,
-    fetcher,
+  const { data: artifacts } = useArtifacts(
+    {
+      organization: orgSlug,
+      projectSlug: projectSlug ?? "",
+      assetSlug: assetSlug ?? "",
+      assetVersionSlug: selectedVersionSlug ?? "",
+    },
+    Boolean(selectedVersionSlug && assetSlug && projectSlug),
   );
 
   // Clear selected artifact whenever the selected version changes
@@ -370,7 +373,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
   const publicBadgeUrl = basePath ? `${basePath}/badges/cvss/` : undefined;
 
-  const assetApiPath = `/api/devguard-tunnel/api/v1/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`;
+  const assetApiPath = `${TUNNEL_BASE_URL}/organizations/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`;
   const badgePreviewUrl =
     selectedVersionSlug && selectedArtifact
       ? `${assetApiPath}/refs/${selectedVersionSlug}/artifacts/${encodeURIComponent(selectedArtifact)}/badges/cvss/`

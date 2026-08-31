@@ -7,11 +7,12 @@ import CustomPagination from "@/components/common/CustomPagination";
 import SortingCaret from "@/components/common/SortingCaret";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import useTable from "@/hooks/useTable";
-import type { Paged, VexRuleRecommendation } from "@/types/api/api";
+import useTable, { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import type { Paged } from "@/types/view/pagination";
+import type { VexRuleRecommendation } from "@/types/view/vexRules";
 import { classNames } from "@/utils/common";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
-import type { ColumnDef } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 import { VerifiedIcon } from "lucide-react";
 import type { FunctionComponent } from "react";
 import VexRuleResult from "./VexRuleResult";
@@ -23,9 +24,9 @@ interface VexRuleRecommendationsTableProps {
   onCreateRule: (recommendation: VexRuleRecommendation) => void;
 }
 
-const columnHelper = createColumnHelper<VexRuleRecommendation>();
+const columnHelper = createAppColumnHelper<VexRuleRecommendation>();
 
-const columnsDef: ColumnDef<VexRuleRecommendation, any>[] = [
+const columnsDef: TableColumnDef<VexRuleRecommendation, any>[] = [
   {
     ...columnHelper.accessor("title", {
       header: "Recommendation",

@@ -14,8 +14,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { AssetDTO, DetailedDependencyVulnDTO } from "@/types/api/api";
-import { RequirementsLevel } from "@/types/api/api";
+import type { AssetDTO } from "@/types/dto";
+import type { DetailedDependencyVulnDTO } from "@/types/view/vulnEvents";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDown } from "lucide-react";
 import type { FunctionComponent, ReactNode } from "react";
@@ -134,30 +134,21 @@ const cvssBE = (
 ) => {
   let str = "";
   // check if the asset has some "high" requirements
-  if (
-    asset.availabilityRequirement === RequirementsLevel.High &&
-    cvssObj["A"] === "H"
-  ) {
+  if (asset.availabilityRequirement === "high" && cvssObj["A"] === "H") {
     str +=
       "Exploiting this vulnerability is critical because the asset requires high availability, and the vulnerability significantly impacts availability.";
   } else if (cvssObj["A"] === "H") {
     str += "Exploiting this vulnerability significantly impacts availability.";
   }
 
-  if (
-    asset.integrityRequirement === RequirementsLevel.High &&
-    cvssObj["I"] === "H"
-  ) {
+  if (asset.integrityRequirement === "high" && cvssObj["I"] === "H") {
     str +=
       "Exploiting this vulnerability is critical because the asset requires high integrity, and the vulnerability significantly impacts integrity.";
   } else if (cvssObj["I"] === "H") {
     str += "Exploiting this vulnerability significantly impacts integrity.";
   }
 
-  if (
-    asset.confidentialityRequirement === RequirementsLevel.High &&
-    cvssObj["C"] === "H"
-  ) {
+  if (asset.confidentialityRequirement === "high" && cvssObj["C"] === "H") {
     str +=
       "Exploiting this vulnerability is critical because the asset requires high confidentiality, and the vulnerability significantly impacts confidentiality.";
   } else if (cvssObj["C"] === "H") {

@@ -194,75 +194,39 @@ const MarkdownEditor: FunctionComponent<MardownEditorProps> = ({
     {
       icon: <Heading className="size-4" />,
       label: "Heading",
-      onClick: () => {
-        format("### ", "");
-      },
+      wrap: ["### ", ""],
     },
-    {
-      icon: <Bold className="size-4" />,
-      label: "Bold",
-      onClick: () => {
-        format("**", "**");
-      },
-    },
-    {
-      icon: <Italic className="size-4" />,
-      label: "Italic",
-      onClick: () => {
-        format("_", "_");
-      },
-    },
-    {
-      icon: <Quote className="size-4" />,
-      label: "Quote",
-      onClick: () => {
-        format("> ", "");
-      },
-    },
+    { icon: <Bold className="size-4" />, label: "Bold", wrap: ["**", "**"] },
+    { icon: <Italic className="size-4" />, label: "Italic", wrap: ["_", "_"] },
+    { icon: <Quote className="size-4" />, label: "Quote", wrap: ["> ", ""] },
     {
       icon: <Code className="size-4" />,
       label: "Inline Code",
-      onClick: () => {
-        format("`", "`");
-      },
+      wrap: ["`", "`"],
     },
     {
       icon: <CodeXml className="size-4" />,
       label: "Codeblock",
-      onClick: () => {
-        format("```\n", "\n```\n");
-      },
+      wrap: ["```\n", "\n```\n"],
     },
-    {
-      icon: <Link className="size-4" />,
-      label: "Link",
-      onClick: () => {
-        format("[](url)", "");
-      },
-    },
+    { icon: <Link className="size-4" />, label: "Link", wrap: ["[](url)", ""] },
   ];
 
   const listButtons = [
     {
       icon: <List className="size-4" />,
       label: "Unordered List",
-      onClick: () => {
-        format("- ", "");
-      },
+      wrap: ["- ", ""],
     },
     {
       icon: <ListOrdered className="size-4" />,
       label: "Ordered List",
-      onClick: () => {
-        format("1. ", "");
-      },
+      wrap: ["1. ", ""],
     },
     {
       icon: <ListCheck className="size-4" />,
       label: "Checklist",
-      onClick: () => {
-        format("- [ ] ", "");
-      },
+      wrap: ["- [ ] ", ""],
     },
   ];
 
@@ -289,7 +253,7 @@ const MarkdownEditor: FunctionComponent<MardownEditorProps> = ({
                       onMouseDown={(e) => e.preventDefault()}
                       className="border-0"
                       size="xs"
-                      onClick={button.onClick}
+                      onClick={() => format(button.wrap[0], button.wrap[1])}
                     >
                       {button.icon}
                     </Button>
@@ -308,7 +272,7 @@ const MarkdownEditor: FunctionComponent<MardownEditorProps> = ({
                       onMouseDown={(e) => e.preventDefault()}
                       className="border-0"
                       size="xs"
-                      onClick={button.onClick}
+                      onClick={() => format(button.wrap[0], button.wrap[1])}
                     >
                       {button.icon}
                     </Button>

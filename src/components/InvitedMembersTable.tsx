@@ -11,7 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
-import { InvitationStatus } from "@/types/api/api";
+import { InvitationStatus } from "@/types/view/invitation";
 import { Badge } from "./ui/badge";
 
 interface Props {

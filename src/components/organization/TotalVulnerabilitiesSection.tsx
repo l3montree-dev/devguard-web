@@ -4,15 +4,17 @@
 import Section from "@/components/common/Section";
 import { RiskHistoryDistributionDiagram } from "@/components/RiskHistoryDistributionDiagram";
 import SeverityCard from "@/components/SeverityCard";
-import type { OrgOverview, ReleaseRiskHistory } from "@/types/api/api";
+
 import MostUsedComponents from "./MostUsedComponents";
 import MostCommonCVEs from "./MostCommonCVEs";
+import type { OrgOverview } from "@/types/dto";
+import type { RiskHistoryPoint } from "@/types/view/riskHistory";
 
 export interface TotalVulnerabilitiesSectionProps {
   mode: "risk" | "cvss";
   isStatisticsLoading: boolean;
   orgStatistics: OrgOverview | undefined;
-  riskHistory: ReleaseRiskHistory[];
+  riskHistory: RiskHistoryPoint[];
 }
 
 export default function TotalVulnerabilitiesSection({

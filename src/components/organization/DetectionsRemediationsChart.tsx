@@ -133,7 +133,7 @@ const DetectionsRemediationsChart: FunctionComponent<ChartProps> = ({
               stroke="var(--color-remediations)"
               strokeWidth={2}
             />
-            <ChartLegend className="mt-8" content={<ChartLegendContent />} />
+            <ChartLegend content={<ChartLegendContent className="mt-8" />} />
           </RadialBarChart>
         </ChartContainer>
       </CardContent>

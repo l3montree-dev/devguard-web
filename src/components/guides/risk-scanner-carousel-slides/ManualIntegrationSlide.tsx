@@ -1,61 +1,62 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-// Copyright (C) 2025 Lars Hermges, l3montree GmbH.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
-import type { ArtifactDTO } from "@/types/api/api";
-import { QuestionMarkCircleIcon, TagIcon } from "@heroicons/react/24/outline";
-import { CaretDownIcon } from "@radix-ui/react-icons";
-import { GitBranchIcon } from "lucide-react";
-import Link from "next/link";
+import type { ArtifactDTO } from "@/types/dto";
 import { useSearchParams } from "next/navigation";
-import React, { type FunctionComponent, useEffect, useState } from "react";
+import type { FunctionComponent } from "react";
+import { useEffect, useState } from "react";
 import { useAssetBranchesAndTags } from "../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../hooks/useDecodedParams";
-import { classNames } from "../../../utils/common";
-import { BranchTagSelector } from "../../BranchTagSelector";
-import FileUpload from "../../FileUpload";
 import { Button } from "../../ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../ui/card";
 import { CarouselItem } from "../../ui/carousel";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../ui/collapsible";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import { Input } from "../../ui/input";
-import { Label } from "../../ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { documentationLinks } from "@/const/documentationLinks";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import ManualUploadTab from "./ManualUploadTab";
+import type {
+  ManualUploadKind,
+  ManualUploadOptions,
+  ManualUploadTab as ManualUploadTabConfig,
+} from "@/types/view/integration";
+
+const UPLOAD_TABS: ManualUploadTabConfig[] = [
+  {
+    value: "sbom",
+    title: "Upload SBOM",
+    description: "Upload a SBOM file in CycloneDX 1.6 or higher (JSON).",
+    originLabel: "Origin of the SBOM",
+    originHint: "Origin of the SBOM (e.g., DEFAULT)",
+    showArtifact: true,
+    docHref: documentationLinks.sbomExplaining,
+    docLabel: "What is an SBOM and how do I create one?",
+  },
+  {
+    value: "sarif",
+    title: "Upload SARIF",
+    description: "Upload a SARIF report from your scanner (.sarif or JSON).",
+    originLabel: "Origin of the SARIF",
+    originHint: "Origin of the SARIF (e.g., DEFAULT)",
+    showArtifact: false,
+  },
+  {
+    value: "vex",
+    title: "Upload VEX-File",
+    description: "Upload a VEX file in CycloneDX 1.6 or higher (JSON).",
+    originLabel: "Origin of the VEX",
+    originHint: "Origin of the VEX (e.g., DEFAULT)",
+    showArtifact: true,
+    docHref: documentationLinks.vexExplaining,
+    docLabel: "What is VEX?",
+  },
+];
 
 interface ManualIntegrationSlideProps {
   api?: {
     scrollTo: (index: number) => void;
     reInit?: () => void;
   };
-  tab: "sbom" | "sarif" | "vex";
-  setTab: (tab: "sbom" | "sarif" | "vex") => void;
+  tab: ManualUploadKind;
+  setTab: (tab: ManualUploadKind) => void;
   setArtifactName?: (name: string | undefined) => void;
   sbomFileName?: string;
   sarifFileName?: string;
@@ -99,18 +100,18 @@ const ManualIntegrationSlide: FunctionComponent<
   const searchParams = useSearchParams();
   const { branches, tags } = useAssetBranchesAndTags();
 
-  const [selectedArtifact, setSelectedArtifact] = React.useState<
-    string | undefined
-  >(() => {
-    const urlArtifact = searchParams?.get("artifact");
-    if (urlArtifact) {
-      return urlArtifact;
-    }
-    // just the first one if exists
-    if (artifacts && artifacts.length > 0) {
-      return artifacts[0].artifactName;
-    }
-  });
+  const [selectedArtifact, setSelectedArtifact] = useState<string | undefined>(
+    () => {
+      const urlArtifact = searchParams?.get("artifact");
+      if (urlArtifact) {
+        return urlArtifact;
+      }
+      // just the first one if exists
+      if (artifacts && artifacts.length > 0) {
+        return artifacts[0].artifactName;
+      }
+    },
+  );
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -137,43 +138,74 @@ const ManualIntegrationSlide: FunctionComponent<
   const [isTag, setIsTag] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Check if the selected branchOrTagName is in branches or tags and set isTag accordingly
-  useEffect(() => {
-    const matchedBranch = branches.find(
-      (branch) => branch.slug === branchOrTagName,
-    );
+  const matchedBranch = branches.find(
+    (branch) => branch.slug === branchOrTagName,
+  );
+  const matchedTag = matchedBranch
+    ? undefined
+    : tags.find((tag) => tag.slug === branchOrTagName);
+  const matchedRef = matchedBranch ?? matchedTag;
 
-    if (matchedBranch && branchOrTagName !== matchedBranch.name) {
-      setBranchOrTagName(matchedBranch.name);
-      setBranchOrTagSlug(matchedBranch.slug);
-      setIsTag(false);
-      return;
-    }
-
-    const matchedTag = tags.find((tag) => tag.slug === branchOrTagName);
-    if (matchedTag && branchOrTagName !== matchedTag.name) {
-      setBranchOrTagName(matchedTag.name);
-      setBranchOrTagSlug(matchedTag.slug);
-      setIsTag(true);
-    }
-  }, [branchOrTagName, branches, tags]);
+  if (matchedRef && matchedRef.name !== branchOrTagName) {
+    setBranchOrTagName(matchedRef.name);
+    setBranchOrTagSlug(matchedRef.slug);
+    setIsTag(Boolean(matchedTag));
+  }
 
   // Update parent component when artifact changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (setArtifactName) {
       setArtifactName(selectedArtifact);
     }
   }, [selectedArtifact, setArtifactName]);
 
+  const [prevTab, setPrevTab] = useState(tab);
+
+  if (tab !== prevTab) {
+    setPrevTab(tab);
+    setOrigin(tab.toUpperCase() + "_DEFAULT");
+  }
+
   useEffect(() => {
     if (api?.reInit) {
       setTimeout(() => api.reInit && api.reInit(), 0);
     }
+  }, [api, tab]);
 
-    setOrigin(() => {
-      return tab.toUpperCase() + "_DEFAULT";
-    });
-  }, [api, tab, setOrigin]);
+  const fileNames: Record<ManualUploadKind, string | undefined> = {
+    sbom: sbomFileName,
+    sarif: sarifFileName,
+    vex: vexFileName,
+  };
+
+  const dropzones: Record<ManualUploadKind, any> = {
+    sbom: sbomDropzone,
+    sarif: sarifDropzone,
+    vex: vexDropzone,
+  };
+
+  const options: ManualUploadOptions = {
+    branches,
+    tags,
+    branchOrTagName,
+    onBranchOrTagChange: (name, slug, nextIsTag) => {
+      setBranchOrTagName(name);
+      setBranchOrTagSlug(slug);
+      setIsTag(nextIsTag);
+    },
+    isTag,
+    onIsTagChange: setIsTag,
+    artifactName,
+    onArtifactNameChange: setArtifactNameLocal,
+    artifacts,
+    selectedArtifact,
+    onSelectedArtifactChange: setSelectedArtifact,
+    origin,
+    onOriginChange: setOrigin,
+    onReInit: () => {
+      setTimeout(() => api?.reInit && api.reInit(), 0);
+    },
+  };
 
   return (
     <CarouselItem>
@@ -188,419 +220,37 @@ const ManualIntegrationSlide: FunctionComponent<
       <div className="mt-4 px-1">
         <Tabs
           value={tab}
-          onValueChange={(v) => setTab(v as "sbom" | "sarif" | "vex")}
+          onValueChange={(v) => setTab(v as ManualUploadKind)}
           className="w-full"
         >
           <div className="flex">
             <TabsList>
-              <TabsTrigger data-testid="sbom-tab" value="sbom">
-                SBOM
-              </TabsTrigger>
-              <TabsTrigger data-testid="sarif-tab" value="sarif">
-                SARIF
-              </TabsTrigger>
-              <TabsTrigger data-testid="vex-tab" value="vex">
-                VEX
-              </TabsTrigger>
+              {UPLOAD_TABS.map((uploadTab) => (
+                <TabsTrigger
+                  key={uploadTab.value}
+                  data-testid={`${uploadTab.value}-tab`}
+                  value={uploadTab.value}
+                >
+                  {uploadTab.value.toUpperCase()}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </div>
 
-          <TabsContent value="sbom" className="mt-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-md">Upload SBOM</CardTitle>
-                <CardDescription>
-                  Upload a SBOM file in CycloneDX 1.6 or higher (JSON).
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileUpload
-                  id="file-upload-sbom"
-                  files={sbomFileName ? [sbomFileName] : []}
-                  dropzone={sbomDropzone}
-                />
-              </CardContent>
-            </Card>
-            <div className="flex flex-row gap-2 mb-4">
-              {branches.length == 0 && tags.length == 0 ? (
-                <Collapsible
-                  className="w-full"
-                  onOpenChange={() => {
-                    setTimeout(() => api?.reInit && api.reInit(), 0);
-                  }}
-                >
-                  <CollapsibleTrigger className="text-muted-foreground flex flex-row justify-between w-full mt-4 pb-2 cursor-pointer text-sm">
-                    More Options
-                    <CaretDownIcon className="ml-2 inline-block h-4 w-4 text-muted-foreground" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="">
-                    <div className="flex w-full border-t pt-4 flex-row gap-2">
-                      <div className="w-full">
-                        <Label className="mb-2 block">Branch/Tag Name</Label>
-                        <Input
-                          value={branchOrTagName}
-                          onChange={(e) => {
-                            setBranchOrTagName(e.target.value);
-                            setBranchOrTagSlug(e.target.value);
-                          }}
-                          placeholder="Enter branch or tag name"
-                        />
-                        <div className="flex items-center mt-2 gap-1 flex-row">
-                          <ToggleGroup className="w-full" type="single">
-                            <ToggleGroupItem
-                              className="w-full cursor-pointer justify-start"
-                              variant="outline"
-                              value="branch"
-                            >
-                              <button
-                                className={classNames(
-                                  "p-1 rounded",
-                                  isTag ? "" : "border bg-card",
-                                )}
-                                onClick={() => setIsTag(false)}
-                              >
-                                <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                              <span>Branch</span>
-                            </ToggleGroupItem>
-                            <ToggleGroupItem
-                              className="w-full cursor-pointer justify-start"
-                              variant="outline"
-                              value="tag"
-                            >
-                              <button
-                                className={classNames(
-                                  "p-1 rounded",
-                                  isTag ? "border bg-card" : "",
-                                )}
-                                onClick={() => setIsTag(true)}
-                              >
-                                <TagIcon className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                              <span>Tag</span>
-                            </ToggleGroupItem>
-                          </ToggleGroup>
-                        </div>
-                      </div>
-                      <div className="w-full">
-                        <Label className="mb-2 block">Artifact</Label>
-                        <Input
-                          value={artifactName}
-                          onChange={(e) => setArtifactNameLocal(e.target.value)}
-                          placeholder="Artifact name"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <Label className="mb-2 block">Origin of the sbom</Label>
-                        <Input
-                          value={origin}
-                          onChange={(e) => setOrigin(e.target.value)}
-                          placeholder="Origin"
-                        />
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              ) : (
-                <div className="mt-4 flex flex-row gap-2">
-                  <div>
-                    <BranchTagSelector
-                      branches={branches}
-                      tags={tags}
-                      disableNavigateToRefInsteadCall={(v) => {
-                        setBranchOrTagName(v.name);
-                        setBranchOrTagSlug(v.slug);
-                        setIsTag(v.type === "tag");
-                      }}
-                    />
-                  </div>
-                  <SimpleArtifactSelector
-                    artifacts={artifacts?.map((a) => a.artifactName) || []}
-                    selectedArtifact={selectedArtifact}
-                    onSelect={setSelectedArtifact}
-                  />
-                  <div className="w-full">
-                    <Input
-                      variant="onCard"
-                      value={origin}
-                      onChange={(e) => setOrigin(e.target.value)}
-                      placeholder="Origin"
-                    />
-                    <span className="text-muted-foreground text-xs">
-                      Origin of the SBOM (e.g., DEFAULT)
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="mt-2 flex text-link flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2" />
-              <Link
-                className="flex text-sm"
-                href={documentationLinks.sbomExplaining}
-                target="_blank"
-              >
-                What is an SBOM and how do I create one?
-              </Link>
-            </div>
-          </TabsContent>
-          <TabsContent value="sarif" className="mt-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-md">Upload SARIF</CardTitle>
-                <CardDescription>
-                  Upload a SARIF report from your scanner (.sarif or JSON).
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileUpload
-                  id="file-upload-sarif"
-                  files={sarifFileName ? [sarifFileName] : []}
-                  dropzone={sarifDropzone}
-                />
-              </CardContent>
-            </Card>
-            <div className="flex flex-row gap-2 mb-4">
-              {branches.length == 0 && tags.length == 0 ? (
-                <Collapsible
-                  className="w-full"
-                  onOpenChange={() => {
-                    setTimeout(() => api?.reInit && api.reInit(), 0);
-                  }}
-                >
-                  <CollapsibleTrigger className="text-muted-foreground flex flex-row justify-between w-full mt-4 pb-2 cursor-pointer text-sm">
-                    More Options
-                    <CaretDownIcon className="ml-2 inline-block h-4 w-4 text-muted-foreground" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="">
-                    <div className="flex w-full border-t pt-4 flex-row gap-2">
-                      <div className="w-full">
-                        <Label className="mb-2 block">Branch/Tag Name</Label>
-                        <Input
-                          value={branchOrTagName}
-                          onChange={(e) => {
-                            setBranchOrTagName(e.target.value);
-                            setBranchOrTagSlug(e.target.value);
-                          }}
-                          placeholder="Enter branch or tag name"
-                        />
-                        <div className="flex items-center mt-2 gap-1 flex-row">
-                          <ToggleGroup className="w-full" type="single">
-                            <ToggleGroupItem
-                              className="w-full cursor-pointer justify-start"
-                              variant="outline"
-                              value="branch"
-                            >
-                              <button
-                                className={classNames(
-                                  "p-1 rounded",
-                                  isTag ? "" : "border bg-card",
-                                )}
-                                onClick={() => setIsTag(false)}
-                              >
-                                <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                              <span>Branch</span>
-                            </ToggleGroupItem>
-                            <ToggleGroupItem
-                              className="w-full cursor-pointer justify-start"
-                              variant="outline"
-                              value="tag"
-                            >
-                              <button
-                                className={classNames(
-                                  "p-1 rounded",
-                                  isTag ? "border bg-card" : "",
-                                )}
-                                onClick={() => setIsTag(true)}
-                              >
-                                <TagIcon className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                              <span>Tag</span>
-                            </ToggleGroupItem>
-                          </ToggleGroup>
-                        </div>
-                      </div>
-                      <div className="w-full">
-                        <Label className="mb-2 block">
-                          Origin of the SARIF
-                        </Label>
-                        <Input
-                          value={origin}
-                          onChange={(e) => setOrigin(e.target.value)}
-                          placeholder="Origin"
-                        />
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              ) : (
-                <div className="mt-4 flex flex-row gap-2">
-                  <div>
-                    <BranchTagSelector
-                      branches={branches}
-                      tags={tags}
-                      disableNavigateToRefInsteadCall={(v) => {
-                        setBranchOrTagName(v.name);
-                        setBranchOrTagSlug(v.slug);
-                        setIsTag(v.type === "tag");
-                      }}
-                    />
-                  </div>
-                  <div className="w-full">
-                    <Input
-                      variant="onCard"
-                      value={origin}
-                      onChange={(e) => setOrigin(e.target.value)}
-                      placeholder="Origin"
-                    />
-                    <span className="text-muted-foreground text-xs">
-                      Origin of the SARIF (e.g., DEFAULT)
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          <TabsContent value="vex" className="mt-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-md">Upload VEX-File</CardTitle>
-                <CardDescription>
-                  Upload a VEX file in CycloneDX 1.6 or higher (JSON).
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <FileUpload
-                  id="file-upload-vex"
-                  files={vexFileName ? [vexFileName] : []}
-                  dropzone={vexDropzone}
-                />
-              </CardContent>
-            </Card>
-            <div className="flex flex-row gap-2 mb-4">
-              {branches.length == 0 && tags.length == 0 ? (
-                <Collapsible
-                  className="w-full"
-                  onOpenChange={() => {
-                    setTimeout(() => api?.reInit && api.reInit(), 0);
-                  }}
-                >
-                  <CollapsibleTrigger className="text-muted-foreground flex flex-row justify-between w-full mt-4 pb-2 cursor-pointer text-sm">
-                    More Options
-                    <CaretDownIcon className="ml-2 inline-block h-4 w-4 text-muted-foreground" />
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="">
-                    <div className="flex w-full border-t pt-4 flex-row gap-2">
-                      <div className="w-full">
-                        <Label className="mb-2 block">Branch/Tag Name</Label>
-                        <Input
-                          value={branchOrTagName}
-                          onChange={(e) => {
-                            setBranchOrTagName(e.target.value);
-                            setBranchOrTagSlug(e.target.value);
-                          }}
-                          placeholder="Enter branch or tag name"
-                        />
-                        <div className="flex items-center mt-2 gap-1 flex-row">
-                          <ToggleGroup className="w-full" type="single">
-                            <ToggleGroupItem
-                              className="w-full cursor-pointer justify-start"
-                              variant="outline"
-                              value="branch"
-                            >
-                              <button
-                                className={classNames(
-                                  "p-1 rounded",
-                                  isTag ? "" : "border bg-card",
-                                )}
-                                onClick={() => setIsTag(false)}
-                              >
-                                <GitBranchIcon className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                              <span>Branch</span>
-                            </ToggleGroupItem>
-                            <ToggleGroupItem
-                              className="w-full cursor-pointer justify-start"
-                              variant="outline"
-                              value="tag"
-                            >
-                              <button
-                                className={classNames(
-                                  "p-1 rounded",
-                                  isTag ? "border bg-card" : "",
-                                )}
-                                onClick={() => setIsTag(true)}
-                              >
-                                <TagIcon className="h-4 w-4 text-muted-foreground" />
-                              </button>
-                              <span>Tag</span>
-                            </ToggleGroupItem>
-                          </ToggleGroup>
-                        </div>
-                      </div>
-                      <div className="w-full">
-                        <Label className="mb-2 block">Artifact</Label>
-                        <Input
-                          value={artifactName}
-                          onChange={(e) => setArtifactNameLocal(e.target.value)}
-                          placeholder="Artifact name"
-                        />
-                      </div>
-                      <div className="w-full">
-                        <Label className="mb-2 block">Origin of the VeX</Label>
-                        <Input
-                          value={origin}
-                          onChange={(e) => setOrigin(e.target.value)}
-                          placeholder="Origin"
-                        />
-                      </div>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              ) : (
-                <div className="mt-4 flex flex-row gap-2">
-                  <div>
-                    <BranchTagSelector
-                      branches={branches}
-                      tags={tags}
-                      disableNavigateToRefInsteadCall={(v) => {
-                        setBranchOrTagName(v.name);
-                        setBranchOrTagSlug(v.slug);
-                        setIsTag(v.type === "tag");
-                      }}
-                    />
-                  </div>
-                  <SimpleArtifactSelector
-                    artifacts={artifacts?.map((a) => a.artifactName) || []}
-                    selectedArtifact={selectedArtifact}
-                    onSelect={setSelectedArtifact}
-                  />
-                  <div className="w-full">
-                    <Input
-                      variant="onCard"
-                      value={origin}
-                      onChange={(e) => setOrigin(e.target.value)}
-                      placeholder="Origin"
-                    />
-                    <span className="text-muted-foreground text-xs">
-                      Origin of the VEX (e.g., DEFAULT)
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="mt-2 flex flex-row items-center">
-              <QuestionMarkCircleIcon className="flex w-4 m-2 text-link" />
-              <Link
-                className="flex text-sm"
-                href={documentationLinks.vexExplaining}
-                target="_blank"
-              >
-                What is VEX?
-              </Link>
-            </div>
-          </TabsContent>
+          {UPLOAD_TABS.map((uploadTab) => (
+            <TabsContent
+              key={uploadTab.value}
+              value={uploadTab.value}
+              className="mt-2"
+            >
+              <ManualUploadTab
+                tab={uploadTab}
+                fileName={fileNames[uploadTab.value]}
+                dropzone={dropzones[uploadTab.value]}
+                options={options}
+              />
+            </TabsContent>
+          ))}
         </Tabs>
 
         <div className="flex mt-6 flex-row gap-2 justify-end">

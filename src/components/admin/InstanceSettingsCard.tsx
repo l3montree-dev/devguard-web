@@ -17,9 +17,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { NoSymbolIcon } from "@heroicons/react/20/solid";
-import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import { useInstanceAdmin } from "@/context/InstanceAdminContext";
-import { adminBrowserApiClient, AdminAPIError } from "@/services/adminApi";
+import { ApiError } from "@/services/apiClient";
+import { patchInstanceSettings } from "@/services/adminService";
 import { useConfig } from "../../context/ConfigContext";
 
 export default function InstanceSettingsCard() {
@@ -53,16 +53,7 @@ export default function InstanceSettingsCard() {
       false,
     );
     try {
-      const resp = await adminBrowserApiClient("/admin/settings", signingKey, {
-        method: "PATCH",
-        body: JSON.stringify({ disable_org_creation: disableOrgCreation }),
-      });
-      if (!resp.ok) {
-        throw new AdminAPIError(
-          `Failed to update instance settings (HTTP ${resp.status})`,
-          resp.status,
-        );
-      }
+      await patchInstanceSettings(signingKey, disableOrgCreation);
       toast.success(
         creationEnabled
           ? "Organisation creation enabled."
@@ -70,7 +61,7 @@ export default function InstanceSettingsCard() {
       );
     } catch (err) {
       const message =
-        err instanceof AdminAPIError
+        err instanceof ApiError
           ? err.message
           : "Failed to update instance settings. Is the API reachable?";
       toast.error(message);

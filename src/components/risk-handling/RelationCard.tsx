@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { CVE } from "@/types/api/api";
+import type { CVEDTO } from "@/types/dto";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDown, ExternalLink } from "lucide-react";
 import { useState } from "react";
@@ -17,7 +17,7 @@ import { advisorySource, advisorySourceUrl } from "./advisorySourceUrl";
 import { parseAdvisoryDescription } from "./parseAdvisoryDescription";
 
 interface Props {
-  related: CVE[];
+  related: CVEDTO[];
   variant?: "collapsible" | "static";
 }
 

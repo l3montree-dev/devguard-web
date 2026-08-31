@@ -11,10 +11,10 @@ import {
 } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { useLoader } from "@/hooks/useLoader";
-import { browserApiClient } from "@/services/devGuardApi";
+import { saveJiraIntegration } from "@/services/organizationService";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "@/lib/toast";
-import type { JiraIntegrationDTO } from "@/types/api/api";
+import type { JiraIntegrationDTO } from "@/types/dto";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import React from "react";
@@ -47,18 +47,16 @@ export default function JiraIntegrationForm({
     name: string;
     userEmail: string;
   }) => {
-    const res = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/jira/test-and-save",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          ...params,
-          url: urlToBaseURL(params.url),
-        }),
-      },
-    );
-    if (res.ok) {
-      const integration = await res.json();
+    let integration;
+    try {
+      integration = await saveJiraIntegration(activeOrg.slug, {
+        ...params,
+        url: urlToBaseURL(params.url),
+      } as never);
+    } catch {
+      integration = null;
+    }
+    if (integration) {
       onNewIntegration(integration);
       setOpen(false);
     } else {

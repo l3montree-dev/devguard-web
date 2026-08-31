@@ -1,12 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { findRecommendationForVuln } from "@/components/vex-rules/useVexRuleRecommendations";
-import type {
-  VexRuleRecommendation,
-  VulnByPackage,
-  VulnWithCVE,
-} from "@/types/api/api";
+import type { VulnByPackage, VulnWithCVE } from "@/types/view/vuln";
 import { classNames, stateLabels } from "@/utils/common";
 import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Row } from "@tanstack/react-table";
@@ -25,9 +20,10 @@ import { groupBy } from "lodash";
 import Link from "next/link";
 import { isDirectDependencyUpdateAvailable } from "../Quickfix";
 import WarningWithDescription from "../common/WarningWithDescription";
+import type { TableFeatures } from "@/hooks/useTable";
 
 interface Props {
-  row: Row<VulnByPackage>;
+  row: Row<TableFeatures, VulnByPackage>;
   index: number;
   arrLength: number;
   selectedVulnIds: Set<string>;
@@ -40,21 +36,6 @@ interface Props {
     mechanicalJustification?: string;
   }) => Promise<void>;
 }
-
-const VexableBadge = () => (
-  <Tooltip>
-    <TooltipTrigger onClick={(e) => e.stopPropagation()}>
-      <Badge variant="secondary" className="text-xs gap-1">
-        Vexable
-      </Badge>
-    </TooltipTrigger>
-    <TooltipContent className="max-w-xs">
-      A matching VEX rule recommendation exists for this vulnerability - other
-      organizations, or your own asset&apos;s history, already vexed it the same
-      way. Open it to review and apply the recommendation.
-    </TooltipContent>
-  </Tooltip>
-);
 
 const SelectionCheckbox = ({
   checked,

@@ -7,7 +7,8 @@ import {
   SessionCountdown,
   useInstanceAdmin,
 } from "@/context/InstanceAdminContext";
-import { adminBrowserApiClient } from "@/services/adminApi";
+import { verifyAdminKey } from "@/services/adminService";
+import { ApiError } from "@/services/apiClient";
 import { importAdminKey } from "@/services/adminRequestSigning";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -75,21 +76,21 @@ export default function InstanceAdminPage() {
         return;
       }
 
-      const resp = await adminBrowserApiClient("/admin", key);
-
-      if (resp.ok) {
-        authenticate(key);
-        setKeyInput("");
-        toast.success("Authenticated as instance admin.");
-      } else if (resp.status === 401 || resp.status === 403) {
+      await verifyAdminKey(key);
+      authenticate(key);
+      setKeyInput("");
+      toast.success("Authenticated as instance admin.");
+    } catch (err) {
+      const status = err instanceof ApiError ? err.status : undefined;
+      if (status === 401 || status === 403) {
         toast.error(
           "Authentication failed. The private key does not match the instance's admin public key.",
         );
+      } else if (status) {
+        toast.error(`Unexpected response from server: ${status}`);
       } else {
-        toast.error(`Unexpected response from server: ${resp.status}`);
+        toast.error("Failed to verify key. Is the API reachable?");
       }
-    } catch (err) {
-      toast.error("Failed to verify key. Is the API reachable?");
     } finally {
       setVerifying(false);
     }

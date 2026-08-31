@@ -16,21 +16,26 @@ import {
 } from "@/components/ui/dialog";
 import { FieldDescription } from "@/components/ui/field";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { CreateVexRuleRequest, VexRule } from "@/types/api/api";
-import type { EditableRule } from "@/types/view/vexRules";
+import { createVexRule, deleteVexRule } from "@/services/vexRuleService";
+
+import type {
+  CreateVexRuleRequest,
+  EditableRule,
+  VexRule,
+} from "@/types/view/vexRules";
 import { CircleAlert } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
 import VexRuleForm from "./VexRuleForm";
 import VexRuleResult from "./VexRuleResult";
 import VexRuleSourceBadge, { isManualVexRule } from "./VexRuleSourceBadge";
 
+import type { AssetScope } from "@/services/vexRuleService";
+
 interface VexRuleDetailsDialogProps {
   vexRule: VexRule | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  // API base of this asset's VEX rules, e.g. /organizations/o/.../vex-rules
-  urlBase: string;
+  scope: AssetScope;
   // Called after the rule was deleted or recreated, so callers can refetch.
   onChanged?: () => void;
 }
@@ -47,7 +52,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
   vexRule,
   isOpen,
   onOpenChange,
-  urlBase,
+  scope,
   onChanged,
 }) => {
   const [draft, setDraft] = useState<EditableRule>({
@@ -96,21 +101,13 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
       eventType: vexRule.eventType,
       mechanicalJustification: vexRule.mechanicalJustification,
     };
-    return browserApiClient(`${urlBase}/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    return createVexRule(scope, body as never);
   };
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const resp = await browserApiClient(`${urlBase}/${vexRule.id}`, {
-        method: "DELETE",
-      });
-      if (!resp.ok) throw new Error(resp.statusText);
-
+      await deleteVexRule(scope, vexRule.id);
       toast.success("VEX rule deleted");
       handleOpenChange(false);
       onChanged?.();
@@ -125,20 +122,25 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
     if (!canUpdate) return false;
 
     // The id derives from the expression, so the old row goes first.
-    const deleted = await browserApiClient(`${urlBase}/${vexRule.id}`, {
-      method: "DELETE",
-    });
-    if (!deleted.ok) {
+    try {
+      await deleteVexRule(scope, vexRule.id);
+    } catch {
       toast.error("Failed to update VEX rule: could not remove the old rule");
       return false;
     }
 
-    const created = await createRule(draft);
-    if (!created.ok) {
+    try {
+      await createRule(draft);
+    } catch {
       // Put it back rather than leaving the asset without the rule.
-      const restored = await createRule(original);
+      let restored = true;
+      try {
+        await createRule(original);
+      } catch {
+        restored = false;
+      }
       toast.error(
-        restored.ok
+        restored
           ? "Failed to update VEX rule — the previous rule was restored"
           : "Failed to update VEX rule and to restore the previous one",
       );
@@ -180,7 +182,7 @@ const VexRuleDetailsDialog: FunctionComponent<VexRuleDetailsDialogProps> = ({
           onSubmit={(e) => e.preventDefault()}
         >
           <VexRuleForm
-            baseUrl={urlBase}
+            scope={scope}
             title={draft.title}
             onTitleChange={(title) => setDraft((d) => ({ ...d, title }))}
             celExpression={draft.celExpression}

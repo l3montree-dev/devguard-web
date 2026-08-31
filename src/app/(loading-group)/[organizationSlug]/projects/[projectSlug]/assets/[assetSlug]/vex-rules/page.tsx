@@ -20,30 +20,22 @@ import CelPlayground from "@/components/vex-rules/CelPlayground";
 import VexExportDialog from "@/components/vex-rules/VexExportDialog";
 import VexRuleRecommendationsTable from "@/components/vex-rules/VexRuleRecommendationsTable";
 import VexRulesTable from "@/components/vex-rules/VexRulesTable";
-import VexSourcesTable, {
-    isVexSourceType,
-    type VexSource,
-} from "@/components/vex-rules/VexSourcesSection";
+import VexSourcesTable from "@/components/vex-rules/VexSourcesSection";
+import { isVexSourceType, type VexSource } from "@/types/view/vexRules";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import useFilter from "@/hooks/useFilter";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type {
-    ExternalReference,
-    Paged,
-    VexRule
-} from "@/types/api/api";
+import { uploadVex } from "@/services/scanUploadService";
+import { useVexRules, useVexSources } from "@/hooks/useVexRules";
 import { buildFilterSearchParams } from "@/utils/url";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
-import useSWR from "swr";
-import useVexRuleRecommendations from "../../../../../../../../hooks/useVexRuleRecommendations";
+import useVexRuleRecommendations from "@/hooks/useVexRuleRecommendations";
 
 const sourcesFilterOptions = [
   {
@@ -152,7 +144,7 @@ const VexRulesPage: FunctionComponent = () => {
     assetSlug: string;
   };
 
-  const vexRulesUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`;
+  const scope = { organization: organizationSlug, projectSlug, assetSlug };
   const query = useMemo(
     () => buildFilterSearchParams(searchParams),
     [searchParams],
@@ -172,26 +164,21 @@ const VexRulesPage: FunctionComponent = () => {
     error,
     isLoading,
     mutate,
-  } = useSWR<Paged<VexRule>>(
-    `${vexRulesUrl}/?${rulesQuery.toString()}`,
-    fetcher,
-  );
+  } = useVexRules(scope, rulesQuery);
   const vexRules = vexRulesResponse?.data ?? [];
 
   const handleVexUpload = async (params: { file: File }) => {
-    const response = await browserApiClient(`/vex`, {
-      method: "POST",
-      body: await params.file.text(),
-      headers: {
-        "X-Asset-Name": `${organizationSlug}/${projectSlug}/${assetSlug}`,
-        "X-Origin": "vex-upload",
-      },
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      toast.error("Failed to upload VEX file: " + errorText);
-      throw new Error("Failed to upload VEX file: " + errorText);
+    try {
+      await uploadVex(
+        {
+          assetName: `${organizationSlug}/${projectSlug}/${assetSlug}`,
+          origin: "vex-upload",
+        },
+        await params.file.text(),
+      );
+    } catch (error) {
+      toast.error("Failed to upload VEX file: " + String(error));
+      throw error;
     }
 
     toast.success("VEX file uploaded successfully");
@@ -214,15 +201,11 @@ const VexRulesPage: FunctionComponent = () => {
     setAddRuleDialogOpen(true);
   };
 
-  const vexSourcesUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
   const {
     data: vexSourcesResponse,
     isLoading: isVexSourcesLoading,
     mutate: mutateVexSources,
-  } = useSWR<Paged<ExternalReference>>(
-    `${vexSourcesUrl}/?${sourcesQuery.toString()}`,
-    fetcher,
-  );
+  } = useVexSources(scope, sourcesQuery);
 
   // The API already excludes references of type "unknown", so every returned
   // reference is a VEX source. This only narrows the type - it must not drop
@@ -313,10 +296,7 @@ const VexRulesPage: FunctionComponent = () => {
         </div>
 
         <AuthGuard require="member">
-          <CelPlayground
-            baseUrl={vexRulesUrl}
-            onCreateRule={openCreateDialog}
-          />
+          <CelPlayground scope={scope} onCreateRule={openCreateDialog} />
         </AuthGuard>
       </Section>
 
@@ -393,7 +373,7 @@ const VexRulesPage: FunctionComponent = () => {
                     pageSize: 25,
                   }
                 }
-                urlBase={vexRulesUrl}
+                scope={scope}
                 isLoading={isLoading}
                 onMutate={() => mutate()}
               />
@@ -483,7 +463,7 @@ const VexRulesPage: FunctionComponent = () => {
                   pageSize: 25,
                 }
               }
-              apiUrl={vexSourcesUrl}
+              scope={scope}
               isLoading={isVexSourcesLoading}
               onMutate={() => mutateVexSources()}
               onAddSource={() => setUploadDialogOpen(true)}
@@ -496,11 +476,12 @@ const VexRulesPage: FunctionComponent = () => {
         open={uploadDialogOpen}
         onOpenChange={setUploadDialogOpen}
         onUpload={handleVexUpload}
+        onSourceAdded={() => mutateVexSources()}
       />
       <AddVexRuleDialog
         open={addRuleDialogOpen}
         onOpenChange={setAddRuleDialogOpen}
-        baseUrl={vexRulesUrl}
+        scope={scope}
         onCreated={() => mutate()}
         prefill={rulePrefill}
       />

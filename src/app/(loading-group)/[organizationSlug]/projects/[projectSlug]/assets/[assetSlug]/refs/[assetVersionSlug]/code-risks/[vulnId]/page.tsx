@@ -5,8 +5,16 @@
 
 import Page from "@/components/Page";
 
-import { browserApiClient } from "@/services/devGuardApi";
-import type { DetailedFirstPartyVulnDTO, VulnEventDTO } from "@/types/api/api";
+import {
+  createFirstPartyVulnEvent,
+  mitigateFirstPartyVuln,
+} from "@/services/vulnService";
+import { useFirstPartyVuln } from "@/hooks/useVulnDetail";
+import type {
+  DetailedFirstPartyVulnDTO,
+  VulnEventDTO,
+} from "@/types/view/vulnEvents";
+
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
@@ -41,8 +49,6 @@ import CopyCode from "@/components/common/CopyCode";
 import VulnState from "@/components/common/VulnState";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import GitProviderIcon from "@/components/GitProviderIcon";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import Err from "@/components/common/Err";
@@ -69,18 +75,20 @@ const Index = () => {
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug, vulnId } =
     params;
 
+  const vulnScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
+
   // Fetch vulnerability data using SWR
   const {
     data: vuln,
     error,
     isLoading,
     mutate,
-  } = useSWR<DetailedFirstPartyVulnDTO>(
-    organizationSlug && projectSlug && assetSlug && assetVersionSlug && vulnId
-      ? `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/first-party-vulns/${vulnId}`
-      : null,
-    fetcher,
-  );
+  } = useFirstPartyVuln(vulnScope, vulnId);
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
@@ -179,51 +187,13 @@ const Index = () => {
 
     const mutatePromise = mutate(
       async (current) => {
-        let json: any;
-        if (data.status === "mitigate") {
-          const resp = await browserApiClient(
-            "/organizations/" +
-              activeOrg.slug +
-              "/projects/" +
-              project.slug +
-              "/assets/" +
-              asset.slug +
-              "/refs/" +
-              assetVersion?.slug +
-              "/first-party-vulns/" +
-              vuln.id +
-              "/mitigate",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
-        } else {
-          const resp = await browserApiClient(
-            "/organizations/" +
-              activeOrg.slug +
-              "/projects/" +
-              project.slug +
-              "/assets/" +
-              asset.slug +
-              "/refs/" +
-              assetVersion?.slug +
-              "/first-party-vulns/" +
+        const json = (await (data.status === "mitigate"
+          ? mitigateFirstPartyVuln(vulnScope, vuln.id, data.justification ?? "")
+          : createFirstPartyVulnEvent(
+              vulnScope,
               vuln.id,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
-        }
+              data as never,
+            ))) as unknown as DetailedFirstPartyVulnDTO;
 
         if (!json.events) {
           toast("Failed to update vulnerability", {
@@ -601,13 +571,13 @@ const Index = () => {
               <h3 className="mb-2 text-lg font-semibold">Rule Details</h3>
               <div className="text-sm text-muted-foreground">
                 <Markdown>{vuln.ruleDescription}</Markdown>
-                {vuln.ruleHelpUri && (
+                {vuln.ruleHelpURI && (
                   <Link
-                    href={vuln.ruleHelpUri}
+                    href={vuln.ruleHelpURI}
                     target="_blank"
                     className="mt-2 inline-block text-sm text-muted-foreground"
                   >
-                    {vuln.ruleHelpUri}
+                    {vuln.ruleHelpURI}
                   </Link>
                 )}
               </div>

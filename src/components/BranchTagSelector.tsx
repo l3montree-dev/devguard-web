@@ -1,14 +1,14 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AssetVersionDTO } from "@/types/api/api";
+import { createAssetVersion } from "@/services/assetVersionService";
+import type { AssetVersionDTO } from "@/types/dto";
 import { PlusCircleIcon, TagIcon } from "@heroicons/react/24/outline";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { GitBranchIcon } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import useDecodedParams from "../hooks/useDecodedParams";
-import { browserApiClient } from "../services/devGuardApi";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -79,22 +79,21 @@ export function BranchTagSelector({
       tag: view === "tags",
     };
 
-    const resp = await browserApiClient(
-      "/organizations/" +
-        params.organizationSlug +
-        "/projects/" +
-        params.projectSlug +
-        "/assets/" +
-        params.assetSlug +
-        "/refs/",
-      { method: "POST", body: JSON.stringify(body) },
-    );
-
-    if (!resp.ok) {
+    let created;
+    try {
+      created = await createAssetVersion(
+        {
+          organization: params.organizationSlug,
+          projectSlug: params.projectSlug,
+          assetSlug: params.assetSlug,
+        },
+        body as never,
+      );
+    } catch {
       return;
     }
 
-    const newVersion = await resp.json();
+    const newVersion = created as AssetVersionDTO;
     // add it to the state
     updateAsset((prev) =>
       !prev

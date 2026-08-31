@@ -3,11 +3,8 @@
 
 "use client";
 import { createContext, useContext } from "react";
-import type {
-  ArtifactDTO,
-  AssetVersionDTO,
-  InformationSources,
-} from "../types/api/api";
+import type { InformationSource } from "@/services/artifactService";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 import { NoopUpdater } from "./ClientContextWrapper";
 import type { WithUpdater } from "@/types/view/context";
 import { fetcher } from "@/data-fetcher/fetcher";
@@ -42,7 +39,7 @@ export const useRootNodes = () => {
     };
 
   const { data: rootNodes, mutate } = useSWR<{
-    [artifactName: string]: InformationSources[];
+    [artifactName: string]: InformationSource[];
   }>(
     "/organizations/" +
       organizationSlug +

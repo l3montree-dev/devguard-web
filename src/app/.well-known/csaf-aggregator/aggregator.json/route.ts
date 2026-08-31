@@ -1,19 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-// just return whatever we fetch from
-
-import { getApiClientInRouteHandler } from "../../../../services/devGuardApiAppRouter";
+import { streamFromApiWithRequest } from "@/services/serverApiClient";
 
 export async function GET(request: Request) {
-  const client = getApiClientInRouteHandler(request);
-
-  // just do a fetch to the same route
-  const response = await client(
+  const response = await streamFromApiWithRequest(
+    request,
     "/.well-known/csaf-aggregator/aggregator.json/",
-    {
-      method: "GET",
-    },
   );
 
   // return the response as is

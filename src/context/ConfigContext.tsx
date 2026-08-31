@@ -5,7 +5,7 @@
 import React from "react";
 import { config } from "../config";
 import { NoopUpdater } from "./ClientContextWrapper";
-import type { InstanceSettings } from "@/types/api/api";
+import type { InstanceSettings } from "@/types/dto";
 import type { WithUpdater } from "../types/view/context";
 
 const ConfigContext = React.createContext<

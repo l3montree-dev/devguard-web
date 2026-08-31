@@ -9,7 +9,8 @@ import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
-import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/api/api";
+import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/dto";
+
 import type { ExternalTicketProvider } from "@/types/common";
 import Image from "next/image";
 import Link from "next/link";

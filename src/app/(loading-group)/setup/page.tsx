@@ -8,7 +8,6 @@ import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import { useConfig } from "../../../context/ConfigContext";
 
 const Lanyard = dynamic(

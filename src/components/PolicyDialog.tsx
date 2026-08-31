@@ -13,8 +13,8 @@ import {
 
 import Link from "next/link";
 import { useDropzone } from "react-dropzone";
-import { useForm } from "react-hook-form";
-import type { Policy } from "../types/api/api";
+import { useForm, useWatch } from "react-hook-form";
+import type { Policy } from "@/types/dto";
 import Callout from "./common/Callout";
 import CopyCode, { CopyCodeFragment } from "./common/CopyCode";
 import FileUpload from "./FileUpload";
@@ -73,7 +73,11 @@ const PolicyDialog: FunctionComponent<Props> = ({
     },
   });
 
-  const content = form.watch("rego");
+  const content = useWatch({ control: form.control, name: "rego" });
+  const predicateType = useWatch({
+    control: form.control,
+    name: "predicateType",
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -169,9 +173,7 @@ const PolicyDialog: FunctionComponent<Props> = ({
             <Callout intent="info">
               Create an attestation for this policy using the command below.{" "}
               <CopyCodeFragment
-                codeString={`devguard-scanner attest --predicateType "${form.watch(
-                  "predicateType",
-                )}" <json file>`}
+                codeString={`devguard-scanner attest --predicateType "${predicateType}" <json file>`}
               />
             </Callout>
             {onSubmit && (

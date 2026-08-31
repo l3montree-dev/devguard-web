@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { useProject } from "@/context/ProjectContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { RequirementsLevel } from "@/types/api/api";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { GroupStructureFlowchart } from "../project/GroupStructureFlowchart";
@@ -54,9 +53,9 @@ export const CreateRepositoryForm: FunctionComponent<Props> = ({
   const form = useForm<AssetFormValues>({
     defaultValues: {
       repositoryProvider: "github",
-      confidentialityRequirement: RequirementsLevel.Medium,
-      integrityRequirement: RequirementsLevel.Medium,
-      availabilityRequirement: RequirementsLevel.Medium,
+      confidentialityRequirement: "medium",
+      integrityRequirement: "medium",
+      availabilityRequirement: "medium",
       cvssAutomaticTicketThreshold: [],
       riskAutomaticTicketThreshold: [],
     },

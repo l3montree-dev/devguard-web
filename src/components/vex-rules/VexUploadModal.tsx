@@ -26,11 +26,8 @@ import { useDropzone } from "react-dropzone";
 import { LinkIcon } from "@heroicons/react/24/outline";
 import { Loader2, CloudUpload } from "lucide-react";
 import useDecodedParams from "@/hooks/useDecodedParams";
-import { browserApiClient } from "@/services/devGuardApi";
+import { createExternalReference } from "@/services/externalReferenceService";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
-import { fetcher } from "@/data-fetcher/fetcher";
-import type { ExternalReference } from "@/types/api/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "../FileUpload";
 import AutoHeight from "embla-carousel-auto-height";
@@ -42,12 +39,15 @@ interface VexUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpload: (params: { file: File }) => Promise<void>;
+  // the page owns the sources list, so it revalidates it
+  onSourceAdded: () => void;
 }
 
 const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
   open,
   onOpenChange,
   onUpload,
+  onSourceAdded,
 }) => {
   const params = useDecodedParams();
   const { organizationSlug, projectSlug, assetSlug } = params;
@@ -67,14 +67,10 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
     setCarouselApi(emblaApi);
   }, []);
 
-  const apiUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/external-references`;
+  const scope = { organization: organizationSlug, projectSlug, assetSlug };
 
   // Only for its mutate: revalidating this key refreshes the sources list on the
   // VEX rules page once a source is added here.
-  const { mutate: refsMutate } = useSWR<ExternalReference[]>(
-    open ? apiUrl : null,
-    fetcher,
-  );
 
   const vexDropzone = useDropzone({
     onDrop: (acceptedFiles) => {
@@ -120,22 +116,14 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
     setIsAdding(true);
     try {
-      const response = await browserApiClient(`${apiUrl}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: newVexUrl.trim(),
-          type: "cyclonedx",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add: ${response.statusText}`);
-      }
+      await createExternalReference(scope, {
+        url: newVexUrl.trim(),
+        type: "cyclonedx",
+      } as never);
 
       toast.success("VEX source added successfully");
       setNewVexUrl("");
-      refsMutate();
+      onSourceAdded();
     } catch (error) {
       toast.error("Failed to add VEX source");
     } finally {
@@ -151,21 +139,13 @@ const VexUploadModal: FunctionComponent<VexUploadModalProps> = ({
 
     setIsAdding(true);
     try {
-      const response = await browserApiClient(`${apiUrl}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: newCsafUrl.trim(),
-          type: "csaf",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add: ${response.statusText}`);
-      }
+      await createExternalReference(scope, {
+        url: newCsafUrl.trim(),
+        type: "csaf",
+      } as never);
       toast.success("CSAF source added successfully");
       setNewCsafUrl("");
-      refsMutate();
+      onSourceAdded();
     } catch (error) {
       toast.error("Failed to add CSAF source");
     } finally {

@@ -1,4 +1,7 @@
-import type { GitlabOAuth2Config } from "@/types/api/api";
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
+import type { GitlabOAuth2Config } from "@/types/dto";
 
 export const providerIdToBaseURL = (
   provider?: string,

@@ -1,20 +1,23 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchContentTree(organizationSlug: string) {
   // get the devGuardApiClient
-  const devGuardApiClient = await getApiClientInAppRouter();
+  const client = await getServerClient();
   // check if there is a slug in the query
 
   if (organizationSlug) {
     // get the organization
-    const contentTree = await devGuardApiClient(
-      "/organizations/" +
-        decodeURIComponent(organizationSlug) +
-        "/content-tree",
+    const { data, response: contentTree } = await client.GET(
+      "/organizations/{organization}/content-tree",
+      {
+        params: {
+          path: { organization: decodeURIComponent(organizationSlug) },
+        },
+      },
     );
 
     if (!contentTree.ok) {
@@ -26,10 +29,8 @@ export async function fetchContentTree(organizationSlug: string) {
       });
     }
 
-    const contentTreeData = await contentTree.json();
-
-    return contentTreeData;
+    return data ?? [];
   } else {
-    return null;
+    return [];
   }
 }

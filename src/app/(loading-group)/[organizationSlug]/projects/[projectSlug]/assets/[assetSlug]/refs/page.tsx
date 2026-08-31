@@ -3,17 +3,13 @@
 
 "use client";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
-import { eventBus } from "@/events";
 import { useRefDistributions } from "@/hooks/useRefDistributions";
 import { toast } from "@/lib/toast";
-import type { AssetVersionDTO } from "@/types/api/api";
 import { EllipsisHorizontalIcon } from "@heroicons/react/20/solid";
 import { TagIcon } from "@heroicons/react/24/outline";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { GitBranchIcon, TriangleAlert } from "lucide-react";
 import React from "react";
-import AuthGuard from "../../../../../../../../components/AuthGuard";
-import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import Page from "../../../../../../../../components/Page";
 import AssetTitle from "../../../../../../../../components/common/AssetTitle";
 import DateString, {
@@ -41,8 +37,16 @@ import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
 import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import { browserApiClient } from "../../../../../../../../services/devGuardApi";
+import {
+  deleteAssetVersion,
+  makeAssetVersionDefault,
+} from "@/services/assetVersionService";
+import type { AssetVersionDTO } from "@/types/dto";
+import CreateRefDialog from "../../../../../../../../components/CreateBranchDialog";
 import { classNames } from "../../../../../../../../utils/common";
+import { eventBus } from "@/events";
+import { readLocalStorage, removeLocalStorage } from "@/hooks/useLocalStorage";
+import AuthGuard from "../../../../../../../../components/AuthGuard";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -53,21 +57,27 @@ const RefsPage = () => {
     projectSlug: string;
     assetSlug: string;
   };
+
+  const refScope = {
+    organization: params.organizationSlug,
+    projectSlug: params.projectSlug,
+    assetSlug: params.assetSlug,
+  };
+
   const [open, setOpen] = React.useState<AssetVersionDTO | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = React.useState<
     false | "tag" | "branch"
   >(false);
   const handleDeleteRef = async () => {
     if (!open) return;
-    const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/` +
-        open.slug,
-      {
-        method: "DELETE",
-      },
-    );
+    let deleted = true;
+    try {
+      await deleteAssetVersion(refScope, open.slug);
+    } catch {
+      deleted = false;
+    }
 
-    if (resp.ok) {
+    if (deleted) {
       toast.success("Ref deleted successfully");
       updateAsset((prev) => {
         if (!prev) return prev;
@@ -77,13 +87,11 @@ const RefsPage = () => {
         };
       });
       // If the deleted ref is the last viewed ref, remove it from localStorage
-      const stored = localStorage.getItem(
+      const stored = readLocalStorage(
         "lastViewedAssetVersionSlug" + params.assetSlug,
       );
       if (stored === open.slug) {
-        localStorage.removeItem(
-          "lastViewedAssetVersionSlug" + params.assetSlug,
-        );
+        removeLocalStorage("lastViewedAssetVersionSlug" + params.assetSlug);
         eventBus.dispatch({ type: "assetVersionDeleted", payload: {} });
       }
 
@@ -94,14 +102,14 @@ const RefsPage = () => {
   };
 
   const handleMakeDefault = async (item: AssetVersionDTO) => {
-    const resp = await browserApiClient(
-      `/organizations/${params.organizationSlug}/projects/${params.projectSlug}/assets/${params.assetSlug}/refs/${item.slug}/make-default`,
-      {
-        method: "POST",
-      },
-    );
+    let ok = true;
+    try {
+      await makeAssetVersionDefault(refScope, item.slug);
+    } catch {
+      ok = false;
+    }
 
-    if (resp.ok) {
+    if (ok) {
       toast.success("Default ref updated successfully");
 
       updateAsset((prev) => {

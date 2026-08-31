@@ -4,8 +4,10 @@
 import { useState } from "react";
 import { toast } from "@/lib/toast";
 
+// basePath is the directory the report lives in, so callers one level below it
+// pass `${pathname}/..`.
 export function useDownloadPdf(
-  pathname: string,
+  basePath: string,
   fileType: string,
   errorLabel: string,
 ) {
@@ -15,8 +17,7 @@ export function useDownloadPdf(
     setIsLoading(true);
     try {
       const response = await fetch(
-        pathname +
-          `/../${fileType}?${new URLSearchParams({ artifact: artifact || "" })}`,
+        `${basePath}/${fileType}?${new URLSearchParams({ artifact: artifact || "" })}`,
         {
           signal: AbortSignal.timeout(60 * 8 * 1000),
           method: "GET",
@@ -32,6 +33,7 @@ export function useDownloadPdf(
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
+      link.download = fileType;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { OryNodeButtonProps } from "@ory/elements-react";
 import { FingerPrintIcon } from "@heroicons/react/24/outline";
@@ -19,9 +19,12 @@ export function OryButton({ node, buttonProps }: OryNodeButtonProps) {
   } = useFormContext();
   const passwordsMismatch = usePasswordMismatch();
 
-  useEffect(() => {
+  const [prevIsSubmitting, setPrevIsSubmitting] = useState(isSubmitting);
+
+  if (isSubmitting !== prevIsSubmitting) {
+    setPrevIsSubmitting(isSubmitting);
     if (!isSubmitting) setClicked(false);
-  }, [isSubmitting]);
+  }
 
   return (
     <Button

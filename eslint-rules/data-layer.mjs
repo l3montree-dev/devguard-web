@@ -10,12 +10,16 @@ import { ESLintUtils } from "@typescript-eslint/utils";
 // https://typescript-eslint.io/developers/custom-rules/#typed-rules
 
 // The transport primitives, by their *declared* name, so a renamed import still
-// matches. `browserApiClient` is the sanctioned API client: calling it is fine
-// in itself, it just may not happen straight from a view.
+// matches. `apiFetch`/`adminFetch` are sanctioned API clients: calling one is
+// fine in itself, it just may not happen straight from a view.
 export const BARE_FETCHERS = new Set(["fetch", "fetcher"]);
-export const ALL_TRANSPORTS = new Set([...BARE_FETCHERS, "browserApiClient"]);
+export const ALL_TRANSPORTS = new Set([
+  ...BARE_FETCHERS,
+  "apiFetch",
+  "adminFetch",
+]);
 
-// Where the real ones live (src/services/devGuardApi.ts, src/data-fetcher/fetcher.ts),
+// Where the real ones live (src/services/apiClient.ts, src/data-fetcher/fetcher.ts),
 // so a same-named local helper is not mistaken for one.
 const TRANSPORT_MODULES = /\/src\/(data-fetcher|services)\//;
 

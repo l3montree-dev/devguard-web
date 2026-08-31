@@ -9,7 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FlaskConical } from "lucide-react";
 import { useState, type FunctionComponent } from "react";
 import VexRuleMatchStatus from "./VexRuleMatchStatus";
-import { useVexRuleMatchCount } from "./useVexRuleMatchCount";
+import { useVexRuleMatchCount } from "@/hooks/useVexRuleMatchCount";
+import type { AssetScope } from "@/services/vexRuleService";
 
 // The shapes rules are usually written in.
 const EXAMPLES: Array<{ label: string; expression: string }> = [
@@ -37,19 +38,18 @@ const EXAMPLES: Array<{ label: string; expression: string }> = [
 ];
 
 interface CelPlaygroundProps {
-  // API base of this asset's VEX rules, e.g. /organizations/o/.../vex-rules
-  baseUrl: string;
+  scope: AssetScope;
   // Hands the current expression over to rule creation.
   onCreateRule: (celExpression: string) => void;
 }
 
 /** A scratchpad: write an expression, see what it matches, turn it into a rule. */
 const CelPlayground: FunctionComponent<CelPlaygroundProps> = ({
-  baseUrl,
+  scope,
   onCreateRule,
 }) => {
   const [celExpression, setCelExpression] = useState("");
-  const status = useVexRuleMatchCount(baseUrl, celExpression);
+  const status = useVexRuleMatchCount(scope, celExpression);
 
   const canCreate =
     celExpression.trim() !== "" &&

@@ -19,7 +19,7 @@ import {
   type KeyboardEvent,
 } from "react";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
-import type { ProjectDTO, SubGroupsAndAsset } from "../../types/api/api";
+import type { SubGroupProject, SubGroupsAndAsset } from "@/types/view/project";
 import { classNames } from "../../utils/common";
 import Markdown from "../common/Markdown";
 import { ProjectBadge } from "../common/ProjectTitle";
@@ -29,7 +29,7 @@ import EmptyGroupState from "./EmptyGroupState";
 import NestedList from "./NestedList";
 
 interface Props {
-  project: ProjectDTO;
+  project: SubGroupProject;
   subgroupsWithAssets?: SubGroupsAndAsset[];
   onFetchData: (projectSlug: string, projectId: string) => any;
   error?: Error;
@@ -68,9 +68,12 @@ const ProjectRow: FunctionComponent<Props> = ({
     }
   }, [onFetchData, project.slug, project.id]);
 
-  useEffect(() => {
+  const [prevHasContent, setPrevHasContent] = useState(hasContent);
+
+  if (hasContent !== prevHasContent) {
+    setPrevHasContent(hasContent);
     if (hasContent) setIsOpen(true);
-  }, [hasContent]);
+  }
 
   useEffect(() => {
     if (isOpen && !isFetched && !inFlight.current) {

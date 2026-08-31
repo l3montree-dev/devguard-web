@@ -6,7 +6,7 @@ import React from "react";
 import { useActiveProject } from "../../hooks/useActiveProject";
 import { useActiveOrg } from "../../hooks/useActiveOrg";
 import { Badge } from "../ui/badge";
-import type { ProjectDTO } from "../../types/api/api";
+import type { ProjectDTO } from "@/types/dto";
 import Image from "next/image";
 import { truncateMiddle } from "@/utils/common";
 import { cn } from "@/lib/utils";

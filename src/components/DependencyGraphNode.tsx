@@ -42,9 +42,10 @@ export const LoadMoreNode: FunctionComponent<{
 
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
-import type { DependencyVuln } from "../types/api/api";
+
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
+import type { DependencyVuln } from "@/types/dto";
 
 export interface DependencyGraphNodeProps {
   data: {

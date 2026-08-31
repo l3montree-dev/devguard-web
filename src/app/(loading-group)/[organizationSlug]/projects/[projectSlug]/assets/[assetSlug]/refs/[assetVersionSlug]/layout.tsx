@@ -44,8 +44,10 @@ async function AssetVersionShell({
   const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
     await params;
 
+  let assetVersion;
+  let artifacts;
   try {
-    const [assetVersion, artifacts] = await Promise.all([
+    [assetVersion, artifacts] = await Promise.all([
       fetchAssetVersion(
         decodeURIComponent(organizationSlug),
         projectSlug,
@@ -59,21 +61,21 @@ async function AssetVersionShell({
         assetVersionSlug,
       ),
     ]);
-
-    return (
-      <ClientContextWrapper
-        Provider={AssetVersionProvider}
-        value={{
-          artifacts,
-          assetVersion,
-        }}
-      >
-        {children}
-      </ClientContextWrapper>
-    );
   } catch (error) {
     handleHttpError(error, organizationSlug);
   }
+
+  return (
+    <ClientContextWrapper
+      Provider={AssetVersionProvider}
+      value={{
+        artifacts,
+        assetVersion,
+      }}
+    >
+      {children}
+    </ClientContextWrapper>
+  );
 }
 
 export default AssetVersionLayout;

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import React, { useState } from "react";
-import type { Policy } from "../../types/api/api";
+import type { Policy } from "@/types/dto";
 import ListItem from "./ListItem";
 import { Switch } from "../ui/switch";
 import { Badge } from "../ui/badge";

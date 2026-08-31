@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import { useDownloadPdf } from "@/hooks/useDownloadPdf";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import AssetTitle from "@/components/common/AssetTitle";
@@ -39,8 +40,6 @@ import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { groupBy } from "lodash";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
-import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import { RiskHistoryDistributionDiagram } from "../../../../../../../../../components/RiskHistoryDistributionDiagram";
 import { AffectedBranchesTags } from "@/components/AffectedBranchesTags";
 import { useRefDistributions } from "@/hooks/useRefDistributions";
@@ -49,19 +48,19 @@ import { Badge } from "../../../../../../../../../components/ui/badge";
 import { AsyncButton } from "../../../../../../../../../components/ui/button";
 import VulnEventItem from "../../../../../../../../../components/VulnEventItem";
 import { useArtifacts } from "../../../../../../../../../context/AssetVersionContext";
-import { fetcher } from "../../../../../../../../../data-fetcher/fetcher";
+import {
+  useAssetVersionEvents,
+  useAverageFixingTime,
+  useComponentLicenses,
+  useComponentRisk,
+  useRiskHistory,
+} from "@/hooks/useAssetVersionStats";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
-import type {
-  AllAverageFixingTimes,
-  ComponentRisk,
-  LicenseResponse,
-  Paged,
-  RiskHistory,
-  VulnEventDTO,
-} from "../../../../../../../../../types/api/api";
+
 import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
+import type { RiskHistory } from "@/types/dto";
 
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
@@ -81,53 +80,36 @@ const Index: FunctionComponent = () => {
     };
   const selectedArtifact = useSearchParams()?.get("artifact") || undefined;
 
-  const url =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/refs/" +
-    assetVersionSlug;
+  const versionScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
 
-  const { data: events, isLoading: eventsLoading } = useSWR<
-    Paged<VulnEventDTO>
-  >(url + "/events/?pageSize=4", fetcher);
-
-  const urlQueryAppendixForArtifact = selectedArtifact
-    ? "?artifactName=" + encodeURIComponent(selectedArtifact)
-    : "";
-  const urlAppendixForArtifact = selectedArtifact
-    ? "&artifactName=" + encodeURIComponent(selectedArtifact)
-    : "";
-
-  const { data: componentRisk, isLoading: componentRiskLoading } =
-    useSWR<ComponentRisk>(
-      url + "/stats/component-risk/" + urlQueryAppendixForArtifact,
-      fetcher,
-    );
-  const { data: riskHistoryResp, isLoading: riskHistoryLoading } = useSWR<
-    RiskHistory[]
-  >(
-    url +
-      "/stats/risk-history/?start=" +
-      extractDateOnly(last3Month) +
-      "&end=" +
-      extractDateOnly(new Date()) +
-      urlAppendixForArtifact,
-    fetcher,
+  const { data: events, isLoading: eventsLoading } = useAssetVersionEvents(
+    versionScope,
+    4,
   );
 
-  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
-    useSWR<AllAverageFixingTimes>(
-      url + "/stats/average-fixing-time/" + urlQueryAppendixForArtifact,
-      fetcher,
+  const { data: componentRisk, isLoading: componentRiskLoading } =
+    useComponentRisk(versionScope, selectedArtifact);
+
+  const { data: riskHistoryResp, isLoading: riskHistoryLoading } =
+    useRiskHistory(
+      versionScope,
+      extractDateOnly(last3Month),
+      extractDateOnly(new Date()),
+      selectedArtifact,
     );
 
-  const { data: licenses, isLoading: licenseLoading } = useSWR<
-    LicenseResponse[]
-  >(url + "/components/licenses/" + urlQueryAppendixForArtifact, fetcher);
+  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
+    useAverageFixingTime(versionScope, selectedArtifact);
+
+  const { data: licenses, isLoading: licenseLoading } = useComponentLicenses(
+    versionScope,
+    selectedArtifact,
+  );
 
   const riskHistory = useMemo(() => {
     const groups = groupBy(riskHistoryResp, "day");
@@ -151,36 +133,11 @@ const Index: FunctionComponent = () => {
 
   const pathname = usePathname();
 
-  const downloadPdfReport = async () => {
-    try {
-      const response = await fetch(
-        `${pathname}/vulnerability-report.pdf?${new URLSearchParams({
-          artifact: selectedArtifact || "",
-        })}`,
-        {
-          signal: AbortSignal.timeout(60 * 8 * 1000), // 8 minutes timeout
-          method: "GET",
-        },
-      );
-      if (!response.ok) {
-        toast.error(
-          "Failed to download Vulnerability Report PDF. Please try again later.",
-        );
-        return;
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      // add download attribute to the link
-      link.download = `vulnerability-report.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      toast.error("Failed to download SBOM PDF. Please try again later.");
-    }
-  };
+  const { handleDownload: downloadPdfReport } = useDownloadPdf(
+    pathname ?? "",
+    "vulnerability-report.pdf",
+    "Vulnerability Report PDF",
+  );
 
   const latest = riskHistory?.length
     ? riskHistory[riskHistory.length - 1]
@@ -201,7 +158,7 @@ const Index: FunctionComponent = () => {
         <div className="flex relative flex-col">
           <AsyncButton
             disabled={selectedArtifact === undefined}
-            onClick={downloadPdfReport}
+            onClick={() => downloadPdfReport(selectedArtifact)}
             variant={"secondary"}
             data-testid="download-pdf-report"
           >

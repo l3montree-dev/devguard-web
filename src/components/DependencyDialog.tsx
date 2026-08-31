@@ -1,7 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { useCallback, useEffect, useState } from "react";
+import type { ComponentProject, ScoreCard } from "@/types/view/component";
+import { useMemo } from "react";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import DependencyGraph from "@/components/DependencyGraph";
 import {
@@ -12,9 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { Project, ScoreCard } from "@/types/api/api";
-import { toast } from "@/lib/toast";
+import { useApiQuery } from "@/hooks/useApiQuery";
 
 import { Badge } from "@/components/ui/badge";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
@@ -27,14 +26,13 @@ import DateString, { parseDateOnly } from "./common/DateString";
 import ListItem from "./common/ListItem";
 import OpenSsfScore from "./common/OpenSsfScore";
 import { convertPathsToTree } from "../utils/dependencyGraphHelpers";
-import type { ViewDependencyTreeNode } from "../types/view/dependencyGraph";
 
 interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   purl: string;
   scoreCard?: ScoreCard;
-  project: Project;
+  project: ComponentProject;
 }
 
 const DependencyDialog: FunctionComponent<Props> = ({
@@ -45,10 +43,6 @@ const DependencyDialog: FunctionComponent<Props> = ({
   project: componentProject,
 }) => {
   const search = useSearchParams();
-
-  const [graphData, setGraphData] = useState<ViewDependencyTreeNode | null>(
-    null,
-  );
 
   //read artifactName from url query params
   const artifactName = (search?.get("artifact") as string) || "";
@@ -61,37 +55,25 @@ const DependencyDialog: FunctionComponent<Props> = ({
       assetVersionSlug: string;
     };
 
-  const handleGraphFetch = useCallback(
-    async (data: string) => {
-      const query = new URLSearchParams({
-        purl: data,
-      });
-      // check if artifact is set
-      if (artifactName) {
-        query.append("artifact", artifactName);
-      }
-
-      const resp = await browserApiClient(
-        `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/path-to-component?${query.toString()}`,
-        {
-          method: "GET",
+  const { data: paths } = useApiQuery(
+    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/path-to-component/",
+    {
+      params: {
+        path: {
+          organization: organizationSlug,
+          projectSlug,
+          assetSlug,
+          assetVersionSlug,
         },
-      );
-
-      if (resp.ok) {
-        const json2 = await resp.json();
-        const graphData = convertPathsToTree(json2, []);
-        setGraphData(graphData);
-      } else {
-        toast.error("Could not fetch Graph Data from Endpoint");
-      }
+        query: { purl, artifactName },
+      },
     },
-    [artifactName, organizationSlug, projectSlug, assetSlug, assetVersionSlug],
   );
 
-  useEffect(() => {
-    handleGraphFetch(purl);
-  }, [purl, handleGraphFetch]);
+  const graphData = useMemo(
+    () => (paths ? convertPathsToTree(paths as never, []) : null),
+    [paths],
+  );
 
   return (
     <Dialog open={open}>

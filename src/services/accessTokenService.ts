@@ -1,12 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { apiFetch } from "@/services/apiClient";
+import { generateKeyPair } from "./keyService";
 import type {
   SeeOncePatWithBearerToken as SeeOnceAccessTokenWithBearerToken,
   SeeOncePatWithPrivKey as SeeOnceAccessTokenWithPrivKey,
-} from "@/types/api/api";
-import { browserApiClient } from "./devGuardApi";
-import { generateKeyPair } from "./keyService";
+} from "@/types/view/accessToken";
 
 async function createAccessToken(
   data: {
@@ -45,7 +45,7 @@ async function createAccessToken(
   url: string = "/pats/",
 ): Promise<SeeOnceAccessTokenWithPrivKey | SeeOnceAccessTokenWithBearerToken> {
   if (data.symmetric) {
-    const resp = await browserApiClient(url, {
+    const resp = await apiFetch(url, {
       method: "POST",
       body: JSON.stringify(data),
     });
@@ -62,7 +62,7 @@ async function createAccessToken(
 
   const d = { ...data, pubKey: publicKey };
 
-  const resp = await browserApiClient(url, {
+  const resp = await apiFetch(url, {
     method: "POST",
     // send hex-encoded pubkey
     body: JSON.stringify(d),

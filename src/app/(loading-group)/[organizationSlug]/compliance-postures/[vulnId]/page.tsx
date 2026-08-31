@@ -15,15 +15,13 @@ const Index = () => {
 
   const orgMenu = useOrganizationMenu();
 
-  const apiBaseUrl =
-    "/organizations/" + organizationSlug + "/compliance-postures/";
+  const scope = {
+    level: "organization",
+    organization: organizationSlug,
+  } as const;
 
   return (
-    <CompliancePostureDetailView
-      apiBaseUrl={apiBaseUrl}
-      vulnId={vulnId}
-      Menu={orgMenu}
-    />
+    <CompliancePostureDetailView scope={scope} vulnId={vulnId} Menu={orgMenu} />
   );
 };
 

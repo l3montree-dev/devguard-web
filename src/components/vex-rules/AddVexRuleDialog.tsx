@@ -15,8 +15,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import VexRuleForm from "./VexRuleForm";
-import type { VexRuleVulnContext } from "@/types/view/vexRules";
-import { browserApiClient } from "@/services/devGuardApi";
+import type {
+  CreateVexRuleRequest,
+  VexRuleEventType,
+  VexRulePrefill,
+  VexRuleVulnContext,
+} from "@/types/view/vexRules";
+import { createVexRule } from "@/services/vexRuleService";
 import { toast } from "@/lib/toast";
 import {
   DropdownMenu,
@@ -28,13 +33,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FieldDescription } from "@/components/ui/field";
 import { ChevronDown, CircleAlert } from "lucide-react";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
-import type {
-  CreateVexRuleRequest,
-  MechanicalJustificationType,
-  VexRuleEventType,
-  VexRulePrefill,
-} from "@/types/api/api";
+import type { MechanicalJustificationType } from "@/types/view/vuln";
+
 import { checkCelSyntax } from "@/components/common/celLinter";
+
+import type { AssetScope } from "@/services/vexRuleService";
 
 const MECHANICAL_JUSTIFICATIONS = Object.keys(
   vexOptionMessages,
@@ -44,7 +47,7 @@ const DEFAULT_MECHANICAL_JUSTIFICATION = MECHANICAL_JUSTIFICATIONS[2];
 interface AddVexRuleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  baseUrl: string;
+  scope: AssetScope;
   onCreated: () => void;
   // Values to open with, from a dependency path, the playground or a recommendation.
   prefill?: VexRulePrefill;
@@ -58,7 +61,7 @@ interface AddVexRuleDialogProps {
 const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
   open,
   onOpenChange,
-  baseUrl,
+  scope,
   onCreated,
   prefill,
   currentVuln,
@@ -121,15 +124,10 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
       wasRecommended: prefill?.wasRecommended,
     };
 
-    const resp = await browserApiClient(baseUrl + "/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    if (!resp.ok) {
-      const errorText = await resp.text();
-      toast.error("Failed to create VEX rule: " + errorText);
+    try {
+      await createVexRule(scope, body as never);
+    } catch (error) {
+      toast.error("Failed to create VEX rule: " + String(error));
       return false;
     }
 
@@ -181,7 +179,7 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
             </TabsList>
             <TabsContent value={eventType} className="flex flex-col gap-4">
               <VexRuleForm
-                baseUrl={baseUrl}
+                scope={scope}
                 title={title}
                 onTitleChange={setTitle}
                 celExpression={celExpression}

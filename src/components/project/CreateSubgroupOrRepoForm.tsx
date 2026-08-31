@@ -8,12 +8,12 @@ import type { FunctionComponent } from "react";
 import { useState } from "react";
 import type { AssetFormValues } from "@/types/view/asset";
 import { CreateRepositoryForm } from "../asset/CreateRepositoryForm";
-import type { CreateProjectReq } from "../../types/api/req";
+import type { ProjectCreateRequest } from "@/services/projectService";
 import { CreateGroupForm } from "./CreateGroupForm";
 
 interface Props {
   onCreateRepository: (req: AssetFormValues) => Promise<void>;
-  onCreateSubgroup: (req: CreateProjectReq) => Promise<void>;
+  onCreateSubgroup: (req: ProjectCreateRequest) => Promise<void>;
 }
 
 export const CreateSubgroupOrRepoForm: FunctionComponent<Props> = ({

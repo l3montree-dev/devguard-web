@@ -15,16 +15,13 @@ const Index = () => {
 
   const projectMenu = useProjectMenu();
 
-  const apiBaseUrl =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/compliance-postures/";
+  const scope = {
+    level: "project",
+    organization: organizationSlug,
+    projectSlug,
+  } as const;
 
-  return (
-    <CompliancePosturesListView apiBaseUrl={apiBaseUrl} Menu={projectMenu} />
-  );
+  return <CompliancePosturesListView scope={scope} Menu={projectMenu} />;
 };
 
 export default Index;

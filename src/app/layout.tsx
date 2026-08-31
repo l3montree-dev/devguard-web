@@ -19,7 +19,7 @@ import { SessionProvider } from "../context/SessionContext";
 import { fetchInstanceSettings } from "../data-fetcher/fetchInstanceSettings";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
-import type { OrganizationDTO } from "../types/api/api";
+import type { OrganizationDTO } from "@/types/dto";
 import InternalServerErrorPage from "./error";
 import { TourContextProvider } from "@/context/TourContext";
 

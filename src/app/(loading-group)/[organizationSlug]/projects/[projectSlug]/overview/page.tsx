@@ -9,7 +9,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 import { QueryArtifactSelector } from "../../../../../../components/ArtifactSelector";
 import Avatar from "../../../../../../components/Avatar";
 import AverageFixingTimeChart from "../../../../../../components/AverageFixingTimeChart";
@@ -41,19 +40,18 @@ import {
 } from "../../../../../../components/ui/tooltip";
 import { useOrganization } from "../../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../../context/ProjectContext";
-import { fetcher } from "../../../../../../data-fetcher/fetcher";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
-import { browserApiClient } from "../../../../../../services/devGuardApi";
-import type {
-  AllAverageFixingTimes,
-  Paged,
-  ReleaseDTO,
-  RiskHistory,
-} from "../../../../../../types/api/api";
+import { downloadFile } from "@/services/apiClient";
+import { useReleases } from "@/hooks/useReleases";
+import {
+  useReleaseAverageFixingTime,
+  useReleaseRiskHistory,
+} from "@/hooks/useReleaseStats";
+
 import { beautifyPurl, classNames } from "../../../../../../utils/common";
 import {
   normalizeContentTree,
@@ -76,10 +74,8 @@ const OverviewPage = () => {
   const last3Month = new Date();
   last3Month.setMonth(last3Month.getMonth() - 3);
 
-  const { data: releases } = useSWR<Paged<ReleaseDTO>>(
-    `/organizations/${organizationSlug}/projects/${projectSlug}/releases/`,
-    fetcher,
-  );
+  const releaseScope = { organization: organizationSlug, projectSlug };
+  const { data: releases } = useReleases(releaseScope);
 
   const pushQuery = useRouterQuery();
   let releaseId: string | undefined = undefined;
@@ -98,40 +94,18 @@ const OverviewPage = () => {
   }, [artifact, releases, pushQuery]);
 
   // fetch all the data
-  const { data: riskHistory, isLoading: riskHistoryLoading } = useSWR<
-    RiskHistory[]
-  >(
-    () =>
-      releaseId
-        ? "/organizations/" +
-          organizationSlug +
-          "/projects/" +
-          projectSlug +
-          "/releases/" +
-          releaseId +
-          "/stats/risk-history?start=" +
-          last3Month.toISOString().split("T")[0] +
-          "&end=" +
-          new Date().toISOString().split("T")[0]
-        : null,
-    fetcher,
-  );
-
-  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
-    useSWR<AllAverageFixingTimes>(
-      releaseId
-        ? "/organizations/" +
-            organizationSlug +
-            "/projects/" +
-            projectSlug +
-            "/releases/" +
-            releaseId +
-            "/stats/average-fixing-time"
-        : null,
-      fetcher,
+  const { data: riskHistory, isLoading: riskHistoryLoading } =
+    useReleaseRiskHistory(
+      releaseScope,
+      releaseId,
+      last3Month.toISOString().split("T")[0],
+      new Date().toISOString().split("T")[0],
     );
 
-  const completeRiskHistory: RiskHistory[][] = useMemo(() => {
+  const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
+    useReleaseAverageFixingTime(releaseScope, releaseId);
+
+  const completeRiskHistory = useMemo(() => {
     const groups = groupBy(riskHistory ?? [], "day");
     const days = Object.keys(groups).sort();
     return days.map((day) => {
@@ -268,24 +242,11 @@ const OverviewPage = () => {
 
   const downloadSBOMReport = async () => {
     try {
-      const response = await browserApiClient(
+      await downloadFile(
         `/organizations/${organizationSlug}/projects/${projectSlug}/releases/${releaseId}/sbom.json/`,
-        { method: "GET", signal: AbortSignal.timeout(60 * 8 * 1000) },
+        `${releaseId}.json`,
       );
-      if (!response.ok) {
-        toast.error("Failed to download SBOM report. Please try again later.");
-        return;
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      // add download attribute to the link
-      link.download = `${releaseId}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
+    } catch {
       toast.error("Failed to download SBOM. Please try again later.");
     }
   };

@@ -4,7 +4,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { acceptInvitation } from "@/services/organizationService";
 import { Form } from "./ui/form";
 
 import { InvitationForm } from "@/components/InvitationForm";
@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 import { toast } from "@/lib/toast";
 import { extractInvitationCode } from "@/utils/url";
+import { writeLocalStorage } from "@/hooks/useLocalStorage";
 
 interface Props {
   isOpen: boolean;
@@ -40,15 +41,10 @@ export default function AcceptInvitationDialog({
       return;
     }
 
-    const resp = await browserApiClient("/accept-invitation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ code }),
-    });
-
-    if (!resp.ok) {
+    let joined;
+    try {
+      joined = (await acceptInvitation(code)) as { slug: string };
+    } catch {
       toast.error("Could not accept invitation", {
         description:
           "The invitation code is invalid or bound to a different account. Please check the code and make sure you are logged in with the correct account.",
@@ -56,14 +52,14 @@ export default function AcceptInvitationDialog({
       return;
     }
 
-    const { slug } = await resp.json();
+    const { slug } = joined;
 
     toast.success("Successfully joined the organization");
 
     form.reset();
     onOpenChange(false);
 
-    localStorage.setItem("lastActiveOrg", slug);
+    writeLocalStorage("lastActiveOrg", slug);
     router.replace(`/${slug}`);
   };
 

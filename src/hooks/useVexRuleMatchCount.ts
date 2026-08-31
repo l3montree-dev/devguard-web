@@ -4,9 +4,13 @@
 "use client";
 
 import { checkCelSyntax } from "@/components/common/celLinter";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { VexRuleEventType } from "@/types/api/api";
-import type { VexRuleMatchCount } from "@/types/view/vexRules";
+import type { AssetScope } from "@/services/vexRuleService";
+import { testVexRules } from "@/services/vexRuleService";
+
+import type {
+  VexRuleEventType,
+  VexRuleMatchCount,
+} from "@/types/view/vexRules";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -15,7 +19,7 @@ import { useEffect, useRef, useState } from "react";
  * expression so no stale count lingers during edits.
  */
 export function useVexRuleMatchCount(
-  baseUrl: string,
+  scope: AssetScope,
   celExpression: string,
   // The backend requires an event type to know which vulnerability scope to
   // match against; default to falsePositive when the caller has none to offer.
@@ -47,23 +51,18 @@ export function useVexRuleMatchCount(
     debounceRef.current = setTimeout(async () => {
       setIsTesting(true);
       try {
-        const resp = await browserApiClient(baseUrl + "/test", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+        let counts: Record<string, number>;
+        try {
+          counts = await testVexRules(scope, {
             celExpression: [expression],
             eventType,
-          }),
-        });
-
-        if (!resp.ok) {
+          } as never);
+        } catch {
           setTestingError("Failed to test CEL expression");
           return;
         }
         setTestingError(null);
-
-        const data: Record<string, number> = await resp.json();
-        setMatchResult({ expr: expression, count: data[expression] ?? 0 });
+        setMatchResult({ expr: expression, count: counts[expression] ?? 0 });
       } finally {
         setIsTesting(false);
       }
@@ -72,7 +71,7 @@ export function useVexRuleMatchCount(
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [celExpression, hasSyntaxError, baseUrl, eventType]);
+  }, [celExpression, hasSyntaxError, scope, eventType]);
 
   return {
     syntaxError,

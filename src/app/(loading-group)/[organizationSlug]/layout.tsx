@@ -37,27 +37,29 @@ async function OrganizationShell({
   params: Promise<{ organizationSlug: string }>;
 }) {
   let organizationSlug = "";
+  let org;
+  let contentTree;
   try {
     const { organizationSlug: slug } = await params;
     organizationSlug = slug;
-    const [org, contentTree] = await Promise.all([
+    [org, contentTree] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
       fetchContentTree(decodeURIComponent(organizationSlug)),
     ]);
-
-    return (
-      <ClientContextWrapper
-        Provider={OrganizationProvider}
-        value={{
-          organization: org,
-          contentTree,
-        }}
-      >
-        <OrgHeader />
-        {children}
-      </ClientContextWrapper>
-    );
   } catch (error) {
     handleHttpError(error, organizationSlug);
   }
+
+  return (
+    <ClientContextWrapper
+      Provider={OrganizationProvider}
+      value={{
+        organization: org,
+        contentTree,
+      }}
+    >
+      <OrgHeader />
+      {children}
+    </ClientContextWrapper>
+  );
 }

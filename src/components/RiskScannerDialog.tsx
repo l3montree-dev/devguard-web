@@ -5,7 +5,7 @@ import AutoHeight from "embla-carousel-auto-height";
 import Fade from "embla-carousel-fade";
 
 import { useAutosetup } from "@/hooks/useAutosetup";
-import type { ArtifactDTO, AssetVersionDTO } from "@/types/api/api";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 import React, {
   type FunctionComponent,
   useCallback,
@@ -21,10 +21,13 @@ import { useActiveOrg } from "../hooks/useActiveOrg";
 import { useActiveProject } from "../hooks/useActiveProject";
 import useAccessToken from "../hooks/useAccessToken";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
+import { createArtifact } from "@/services/artifactService";
+import { createAssetVersion } from "@/services/assetVersionService";
 import {
-  browserApiClient,
-  multipartBrowserApiClient,
-} from "../services/devGuardApi";
+  uploadSarif,
+  uploadSbomFile,
+  uploadVex,
+} from "@/services/scanUploadService";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
@@ -211,6 +214,17 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     },
   });
 
+  const scanTarget = (params: {
+    branchOrTagName: string;
+    isTag: boolean;
+    isDefault: boolean;
+    artifactName: string;
+    origin: string;
+  }) => ({
+    ...params,
+    assetName: `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
+  });
+
   const uploadSBOM = async (params: {
     branchOrTagName: string;
     branchOrTagSlug: string;
@@ -220,25 +234,15 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     origin: string;
   }) => {
     if (!sbomFileRef.current) return;
-    const formdata = new FormData();
-    formdata.append("file", sbomFileRef.current);
 
-    const resp = await multipartBrowserApiClient(
-      `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${activeProject.slug}/assets/${asset!.slug}/sbom-file`,
+    const resp = await uploadSbomFile(
       {
-        method: "POST",
-        body: formdata,
-        headers: {
-          "X-Asset-Ref": params.branchOrTagName,
-          "X-Asset-Default-Branch": params.isDefault
-            ? params.branchOrTagName
-            : "",
-          "X-Tag": params.isTag ? "1" : "0",
-          "X-Artifact-Name": params.artifactName,
-          "X-Origin": params.origin,
-          "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
-        },
+        organization: decodeURIComponent(activeOrg.slug),
+        projectSlug: activeProject.slug,
+        assetSlug: asset!.slug,
       },
+      scanTarget(params),
+      sbomFileRef.current,
     );
 
     if (resp.ok) {
@@ -249,6 +253,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       // You can see we added a better error tracking in the AssetLayout to make that visible.
       // As router.push() (and not in combination with refresh) did not helped us out here we used the hard navigation here...
       // The End. And if they are not debugging version 1.0.0 release canidate a thousand they will be dead.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination, react-hooks/immutability -- see above
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/dependency-risks?artifact=${encodeURIComponent(params.artifactName)}`;
       onOpenChange(false);
       toast.success("SBOM has successfully been sent!");
@@ -269,26 +274,18 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   }) => {
     if (!sarifContentRef.current) return;
 
-    const resp = await browserApiClient(`/sarif-scan`, {
-      method: "POST",
-      body: sarifContentRef.current,
-      headers: {
-        "X-Tag": params.isTag ? "1" : "0",
-        "X-Asset-Ref": params.branchOrTagName,
-        "X-Asset-Default-Branch": params.isDefault
-          ? params.branchOrTagName
-          : "",
-        "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
-        "X-Scanner": params.origin,
-      },
-    });
+    try {
+      await uploadSarif(scanTarget(params), sarifContentRef.current);
+    } catch {
+      toast.error("SARIF report has not been sent successfully");
+      return;
+    }
 
-    if (resp.ok) {
+    {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- hard navigation, see the SBOM upload above
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/code-risks/`;
       onOpenChange(false);
       toast.success("SARIF report has successfully been sent!");
-    } else {
-      toast.error("SARIF report has not been sent successfully");
     }
   };
 
@@ -302,27 +299,18 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   }) => {
     if (!vexContentRef.current) return;
 
-    const resp = await browserApiClient(`/vex`, {
-      method: "POST",
-      body: vexContentRef.current,
-      headers: {
-        "X-Tag": params.isTag ? "1" : "0",
-        "X-Asset-Ref": params.branchOrTagName,
-        "X-Artifact-Name": params.artifactName,
-        "X-Asset-Default-Branch": params.isDefault
-          ? params.branchOrTagName
-          : "",
-        "X-Asset-Name": `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
-        "X-Origin": params.origin,
-      },
-    });
+    try {
+      await uploadVex(scanTarget(params), vexContentRef.current);
+    } catch {
+      toast.error("VEX has not been sent successfully");
+      return;
+    }
 
-    if (resp.ok) {
+    {
       onOpenChange(false);
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- hard navigation, see the SBOM upload above
       window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/vex-rules/`;
       toast.success("VEX has successfully been sent!");
-    } else {
-      toast.error("VEX has not been sent successfully");
     }
   };
 
@@ -333,58 +321,49 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     isDefault: boolean;
     informationSources: Array<{ url: string }>;
   }) => {
+    const scope = {
+      organization: decodeURIComponent(activeOrg.slug),
+      projectSlug: activeProject.slug,
+      assetSlug: asset!.slug,
+    };
+
     // first create the asset version
-    const resp = await browserApiClient(
-      `/organizations/${decodeURIComponent(
-        activeOrg.slug,
-      )}/projects/${activeProject.slug}/assets/${asset!.slug}/refs`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: params.branchOrTagName,
-          tag: params.isTag,
-          defaultBranch: params.isDefault,
-        }),
-      },
-    );
+    const assetVersionData = await createAssetVersion(scope, {
+      name: params.branchOrTagName,
+      tag: params.isTag,
+      defaultBranch: params.isDefault,
+    });
 
     // now create the artifact
-    if (resp.ok) {
-      const assetVersionData = await resp.json();
-      const artifactResp = await browserApiClient(
-        `/organizations/${decodeURIComponent(
-          activeOrg.slug,
-        )}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/artifacts`,
+    try {
+      await createArtifact(
+        { ...scope, assetVersionSlug: assetVersionData.slug },
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            artifactName: params.artifactName,
-            informationSources: params.informationSources,
-          }),
+          artifactName: params.artifactName,
+          informationSources: params.informationSources,
         },
       );
-      if (artifactResp.ok) {
-        onOpenChange(false);
-        window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`;
+    } catch (error) {
+      // the handler answers with external reference error dtos, so we can show
+      // the user which urls were invalid and why
+      const invalid = (error as { data?: unknown }).data;
+      if (Array.isArray(invalid)) {
+        const errorMessage = invalid
+          .map((el) => `${el.url}: ${el.reason}`)
+          .join(", ");
+        toast.error(`Some information sources were invalid: ${errorMessage}`);
       } else {
-        // read the body, we get external reference error dtos here, we can show the user which urls were invalid and why
-        const errorBody = await artifactResp.json();
-        if (errorBody && Array.isArray(errorBody)) {
-          const errorMessage = errorBody
-            .map((el: any) => `${el.url}: ${el.reason}`)
-            .join(", ");
-          toast.error(`Some information sources were invalid: ${errorMessage}`);
-        } else {
-          toast.error("Information source setup was not created successfully");
-        }
+        toast.error("Information source setup was not created successfully");
       }
+      return;
     }
+
+    onOpenChange(false);
+    // hard navigation, see the SBOM upload above
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign(
+      `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`,
+    );
   };
 
   const handleUpload = async (params: {
@@ -465,11 +444,14 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   const [slideHistory, setSlideHistory] = useState<number[]>([getStartIndex()]);
 
-  useEffect(() => {
-    if (open) {
-      setSlideHistory([getStartIndex()]);
-    }
-  }, [open, initialSlide]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [prevOpen, setPrevOpen] = useState(open);
+  const [prevInitialSlide, setPrevInitialSlide] = useState(initialSlide);
+
+  if (open !== prevOpen || initialSlide !== prevInitialSlide) {
+    setPrevOpen(open);
+    setPrevInitialSlide(initialSlide);
+    if (open) setSlideHistory([getStartIndex()]);
+  }
 
   const prevIndex =
     slideHistory[slideHistory.length - 2] ?? slideHistory[0] ?? 0;

@@ -1,22 +1,20 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { OrganizationDTO } from "@/types/api/api";
+import type { OrganizationDTO } from "@/types/dto";
 import { uniqBy } from "lodash";
-import { getApiClientInAppRouter } from "../services/devGuardApiAppRouter";
+import { getServerClient } from "@/services/serverApiClient";
 import { HttpError } from "./httpError";
 
 export async function fetchOrgs() {
-  // get the devGuardApiClient
-  const devGuardApiClient = await getApiClientInAppRouter();
+  const client = await getServerClient();
 
-  // get the organization
-  const [r, orgsAfterTrigger] = await Promise.all([
-    devGuardApiClient("/organizations/"),
-    devGuardApiClient("/trigger-sync", {
-      method: "GET",
-    }),
+  const [orgs, synced] = await Promise.all([
+    client.GET("/organizations"),
+    client.GET("/trigger-sync"),
   ]);
+  const r = orgs.response;
+  const orgsAfterTrigger = synced.response;
 
   if (!r.ok) {
     throw new HttpError("An unexpected error occurred", {
@@ -24,11 +22,11 @@ export async function fetchOrgs() {
     });
   }
   // parse the organization
-  let organizations: OrganizationDTO[] = await r.json();
+  // GET /organizations is annotated with models.Org, not dtos.OrgDTO
+  let organizations = orgs.data as unknown as OrganizationDTO[];
 
   if (orgsAfterTrigger.ok) {
-    const orgsAfterTriggerJson: OrganizationDTO[] =
-      await orgsAfterTrigger.json();
+    const orgsAfterTriggerJson = synced.data as unknown as OrganizationDTO[];
     // merge the two org lists, avoiding duplicates
     organizations = uniqBy(organizations.concat(orgsAfterTriggerJson), "slug");
   }

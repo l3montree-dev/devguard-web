@@ -1,12 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type {
-  ArtifactDTO,
-  AssetDTO,
-  DependencyVuln,
-  ExternalReferenceErrorDTO,
-} from "@/types/api/api";
+import type { AssetDTO, DependencyVuln } from "@/types/dto";
+
 import type { Modify } from "@/types/common";
 
 export type AssetFormValues = Modify<
@@ -15,15 +11,13 @@ export type AssetFormValues = Modify<
     cvssAutomaticTicketThreshold: number[];
     riskAutomaticTicketThreshold: number[];
     enableTicketRange: boolean;
+    enableExposureMetrics: boolean;
+    keepOriginalSbomRootComponent: boolean;
+    vulnAutoReopenAfterDays: number | null;
   }
 >;
 
 export type SecretType = "webhook";
-
-export interface UpdateArtifactResponse {
-  artifact: ArtifactDTO;
-  invalidURLs: ExternalReferenceErrorDTO[];
-}
 
 export type QuickfixVuln = Pick<
   DependencyVuln,

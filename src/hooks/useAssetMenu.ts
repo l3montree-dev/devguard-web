@@ -1,7 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AssetDTO, AssetVersionDTO } from "@/types/api/api";
+import type { AssetDTO, AssetVersionDTO } from "@/types/dto";
+
 import { RocketLaunchIcon } from "@heroicons/react/20/solid";
 import {
   ChartBarSquareIcon,

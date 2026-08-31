@@ -8,12 +8,12 @@ import EmptyParty from "@/components/common/EmptyParty";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
+import { useProjectResources } from "@/hooks/useProjectResources";
 import { toast } from "@/lib/toast";
 import { buildFilterSearchParams } from "@/utils/url";
 import { debounce } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
 import type { AssetFormValues } from "@/types/view/asset";
 import { CreateRepositoryForm } from "../../../../../components/asset/CreateRepositoryForm";
 import AuthGuard from "../../../../../components/AuthGuard";
@@ -25,19 +25,17 @@ import { CreateSubgroupOrRepoForm } from "../../../../../components/project/Crea
 import { Button } from "../../../../../components/ui/button";
 import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
-import { fetcher } from "../../../../../data-fetcher/fetcher";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
 import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { isAdmin, useCurrentUserRole } from "../../../../../hooks/useUserRole";
-import { browserApiClient } from "../../../../../services/devGuardApi";
-import type {
-  AssetDTO,
-  EnvDTO,
-  Paged,
-  ProjectDTO,
-  SubGroupsAndAsset,
-} from "../../../../../types/api/api";
-import type { CreateProjectReq } from "../../../../../types/api/req";
+import {
+  createAsset,
+  createProject,
+  listProjectResources,
+} from "@/services/projectService";
+import type { Paged } from "@/types/view/pagination";
+import type { SubGroupsAndAsset } from "@/types/view/project";
+import type { ProjectCreateRequest } from "@/services/projectService";
 
 import { groupHomeTourSteps } from "@/components/common/tours/groupHomeTour";
 import Sort from "@/components/Sort";
@@ -72,37 +70,17 @@ export default function RepositoriesPage() {
 
   const pushQuery = useRouterQuery();
 
-  const swrUrl = (() => {
-    if (!organization.organization) return null;
-    const orgSlug = decodeURIComponent(organization.organization.slug);
-    if (isSearchActive) {
-      return `/organizations/${orgSlug}/projects/search?parentId=${project?.id}&${queryWithState.toString()}`;
-    }
-    const base = `/organizations/${orgSlug}/projects/${decodeURIComponent(project.slug)}/resources?parentId=${project?.id}`;
-    const query = queryWithState.toString();
-    return query ? `${base}&${query}` : base;
-  })();
-
   const {
     isLoading,
     data: subgroupsWithAssets,
     error,
     mutate,
-  } = useSWR<Paged<SubGroupsAndAsset>>(
-    swrUrl,
-    async (url: string) => {
-      if (isSearchActive) {
-        const raw = (await fetcher(url)) as Paged<
-          ProjectDTO & { subGroupsAndAsset: SubGroupsAndAsset[] | null }
-        >;
-        return {
-          ...raw,
-          data: raw.data.flatMap((item) => item.subGroupsAndAsset ?? []),
-        };
-      }
-      return fetcher<Paged<SubGroupsAndAsset>>(url);
-    },
-    { keepPreviousData: true },
+  } = useProjectResources(
+    organization.organization?.slug,
+    project.slug,
+    project.id,
+    queryWithState,
+    isSearchActive,
   );
 
   const router = useRouter();
@@ -147,26 +125,24 @@ export default function RepositoriesPage() {
     }
   };
 
-  const handleCreateProject = async (data: CreateProjectReq) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/projects/",
-      {
-        method: "POST",
-        body: JSON.stringify({ ...data, parentId: project.id }),
-      },
-    );
-    if (resp.ok) {
-      const res: ProjectDTO = await resp.json();
+  const handleCreateProject = async (data: ProjectCreateRequest) => {
+    try {
+      const res = await createProject(activeOrg.slug, {
+        ...data,
+        parentId: project.id,
+      } as never);
       setShowProjectModal(false);
       // navigate to the new application
-      router.push(`/${activeOrg.slug}/projects/${res.slug}`);
-    } else {
+      router.push(
+        `/${activeOrg.slug}/projects/${(res as { slug: string }).slug}`,
+      );
+    } catch {
       toast("Error", { description: "Could not create project" });
     }
   };
 
   const handleCreateAsset = async (data: AssetFormValues) => {
-    const modifiedData: AssetDTO = {
+    const modifiedData = {
       ...data,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
         ? data.cvssAutomaticTicketThreshold[0]
@@ -176,40 +152,40 @@ export default function RepositoriesPage() {
         ? data.riskAutomaticTicketThreshold[0]
         : 2,
     };
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project.slug +
-        "/assets",
-      {
-        method: "POST",
-        body: JSON.stringify(modifiedData),
-      },
-    );
-    if (resp.ok) {
-      const res: AssetDTO & {
-        env: Array<EnvDTO>;
-      } = await resp.json();
+    try {
+      const res = (await createAsset(
+        { organization: activeOrg.slug, projectSlug: project.slug },
+        modifiedData as never,
+      )) as { slug: string };
       setShowModal(false);
       // navigate to the new application
       router.push(
         `/${activeOrg.slug}/projects/${project.slug}/assets/${res.slug}`,
       );
-    } else {
+    } catch {
       toast("Error", { description: "Could not create asset" });
     }
   };
 
   const handleLazyDataFetching = useCallback(
     async (projectSlug: string, projectId: string) => {
-      const base = `/organizations/${decodeURIComponent(activeOrg.slug)}/projects/${decodeURIComponent(projectSlug)}/resources?parentId=${projectId}`;
+      let subGroupsAndAsset;
+      try {
+        subGroupsAndAsset = (await listProjectResources(
+          {
+            organization: decodeURIComponent(activeOrg.slug),
+            projectSlug: decodeURIComponent(projectSlug),
+          },
+          projectId,
+        )) as unknown as Paged<SubGroupsAndAsset>;
+      } catch {
+        toast.error(
+          "Failed to load subgroups and assets. Please try again later.",
+        );
+        return;
+      }
 
-      const resp = await browserApiClient(base);
-      if (resp.ok) {
-        const data = await resp.json();
-        const subGroupsAndAsset = data as Paged<SubGroupsAndAsset>;
-
+      {
         mutate(
           (prev) => {
             if (!prev) return prev;
@@ -242,10 +218,6 @@ export default function RepositoriesPage() {
             };
           },
           { revalidate: false },
-        );
-      } else {
-        toast.error(
-          "Failed to load subgroups and assets. Please try again later.",
         );
       }
     },

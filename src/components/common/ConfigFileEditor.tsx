@@ -7,10 +7,10 @@ import CodeEditor, { type Language } from "@/components/common/CodeEditor";
 import type { Diagnostic } from "@codemirror/lint";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { browserApiClient } from "@/services/devGuardApi";
+import type { ConfigScope } from "@/services/configFileService";
+import { useConfigFile } from "@/hooks/useConfigFile";
 import { useState } from "react";
 import { toast } from "@/lib/toast";
-import useSWR from "swr";
 
 const defaultConfigFiles = [
   { value: "trivy", label: "Trivy", language: "yaml" },
@@ -24,12 +24,12 @@ export type ConfigFile = (typeof defaultConfigFiles)[number] & {
 };
 
 interface Props {
-  baseUrl: string | null;
+  scope: ConfigScope | null;
   configFiles?: ConfigFile[];
 }
 
 const ConfigFileEditor = ({
-  baseUrl,
+  scope,
   configFiles = defaultConfigFiles,
 }: Props) => {
   const [selectedConfigId, setSelectedConfigId] = useState(
@@ -42,19 +42,9 @@ const ConfigFileEditor = ({
   const selectedLanguage = (selectedConfig?.language ?? "json") as Language;
   const selectedExtension = selectedConfig?.extension ?? selectedLanguage;
 
-  const configFileUrl = baseUrl
-    ? baseUrl + "/config-files/" + selectedConfigId + "." + selectedExtension
-    : null;
-
-  const { data: configFile, mutate } = useSWR<string | null>(
-    configFileUrl,
-    async (url: string) => {
-      const response = await browserApiClient(url);
-      if (!response.ok && response.status !== 404) {
-        throw new Error("Failed to fetch config file");
-      }
-      return response.text();
-    },
+  const { content: configFile, save } = useConfigFile(
+    scope,
+    selectedConfigId + "." + selectedExtension,
   );
 
   const editorValue = localEdit ?? configFile ?? "";
@@ -66,24 +56,15 @@ const ConfigFileEditor = ({
   };
 
   const handleConfigFileChange = async (newConfig: string) => {
-    if (!configFileUrl) {
-      return;
-    }
-
-    const resp = await browserApiClient(configFileUrl, {
-      method: "PUT",
-      headers: { "Content-Type": "text/plain" },
-      body: newConfig,
-    });
-
-    if (!resp.ok) {
+    try {
+      await save(newConfig);
+    } catch {
       setCodeError("Failed to save the new Configuration");
       return;
     }
     toast.success("Config saved successfully");
     setLocalEdit(newConfig);
     setCodeError(null);
-    mutate();
   };
 
   const handleEditorValidation = (

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import type { FunctionComponent } from "react";
-import type { SubGroupsAndAsset } from "../../types/api/api";
+import type { SubGroupsAndAsset } from "@/types/view/project";
 import Err from "../common/Err";
 import { Skeleton } from "../ui/skeleton";
 import AssetRow from "./AssetRow";
@@ -74,7 +74,9 @@ const NestedList: FunctionComponent<Props> = ({
           <ProjectRow
             key={subgroup.id}
             project={subgroup}
-            subgroupsWithAssets={subgroup.subGroupsAndAsset}
+            subgroupsWithAssets={
+              subgroup.subGroupsAndAsset as SubGroupsAndAsset[]
+            }
             onFetchData={onFetchData}
             depth="nested"
             isLast={index === items.length - 1}

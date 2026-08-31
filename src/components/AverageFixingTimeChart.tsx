@@ -12,7 +12,7 @@ import {
 } from "./ui/card";
 import { classNames, getHumanReadableDuration } from "../utils/common";
 import { getSeverityClassNames } from "./common/Severity";
-import type { AverageFixingTime } from "../types/api/api";
+import type { AverageFixingTime } from "@/types/view/vuln";
 import { Skeleton } from "./ui/skeleton";
 
 interface Props {

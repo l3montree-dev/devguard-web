@@ -3,14 +3,21 @@
 
 "use client";
 
+import { useWebhooks } from "@/hooks/useWebhooks";
 import { useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import Page from "../../../../../../components/Page";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
-import { browserApiClient } from "../../../../../../services/devGuardApi";
-import { UserRole } from "../../../../../../types/api/api";
-import type { ProjectDTO, WebhookDTO } from "../../../../../../types/api/api";
+import {
+  changeProjectMemberRole,
+  deleteProject,
+  patchProject,
+  removeProjectMember,
+} from "@/services/projectService";
+import { UserRole } from "@/types/view/vuln";
+import type { ProjectDTO, WebhookDTO } from "@/types/dto";
+
 import { ProjectDangerZone } from "@/components/project/ProjectDangerZone";
 import { ProjectForm } from "@/components/project/ProjectForm";
 import { Button } from "@/components/ui/button";
@@ -18,11 +25,9 @@ import { Card } from "@/components/ui/card";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
 import { WebhookIntegrationDialog } from "@/components/common/WebhookIntegrationDialog";
-import { fetcher } from "@/data-fetcher/fetcher";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import useSWR from "swr";
 import { toast } from "@/lib/toast";
 import MembersTable from "../../../../../../components/MembersTable";
 import WebhooksTable from "../../../../../../components/WebhooksTable";
@@ -59,19 +64,11 @@ const Index: FunctionComponent = () => {
     projectSlug +
     "/pats/";
 
-  const {
-    data: webhooks,
-    isLoading: webhooksLoading,
-    mutate: mutateWebhooks,
-  } = useSWR<Array<WebhookDTO>>(
-    "/organizations/" + organizationSlug + "/projects/" + projectSlug + "/",
-    async (projectUrl: string) => {
-      const details = await fetcher<{ webhooks: Array<WebhookDTO> | null }>(
-        projectUrl,
-      );
-      return details.webhooks ?? [];
-    },
-  );
+  const { webhooks, webhooksLoading, mutateWebhooks } = useWebhooks({
+    level: "project",
+    organization: organizationSlug,
+    projectSlug,
+  });
 
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     mutateWebhooks((prev) => (prev ?? []).concat(integration), {
@@ -97,20 +94,8 @@ const Index: FunctionComponent = () => {
     id: string,
     role: UserRole.Admin | UserRole.Member,
   ) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project?.slug +
-        "/members/" +
-        id,
-      {
-        method: "PUT",
-        body: JSON.stringify({ role }),
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await changeProjectMemberRole(projectScope, id, role);
       updateProject({
         ...project!,
         members: project!.members.map((member) =>
@@ -118,50 +103,39 @@ const Index: FunctionComponent = () => {
         ),
       });
       toast.success("Role successfully changed");
-    } else {
+    } catch {
       toast.error("Failed to update member role");
     }
   };
 
   const handleDeleteProject = async () => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/projects/" + project!.slug, // can never be null
-      {
-        method: "DELETE",
-      },
-    );
-    if (resp.ok) {
+    try {
+      await deleteProject(projectScope);
       toast("Group deleted", {
         description: "The group has been deleted",
       });
       router.push("/" + activeOrg.slug);
-    } else {
+    } catch {
       toast.error("Could not delete asset");
     }
   };
 
   const handleRemoveMember = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project?.slug +
-        "/members/" +
-        id,
-      {
-        method: "DELETE",
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await removeProjectMember(projectScope, id);
       updateProject({
         ...project!,
         members: project!.members.filter((member) => member.id !== id),
       });
       toast.success("Member deleted");
-    } else {
+    } catch {
       toast.error("Failed to remove member");
     }
+  };
+
+  const projectScope = {
+    organization: activeOrg.slug,
+    projectSlug: project!.slug,
   };
 
   const projectMenu = useProjectMenu();
@@ -169,15 +143,10 @@ const Index: FunctionComponent = () => {
   const form = useForm<ProjectDTO>({ defaultValues: project });
 
   const handleUpdate = async (data: Partial<ProjectDTO>) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/projects/" + project!.slug + "/",
-      {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      },
-    );
-
-    if (!resp.ok) {
+    let newProject;
+    try {
+      newProject = await patchProject(projectScope, data);
+    } catch {
       toast.error("Could not update group");
       return false;
     }
@@ -186,8 +155,7 @@ const Index: FunctionComponent = () => {
       description: "Group updated",
     });
     // check if the slug changed - if so, redirect to the new slug
-    const newProject = await resp.json();
-    updateProject(newProject);
+    updateProject(newProject as typeof project);
 
     if (newProject.slug !== project!.slug) {
       router.push(
@@ -273,13 +241,11 @@ These identifiers are managed by the external system and are treated as immutabl
           >
             <WebhooksTable
               webhooks={webhooks ?? []}
-              urlBase={
-                "/organizations/" +
-                organizationSlug +
-                "/projects/" +
-                projectSlug +
-                "/integrations/webhook"
-              }
+              scope={{
+                level: "project",
+                organization: organizationSlug,
+                projectSlug,
+              }}
               onUpdateWebhook={handleUpdateWebhookIntegration}
               onDeleted={handleWebhookDeleted}
               projectWebhook={true}

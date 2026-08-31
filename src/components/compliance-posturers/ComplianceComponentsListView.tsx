@@ -3,20 +3,17 @@
 
 "use client";
 
+import type { ComplianceComponentImplementsControlDTO } from "@/types/dto";
+import { useComplianceComponents } from "@/hooks/useCompliancePostures";
 import Page from "@/components/Page";
 import EmptyParty from "@/components/common/EmptyParty";
 import ListItem from "@/components/common/ListItem";
 import Section from "@/components/common/Section";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetcher } from "@/data-fetcher/fetcher";
-import type {
-  ComplianceComponentDetailsDTO,
-  ComplianceComponentImplementsControlDTO,
-} from "@/types/api/api";
+
 import type { FunctionComponent } from "react";
 import { useState } from "react";
-import useSWR from "swr";
 import ComplianceComponentIcon from "./ComplianceComponentIcon";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import InfoTooltip from "../common/InfoTooltip";
@@ -69,9 +66,7 @@ interface Props {
 }
 
 const ComplianceComponentsListView: FunctionComponent<Props> = ({ Menu }) => {
-  const { data: components, isLoading } = useSWR<
-    ComplianceComponentDetailsDTO[]
-  >("/compliance-components/", fetcher);
+  const { data: components, isLoading } = useComplianceComponents();
 
   return (
     <Page

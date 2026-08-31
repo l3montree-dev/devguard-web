@@ -4,8 +4,8 @@
 import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { OrganizationDetailsDTO } from "@/types/api/api";
+import { deleteGitlabIntegration } from "@/services/organizationService";
+import type { OrganizationDetailsDTO } from "@/types/dto";
 import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import Image from "next/image";
@@ -42,14 +42,14 @@ export default function ProviderSetup({
   const activeOrg = activeOrgFromContext || activeOrgProp;
 
   const handleDelete = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/gitlab/" + id,
-      {
-        method: "DELETE",
-      },
-    );
+    let deleted = true;
+    try {
+      await deleteGitlabIntegration(activeOrg.slug, id);
+    } catch {
+      deleted = false;
+    }
 
-    if (resp.ok) {
+    if (deleted) {
       // Update the organization context with the filtered integrations
       updateOrganization((prev) => {
         if (!prev.organization) {

@@ -7,7 +7,7 @@
 
 "use client";
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { finishIntegrationInstallation } from "@/services/organizationService";
 import { decodeObjectBase64 } from "@/services/encodeService";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -32,28 +32,28 @@ const Gh = () => {
 
       // quick fix for https://github.com/l3montree-dev/devguard-web/issues/53
       // retry 3 times
-      let installation: Response | null = null;
+      let installed = false;
       for (let i = 0; i < 3; i++) {
-        installation = await browserApiClient(
-          `/organizations/${stateObj?.orgSlug}/integrations/finish-installation?installationId=${installationId}`,
-        );
+        try {
+          await finishIntegrationInstallation(
+            stateObj?.orgSlug,
+            installationId as string,
+          );
+          installed = true;
+        } catch {
+          installed = false;
+        }
 
         // wait 3 seconds
         await new Promise((resolve) => setTimeout(resolve, 3000));
 
-        if (installation.ok) {
+        if (installed) {
           break;
         }
       }
 
-      if (!installation) {
+      if (!installed) {
         console.log("Installation failed");
-        setErr("Installation failed");
-        return;
-      }
-
-      if (!installation.ok) {
-        console.log("Installation failed", installation);
         setErr("Installation failed");
         return;
       }

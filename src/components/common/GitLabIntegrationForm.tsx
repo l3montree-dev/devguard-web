@@ -9,12 +9,13 @@ import {
   FormItem,
   FormLabel,
 } from "../ui/form";
+import type { GitLabIntegrationDTO } from "@/types/dto";
 import { useForm } from "react-hook-form";
 import { useLoader } from "@/hooks/useLoader";
-import { browserApiClient } from "@/services/devGuardApi";
+import { saveGitlabIntegration } from "@/services/organizationService";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "@/lib/toast";
-import type { GitLabIntegrationDTO } from "@/types/api/api";
+
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 
@@ -47,18 +48,16 @@ export default function GitLabIntegrationForm({
     token: string;
     name: string;
   }) => {
-    const res = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/gitlab/test-and-save",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          ...params,
-          url: urlToBaseURL(params.url),
-        }),
-      },
-    );
-    if (res.ok) {
-      const integration = await res.json();
+    let integration;
+    try {
+      integration = await saveGitlabIntegration(activeOrg.slug, {
+        ...params,
+        url: urlToBaseURL(params.url),
+      } as never);
+    } catch {
+      integration = null;
+    }
+    if (integration) {
       onNewIntegration(integration);
       if (setOpen) {
         setOpen(false);

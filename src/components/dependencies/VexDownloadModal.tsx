@@ -27,7 +27,7 @@ import { useActiveAsset } from "../../hooks/useActiveAsset";
 import { useActiveAssetVersion } from "../../hooks/useActiveAssetVersion";
 import { useSelectArtifact } from "../ArtifactSelector";
 import { usePublicSharing } from "./PublicUrlSection";
-import { useDownloadPdf } from "./useDownloadPdf";
+import { useDownloadPdf } from "@/hooks/useDownloadPdf";
 import { ArtifactAndPublicUrlGrid } from "./ArtifactAndPublicUrlGrid";
 
 interface VexDownloadModalProps {
@@ -50,7 +50,7 @@ export default function VexDownloadModal({
   const { sharesInformation, isPublicLoading, handleTogglePublic } =
     usePublicSharing();
   const { isLoading, handleDownload: handleDownloadPdfVex } = useDownloadPdf(
-    pathname,
+    `${pathname}/..`,
     "vulnerability-report.pdf",
     "VeX PDF",
   );

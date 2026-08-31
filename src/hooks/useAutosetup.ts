@@ -1,28 +1,19 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-// Copyright 2024 Tim Bastin, l3montree GmbH
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-
-import { browserApiClient } from "@/services/devGuardApi";
-import { once } from "lodash";
-import { useCallback, useEffect, useState } from "react";
+import { apiFetch, TUNNEL_BASE_URL } from "@/services/apiClient";
+import { useEffect, useEffectEvent, useState } from "react";
 import { toast } from "@/lib/toast";
 import { useActiveAsset } from "./useActiveAsset";
 import { useActiveOrg } from "./useActiveOrg";
 import { useActiveProject } from "./useActiveProject";
 import { useLoader } from "./useLoader";
 import useAccessToken from "./useAccessToken";
+import {
+  readSessionStorage,
+  removeSessionStorage,
+  writeSessionStorage,
+} from "./useSessionStorage";
 
 // limitations under the License.
 export function useAutosetup(
@@ -77,11 +68,12 @@ export function useAutosetup(
       // check if the asset is an external entity
       if (asset?.externalEntityProviderId && !pendingAutosetup) {
         // we need to redirect the user to authorize the "autosetup" oauth2 application
-        sessionStorage.setItem("pending-autosetup", "true");
+        writeSessionStorage("pending-autosetup", "true");
         // eslint-disable-next-line react-hooks/immutability
         window.location.href =
           window.location.origin +
-          "/api/devguard-tunnel/api/v1/oauth2/gitlab/" +
+          TUNNEL_BASE_URL +
+          "/oauth2/gitlab/" +
           asset.externalEntityProviderId.replace("@", "") +
           "autosetup?redirectTo=" +
           encodeURIComponent(window.location.href);
@@ -93,6 +85,7 @@ export function useAutosetup(
       const accessToken = await onCreateAccessToken({
         description: "DevGuard Autosetup (used inside GitLab Pipeline)",
         scopes: "scan",
+        // eslint-disable-next-line react-hooks/purity
         expiryDateUnix: Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
       });
 
@@ -105,10 +98,11 @@ export function useAutosetup(
 
       // set the progress to pending
       setProgress((prev) => {
-        for (const key in prev) {
-          prev[key as keyof typeof prev].status = "pending";
+        const next = { ...prev };
+        for (const key in next) {
+          next[key] = { ...next[key], status: "pending" };
         }
-        return { ...prev };
+        return next;
       });
 
       let url = `/organizations/${activeOrg.slug}/projects/${activeProject?.slug}/assets/${asset?.slug}/integrations/gitlab/autosetup?scanner=${scanner}`;
@@ -119,7 +113,7 @@ export function useAutosetup(
           `&providerId=${activeOrg.externalEntityProviderId?.replace("@", "")}autosetup`;
       }
 
-      const resp = await browserApiClient(url, {
+      const resp = await apiFetch(url, {
         method: "POST",
         body: JSON.stringify({
           devguardPrivateKey: privKey,
@@ -156,14 +150,14 @@ export function useAutosetup(
             if ("url" in data) {
               window.open(data.url as string, "_blank");
             }
-            setProgress((prev) => {
-              prev[data.step as keyof typeof prev] = {
+            setProgress((prev) => ({
+              ...prev,
+              [data.step as string]: {
                 status: data.status as "notStarted" | "pending" | "success",
                 message: prev[data.step as keyof typeof prev].message,
                 url: data.url as string | undefined,
-              };
-              return { ...prev };
-            });
+              },
+            }));
           }
         }
         return;
@@ -173,13 +167,15 @@ export function useAutosetup(
     },
   );
 
-  const autosetupOnce = useCallback(once(handleAutosetup), []);
+  const startPendingAutosetup = useEffectEvent(() => {
+    handleAutosetup(true);
+  });
 
   useEffect(() => {
     // check for pending autosetup - if so, we should be able to continue
-    if (listenForChanges && sessionStorage.getItem("pending-autosetup")) {
-      sessionStorage.removeItem("pending-autosetup");
-      autosetupOnce(true);
+    if (listenForChanges && readSessionStorage("pending-autosetup")) {
+      removeSessionStorage("pending-autosetup");
+      startPendingAutosetup();
     }
   }, [listenForChanges]);
 

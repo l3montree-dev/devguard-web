@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import type { ProjectDTO } from "@/types/api/api";
+import type { ProjectDTO } from "@/types/dto";
 import { classNames } from "@/utils/common";
 import type { FunctionComponent } from "react";
 import { useState } from "react";

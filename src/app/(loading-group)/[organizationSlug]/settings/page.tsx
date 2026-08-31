@@ -28,20 +28,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { fetcher } from "@/data-fetcher/fetcher";
-import { browserApiClient } from "@/services/devGuardApi";
-import { UserRole } from "@/types/api/api";
+import { useWebhooks } from "@/hooks/useWebhooks";
+import {
+  changeOrgMemberRole,
+  deleteGitlabIntegration,
+  deleteJiraIntegration,
+  deleteOrganization,
+  patchOrganization,
+  removeOrgMember,
+  revokeInvitation,
+} from "@/services/organizationService";
+import { UserRole } from "@/types/view/vuln";
 import type {
   GitLabIntegrationDTO,
   JiraIntegrationDTO,
   OrganizationDetailsDTO,
   WebhookDTO,
-} from "@/types/api/api";
+} from "@/types/dto";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
-import useSWR from "swr";
 import { toast } from "@/lib/toast";
 import { useConfig } from "../../../../context/ConfigContext";
 import {
@@ -79,22 +87,20 @@ const Home = () => {
   });
 
   const handleUpdate = async (data: Partial<OrganizationDetailsDTO>) => {
-    const resp = await browserApiClient("/organizations/" + activeOrg.slug, {
-      method: "PATCH",
-      body: JSON.stringify({
+    let updated;
+    try {
+      updated = await patchOrganization(activeOrg.slug, {
         ...data,
         numberOfEmployees: !!data.numberOfEmployees
           ? Number(data.numberOfEmployees)
           : undefined,
-      }),
-    });
-
-    if (!resp.ok) {
+      });
+    } catch {
       toast.error("Could not update organization");
       return false;
     }
 
-    const newOrg = await resp.json();
+    const newOrg = updated as OrganizationDetailsDTO;
 
     if (newOrg.slug !== activeOrg.slug) {
       toast("Success", {
@@ -136,19 +142,10 @@ const Home = () => {
     });
   };
 
-  const {
-    data: webhooks,
-    isLoading: webhooksLoading,
-    mutate: mutateWebhooks,
-  } = useSWR<Array<WebhookDTO>>(
-    "/organizations/" + organizationSlug + "/settings/",
-    async (settingsUrl: string) => {
-      const settings = await fetcher<{ webhooks: Array<WebhookDTO> | null }>(
-        settingsUrl,
-      );
-      return settings.webhooks ?? [];
-    },
-  );
+  const { webhooks, webhooksLoading, mutateWebhooks } = useWebhooks({
+    level: "organization",
+    organization: organizationSlug,
+  });
 
   const handleNewWebhookIntegration = (integration: WebhookDTO) => {
     mutateWebhooks((prev) => (prev ?? []).concat(integration), {
@@ -174,15 +171,8 @@ const Home = () => {
     id: string,
     role: UserRole.Admin | UserRole.Member,
   ) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/members/" + id,
-      {
-        method: "PUT",
-        body: JSON.stringify({ role }),
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await changeOrgMemberRole(activeOrg.slug, id, role);
       updateOrgCtx({
         ...orgCtx,
         organization: {
@@ -192,20 +182,14 @@ const Home = () => {
           ),
         },
       });
-    } else {
+    } catch {
       toast.error("Failed to update member role");
     }
   };
 
   const handleRemoveMember = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/members/" + id,
-      {
-        method: "DELETE",
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await removeOrgMember(activeOrg.slug, id);
       updateOrgCtx({
         ...orgCtx,
         organization: {
@@ -213,78 +197,52 @@ const Home = () => {
           members: activeOrg.members.filter((m) => m.id !== id),
         },
       });
-    } else {
+    } catch {
       toast.error("Failed to remove member");
     }
   };
 
   const handleDeleteGitLabIntegration = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/gitlab/" + id,
-      {
-        method: "DELETE",
+    await deleteGitlabIntegration(activeOrg.slug, id);
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
+          (i) => i.id !== id,
+        ),
       },
-    );
-
-    if (resp.ok) {
-      updateOrgCtx({
-        ...orgCtx,
-        organization: {
-          ...activeOrg,
-          gitLabIntegrations: activeOrg.gitLabIntegrations.filter(
-            (i) => i.id !== id,
-          ),
-        },
-      });
-    }
+    });
   };
 
   const handleDeleteJiraIntegration = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/integrations/jira/" + id,
-      {
-        method: "DELETE",
+    await deleteJiraIntegration(activeOrg.slug, id);
+    updateOrgCtx({
+      ...orgCtx,
+      organization: {
+        ...activeOrg,
+        jiraIntegrations: activeOrg.jiraIntegrations.filter((i) => i.id !== id),
       },
-    );
-
-    if (resp.ok) {
-      updateOrgCtx({
-        ...orgCtx,
-        organization: {
-          ...activeOrg,
-          jiraIntegrations: activeOrg.jiraIntegrations.filter(
-            (i) => i.id !== id,
-          ),
-        },
-      });
-    }
+    });
   };
 
   const handleDeleteOrganization = async () => {
-    const res = await browserApiClient("/organizations/" + activeOrg.slug, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
+    try {
+      await deleteOrganization(activeOrg.slug);
       toast.success("Organization deleted successfully");
       // Full navigation instead of router.push so the organization list is
       // refetched — otherwise the stale list redirects back into the
       // just-deleted organization.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- a soft push keeps the deleted org in the client cache
       window.location.href = "/";
-    } else {
+    } catch {
       toast.error("Failed to delete organization");
     }
   };
 
   const handleRevokeInvitation = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" + activeOrg.slug + "/invitation/" + id,
-      {
-        method: "DELETE",
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await revokeInvitation(activeOrg.slug, id);
       updateOrgCtx({
         ...orgCtx,
         organization: {
@@ -292,7 +250,7 @@ const Home = () => {
           invitedMembers: activeOrg.invitedMembers.filter((m) => m.id !== id),
         },
       });
-    } else {
+    } catch {
       toast.error("Failed to revoke invitation");
     }
   };
@@ -500,9 +458,7 @@ const Home = () => {
         >
           <WebhooksTable
             webhooks={webhooks ?? []}
-            urlBase={
-              "/organizations/" + activeOrg.slug + "/integrations/webhook"
-            }
+            scope={{ level: "organization", organization: activeOrg.slug }}
             onUpdateWebhook={handleUpdateWebhookIntegration}
             onDeleted={handleWebhookDeleted}
             projectWebhook={false}

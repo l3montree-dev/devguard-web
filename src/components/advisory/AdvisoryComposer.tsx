@@ -7,7 +7,7 @@ import AuthGuard from "@/components/AuthGuard";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
 import { toast } from "@/lib/toast";
-import type { AdvisoryState } from "@/types/api/api";
+import type { AdvisoryState } from "@/types/view/advisory";
 import { Lightbulb } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { FunctionComponent } from "react";

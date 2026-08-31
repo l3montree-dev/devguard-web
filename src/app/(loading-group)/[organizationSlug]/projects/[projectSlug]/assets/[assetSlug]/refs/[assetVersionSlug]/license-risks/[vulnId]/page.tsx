@@ -4,7 +4,10 @@
 "use client";
 
 import Page from "@/components/Page";
-import type { DetailedLicenseRiskDTO, VulnEventDTO } from "@/types/api/api";
+import type {
+  DetailedLicenseRiskDTO,
+  VulnEventDTO,
+} from "@/types/view/vulnEvents";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
 import { AsyncButton, Button } from "@/components/ui/button";
@@ -16,9 +19,8 @@ import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FunctionComponent } from "react";
-import useSWR from "swr";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import { Combobox } from "@/components/common/Combobox";
@@ -30,7 +32,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { browserApiClient } from "@/services/devGuardApi";
+import {
+  createLicenseRiskEvent,
+  finalLicenseDecision,
+  mitigateLicenseRisk,
+} from "@/services/vulnService";
+import { useLicenseRisk } from "@/hooks/useVulnDetail";
 import { beautifyPurl, extractVersion, licenses } from "@/utils/common";
 import {
   emptyThenNull,
@@ -40,12 +47,10 @@ import dynamic from "next/dynamic";
 import { toast } from "@/lib/toast";
 import VulnState from "../../../../../../../../../../../components/common/VulnState";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
-import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 
 import ArtifactBadge from "@/components/ArtifactBadge";
 import Callout from "../../../../../../../../../../../components/common/Callout";
 import EcosystemImage from "../../../../../../../../../../../components/common/EcosystemImage";
-import { fetcher } from "../../../../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
@@ -76,39 +81,42 @@ const Index: FunctionComponent = () => {
       vulnId: string;
     };
 
+  const vulnScope = {
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+    assetVersionSlug,
+  };
+
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
   const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
-  const assetVersion = useActiveAssetVersion()!;
   const { session } = useSession();
 
   const [justification, setJustification] = useState<string | undefined>(
     undefined,
   );
 
-  // Data fetching with useSWR
   const {
     data: vuln,
     mutate,
     isLoading,
     error,
-  } = useSWR<DetailedLicenseRiskDTO>(
-    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/license-risks/${vulnId}`,
-    fetcher,
-  );
+  } = useLicenseRisk(vulnScope, vulnId);
 
   const [updatedLicense, setUpdatedLicense] = useState<string>(
     vuln?.component.license ?? "unknown",
   );
   const deleteEvent = useDeleteEvent();
 
-  // Update updatedLicense when vuln data changes
-  useEffect(() => {
-    if (vuln?.component.license) {
-      setUpdatedLicense(vuln.component.license);
-    }
-  }, [vuln?.component.license]);
+  const vulnLicense = vuln?.component.license;
+  const [prevVulnLicense, setPrevVulnLicense] = useState(vulnLicense);
+
+  if (vulnLicense !== prevVulnLicense) {
+    setPrevVulnLicense(vulnLicense);
+    if (vulnLicense) setUpdatedLicense(vulnLicense);
+  }
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
@@ -157,46 +165,24 @@ const Index: FunctionComponent = () => {
         let json: DetailedLicenseRiskDTO;
 
         if (data.status === "mitigate") {
-          const resp = await browserApiClient(
-            `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.id}/mitigate`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
+          // the route reads `comment`, not `justification`
+          json = (await mitigateLicenseRisk(
+            vulnScope,
+            vuln.id,
+            data.justification ?? "",
+          )) as unknown as DetailedLicenseRiskDTO;
         } else if (data.status === "licenseDecision") {
-          const resp = await browserApiClient(
-            `/organizations/${activeOrg.slug}/projects/${project.slug}/assets/${asset.slug}/refs/${assetVersion?.slug}/license-risks/${vuln.id}/final-license-decision`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
+          json = (await finalLicenseDecision(
+            vulnScope,
+            vuln.id,
+            data as never,
+          )) as unknown as DetailedLicenseRiskDTO;
         } else {
-          const resp = await browserApiClient(
-            "/organizations/" +
-              activeOrg.slug +
-              "/projects/" +
-              project.slug +
-              "/assets/" +
-              asset.slug +
-              "/refs/" +
-              assetVersion?.slug +
-              "/license-risks/" +
-              vuln.id,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(data),
-            },
-          );
-          json = await resp.json();
+          json = (await createLicenseRiskEvent(
+            vulnScope,
+            vuln.id,
+            data as never,
+          )) as unknown as DetailedLicenseRiskDTO;
         }
 
         if (!json?.events) {

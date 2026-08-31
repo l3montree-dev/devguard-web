@@ -41,18 +41,21 @@ async function AssetShell({
 }) {
   const { organizationSlug, projectSlug, assetSlug } = await params;
 
+  let asset;
   try {
-    const [asset] = await Promise.all([
-      fetchAsset(decodeURIComponent(organizationSlug), projectSlug, assetSlug),
-    ]);
-
-    return (
-      <ClientContextWrapper Provider={AssetProvider} value={asset}>
-        <AssetHeader />
-        {children}
-      </ClientContextWrapper>
+    asset = await fetchAsset(
+      decodeURIComponent(organizationSlug),
+      projectSlug,
+      assetSlug,
     );
   } catch (error) {
     handleHttpError(error, organizationSlug);
   }
+
+  return (
+    <ClientContextWrapper Provider={AssetProvider} value={asset}>
+      <AssetHeader />
+      {children}
+    </ClientContextWrapper>
+  );
 }

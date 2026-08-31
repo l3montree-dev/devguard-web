@@ -8,11 +8,25 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { Badge } from "../ui/badge";
 import ProjectTitle from "./ProjectTitle";
 import { eventBus } from "@/events";
 import { truncateMiddle } from "@/utils/common";
+import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
+
+const subscribe = (onStoreChange: () => void) => {
+  eventBus.subscribe(
+    "assetTitleListener",
+    "assetVersionDeleted",
+    onStoreChange,
+  );
+  return () => {
+    eventBus.unsubscribe("assetTitleListener");
+  };
+};
+
+const getServerSnapshot = () => "";
 
 const AssetTitle = () => {
   const activeOrg = useActiveOrg();
@@ -20,38 +34,27 @@ const AssetTitle = () => {
   const asset = useActiveAsset();
 
   const params = useDecodedParams() as { assetVersionSlug?: string };
+  const currentSlug = params?.assetVersionSlug;
+  const storageKey = "lastViewedAssetVersionSlug" + asset?.slug;
 
-  const [assetVersionSlug, setAssetVersionSlug] = useState<string>();
+  const getSnapshot = useCallback(() => {
+    const stored = readLocalStorage(storageKey);
+    return stored && stored !== "undefined" ? stored : "";
+  }, [storageKey]);
+
+  const storedSlug = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+
+  const assetVersionSlug = currentSlug ?? storedSlug;
 
   useEffect(() => {
-    const currentSlug = params?.assetVersionSlug;
-
     if (currentSlug) {
-      localStorage.setItem(
-        "lastViewedAssetVersionSlug" + asset?.slug,
-        currentSlug,
-      );
-      setAssetVersionSlug(currentSlug);
-    } else {
-      const stored = localStorage.getItem(
-        "lastViewedAssetVersionSlug" + asset?.slug,
-      );
-      setAssetVersionSlug(stored && stored !== "undefined" ? stored : "");
+      writeLocalStorage(storageKey, currentSlug);
     }
-  }, [params?.assetVersionSlug, asset?.slug]);
-
-  useEffect(() => {
-    eventBus.subscribe("assetTitleListener", "assetVersionDeleted", () => {
-      const stored = localStorage.getItem(
-        "lastViewedAssetVersionSlug" + asset?.slug,
-      );
-      setAssetVersionSlug(stored && stored !== "undefined" ? stored : "");
-    });
-
-    return () => {
-      eventBus.unsubscribe("assetTitleListener");
-    };
-  }, [asset?.slug]);
+  }, [currentSlug, storageKey]);
 
   return (
     <span className="flex flex-row gap-2 min-w-0 overflow-hidden">

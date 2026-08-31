@@ -4,7 +4,7 @@
 import CopyCode from "@/components/common/CopyCode";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import Purl from "@/components/common/Purl";
-import type { DetailedDependencyVulnDTO } from "@/types/api/api";
+import type { DetailedDependencyVulnDTO } from "@/types/view/vulnEvents";
 import { isValidPackagePurl } from "@/utils/common";
 import { Wrench } from "lucide-react";
 import { PackageURL } from "packageurl-js";

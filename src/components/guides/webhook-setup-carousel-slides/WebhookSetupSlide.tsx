@@ -9,7 +9,7 @@ import { InputWithCustomButton } from "@/components/ui/input-with-custom-button"
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { browserApiClient } from "@/services/devGuardApi";
+import { patchAsset } from "@/services/assetService";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
 import Image from "next/image";
 import { useState } from "react";
@@ -46,21 +46,23 @@ export default function WebhookSetupSlide({
       "gitlab";
 
   const handleGenerateNewSecret = async () => {
-    const resp = await browserApiClient(
-      `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          ["webhookSecret"]: generateNewSecret(),
-        }),
-      },
-    );
+    let r;
+    try {
+      r = (await patchAsset(
+        {
+          organization: activeOrg.slug,
+          projectSlug: project!.slug,
+          assetSlug: asset.slug,
+        },
+        { webhookSecret: generateNewSecret() } as never,
+      )) as { webhookSecret: string };
+    } catch {
+      r = null;
+    }
 
-    if (resp.ok) {
-      const r = await resp.json();
+    if (r) {
       setWebhookSecret(r.webhookSecret);
-      asset.webhookSecret = r.webhookSecret;
-      updateAsset(asset);
+      updateAsset({ ...asset, webhookSecret: r.webhookSecret });
       navigator.clipboard.writeText(r.webhookSecret);
       toast.success("New webhook secret generated and copied to clipboard");
     } else {

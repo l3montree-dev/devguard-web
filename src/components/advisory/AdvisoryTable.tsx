@@ -10,19 +10,19 @@ import SortingCaret from "@/components/common/SortingCaret";
 import { CVSSBadge } from "@/components/common/Severity";
 import FormatDate from "@/components/risk-assessment/FormatDate";
 import useTable from "@/hooks/useTable";
-import type { AdvisoryState, Paged, SecurityAdvisory } from "@/types/api/api";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import type { AdvisoryState, SecurityAdvisory } from "@/types/view/advisory";
+
+import type { Paged } from "@/types/view/pagination";
 import { classNames } from "@/utils/common";
 import { vectorStringToScore } from "@/utils/cvss";
-import type { ColumnDef } from "@tanstack/react-table";
-import {
-  createColumnHelper,
-  flexRender,
-  getSortedRowModel,
-} from "@tanstack/react-table";
+
+import { flexRender } from "@tanstack/react-table";
 import type { FunctionComponent } from "react";
 import { useMemo } from "react";
 
-const columnHelper = createColumnHelper<SecurityAdvisory>();
+const columnHelper = createAppColumnHelper<SecurityAdvisory>();
 
 const updatedAtHeader: Record<string, string> = {
   draft: "Opened",
@@ -34,7 +34,7 @@ const buildColumnsDef = (
   state: string,
   csafBaseUrl: string,
   sharesInformation: boolean,
-): ColumnDef<SecurityAdvisory, any>[] => [
+): TableColumnDef<SecurityAdvisory, any>[] => [
   columnHelper.accessor("title", {
     header: "Title",
     enableSorting: true,
@@ -120,7 +120,7 @@ const AdvisoryTable: FunctionComponent<AdvisoryTableProps> = ({
   );
   const { table } = useTable(
     { columnsDef, data: advisories?.data ?? [] },
-    { getSortedRowModel: getSortedRowModel(), manualSorting: false },
+    { manualSorting: false },
   );
 
   if (!advisories?.data?.length) {

@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FunctionComponent } from "react";
 import {
   Dialog,
@@ -13,8 +13,9 @@ import {
 } from "./ui/dialog";
 
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { browserApiClient } from "@/services/devGuardApi";
-import { UserRole } from "@/types/api/api";
+import { useApiQuery } from "@/hooks/useApiQuery";
+import { inviteProjectMembers } from "@/services/projectService";
+import { UserRole } from "@/types/view/vuln";
 import { toast } from "@/lib/toast";
 import { useUpdateProject } from "../context/ProjectContext";
 import { useActiveProject } from "../hooks/useActiveProject";
@@ -42,21 +43,17 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
 
   const handleInviteSelectedMembers = async () => {
     const ids = selectedMembers.map((m) => m.value);
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        activeProject.slug +
-        "/members",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          ids,
-        }),
-      },
-    );
+    let ok = true;
+    try {
+      await inviteProjectMembers(
+        { organization: activeOrg.slug, projectSlug: activeProject.slug },
+        ids,
+      );
+    } catch {
+      ok = false;
+    }
 
-    if (!resp.ok) {
+    if (!ok) {
       toast.error("Failed to invite member");
       return;
     } else {
@@ -76,57 +73,28 @@ const ProjectMemberDialog: FunctionComponent<Props> = ({
     }
   };
 
-  const [membersToInvite, setMembersToInvite] = useState<
-    Array<{ id: string; name: string; avatarUrl?: string; role?: string }>
-  >([]);
-  const [loadingMembers, setLoadingMembers] = useState(false);
+  const parentSlug = activeProject.parentId
+    ? activeProject.parent?.slug
+    : undefined;
 
-  useEffect(() => {
-    const projectMemberIds = activeProject.members.reduce(
-      (acc, m) => {
-        acc[m.id] = true;
-        return acc;
+  const { data: parentMembers, isLoading: loadingMembers } = useApiQuery(
+    parentSlug
+      ? "/organizations/{organization}/projects/{projectSlug}/members"
+      : null,
+    {
+      params: {
+        path: { organization: activeOrg.slug, projectSlug: parentSlug ?? "" },
       },
-      {} as Record<string, boolean>,
-    );
+    },
+  );
 
-    if (activeProject.parentId && activeProject.parent?.slug) {
-      setLoadingMembers(true);
-      browserApiClient(
-        "/organizations/" +
-          activeOrg.slug +
-          "/projects/" +
-          activeProject.parent.slug +
-          "/members",
-      )
-        .then(async (resp) => {
-          if (!resp.ok) {
-            toast.error("Failed to fetch parent project members");
-            return;
-          }
-          const parentMembers = (await resp.json()) as Array<{
-            id: string;
-            name: string;
-            avatarUrl?: string;
-            role?: string;
-          }>;
-          setMembersToInvite(
-            parentMembers.filter((m) => !projectMemberIds[m.id]),
-          );
-        })
-        .finally(() => setLoadingMembers(false));
-    } else {
-      setMembersToInvite(
-        activeOrg.members.filter((m) => !projectMemberIds[m.id]),
-      );
-    }
-  }, [
-    activeProject.members,
-    activeProject.parentId,
-    activeProject.parent?.slug,
-    activeOrg.slug,
-    activeOrg.members,
-  ]);
+  const projectMemberIds = new Set(activeProject.members.map((m) => m.id));
+
+  const memberPool: Array<{ id: string; name: string }> = parentSlug
+    ? (parentMembers ?? []).map((m) => ({ id: m.id ?? "", name: m.name ?? "" }))
+    : activeOrg.members;
+
+  const membersToInvite = memberPool.filter((m) => !projectMemberIds.has(m.id));
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

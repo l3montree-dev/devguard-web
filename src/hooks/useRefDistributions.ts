@@ -1,9 +1,12 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { groupBy, mapValues, sumBy } from "lodash";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import useSWR from "swr";
 import { fetcher } from "../data-fetcher/fetcher";
-import type { RiskHistory } from "../types/api/api";
+import type { RiskHistory } from "@/types/dto";
 import useDecodedParams from "./useDecodedParams";
 
 export interface RefDistribution {

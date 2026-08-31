@@ -1,6 +1,7 @@
 // Copyright 2026 L3montree GmbH.
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import type { AccessTokenDTO } from "@/types/view/accessToken";
 import { useState } from "react";
 import type { FunctionComponent, PropsWithChildren } from "react";
 import {
@@ -11,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import type { AccessTokenDTO } from "@/types/api/api";
+
 import { Button } from "./ui/button";
 import DateString, { parseDateOnly } from "./common/DateString";
 import ConfirmTokenDeletion from "./common/ConfirmTokenDeletion";

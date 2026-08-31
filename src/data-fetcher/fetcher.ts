@@ -1,25 +1,17 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { browserApiClient } from "../services/devGuardApi";
+import { apiFetch, ApiError } from "@/services/apiClient";
 
-export class FetcherError extends Error {
-  status: number;
-  constructor(message: string, status: number) {
-    super(message);
-    Object.setPrototypeOf(this, FetcherError.prototype);
-    this.name = "FetcherError";
-    this.status = status;
-  }
-}
-
+// SWR fetcher for the URL-keyed reads that cannot go through the generated
+// client (dynamic filterQuery keys).
 export const fetcher = <T = any>(
   url: string,
   options?: RequestInit,
 ): Promise<T> =>
-  browserApiClient(url, options).then(async (res) => {
+  apiFetch(url, options).then(async (res) => {
     if (!res.ok) {
-      throw new FetcherError(
+      throw new ApiError(
         "An error occurred while fetching the data.",
         res.status,
       );

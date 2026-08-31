@@ -32,18 +32,20 @@ async function ProjectShell({
   params: Promise<{ organizationSlug: string; projectSlug: string }>;
 }) {
   const { organizationSlug, projectSlug } = await params;
+  let project;
   try {
-    const [project] = await Promise.all([
-      fetchProject(decodeURIComponent(organizationSlug), projectSlug),
-    ]);
-
-    return (
-      <ClientContextWrapper Provider={ProjectProvider} value={project}>
-        <ProjectHeader />
-        {children}
-      </ClientContextWrapper>
+    project = await fetchProject(
+      decodeURIComponent(organizationSlug),
+      projectSlug,
     );
   } catch (error) {
     handleHttpError(error, organizationSlug);
   }
+
+  return (
+    <ClientContextWrapper Provider={ProjectProvider} value={project}>
+      <ProjectHeader />
+      {children}
+    </ClientContextWrapper>
+  );
 }

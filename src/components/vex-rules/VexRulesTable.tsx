@@ -5,11 +5,13 @@
 
 import SortingCaret from "@/components/common/SortingCaret";
 import { Skeleton } from "@/components/ui/skeleton";
-import useTable from "@/hooks/useTable";
-import type { Paged, VexRule } from "@/types/api/api";
+import useTable, { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import type { AssetScope } from "@/services/vexRuleService";
+import type { Paged } from "@/types/view/pagination";
+import type { VexRule } from "@/types/view/vexRules";
 import { classNames } from "@/utils/common";
-import type { ColumnDef } from "@tanstack/react-table";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 import { useState, type FunctionComponent } from "react";
 import CustomPagination from "../common/CustomPagination";
 import VexRuleActionsCell from "./VexRuleActionsCell";
@@ -19,15 +21,14 @@ import VexRuleSourceBadge from "./VexRuleSourceBadge";
 
 interface VexRulesTableProps {
   rules: Paged<VexRule>;
-  // API base of this asset's VEX rules, e.g. /organizations/o/.../vex-rules
-  urlBase: string;
+  scope: AssetScope;
   isLoading?: boolean;
   onMutate: () => void;
 }
 
-const columnHelper = createColumnHelper<VexRule>();
+const columnHelper = createAppColumnHelper<VexRule>();
 
-const columnsDef: ColumnDef<VexRule, any>[] = [
+const columnsDef: TableColumnDef<VexRule, any>[] = [
   {
     ...columnHelper.accessor("title", {
       header: "Rule",
@@ -61,7 +62,7 @@ const columnsDef: ColumnDef<VexRule, any>[] = [
 /** One flat row per rule; the source is a badge, not a grouping level. */
 const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
   rules,
-  urlBase,
+  scope,
   isLoading,
   onMutate,
 }) => {
@@ -171,7 +172,8 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
                             onClick={(e) => e.stopPropagation()}
                           >
                             <VexRuleActionsCell
-                              deleteUrl={`${urlBase}/${rule.id}`}
+                              scope={scope}
+                              ruleId={rule.id}
                               onEdit={() => setSelectedRule(rule)}
                               onDeleted={onMutate}
                             />
@@ -192,7 +194,7 @@ const VexRulesTable: FunctionComponent<VexRulesTableProps> = ({
         onOpenChange={(open) => {
           if (!open) setSelectedRule(null);
         }}
-        urlBase={urlBase}
+        scope={scope}
         onChanged={onMutate}
       />
     </>

@@ -6,7 +6,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { ScoreCard } from "@/types/api/api";
+
+import type { ScoreCard } from "@/types/view/component";
 import { classNames } from "@/utils/common";
 import {
   ChevronDownIcon,

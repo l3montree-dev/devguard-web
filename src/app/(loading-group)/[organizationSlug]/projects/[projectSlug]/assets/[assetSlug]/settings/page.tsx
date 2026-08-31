@@ -5,7 +5,7 @@
 import AccessTokenManagement from "@/components/AccessTokenManagement";
 import Page from "@/components/Page";
 import AssetForm from "@/components/asset/AssetForm";
-import type { AssetFormValues } from "@/types/view/asset";
+import type { AssetFormValues, SecretType } from "@/types/view/asset";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import { repoSettingsTourSteps } from "@/components/common/tours/repoSettingsTour";
@@ -19,14 +19,19 @@ import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { convertRepos } from "@/hooks/useRepositorySearch";
 import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
+import {
+  changeAssetMemberRole,
+  deleteAsset,
+  patchAsset,
+  removeAssetMember,
+  triggerAssetPipeline,
+} from "@/services/assetService";
 import { classNames, isNumber } from "@/utils/common";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import useSWR from "swr";
 import Alert from "../../../../../../../../components/common/Alert";
 import DangerZone from "../../../../../../../../components/common/DangerZone";
 import ListItem from "../../../../../../../../components/common/ListItem";
@@ -38,10 +43,12 @@ import {
 import { Switch } from "../../../../../../../../components/ui/switch";
 import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../../context/ConfigContext";
-import { fetcher } from "../../../../../../../../data-fetcher/fetcher";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
-import type { AssetDTO } from "../../../../../../../../types/api/api";
-import { UserRole } from "../../../../../../../../types/api/api";
+import type { AssetDetailsWithSecretsDTO } from "@/types/dto";
+import type { components } from "@/types/api/generated";
+import { useAssetSecrets } from "@/hooks/useAssetSecrets";
+import { useIntegrationRepositories } from "@/hooks/useIntegrationRepositories";
+import { UserRole } from "@/types/view/vuln";
 import {
   generateNewSecret,
   getParentRepositoryIdAndName,
@@ -53,8 +60,6 @@ const firstOrUndefined = (el?: number[]): number | undefined => {
   }
   return el[0];
 };
-
-import type { SecretType } from "@/types/view/asset";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -72,18 +77,11 @@ const Index: FunctionComponent = () => {
     assetSlug: string;
   };
 
-  const { data: secrets, mutate: mutateSecrets } = useSWR<{
-    webhookSecret: string;
-  }>(
-    "/organizations/" +
-      organizationSlug +
-      "/projects/" +
-      projectSlug +
-      "/assets/" +
-      assetSlug +
-      "/secrets",
-    fetcher,
-  );
+  const { data: secrets, mutate: mutateSecrets } = useAssetSecrets({
+    organization: organizationSlug,
+    projectSlug,
+    assetSlug,
+  });
 
   const url =
     "/organizations/" +
@@ -94,13 +92,11 @@ const Index: FunctionComponent = () => {
     assetSlug +
     "/pats/";
 
-  const { data: repoResp } = useSWR<any[]>(
-    "/organizations/" + organizationSlug + "/integrations/repositories",
-    fetcher,
-  );
+  const { repositories: repoResp } =
+    useIntegrationRepositories(organizationSlug);
 
   const repositories = useMemo(() => {
-    return convertRepos(repoResp || []);
+    return convertRepos(repoResp);
   }, [repoResp]);
 
   const form = useForm<AssetFormValues>({
@@ -136,53 +132,31 @@ const Index: FunctionComponent = () => {
     });
   }, [asset.sharesInformation, form]);
 
-  const handleTriggerBackgroundJobs = async () => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project!.slug + // can never be null
-        "/assets/" +
-        asset.slug +
-        "/pipeline-trigger",
-      {
-        method: "POST",
-      },
-    );
+  const assetScope = {
+    organization: activeOrg.slug,
+    projectSlug: project!.slug,
+    assetSlug: asset.slug,
+  };
 
-    if (resp.ok) {
+  const handleTriggerBackgroundJobs = async () => {
+    try {
+      await triggerAssetPipeline(assetScope);
       toast.success("Background jobs triggered");
-    } else {
-      // error
-      // read the body
-      const errorBody = await resp.text();
-      console.error("Failed to trigger background jobs:", errorBody);
+    } catch (error) {
+      console.error("Failed to trigger background jobs:", error);
       toast.error("Failed to trigger background jobs");
     }
   };
 
   const handleRemoveMember = async (id: string) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project?.slug +
-        "/assets/" +
-        asset.slug +
-        "/members/" +
-        id,
-      {
-        method: "DELETE",
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await removeAssetMember(assetScope, id);
       updateAsset({
         ...asset,
         members: asset.members.filter((member) => member.id !== id),
       });
       toast.success("Member deleted");
-    } else {
+    } catch {
       toast.error("Failed to remove member");
     }
   };
@@ -191,22 +165,8 @@ const Index: FunctionComponent = () => {
     id: string,
     role: UserRole.Admin | UserRole.Member,
   ) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project?.slug +
-        "/assets/" +
-        asset.slug +
-        "/members/" +
-        id,
-      {
-        method: "PUT",
-        body: JSON.stringify({ role }),
-      },
-    );
-
-    if (resp.ok) {
+    try {
+      await changeAssetMemberRole(assetScope, id, role);
       updateAsset({
         ...asset,
         members: asset.members.map((member) =>
@@ -214,7 +174,7 @@ const Index: FunctionComponent = () => {
         ),
       });
       toast.success("Role successfully changed");
-    } else {
+    } catch {
       toast.error("Failed to update member role");
     }
   };
@@ -228,17 +188,9 @@ const Index: FunctionComponent = () => {
 
     mutateSecrets(
       async (prev) => {
-        const resp = await browserApiClient(
-          `/organizations/${activeOrg.slug}/projects/${project!.slug}/assets/${asset.slug}`,
-          {
-            method: "PATCH",
-            body: JSON.stringify({
-              [bodyKey]: secret,
-            }),
-          },
-        );
-
-        const r = (await resp.json()) as AssetDTO;
+        const r = (await patchAsset(assetScope, {
+          [bodyKey]: secret,
+        })) as AssetDetailsWithSecretsDTO;
 
         updateAsset(r);
         return {
@@ -263,59 +215,30 @@ const Index: FunctionComponent = () => {
   };
 
   const handleDeleteAsset = async () => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project!.slug + // can never be null
-        "/assets/" +
-        asset.slug,
-      {
-        method: "DELETE",
-      },
-    );
-    if (resp.ok) {
+    try {
+      await deleteAsset(assetScope);
       toast("Repository deleted", {
         description: "The asset has been deleted",
       });
       router.push("/" + activeOrg.slug + "/projects/" + project!.slug);
-    } else {
+    } catch {
       toast.error("Could not delete repository");
     }
   };
 
   const handleUpdate = async (data: Partial<AssetFormValues>) => {
-    const resp = await browserApiClient(
-      "/organizations/" +
-        activeOrg.slug +
-        "/projects/" +
-        project!.slug + // can never be null
-        "/assets/" +
-        asset.slug,
-      {
-        method: "PATCH",
-        body: JSON.stringify({
-          ...data,
-          cvssAutomaticTicketThreshold: firstOrUndefined(
-            data.cvssAutomaticTicketThreshold,
-          ),
-          vulnAutoReopenAfterDays: data.vulnAutoReopenAfterDays
-            ? +data.vulnAutoReopenAfterDays
-            : -1,
-          riskAutomaticTicketThreshold: firstOrUndefined(
-            data.riskAutomaticTicketThreshold,
-          ),
-        }),
-      },
-    );
-
-    if (!resp.ok) {
-      toast.error("Could not update asset");
-      console.error("Could not update asset", resp);
-    }
-
-    // check if the slug changed - if so, redirect to the new slug
-    const newAsset = await resp.json();
+    const newAsset = await patchAsset(assetScope, {
+      ...data,
+      cvssAutomaticTicketThreshold: firstOrUndefined(
+        data.cvssAutomaticTicketThreshold,
+      ),
+      vulnAutoReopenAfterDays: data.vulnAutoReopenAfterDays
+        ? +data.vulnAutoReopenAfterDays
+        : -1,
+      riskAutomaticTicketThreshold: firstOrUndefined(
+        data.riskAutomaticTicketThreshold,
+      ),
+    } as Partial<components["schemas"]["dtos.AssetPatchRequest"]>);
     updateAsset(newAsset);
     if (newAsset.slug !== asset.slug) {
       router.push(
@@ -367,7 +290,9 @@ const Index: FunctionComponent = () => {
               organizationSlug={organizationSlug}
               projectSlug={projectSlug}
               assetSlug={assetSlug}
-              repositoryProvider={asset.repositoryProvider}
+              repositoryProvider={
+                asset.repositoryProvider as "github" | "gitlab" | undefined
+              }
               members={asset.members}
               onRemoveMember={handleRemoveMember}
               onChangeMemberRole={handleChangeMemberRole}

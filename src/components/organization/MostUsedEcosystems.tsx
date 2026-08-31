@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/chart";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import type { EcosystemUsageInOrg } from "@/types/api/api";
+import type { EcosystemUsageInOrg } from "@/types/dto";
 
 interface Props {
   ecosystems: EcosystemUsageInOrg[];
@@ -62,7 +62,7 @@ const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
           ecosystem: eco.ecosystem,
           ecosystemKey: key,
           amount: eco.relativeAmount,
-          totalCount: eco.totalCount,
+          totalCount: eco.absoluteAmount,
           fill: `var(--color-${key})`,
           stroke: `var(--color-${key})`,
         };
@@ -122,8 +122,12 @@ const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
                 strokeWidth={2}
               />
               <ChartLegend
-                content={<ChartLegendContent nameKey="ecosystemKey" />}
-                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                content={
+                  <ChartLegendContent
+                    nameKey="ecosystemKey"
+                    className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
+                  />
+                }
               />
             </PieChart>
           </ChartContainer>

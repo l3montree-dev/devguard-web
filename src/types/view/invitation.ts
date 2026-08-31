@@ -4,3 +4,8 @@
 export interface InvitationFormValues {
   "invitation-url": string;
 }
+
+export enum InvitationStatus {
+  Pending = "pending",
+  Expired = "expired",
+}

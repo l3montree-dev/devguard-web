@@ -18,38 +18,39 @@ import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AsyncButton, Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { documentationLinks } from "@/const/documentationLinks";
 import {
-    useActiveAssetVersion,
-    useAssetBranchesAndTags,
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import useTable from "@/hooks/useTable";
-import { toast } from "@/lib/toast";
-import { browserApiClient } from "@/services/devGuardApi";
-import type { Paged, VulnByPackage, VulnWithCVE } from "@/types/api/api";
+import { createAppColumnHelper } from "@/hooks/useTable";
+import type { TableColumnDef } from "@/hooks/useTable";
+import { batchUpdateDependencyVulns } from "@/services/vulnService";
+import { useDependencyVulnList } from "@/hooks/useVulnList";
+import type { VulnByPackage, VulnWithCVE } from "@/types/view/vuln";
 import { buildFilterSearchParams } from "@/utils/url";
-import type { ColumnDef } from "@tanstack/react-table";
-import { createColumnHelper, flexRender } from "@tanstack/react-table";
+import { flexRender } from "@tanstack/react-table";
 import { CircleFadingArrowUp, CircleHelp, Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useCallback, useMemo, useState } from "react";
-import useSWR from "swr";
+import { toast } from "@/lib/toast";
 import SbomDownloadModal from "../../../../../../../../../../components/dependencies/SbomDownloadModal";
 import VexDownloadModal from "../../../../../../../../../../components/dependencies/VexDownloadModal";
 import DependencyRiskScannerDialog from "../../../../../../../../../../components/RiskScannerDialog";
@@ -58,14 +59,13 @@ import AddVexRuleDialog from "../../../../../../../../../../components/vex-rules
 import VexRuleRecommendationsTable from "../../../../../../../../../../components/vex-rules/VexRuleRecommendationsTable";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useConfig } from "../../../../../../../../../../context/ConfigContext";
-import { fetcher } from "../../../../../../../../../../data-fetcher/fetcher";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
 import useDebouncedQuerySearch from "../../../../../../../../../../hooks/useDebouncedQuerySearch";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPathname";
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
-import useVexRuleRecommendations from "../../../../../../../../../../hooks/useVexRuleRecommendations";
+import useVexRuleRecommendations from "@/hooks/useVexRuleRecommendations";
 
 const severityRanges: Record<string, [number | null, number | null]> = {
   low: [null, 4],
@@ -76,9 +76,9 @@ const severityRanges: Record<string, [number | null, number | null]> = {
 
 const rangeFilterFields = ["CVE.cvss", "risk_assessment"];
 
-const columnHelper = createColumnHelper<VulnByPackage>();
+const columnHelper = createAppColumnHelper<VulnByPackage>();
 
-const columnsDef: ColumnDef<VulnByPackage, any>[] = [
+const columnsDef: TableColumnDef<VulnByPackage, any>[] = [
   {
     ...columnHelper.accessor("packageName", {
       header: "Package",
@@ -186,49 +186,40 @@ const Index: FunctionComponent = () => {
     return p;
   }, [searchParams]);
 
-  const uri =
-    "/organizations/" +
-    organizationSlug +
-    "/projects/" +
-    projectSlug +
-    "/assets/" +
-    assetSlug +
-    "/";
-
-  const vulnsSwrKey =
-    uri +
-    "refs/" +
-    assetVersionSlug +
-    "/" +
-    "dependency-vulns/?" +
-    queryWithState.toString();
+  const vulnScope = useMemo(
+    () => ({
+      organization: organizationSlug,
+      projectSlug,
+      assetSlug,
+      assetVersionSlug,
+    }),
+    [organizationSlug, projectSlug, assetSlug, assetVersionSlug],
+  );
 
   const {
     data: vulns,
     isLoading,
     mutate: mutateVulns,
-  } = useSWR<Paged<VulnByPackage>>(vulnsSwrKey, fetcher, {
-    keepPreviousData: true,
-  });
+  } = useDependencyVulnList<VulnByPackage>(vulnScope, queryWithState);
 
+  // the "See all" link reuses these, so the filter and the count query are separate
   const fixableFilterParams = useMemo(() => {
     const p = new URLSearchParams(queryWithState);
     p.append("filterQuery[direct_dependency_fixed_version][is not null]", "1");
     return p;
   }, [queryWithState]);
 
-  const fixableVulnsSwrKey = useMemo(() => {
+  // pageSize 0 asks for the total without the rows
+  const fixableCountQuery = useMemo(() => {
     const p = new URLSearchParams(fixableFilterParams);
     p.set("page", "1");
     p.set("pageSize", "0");
-    return (
-      uri + "refs/" + assetVersionSlug + "/dependency-vulns/?" + p.toString()
-    );
-  }, [fixableFilterParams, uri, assetVersionSlug]);
+    return p;
+  }, [fixableFilterParams]);
 
-  const { data: fixableVulns } = useSWR<Paged<VulnByPackage>>(
-    fixableVulnsSwrKey,
-    fetcher,
+  const { data: fixableVulns } = useDependencyVulnList<VulnByPackage>(
+    vulnScope,
+    fixableCountQuery,
   );
   const fixableVulnsCount = fixableVulns?.total ?? 0;
 
@@ -265,22 +256,12 @@ const Index: FunctionComponent = () => {
 
       await mutateVulns(
         async () => {
-          const resp = await browserApiClient(
-            uri + "refs/" + assetVersionSlug + "/dependency-vulns/batch/",
-            {
-              method: "POST",
-              body: JSON.stringify({
-                vulnIds: params.vulnIds,
-                status: params.status,
-                justification: params.justification,
-                mechanicalJustification: params.mechanicalJustification ?? "",
-              }),
-            },
-          );
-
-          if (!resp.ok) {
-            throw new Error("Bulk action failed");
-          }
+          await batchUpdateDependencyVulns(vulnScope, {
+            vulnIds: params.vulnIds,
+            status: params.status,
+            justification: params.justification,
+            mechanicalJustification: params.mechanicalJustification ?? "",
+          } as never);
 
           // clear selection for the affected IDs
           setSelectedVulnIds((prev) => {
@@ -299,7 +280,7 @@ const Index: FunctionComponent = () => {
         },
       );
     },
-    [uri, assetVersionSlug, mutateVulns, vulns],
+    [vulnScope, mutateVulns, vulns],
   );
 
   const handleSearch = useDebouncedQuerySearch();
@@ -436,8 +417,6 @@ const Index: FunctionComponent = () => {
     [handleFilter, params, pathname, router],
   );
 
-  const vexRulesUrl = `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules`;
-
   const {
     canSeeRecommendations,
     addRuleDialogOpen,
@@ -450,11 +429,13 @@ const Index: FunctionComponent = () => {
   );
 
   // Compute selected open/closed IDs for batch actions
+  const vulnData = vulns?.data;
+
   const { selectedOpenIds, selectedClosedIds } = useMemo(() => {
-    if (!vulns?.data) return { selectedOpenIds: [], selectedClosedIds: [] };
+    if (!vulnData) return { selectedOpenIds: [], selectedClosedIds: [] };
 
     const vulnById = new Map<string, { state: string }>();
-    vulns.data.forEach((pkg) => {
+    vulnData.forEach((pkg) => {
       pkg.vulns.forEach((v) => {
         vulnById.set(v.id, { state: v.state });
       });
@@ -476,7 +457,7 @@ const Index: FunctionComponent = () => {
     });
 
     return { selectedOpenIds: openIds, selectedClosedIds: closedIds };
-  }, [vulns?.data, selectedVulnIds]);
+  }, [vulnData, selectedVulnIds]);
 
   return (
     <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
@@ -543,7 +524,11 @@ const Index: FunctionComponent = () => {
                 <AddVexRuleDialog
                   open={addRuleDialogOpen}
                   onOpenChange={setAddRuleDialogOpen}
-                  baseUrl={vexRulesUrl}
+                  scope={{
+                    organization: organizationSlug,
+                    projectSlug,
+                    assetSlug,
+                  }}
                   onCreated={() => mutateVulns()}
                   prefill={rulePrefill}
                 />

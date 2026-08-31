@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { browserApiClient } from "@/services/devGuardApi";
+import { apiFetch } from "@/services/apiClient";
 import useDecodedParams from "./useDecodedParams";
 import { toast } from "@/lib/toast";
 
@@ -10,7 +10,7 @@ export const useDeleteEvent = () => {
     useDecodedParams();
 
   return async (eventId: string) => {
-    const resp = await browserApiClient(
+    const resp = await apiFetch(
       `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/events/${eventId}`,
       { method: "DELETE" },
     );

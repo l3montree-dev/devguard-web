@@ -11,23 +11,16 @@ import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetcher, FetcherError } from "@/data-fetcher/fetcher";
+import { ApiError } from "@/services/apiClient";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { useViewMode } from "@/hooks/useViewMode";
-import type { OrgOverview } from "@/types/api/api";
+
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useState, type FunctionComponent } from "react";
-import useSWR from "swr";
-
-const STATS_PARAMS = new URLSearchParams({
-  orgComponentsLimit: "5",
-  topCVEsLimit: "5",
-  topComponentsLimit: "5",
-  topEcosystemsLimit: "5",
-}).toString();
+import { useOrgOverview } from "@/hooks/useOrgOverview";
 
 const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -41,24 +34,15 @@ const OrganizationOverview: FunctionComponent = () => {
     data: orgStatistics,
     isLoading: isStatisticsLoading,
     error,
-    mutate,
-  } = useSWR<OrgOverview>(
-    `/organizations/${orgSlug}/stats/vuln-statistics/?${STATS_PARAMS}`,
-    fetcher,
-  );
+    refresh,
+  } = useOrgOverview(orgSlug);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // The backend caches these statistics for 15 minutes. Hitting the same
-  // endpoint with `forceRefresh=true` bypasses that cache; we then seed the SWR
-  // cache with the fresh result so a plain revalidation wouldn't undo it.
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      const fresh = await fetcher<OrgOverview>(
-        `/organizations/${orgSlug}/stats/vuln-statistics/?${STATS_PARAMS}&forceRefresh=true`,
-      );
-      await mutate(fresh, { revalidate: false });
+      await refresh();
     } catch {
       // Fetch failures surface through SWR's own error state on next load.
     } finally {
@@ -66,7 +50,7 @@ const OrganizationOverview: FunctionComponent = () => {
     }
   };
 
-  const is404 = error instanceof FetcherError && error.status === 404;
+  const is404 = error instanceof ApiError && error.status === 404;
   const isError = !isStatisticsLoading && error && !is404;
   const isEmptyResponse =
     !!orgStatistics &&

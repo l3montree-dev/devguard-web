@@ -1,26 +1,13 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { UserRole } from "@/types/api/api";
-import type { DependencyVuln } from "@/types/api/api";
+import { UserRole } from "@/types/view/vuln";
+
 import { PackageURL } from "packageurl-js";
+import type { DependencyVuln } from "@/types/dto";
 
 export function classNames(...classes: Array<string | undefined | Boolean>) {
   return classes.filter(Boolean).join(" ");
-}
-
-export function toSearchParams(obj: Record<string, any>): URLSearchParams {
-  const res = Object.keys(obj).reduce(
-    (acc, key) => {
-      if (obj[key] !== undefined) {
-        acc[key] = obj[key];
-      }
-      return acc;
-    },
-    {} as Record<string, any>,
-  );
-
-  return new URLSearchParams(res as Record<string, string>);
 }
 
 export const getEcosystem = (packageName?: string) => {
@@ -308,6 +295,9 @@ export const stateLabels: Record<DependencyVuln["state"], string> = {
   markedForTransfer: "Marked for Transfer",
   implemented: "Implemented",
   notApplicable: "Not Applicable",
+  draft: "Draft",
+  public: "Published",
+  withdrawn: "Withdrawn",
 };
 
 // Utility function to truncate text in the middle with ellipsis

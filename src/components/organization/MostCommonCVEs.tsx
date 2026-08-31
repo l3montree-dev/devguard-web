@@ -1,8 +1,9 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import type { CVEOccurrenceInOrg } from "@/types/dto";
 import type { FunctionComponent } from "react";
-import type { CVEOccurrenceInOrg } from "@/types/api/api";
+
 import {
   Card,
   CardContent,
