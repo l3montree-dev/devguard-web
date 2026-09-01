@@ -33,6 +33,8 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { EssentialProjectConfigContent } from "@/components/common/EssentialProjectConfigDrawer";
 import { useActiveOrg } from "../../../../../../../hooks/useActiveOrg";
+import { useAutoTour } from "@/hooks/useAutoTour";
+import { repoSetupTourSteps } from "@/components/common/tours/repoSetupTour";
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
@@ -86,10 +88,15 @@ const Index: FunctionComponent = () => {
     searchParams,
   ]);
 
+  const showSetupCards = Boolean(
+    asset && asset.refs.length === 0 && isLoggedIn(role),
+  );
+
+  useAutoTour("repo-setup", showSetupCards ? repoSetupTourSteps : []);
+
   if (!asset) {
     return <PageSkeleton />;
   }
-
   if (asset.refs.length > 0) {
     return <PageSkeleton />;
   }
@@ -204,6 +211,7 @@ const Index: FunctionComponent = () => {
                       githubOnly: false,
                       slide: 7,
                       testId: "own-setup-card",
+                      tour: "setup-risk-scan",
                     },
                     {
                       icon: <Code />,
@@ -213,6 +221,7 @@ const Index: FunctionComponent = () => {
                       githubOnly: false,
                       slide: 16,
                       testId: "devguard-cli-card",
+                      tour: "setup-devguard-cli",
                     },
                     {
                       icon: <Upload />,
@@ -222,15 +231,19 @@ const Index: FunctionComponent = () => {
                       githubOnly: false,
                       slide: 11,
                       testId: "manual-upload-card",
+                      tour: "setup-manual-upload",
                     },
                     {
                       icon: <Link2 />,
-                      name: "Supplier provided URL",
-                      sub: "Provide SBOM URLs to setup DevGuard based on external data sources. This data will be periodically fetched and updated.",
+                      name: "External SBOM URLs",
+                      sub: "Bundle several component SBOMs into one release asset, or link a supplier's. Fetched and updated periodically.",
                       recommended: false,
                       githubOnly: false,
                       slide: 15,
-                      testId: "supplier-url-card",
+                      testId: "external-url-card",
+                      tour: "setup-external-url",
+                      docsLink:
+                        "https://docs.devguard.org/how-to-guides/vex/multi-level-vexing/",
                     },
                   ];
 
@@ -243,14 +256,21 @@ const Index: FunctionComponent = () => {
                       className={`grid gap-4 mt-4 ${cards.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}
                     >
                       {cards.map(
-                        ({ icon, name, sub, recommended, slide, testId }) => (
+                        ({
+                          icon,
+                          name,
+                          sub,
+                          recommended,
+                          slide,
+                          testId,
+                          docsLink,
+                          tour,
+                        }) => (
                           <button
                             key={name}
                             type="button"
                             data-testid={testId}
-                            data-tour={
-                              recommended ? "setup-risk-scan" : undefined
-                            }
+                            data-tour={tour}
                             className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
                               recommended
                                 ? "border-primary"
@@ -271,7 +291,17 @@ const Index: FunctionComponent = () => {
                               {name}
                             </span>
                             <span className="text-sm leading-relaxed text-muted-foreground">
-                              {sub}
+                              {sub}{" "}
+                              {docsLink && (
+                                <a
+                                  href={docsLink}
+                                  target="_blank"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-primary"
+                                >
+                                  Learn more
+                                </a>
+                              )}
                             </span>
                           </button>
                         ),

@@ -122,13 +122,13 @@ export default function ScannerSelectionSlide({
           <CardHeader>
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <LinkIcon className="inline-block mr-2 w-4 h-4" />
-              Supplier provided SBOM (URL)
+              External SBOM URLs (URL)
               <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
                 Expert
               </Badge>
             </CardTitle>
             <CardDescription>
-              Provide an SBOM URLs to setup Devguard based on external data
+              Provide SBOM URLs to setup Devguard based on external data
               sources. This data will be periodically fetched and updated.
             </CardDescription>
           </CardHeader>

@@ -90,7 +90,7 @@ test.describe("DevGuard handle vuln flows", () => {
   test.skip("test to use upstream vex url and sync it", async ({
     page,
   }, testInfo) => {
-    await page.getByTestId("supplier-url-card").click();
+    await page.getByTestId("external-url-card").click();
     await page.getByTestId("artifact-name-input").click();
     await page.getByTestId("artifact-name-input").fill("DevGuardSBOM");
     await page.getByTestId("sbom-url-upload-button").click();
