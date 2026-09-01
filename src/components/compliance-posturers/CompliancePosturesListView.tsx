@@ -532,6 +532,10 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
                           "hover:bg-muted",
                         )}
                         key={row.original.frameworkControlId}
+                        data-testid="compliance-posture-row"
+                        data-framework-control-id={
+                          row.original.frameworkControlId
+                        }
                       >
                         {row.getVisibleCells().map((cell) => (
                           <td className="p-4" key={cell.id}>

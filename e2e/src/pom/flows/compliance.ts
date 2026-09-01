@@ -31,6 +31,38 @@ export class ComplianceFlow {
     );
   }
 
+  // A control id like "Grundschutz++:BES.4.6" only survives the round trip
+  // through the url if the api percent-decodes the path param, so open a
+  // row that actually carries characters needing encoding.
+  async openCompliancePostureNeedingUrlEncoding() {
+    const row = this.page
+      .locator(
+        '[data-testid="compliance-posture-row"][data-framework-control-id*="+"], [data-testid="compliance-posture-row"][data-framework-control-id*=":"]',
+      )
+      .first();
+    await row.waitFor({ state: "visible", timeout: 10_000 });
+
+    const frameworkControlID = (await row.getAttribute(
+      "data-framework-control-id",
+    ))!;
+    expect(frameworkControlID).toMatch(/[+:]/);
+    const title = (await row.locator("td").first().innerText()).trim();
+
+    await row.click({ timeout: 10_000 });
+
+    await expect
+      .poll(() => decodeURIComponent(new URL(this.page.url()).pathname), {
+        timeout: 10_000,
+      })
+      .toContain(`/compliance-postures/${frameworkControlID}`);
+
+    await expect(
+      this.page.getByRole("heading", { level: 1, name: title }),
+    ).toBeVisible({ timeout: 30_000 });
+
+    return { frameworkControlID, title };
+  }
+
   private async openCompliancePostures(
     level: DevGuardNavigationLevel,
     testId: string,
