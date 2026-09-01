@@ -31,6 +31,22 @@ export class ComplianceFlow {
     );
   }
 
+  async openCompliancePostureWithPlusInControlID() {
+    const row = this.page
+      .locator(
+        '[data-testid="compliance-posture-row"][data-framework-control-id*="+"]',
+      )
+      .first();
+    await row.waitFor({ state: "visible", timeout: 10_000 });
+
+    const title = (await row.locator("td").first().innerText()).trim();
+    await row.click({ timeout: 10_000 });
+
+    await expect(
+      this.page.getByRole("heading", { level: 1, name: title }),
+    ).toBeVisible({ timeout: 10_000 });
+  }
+
   private async openCompliancePostures(
     level: DevGuardNavigationLevel,
     testId: string,
