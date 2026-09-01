@@ -40,9 +40,9 @@ test.describe("DevGuard compliance posture flows", () => {
     await devguardPOM.compliance().openRepoCompliancePostures();
   });
 
-  test("open a compliance posture whose control id needs url encoding", async () => {
+  test("open a compliance posture whose control id contains a plus", async () => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
     await devguardPOM.compliance().openOrgCompliancePostures();
-    await devguardPOM.compliance().openCompliancePostureNeedingUrlEncoding();
+    await devguardPOM.compliance().openCompliancePostureWithPlusInControlID();
   });
 });
