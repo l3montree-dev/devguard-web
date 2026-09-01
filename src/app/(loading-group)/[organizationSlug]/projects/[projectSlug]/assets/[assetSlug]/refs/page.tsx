@@ -171,7 +171,9 @@ const RefsPage = () => {
                     </td>
                   </tr>
                 )}
-                {assetVersions.tags.map((tag, i) => (
+                {[...assetVersions.tags]
+                  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                  .map((tag, i) => (
                   <tr
                     key={tag.name}
                     className={classNames(
@@ -254,7 +256,9 @@ const RefsPage = () => {
                     </td>
                   </tr>
                 )}
-                {assetVersions.branches.map((branch, i) => (
+                {[...assetVersions.branches]
+                .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                .map((branch, i) => (
                   <tr
                     key={branch.name}
                     className={classNames(
