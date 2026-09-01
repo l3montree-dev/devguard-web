@@ -44,7 +44,7 @@ export class ComplianceFlow {
 
     await expect(
       this.page.getByRole("heading", { level: 1, name: title }),
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible({ timeout: 10_000 });
   }
 
   private async openCompliancePostures(
