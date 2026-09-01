@@ -96,4 +96,26 @@ export class RepoFlow {
     await this.page.getByTestId("repository-settings").click();
     await this.page.getByTestId("publish-repo-switch").click();
   }
+
+  async publishRepoURLs() {
+    await this.page.getByTestId("repository-settings").click();
+    await this.page.getByTestId("enable-public-access-switch").click();
+    await this.page
+      .getByTestId("save-vulnerability-management-settings-button")
+      .click();
+  }
+
+  async copyPublishedSBOMUrl(): Promise<string> {
+    await this.page.getByTestId("urls-collapsible").click();
+    await this.page.locator('button[name="clipboard-sbom-url"]').click();
+    return this.page.locator('input[name="inputsbom-url"]').inputValue();
+  }
+
+  async navigateToGroup() {
+    const match = this.page.url().match(/^(.*\/projects\/[^/]+)/);
+    if (!match) {
+      throw new Error(`Cannot derive group URL from ${this.page.url()}`);
+    }
+    await this.page.goto(match[1]);
+  }
 }

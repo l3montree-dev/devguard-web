@@ -120,4 +120,45 @@ test.describe("DevGuard handle vuln flows", () => {
     await page.reload();
     await docShot(page, testInfo, "upstream-vex-rules");
   });
+
+  test("test to create a release asset", async ({ page }, testInfo) => {
+    // Setup first repository
+    await devguardPOM.setupSbomUpload();
+    await devguardPOM.repo().publishRepoURLs();
+    const sbomUrlRepo1 = await devguardPOM.repo().copyPublishedSBOMUrl();
+    await devguardPOM.repo().navigateToGroup();
+
+    // Setup second repository
+    await devguardPOM
+      .repo()
+      .createGitHubRepo(
+        `Test Repo ${Date.now()}`,
+        "This repo contains top secret information.",
+      );
+    await devguardPOM.setupSbomUpload("large-sbom.json");
+    await devguardPOM.repo().publishRepoURLs();
+    const sbomUrlRepo2 = await devguardPOM.repo().copyPublishedSBOMUrl();
+    await devguardPOM.repo().navigateToGroup();
+
+    // Setup release asset
+    await devguardPOM
+      .repo()
+      .createGitHubRepo(
+        `Release Asset`,
+        "This repo contains top secret release information.",
+      );
+    await docShot(page, testInfo, "upstream-url-field");
+    await page.getByTestId("external-url-card").click();
+    await page.getByTestId("artifact-name-input").click();
+    await page.getByTestId("artifact-name-input").fill("pkg:oci/release-asset");
+    await page.getByTestId("sbom-url-upload-button").click();
+    await page.getByTestId("upstream-url-field").click({
+      modifiers: ["ControlOrMeta"],
+    });
+    await page.getByTestId("upstream-url-field").fill(sbomUrlRepo1);
+    await page.getByTestId("sbom-url-upload-button").click();
+    await page.locator('[id="_r_1l_-form-item"]').fill(sbomUrlRepo2);
+    await docShot(page, testInfo, "create-release-asset");
+    await page.getByTestId("setup-information-sources-create").click();
+  });
 });
