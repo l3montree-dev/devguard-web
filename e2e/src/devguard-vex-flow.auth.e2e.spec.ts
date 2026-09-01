@@ -135,7 +135,7 @@ test.describe("DevGuard handle vuln flows", () => {
         `Test Repo ${Date.now()}`,
         "This repo contains top secret information.",
       );
-    await devguardPOM.setupSbomUpload("large-sbom.json");
+    await devguardPOM.setupSbomUpload("sbom2.json");
     await devguardPOM.repo().publishRepoURLs();
     const sbomUrlRepo2 = await devguardPOM.repo().copyPublishedSBOMUrl();
     await devguardPOM.repo().navigateToGroup();
