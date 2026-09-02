@@ -13,8 +13,8 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input, type InputProps } from "../ui/input";
-import Section from "../common/Section";
 import { Button } from "../ui/button";
+import Section from "../common/Section";
 
 interface Props {
   form: UseFormReturn<ProjectDTO, any, ProjectDTO>;
@@ -33,11 +33,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
 }) => {
   return (
     <>
-      <Section
-        forceVertical={forceVerticalSections}
-        description="General Settings of the group"
-        title="General"
-      >
+      <Section forceVertical={forceVerticalSections}>
         <FormField
           name="name"
           control={form.control}
@@ -50,6 +46,7 @@ export const ProjectForm: FunctionComponent<Props> = ({
                   disabled={disabled}
                   required={true}
                   variant={inputVariant}
+                  autoFocus
                   {...field}
                 />
               </FormControl>

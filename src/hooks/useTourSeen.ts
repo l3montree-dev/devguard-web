@@ -12,6 +12,7 @@ const ALL_TOUR_KEYS = [
   "org-overview",
   "group-home",
   "repo-home",
+  "repo-setup",
   "repo-settings",
   "dependency-risk",
   "dependency-insights",

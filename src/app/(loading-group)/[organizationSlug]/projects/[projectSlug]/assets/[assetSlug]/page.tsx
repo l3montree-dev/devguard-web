@@ -21,7 +21,7 @@ import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
 import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
 import { SearchCode, Code, Blocks, Upload, Link2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -33,6 +33,8 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { EssentialProjectConfigContent } from "@/components/common/EssentialProjectConfigDrawer";
 import { useActiveOrg } from "../../../../../../../hooks/useActiveOrg";
+import { useAutoTour } from "@/hooks/useAutoTour";
+import { repoSetupTourSteps } from "@/components/common/tours/repoSetupTour";
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
@@ -86,10 +88,15 @@ const Index: FunctionComponent = () => {
     searchParams,
   ]);
 
+  const showSetupCards = Boolean(
+    asset && asset.refs.length === 0 && isLoggedIn(role),
+  );
+
+  useAutoTour("repo-setup", showSetupCards ? repoSetupTourSteps : []);
+
   if (!asset) {
     return <PageSkeleton />;
   }
-
   if (asset.refs.length > 0) {
     return <PageSkeleton />;
   }
@@ -195,42 +202,55 @@ const Index: FunctionComponent = () => {
                   // 16 = DevGuardCliSlide
                   // 11 = IntegrationMethodSelectionSlide (manual upload)
                   // 15 = SetupInformationSourceSlide (supplier URL)
-                  const allCards = [
+                  const allCards: {
+                    icon: React.ReactNode;
+                    name: string;
+                    sub: string;
+                    badge?: { label: string; variant: BadgeProps["variant"] };
+                    githubOnly: boolean;
+                    slide: number;
+                    testId: string;
+                    tour: string;
+                    docsLink?: string;
+                  }[] = [
                     {
                       icon: <Blocks />,
                       name: "DevGuard CI/CD Integration",
                       sub: "From our curated list of scans and scanners, select the ones you want to use.",
-                      recommended: true,
+                      badge: { label: "Recommended", variant: "default" },
                       githubOnly: false,
                       slide: 7,
                       testId: "own-setup-card",
+                      tour: "setup-risk-scan",
                     },
                     {
                       icon: <Code />,
                       name: "DevGuard CLI",
                       sub: "Use the DevGuard CLI to run scans and upload the results to DevGuard.",
-                      recommended: false,
                       githubOnly: false,
                       slide: 16,
                       testId: "devguard-cli-card",
+                      tour: "setup-devguard-cli",
                     },
                     {
                       icon: <Upload />,
                       name: "Manually Upload",
                       sub: "You already have a SARIF/ SBOM file and want to scan for known vulnerabilities or manage your findings.",
-                      recommended: false,
                       githubOnly: false,
                       slide: 11,
                       testId: "manual-upload-card",
+                      tour: "setup-manual-upload",
                     },
                     {
                       icon: <Link2 />,
-                      name: "Supplier provided URL",
-                      sub: "Provide SBOM URLs to setup DevGuard based on external data sources. This data will be periodically fetched and updated.",
-                      recommended: false,
+                      name: "External SBOM URLs",
+                      sub: "Bundle several component SBOMs into one release asset, or link a supplier's. Fetched and updated periodically.",
                       githubOnly: false,
                       slide: 15,
-                      testId: "supplier-url-card",
+                      testId: "external-url-card",
+                      tour: "setup-external-url",
+                      docsLink:
+                        "https://docs.devguard.org/how-to-guides/vex/multi-level-vexing/",
                     },
                   ];
 
@@ -243,37 +263,59 @@ const Index: FunctionComponent = () => {
                       className={`grid gap-4 mt-4 ${cards.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}
                     >
                       {cards.map(
-                        ({ icon, name, sub, recommended, slide, testId }) => (
-                          <button
+                        ({
+                          icon,
+                          name,
+                          sub,
+                          badge,
+                          slide,
+                          testId,
+                          docsLink,
+                          tour,
+                        }) => (
+                          <div
                             key={name}
-                            type="button"
                             data-testid={testId}
-                            data-tour={
-                              recommended ? "setup-risk-scan" : undefined
-                            }
-                            className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
-                              recommended
+                            data-tour={tour}
+                            className={`relative flex flex-col gap-1.5 rounded-lg border hover:bg-muted p-4 text-left ${
+                              badge?.variant === "default"
                                 ? "border-primary"
                                 : "border-secondary"
                             }`}
-                            onClick={() => {
-                              setRiskScanningInitialSlide(slide);
-                              setRiskScanningOpen(true);
-                            }}
                           >
+                            <button
+                              type="button"
+                              aria-label={name}
+                              className="absolute inset-0 cursor-pointer rounded-lg"
+                              onClick={() => {
+                                setRiskScanningInitialSlide(slide);
+                                setRiskScanningOpen(true);
+                              }}
+                            />
                             <div className="flex items-center justify-between">
                               {icon}
-                              {recommended && (
-                                <Badge variant="default">Recommended</Badge>
+                              {badge && (
+                                <Badge variant={badge.variant}>
+                                  {badge.label}
+                                </Badge>
                               )}
                             </div>
                             <span className="text-base font-medium">
                               {name}
                             </span>
                             <span className="text-sm leading-relaxed text-muted-foreground">
-                              {sub}
+                              {sub}{" "}
+                              {docsLink && (
+                                <a
+                                  href={docsLink}
+                                  target="_blank"
+                                  className="relative text-primary"
+                                >
+                                  Learn more
+                                </a>
+                              )}
                             </span>
-                          </button>
+                          </div>
                         ),
                       )}
                     </div>

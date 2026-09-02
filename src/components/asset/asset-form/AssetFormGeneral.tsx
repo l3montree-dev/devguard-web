@@ -48,6 +48,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 disabled={disable}
                 required={true}
                 variant={inputVariant}
+                autoFocus
                 {...field}
               />
             </FormControl>

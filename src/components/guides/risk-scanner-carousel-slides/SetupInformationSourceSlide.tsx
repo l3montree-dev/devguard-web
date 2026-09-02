@@ -48,7 +48,7 @@ export const SetupInformationSourceSlide: FunctionComponent<
   const errorFields = Object.keys(form.formState.errors).join(",");
   useEffect(() => {
     api?.reInit();
-  }, [api, sourceURLs, errorFields]);
+  }, [api, sources.length, sourceURLs, errorFields]);
 
   const handleSubmit = async (data: ArtifactRequest) => {
     if (data.informationSources.length === 0) {
@@ -77,7 +77,9 @@ export const SetupInformationSourceSlide: FunctionComponent<
   return (
     <CarouselItem>
       <DialogHeader>
-        <DialogTitle>How do you want to Setup Devguard?</DialogTitle>
+        <DialogTitle>
+          Do you want to connect external URLs or create a release asset?
+        </DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form

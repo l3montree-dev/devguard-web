@@ -123,11 +123,7 @@ const AssetSettingsForm: FunctionComponent<
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   return (
     <>
-      <Section
-        forceVertical={forceVerticalSections}
-        title="General"
-        description="General settings"
-      >
+      <Section forceVertical={forceVerticalSections}>
         <AssetFormGeneral
           disable={disable}
           form={form}
