@@ -245,7 +245,6 @@ const Index: FunctionComponent = () => {
                       icon: <Link2 />,
                       name: "External SBOM URLs",
                       sub: "Bundle several component SBOMs into one release asset, or link a supplier's. Fetched and updated periodically.",
-                      badge: { label: "Release Asset", variant: "secondary" },
                       githubOnly: false,
                       slide: 15,
                       testId: "external-url-card",
