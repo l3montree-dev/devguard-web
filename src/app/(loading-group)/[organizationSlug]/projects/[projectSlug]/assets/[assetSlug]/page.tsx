@@ -273,21 +273,25 @@ const Index: FunctionComponent = () => {
                           docsLink,
                           tour,
                         }) => (
-                          <button
+                          <div
                             key={name}
-                            type="button"
                             data-testid={testId}
                             data-tour={tour}
-                            className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
-                              badge?.variant == "default"
+                            className={`relative flex flex-col gap-1.5 rounded-lg border hover:bg-muted p-4 text-left ${
+                              badge?.variant === "default"
                                 ? "border-primary"
                                 : "border-secondary"
                             }`}
-                            onClick={() => {
-                              setRiskScanningInitialSlide(slide);
-                              setRiskScanningOpen(true);
-                            }}
                           >
+                            <button
+                              type="button"
+                              aria-label={name}
+                              className="absolute inset-0 cursor-pointer rounded-lg"
+                              onClick={() => {
+                                setRiskScanningInitialSlide(slide);
+                                setRiskScanningOpen(true);
+                              }}
+                            />
                             <div className="flex items-center justify-between">
                               {icon}
                               {badge && (
@@ -305,14 +309,13 @@ const Index: FunctionComponent = () => {
                                 <a
                                   href={docsLink}
                                   target="_blank"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="text-primary"
+                                  className="relative text-primary"
                                 >
                                   Learn more
                                 </a>
                               )}
                             </span>
-                          </button>
+                          </div>
                         ),
                       )}
                     </div>

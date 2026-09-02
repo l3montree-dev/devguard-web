@@ -157,7 +157,7 @@ test.describe("DevGuard handle vuln flows", () => {
     });
     await page.getByTestId("upstream-url-field").fill(sbomUrlRepo1);
     await page.getByTestId("sbom-url-upload-button").click();
-    await page.locator('[id="_r_1l_-form-item"]').fill(sbomUrlRepo2);
+    await page.getByTestId("upstream-url-field").nth(1).fill(sbomUrlRepo2);
     await docShot(page, testInfo, "create-release-asset");
     await page.getByTestId("setup-information-sources-create").click();
   });

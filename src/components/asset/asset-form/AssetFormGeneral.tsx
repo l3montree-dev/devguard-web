@@ -80,11 +80,11 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
       />
       {!externalEntityProviderId && (
         <>
-          <Label className="my-4">
+          <Label className="mt-4">
             Which Repository provider are you using?
           </Label>
 
-          <div className="flex gap-2 w-full mb-4">
+          <div className="flex gap-2 w-full">
             <Button
               data-testid="github-repository-provider-button"
               variant={"secondary"}
