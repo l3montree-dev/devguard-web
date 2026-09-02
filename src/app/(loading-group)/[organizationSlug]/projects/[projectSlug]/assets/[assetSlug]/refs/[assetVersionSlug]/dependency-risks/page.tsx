@@ -536,15 +536,39 @@ const Index: FunctionComponent = () => {
                     </div>
                   </>
                 ) : (
-                  <Card className="flex flex-1 flex-col justify-center gap-2 p-6 text-center">
-                    <span className="text-sm font-medium">
-                      No VEX-Rule recommendations yet
-                    </span>
-                    <CardDescription>
-                      Recommendations appear once other DevGuard users or
-                      upstream sources have assessed vulnerabilities that also
-                      show up in this repository.
-                    </CardDescription>
+                  <Card className="flex flex-1 flex-col">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex flex-row items-center gap-2">
+                        <CircleHelp className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          No VEX-Rule recommendations yet
+                        </span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription>
+                        Recommendations appear once other DevGuard users or
+                        upstream sources have assessed vulnerabilities. Learn
+                        more about the{" "}
+                        <Link
+                          href={documentationLinks.mitigationStrategies}
+                          target="_blank"
+                          className="underline"
+                        >
+                          mitigation strategies
+                        </Link>{" "}
+                        and how VEX rules apply them automatically. New to VEX?
+                        Read{" "}
+                        <Link
+                          href={documentationLinks.vexExplaining}
+                          target="_blank"
+                          className="underline"
+                        >
+                          what VEX is
+                        </Link>{" "}
+                        first.
+                      </CardDescription>
+                    </CardContent>
                   </Card>
                 )}
                 <AddVexRuleDialog
