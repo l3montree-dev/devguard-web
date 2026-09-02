@@ -26,7 +26,6 @@ interface Props {
 export const ProjectForm: FunctionComponent<Props> = ({
   form,
   disabled,
-  forceVerticalSections,
   onUpdate,
   inputVariant,
 }) => {
