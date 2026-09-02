@@ -21,7 +21,7 @@ import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
 import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
 import { SearchCode, Code, Blocks, Upload, Link2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -202,12 +202,22 @@ const Index: FunctionComponent = () => {
                   // 16 = DevGuardCliSlide
                   // 11 = IntegrationMethodSelectionSlide (manual upload)
                   // 15 = SetupInformationSourceSlide (supplier URL)
-                  const allCards = [
+                  const allCards: {
+                    icon: React.ReactNode;
+                    name: string;
+                    sub: string;
+                    badge?: { label: string; variant: BadgeProps["variant"] };
+                    githubOnly: boolean;
+                    slide: number;
+                    testId: string;
+                    tour: string;
+                    docsLink?: string;
+                  }[] = [
                     {
                       icon: <Blocks />,
                       name: "DevGuard CI/CD Integration",
                       sub: "From our curated list of scans and scanners, select the ones you want to use.",
-                      recommended: true,
+                      badge: { label: "Recommended", variant: "default" },
                       githubOnly: false,
                       slide: 7,
                       testId: "own-setup-card",
@@ -217,7 +227,6 @@ const Index: FunctionComponent = () => {
                       icon: <Code />,
                       name: "DevGuard CLI",
                       sub: "Use the DevGuard CLI to run scans and upload the results to DevGuard.",
-                      recommended: false,
                       githubOnly: false,
                       slide: 16,
                       testId: "devguard-cli-card",
@@ -227,7 +236,6 @@ const Index: FunctionComponent = () => {
                       icon: <Upload />,
                       name: "Manually Upload",
                       sub: "You already have a SARIF/ SBOM file and want to scan for known vulnerabilities or manage your findings.",
-                      recommended: false,
                       githubOnly: false,
                       slide: 11,
                       testId: "manual-upload-card",
@@ -237,7 +245,7 @@ const Index: FunctionComponent = () => {
                       icon: <Link2 />,
                       name: "External SBOM URLs",
                       sub: "Bundle several component SBOMs into one release asset, or link a supplier's. Fetched and updated periodically.",
-                      recommended: false,
+                      badge: { label: "Release Asset", variant: "secondary" },
                       githubOnly: false,
                       slide: 15,
                       testId: "external-url-card",
@@ -260,7 +268,7 @@ const Index: FunctionComponent = () => {
                           icon,
                           name,
                           sub,
-                          recommended,
+                          badge,
                           slide,
                           testId,
                           docsLink,
@@ -272,7 +280,7 @@ const Index: FunctionComponent = () => {
                             data-testid={testId}
                             data-tour={tour}
                             className={`flex flex-col gap-1.5 rounded-lg border cursor-pointer hover:bg-muted p-4 text-left ${
-                              recommended
+                              badge?.variant == "default"
                                 ? "border-primary"
                                 : "border-secondary"
                             }`}
@@ -283,8 +291,10 @@ const Index: FunctionComponent = () => {
                           >
                             <div className="flex items-center justify-between">
                               {icon}
-                              {recommended && (
-                                <Badge variant="default">Recommended</Badge>
+                              {badge && (
+                                <Badge variant={badge.variant}>
+                                  {badge.label}
+                                </Badge>
                               )}
                             </div>
                             <span className="text-base font-medium">
