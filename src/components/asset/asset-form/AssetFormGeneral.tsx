@@ -48,6 +48,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 disabled={disable}
                 required={true}
                 variant={inputVariant}
+                autoFocus
                 {...field}
               />
             </FormControl>
@@ -79,11 +80,11 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
       />
       {!externalEntityProviderId && (
         <>
-          <Label className="mt-4">
+          <Label className="my-4">
             Which Repository provider are you using?
           </Label>
 
-          <div className="flex gap-2 w-full">
+          <div className="flex gap-2 w-full mb-4">
             <Button
               data-testid="github-repository-provider-button"
               variant={"secondary"}

@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input, type InputProps } from "../ui/input";
-import Section from "../common/Section";
 import { Button } from "../ui/button";
 
 interface Props {
@@ -33,58 +32,53 @@ export const ProjectForm: FunctionComponent<Props> = ({
 }) => {
   return (
     <>
-      <Section
-        forceVertical={forceVerticalSections}
-        description="General Settings of the group"
-        title="General"
-      >
-        <FormField
-          name="name"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input
-                  data-testid="group-name"
-                  disabled={disabled}
-                  required={true}
-                  variant={inputVariant}
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>The name of the group.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="description"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Input
-                  data-testid="group-description"
-                  disabled={disabled}
-                  variant={inputVariant}
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>The description of the group.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {onUpdate && (
-          <div className="mt-4 flex flex-row justify-end">
-            <Button isSubmitting={form.formState.isSubmitting} type="submit">
-              Update
-            </Button>
-          </div>
+      <FormField
+        name="name"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Name</FormLabel>
+            <FormControl>
+              <Input
+                data-testid="group-name"
+                disabled={disabled}
+                required={true}
+                variant={inputVariant}
+                autoFocus
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>The name of the group.</FormDescription>
+            <FormMessage />
+          </FormItem>
         )}
-      </Section>
+      />
+      <FormField
+        name="description"
+        control={form.control}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Input
+                data-testid="group-description"
+                disabled={disabled}
+                variant={inputVariant}
+                {...field}
+              />
+            </FormControl>
+            <FormDescription>The description of the group.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      {onUpdate && (
+        <div className="mt-4 flex flex-row justify-end">
+          <Button isSubmitting={form.formState.isSubmitting} type="submit">
+            Update
+          </Button>
+        </div>
+      )}
     </>
   );
 };
