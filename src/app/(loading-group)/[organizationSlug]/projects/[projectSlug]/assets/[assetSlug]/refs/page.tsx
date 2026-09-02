@@ -172,50 +172,52 @@ const RefsPage = () => {
                   </tr>
                 )}
                 {[...assetVersions.tags]
-                  .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                  .sort((a, b) =>
+                    a.name.localeCompare(b.name, undefined, { numeric: true }),
+                  )
                   .map((tag, i) => (
-                  <tr
-                    key={tag.name}
-                    className={classNames(
-                      "border-b",
-                      i % 2 !== 0 && "bg-card/50",
-                    )}
-                  >
-                    <td className="px-4 py-2">
-                      <Badge variant={"outline"}>
-                        <TagIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                        {tag.name}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-2" />
-                    <td className="px-4 py-2">
-                      <DateString date={parseDateOnly(tag.lastAccessedAt)} />
-                    </td>
-                    <td className="px-4 py-2">
-                      {distributionByRef[tag.name] && (
-                        <span>
-                          <CVERainbowBadge {...distributionByRef[tag.name]} />
-                        </span>
+                    <tr
+                      key={tag.name}
+                      className={classNames(
+                        "border-b",
+                        i % 2 !== 0 && "bg-card/50",
                       )}
-                    </td>
-                    <AuthGuard require="admin">
-                      <td className="px-4 py-2 flex flex-row justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button size={"icon"} variant={"ghost"}>
-                              <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => setOpen(tag)}>
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                    >
+                      <td className="px-4 py-2">
+                        <Badge variant={"outline"}>
+                          <TagIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                          {tag.name}
+                        </Badge>
                       </td>
-                    </AuthGuard>
-                  </tr>
-                ))}
+                      <td className="px-4 py-2" />
+                      <td className="px-4 py-2">
+                        <DateString date={parseDateOnly(tag.lastAccessedAt)} />
+                      </td>
+                      <td className="px-4 py-2">
+                        {distributionByRef[tag.name] && (
+                          <span>
+                            <CVERainbowBadge {...distributionByRef[tag.name]} />
+                          </span>
+                        )}
+                      </td>
+                      <AuthGuard require="admin">
+                        <td className="px-4 py-2 flex flex-row justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size={"icon"} variant={"ghost"}>
+                                <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={() => setOpen(tag)}>
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </AuthGuard>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -257,63 +259,67 @@ const RefsPage = () => {
                   </tr>
                 )}
                 {[...assetVersions.branches]
-                .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
-                .map((branch, i) => (
-                  <tr
-                    key={branch.name}
-                    className={classNames(
-                      "border-b",
-                      i % 2 !== 0 && "bg-card/50",
-                    )}
-                  >
-                    <td className="px-4 py-2">
-                      <Badge variant={"outline"}>
-                        <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                        {branch.name}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-2">
-                      {branch.defaultBranch && (
-                        <Badge variant={"success"}>Default</Badge>
+                  .sort((a, b) =>
+                    a.name.localeCompare(b.name, undefined, { numeric: true }),
+                  )
+                  .map((branch, i) => (
+                    <tr
+                      key={branch.name}
+                      className={classNames(
+                        "border-b",
+                        i % 2 !== 0 && "bg-card/50",
                       )}
-                    </td>
-                    <td className="px-4 py-2">
-                      <DateString date={parseDateOnly(branch.lastAccessedAt)} />
-                    </td>
-                    <td className="px-4 py-2">
-                      {distributionByRef[branch.name] && (
-                        <span>
-                          <CVERainbowBadge
-                            {...distributionByRef[branch.name]}
-                          />
-                        </span>
-                      )}
-                    </td>
-                    <AuthGuard require="admin">
-                      <td className="px-4 py-2 flex flex-row justify-end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button size={"icon"} variant={"ghost"}>
-                              <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            {!branch.defaultBranch && (
-                              <DropdownMenuItem
-                                onClick={() => handleMakeDefault(branch)}
-                              >
-                                Make default
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={() => setOpen(branch)}>
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                    >
+                      <td className="px-4 py-2">
+                        <Badge variant={"outline"}>
+                          <GitBranchIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                          {branch.name}
+                        </Badge>
                       </td>
-                    </AuthGuard>
-                  </tr>
-                ))}
+                      <td className="px-4 py-2">
+                        {branch.defaultBranch && (
+                          <Badge variant={"success"}>Default</Badge>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        <DateString
+                          date={parseDateOnly(branch.lastAccessedAt)}
+                        />
+                      </td>
+                      <td className="px-4 py-2">
+                        {distributionByRef[branch.name] && (
+                          <span>
+                            <CVERainbowBadge
+                              {...distributionByRef[branch.name]}
+                            />
+                          </span>
+                        )}
+                      </td>
+                      <AuthGuard require="admin">
+                        <td className="px-4 py-2 flex flex-row justify-end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size={"icon"} variant={"ghost"}>
+                                <EllipsisHorizontalIcon className="text-muted-foreground w-5 h-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              {!branch.defaultBranch && (
+                                <DropdownMenuItem
+                                  onClick={() => handleMakeDefault(branch)}
+                                >
+                                  Make default
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => setOpen(branch)}>
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </AuthGuard>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
