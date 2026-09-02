@@ -422,11 +422,14 @@ const Index: FunctionComponent = () => {
     addRuleDialogOpen,
     rulePrefill,
     recommendationsResponse,
+    isRecommendationsLoading,
     setAddRuleDialogOpen,
     createRuleFromRecommendation,
   } = useVexRuleRecommendations(
     new URLSearchParams({ page: "1", pageSize: "3" }),
   );
+
+  const hasRecommendations = (recommendationsResponse?.data.length ?? 0) > 0;
 
   // Compute selected open/closed IDs for batch actions
   const vulnData = vulns?.data;
@@ -498,29 +501,52 @@ const Index: FunctionComponent = () => {
         description="This table shows all the identified dependency risks for this repository."
         className="mb-4 mt-4"
       >
-        <div className="flex flex-1 flex-col gap-2">
+        <div className="flex flex-1 flex-col gap-4">
           <div className="flex flex-row gap-2">
-            {recommendationsResponse?.data && canSeeRecommendations && (
-              <div className="flex-3 relative">
-                <small className="text-xs absolute top-5 right-5">
-                  <Link
-                    href={"../../vex-rules"}
-                    className="text-xs !text-muted-foreground font-medium"
-                  >
-                    See all recommendations
-                  </Link>
-                </small>
-                <VexRuleRecommendationsTable
-                  hidePagination={true}
-                  onCreateRule={createRuleFromRecommendation}
-                  recommendations={recommendationsResponse}
-                />
-                <div className="flex flex-row items-center justify-between">
-                  <small className="text-xs text-muted-foreground -mt-2 text-right block">
-                    VEX-Rule recommendations are not scoped to a specific branch
-                    or tag out of performance reasons.
-                  </small>
-                </div>
+            {canSeeRecommendations && (
+              <div className="flex-3 relative flex flex-col">
+                {isRecommendationsLoading || hasRecommendations ? (
+                  <>
+                    <small className="text-xs absolute top-5 right-5">
+                      <Link
+                        href={"../../vex-rules"}
+                        className="text-xs !text-muted-foreground font-medium"
+                      >
+                        See all recommendations
+                      </Link>
+                    </small>
+                    <VexRuleRecommendationsTable
+                      hidePagination={true}
+                      isLoading={isRecommendationsLoading}
+                      onCreateRule={createRuleFromRecommendation}
+                      recommendations={
+                        recommendationsResponse ?? {
+                          data: [],
+                          total: 0,
+                          page: 1,
+                          pageSize: 3,
+                        }
+                      }
+                    />
+                    <div className="flex flex-row items-center justify-between">
+                      <small className="text-xs text-muted-foreground -mt-2 text-right block">
+                        VEX-Rule recommendations are not scoped to a specific
+                        branch or tag out of performance reasons.
+                      </small>
+                    </div>
+                  </>
+                ) : (
+                  <Card className="flex flex-1 flex-col justify-center gap-2 p-6 text-center">
+                    <span className="text-sm font-medium">
+                      No VEX-Rule recommendations yet
+                    </span>
+                    <CardDescription>
+                      Recommendations appear once other DevGuard users or
+                      upstream sources have assessed vulnerabilities that also
+                      show up in this repository.
+                    </CardDescription>
+                  </Card>
+                )}
                 <AddVexRuleDialog
                   open={addRuleDialogOpen}
                   onOpenChange={setAddRuleDialogOpen}
@@ -540,14 +566,22 @@ const Index: FunctionComponent = () => {
                 <CardTitle className="flex flex-row items-start justify-between">
                   <span className="flex flex-row items-center gap-2">
                     <CircleFadingArrowUp className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-3xl">{fixableVulnsCount}</span>
+                    {fixableVulnsCount !== 0 ? (
+                      <span className="text-3xl">{fixableVulnsCount}</span>
+                    ) : (
+                      <span className="text-sm font-medium">
+                        No quick fixes available
+                      </span>
+                    )}
                   </span>
-                  <Link
-                    href={`${pathname}?${fixableFilterParams.toString()}`}
-                    className="text-xs !text-muted-foreground"
-                  >
-                    See all
-                  </Link>
+                  {fixableVulnsCount !== 0 && (
+                    <Link
+                      href={`${pathname}?${fixableFilterParams.toString()}`}
+                      className="text-xs !text-muted-foreground"
+                    >
+                      See all
+                    </Link>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
