@@ -101,7 +101,9 @@ const VexRuleRecommendationsTable: FunctionComponent<
             </thead>
             <tbody className="text-foreground">
               {isLoading
-                ? Array.from({ length: 5 }).map((_, row) => (
+                ? Array.from({
+                    length: Math.min(recommendations.pageSize || 5, 5),
+                  }).map((_, row) => (
                     <tr
                       key={row}
                       className={classNames(
