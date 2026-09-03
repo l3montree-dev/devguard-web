@@ -71,7 +71,7 @@ export function OrySsoButton({
   return (
     <Button
       variant="outline"
-      className={`px-6 ${className ?? ""}`.trim()}
+      className={`px-6 flex-1 ${className ?? ""}`.trim()}
       name={buttonProps.name}
       type={buttonProps.type === "button" ? "button" : "submit"}
       value={buttonProps.value?.toString()}
