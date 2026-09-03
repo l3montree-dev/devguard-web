@@ -57,7 +57,7 @@ export function VulnerableComponents({
   return (
     <Card className="col-span-2">
       <CardHeader>
-        <CardTitle className="relative w-full">
+        <CardTitle className="relative text-base w-full">
           Vulnerable Components
           <Link
             href={

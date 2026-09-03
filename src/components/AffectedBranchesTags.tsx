@@ -58,7 +58,7 @@ export function AffectedBranchesTags({
   return (
     <Card className="flex flex-1 flex-col">
       <CardHeader>
-        <CardTitle className="relative w-full">
+        <CardTitle className="relative text-base w-full">
           {type == "branch" ? "Top 5 affected Branches" : "Top 5 affected Tags"}
           {/* <Link
             href={`#`}
