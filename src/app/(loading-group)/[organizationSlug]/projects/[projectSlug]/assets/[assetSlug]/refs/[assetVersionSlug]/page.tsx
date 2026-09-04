@@ -277,7 +277,7 @@ const Index: FunctionComponent = () => {
 
               <Card className="col-span-2 flex flex-col">
                 <CardHeader>
-                  <CardTitle className="relative w-full">
+                  <CardTitle className="relative text-base w-full">
                     Licenses
                     <Link
                       href={
@@ -429,7 +429,7 @@ const Index: FunctionComponent = () => {
               </div>
               <Card className="col-span-4 flex flex-col">
                 <CardHeader>
-                  <CardTitle className="relative w-full">
+                  <CardTitle className="relative text-base w-full">
                     Activity Stream
                     <Link
                       href={
