@@ -463,7 +463,7 @@ const Index: FunctionComponent = () => {
                   <Skeleton className="w-full h-20" />
                 )}
               </div>
-              <div data-tour="path" className={lockedOverlay}>
+              <div data-tour="path">
                 {!graphLoading && (
                   <div className="mt-6">
                     {vuln && hasVulnerabilityPath && (
