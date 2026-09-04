@@ -12,7 +12,8 @@ import path from "path";
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
-export const STORAGE_STATE = path.join(__dirname, "playwright/.auth/user.json");
+export const storageStateFor = (browserName: string) =>
+  path.join(__dirname, `playwright/.auth/user-${browserName}.json`);
 
 export default defineConfig({
   testDir: "./e2e/src",
@@ -46,23 +47,45 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "setup",
+      name: "setup-chromium",
       testMatch: /devguard-auth-setup\.ts/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "setup-firefox",
+      testMatch: /devguard-auth-setup\.ts/,
+      use: { ...devices["Desktop Firefox"] },
     },
     {
       name: "chromium-authenticated",
       testMatch: /devguard-.*\.auth\.e2e\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
-        storageState: STORAGE_STATE,
+        storageState: storageStateFor("chromium"),
       },
-      dependencies: ["setup"],
+      dependencies: ["setup-chromium"],
     },
     {
       name: "chromium",
       testMatch: /devguard-(?!auth-setup).*(?<!\.auth)\.e2e\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
+      },
+    },
+    {
+      name: "firefox-authenticated",
+      testMatch: /devguard-.*\.auth\.e2e\.spec\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
+        storageState: storageStateFor("firefox"),
+      },
+      dependencies: ["setup-firefox"],
+    },
+    {
+      name: "firefox",
+      testMatch: /devguard-(?!auth-setup).*(?<!\.auth)\.e2e\.spec\.ts/,
+      use: {
+        ...devices["Desktop Firefox"],
       },
     },
     /*

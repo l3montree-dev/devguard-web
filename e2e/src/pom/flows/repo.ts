@@ -3,6 +3,7 @@
 
 import { test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
+import { goto } from "../../utils";
 
 export class RepoFlow {
   constructor(private page: Page) {}
@@ -116,6 +117,6 @@ export class RepoFlow {
     if (!match) {
       throw new Error(`Cannot derive group URL from ${this.page.url()}`);
     }
-    await this.page.goto(match[1]);
+    await goto(this.page, match[1]);
   }
 }
