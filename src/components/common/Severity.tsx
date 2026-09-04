@@ -22,6 +22,21 @@ export const getSeverityClassNames = (severity: string, gray: boolean) => {
     }
 };
 
+export const getSeverityBorderClassName = (severity: string) => {
+  switch (severity) {
+    case "CRITICAL":
+      return "border-severity-critical";
+    case "HIGH":
+      return "border-severity-high";
+    case "MEDIUM":
+      return "border-severity-medium";
+    case "LOW":
+      return "border-severity-low";
+    default:
+      return "border-border";
+  }
+};
+
 export const severityToColor = (
   severity: string,
   gray?: boolean,

@@ -4,6 +4,11 @@
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import type { FunctionComponent } from "react";
+import {
+  getSeverityBorderClassName,
+  getSeverityClassNames,
+  riskToSeverity,
+} from "./common/Severity";
 
 export const LoadMoreNode: FunctionComponent<{
   data: {
@@ -83,6 +88,14 @@ export const DependencyGraphNode: FunctionComponent<
     }
   };
 
+  const vulns = props.data.vuln ?? [];
+  const openVulns = vulns.filter(
+    (v) => v.state !== "falsePositive" && v.state !== "accepted",
+  );
+  const maxCvss = Math.max(0, ...openVulns.map((v) => v.cve?.cvss ?? 0));
+  const severity = riskToSeverity(maxCvss);
+  const badgeClasses = getSeverityClassNames(severity, false);
+
   return (
     <div
       style={{
@@ -96,9 +109,9 @@ export const DependencyGraphNode: FunctionComponent<
         props.data.hasPatch
           ? "border-success"
           : props.data.vuln
-            ? props.data.vuln.every((v) => v.state === "falsePositive")
+            ? openVulns.length === 0
               ? "border-border shadow-md"
-              : "border-destructive shadow-lg"
+              : classNames(getSeverityBorderClassName(severity), "shadow-lg")
             : "border-border",
       )}
     >
@@ -128,10 +141,14 @@ export const DependencyGraphNode: FunctionComponent<
             ) : (
               <Badge
                 variant="outline"
-                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-destructive text-white border-destructive"
+                className={classNames(
+                  "text-[10px] px-1.5 py-0 font-semibold shadow-md border-transparent",
+                  badgeClasses,
+                )}
                 title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
               >
-                Vulnerable
+                Vulnerable ({maxCvss})
+                {openVulns.length > 1 && ` | ${openVulns.length} CVEs`}
               </Badge>
             )}
           </div>
