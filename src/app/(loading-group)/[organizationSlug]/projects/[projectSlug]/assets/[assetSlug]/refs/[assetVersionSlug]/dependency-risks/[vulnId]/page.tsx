@@ -201,6 +201,8 @@ const Index: FunctionComponent = () => {
     vuln?.componentPurl,
   );
 
+  const hasVulnerabilityPath = (vuln?.vulnerabilityPath.length ?? 0) > 0;
+
   const handleGraphReady = useCallback(() => {
     if (
       searchParams?.get("startTour") !== "dependency-risk" &&
@@ -219,7 +221,7 @@ const Index: FunctionComponent = () => {
       (searchParams?.get("startTour") !== "dependency-risk" &&
         !shouldStartTour) ||
       graphLoading ||
-      (vuln?.vulnerabilityPath.length || 0) !== 0
+      hasVulnerabilityPath
     )
       return;
     markSeen();
@@ -238,7 +240,7 @@ const Index: FunctionComponent = () => {
   // The path is rendered as static boxes (no React Flow), so there is no graph
   // onReady callback — start the tour directly once the path view is ready.
   useEffect(() => {
-    if (!graphLoading && (vuln?.vulnerabilityPath.length || 0) > 0) {
+    if (!graphLoading && hasVulnerabilityPath) {
       handleGraphReady();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -464,7 +466,7 @@ const Index: FunctionComponent = () => {
               <div data-tour="path" className={lockedOverlay}>
                 {!graphLoading && (
                   <div className="mt-6">
-                    {vuln && vuln.vulnerabilityPath.length > 0 && (
+                    {vuln && hasVulnerabilityPath && (
                       <PathToComponent
                         rootNames={
                           vuln.artifacts.length > 0
@@ -498,7 +500,7 @@ const Index: FunctionComponent = () => {
                         }}
                       />
                     )}
-                    {(vuln?.vulnerabilityPath.length || 0) === 0 && (
+                    {!hasVulnerabilityPath && (
                       <div className="mt-4">
                         <Callout intent="warning" showIcon>
                           There are more than 12 different paths which lead to
@@ -576,9 +578,21 @@ const Index: FunctionComponent = () => {
                           isHandledByVexRule={isLastEventVexRule}
                           ticketUrl={vuln.ticketUrl}
                           onCreateVexRule={() => {
-                            setVexRulePrefill(undefined);
+                            const hasPathExplosion =
+                              !hasVulnerabilityPath && !graphLoading;
+                            setVexRulePrefill(
+                              hasPathExplosion && vuln
+                                ? {
+                                    title: `${vuln.cveID ?? "Vulnerability"} not exploitable in ${beautifyPurl(
+                                      vuln.componentPurl,
+                                    )}`,
+                                    celExpression: `vuln.cveId == "${vuln.cveID}" && matchesPurl(vuln.componentPurl, "${vuln.componentPurl}")`,
+                                  }
+                                : undefined,
+                            );
                             setAddVexRuleDialogOpen(true);
                           }}
+
                           onSubmit={handleSubmit}
                           secondaryActions={
                             <CreateTicketButton
