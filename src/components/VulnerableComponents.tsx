@@ -57,7 +57,7 @@ export function VulnerableComponents({
   return (
     <Card className="col-span-2">
       <CardHeader>
-        <CardTitle className="relative w-full">
+        <CardTitle className="relative text-base w-full">
           Vulnerable Components
           <Link
             href={
@@ -75,79 +75,90 @@ export function VulnerableComponents({
       </CardHeader>
       <CardContent>
         <div className="flex -mt-4 flex-col">
-          {isLoading
-            ? Array.from(Array(5).keys()).map((_, i, arr) => (
-                <Skeleton
-                  className={classNames(
-                    "h-[46px]",
-                    i === arr.length - 1 ? "mt-4" : "border-b my-4",
-                  )}
-                  key={i}
-                />
-              ))
-            : d.slice(0, 5).map((item, i, arr) => {
-                const searchQuery = encodeURIComponent(
-                  beautifyPurl(item.componentName),
-                );
-                const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks?search=${searchQuery}`;
+          {isLoading ? (
+            Array.from(Array(5).keys()).map((_, i, arr) => (
+              <Skeleton
+                className={classNames(
+                  "h-[46px]",
+                  i === arr.length - 1 ? "mt-4" : "border-b my-4",
+                )}
+                key={i}
+              />
+            ))
+          ) : !d.length ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-1 py-10 text-center">
+              <span className="text-sm font-semibold">
+                No vulnerable components
+              </span>
+              <span className="text-sm text-muted-foreground">
+                Components appear once a SBOM has been scanned
+              </span>
+            </div>
+          ) : (
+            d.slice(0, 5).map((item, i, arr) => {
+              const searchQuery = encodeURIComponent(
+                beautifyPurl(item.componentName),
+              );
+              const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependency-risks?search=${searchQuery}`;
 
-                return (
-                  <Link
-                    key={item.componentName}
-                    href={href}
-                    className="no-underline hover:bg-accent/70 transition-colors rounded-lg -mx-2 px-2 block !text-foreground"
+              return (
+                <Link
+                  key={item.componentName}
+                  href={href}
+                  className="no-underline hover:bg-accent/70 transition-colors rounded-lg -mx-2 px-2 block !text-foreground"
+                >
+                  <div
+                    className={classNames(
+                      i === arr.length - 1 ? "pt-4" : "border-b py-4",
+                      "flex flex-row items-center gap-4",
+                    )}
                   >
-                    <div
-                      className={classNames(
-                        i === arr.length - 1 ? "pt-4" : "border-b py-4",
-                        "flex flex-row items-center gap-4",
-                      )}
-                    >
-                      <div className="border border-foreground/20 rounded-lg p-1 bg-muted flex items-center justify-center w-8 h-8 aspect-square">
-                        <EcosystemImage
-                          size={20}
-                          packageName={item.componentName}
-                        />
-                      </div>
-                      <div>
-                        <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                          <span className="">
-                            {beautifyPurl(item.componentName)}
-                          </span>
-                          <div className="flex flex-row flex-wrap gap-2">
-                            <CVERainbowBadge
-                              low={
-                                mode === "risk"
-                                  ? item.risk.low
-                                  : item.risk.lowCvss
-                              }
-                              medium={
-                                mode === "risk"
-                                  ? item.risk.medium
-                                  : item.risk.mediumCvss
-                              }
-                              high={
-                                mode === "risk"
-                                  ? item.risk.high
-                                  : item.risk.highCvss
-                              }
-                              critical={
-                                mode === "risk"
-                                  ? item.risk.critical
-                                  : item.risk.criticalCvss
-                              }
-                            />
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-muted-foreground">
-                          Version {extractVersion(item.componentName)}
-                        </p>
-                      </div>
+                    <div className="border border-foreground/20 rounded-lg p-1 bg-muted flex items-center justify-center w-8 h-8 aspect-square">
+                      <EcosystemImage
+                        size={20}
+                        packageName={item.componentName}
+                      />
                     </div>
-                  </Link>
-                );
-              })}
+                    <div>
+                      <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                        <span className="">
+                          {beautifyPurl(item.componentName)}
+                        </span>
+                        <div className="flex flex-row flex-wrap gap-2">
+                          <CVERainbowBadge
+                            low={
+                              mode === "risk"
+                                ? item.risk.low
+                                : item.risk.lowCvss
+                            }
+                            medium={
+                              mode === "risk"
+                                ? item.risk.medium
+                                : item.risk.mediumCvss
+                            }
+                            high={
+                              mode === "risk"
+                                ? item.risk.high
+                                : item.risk.highCvss
+                            }
+                            critical={
+                              mode === "risk"
+                                ? item.risk.critical
+                                : item.risk.criticalCvss
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground">
+                        Version {extractVersion(item.componentName)}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          )}
         </div>
       </CardContent>
     </Card>

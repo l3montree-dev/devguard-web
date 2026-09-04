@@ -61,6 +61,7 @@ interface RiskScannerDialogProps {
   devguardWebLatestScannerImage: string;
   initialSlide?: number;
   defaultCliTab?: "sca" | "sast";
+  onboarding?: boolean;
 }
 
 const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
@@ -74,6 +75,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
   devguardWebLatestScannerImage,
   initialSlide,
   defaultCliTab,
+  onboarding,
 }) => {
   const [api, setApi] = React.useState<{
     reInit: () => void;
@@ -560,6 +562,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               tokenSlideIndex={asset.repositoryProvider === "github" ? 8 : 9}
               prevIndex={prevIndex}
+              onboarding={onboarding}
             />
             <GithubTokenSlide
               pat={accessToken.accessToken?.privKey}
@@ -608,6 +611,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               cliSlideIndex={12}
               fileUploadSlideIndex={13}
               prevIndex={prevIndex}
+              onboarding={onboarding}
             />
             <AutomatedIntegrationSlide
               apiUrl={apiUrl}
@@ -648,6 +652,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
               prevIndex={prevIndex}
               onInformationSourceSetup={handleInformationSourceSetup}
+              onboarding={onboarding}
             />
             <DevGuardCliSlide
               onClose={() => onOpenChange(false)}
@@ -655,6 +660,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               prevIndex={prevIndex}
               scannerImage={devguardWebLatestScannerImage}
               defaultTab={defaultCliTab}
+              onboarding={onboarding}
             />
           </CarouselContent>
         </Carousel>

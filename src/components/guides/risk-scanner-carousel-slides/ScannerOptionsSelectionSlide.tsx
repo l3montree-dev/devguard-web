@@ -27,11 +27,12 @@ interface ScannerOptionsSelectionSlideProps {
   };
   tokenSlideIndex: number;
   prevIndex: number;
+  onboarding?: boolean;
 }
 
 const ScannerOptionsSelectionSlide: FunctionComponent<
   ScannerOptionsSelectionSlideProps
-> = ({ config, setConfig, api, tokenSlideIndex, prevIndex }) => {
+> = ({ config, setConfig, api, tokenSlideIndex, prevIndex, onboarding }) => {
   return (
     <CarouselItem>
       <DialogHeader>
@@ -510,13 +511,15 @@ const ScannerOptionsSelectionSlide: FunctionComponent<
       </div>
 
       <div className="mt-4 flex flex-row gap-2 justify-end">
-        <Button
-          variant={"secondary"}
-          id="scanner-options-back-to-selection"
-          onClick={() => api?.scrollTo(prevIndex)}
-        >
-          Back
-        </Button>
+        {!onboarding && (
+          <Button
+            variant={"secondary"}
+            id="scanner-options-back-to-selection"
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
+            Back
+          </Button>
+        )}
         <Button
           disabled={Object.values(config).every((v) => v === false)}
           id="scanner-options-selection-continue"

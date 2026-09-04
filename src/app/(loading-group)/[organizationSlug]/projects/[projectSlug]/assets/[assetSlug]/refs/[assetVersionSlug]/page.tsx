@@ -111,6 +111,8 @@ const Index: FunctionComponent = () => {
     selectedArtifact,
   );
 
+  const hasLicenses = (licenses?.length ?? 0) > 0;
+
   const riskHistory = useMemo(() => {
     const groups = groupBy(riskHistoryResp, "day");
     const days = Object.keys(groups).sort();
@@ -277,7 +279,7 @@ const Index: FunctionComponent = () => {
 
               <Card className="col-span-2 flex flex-col">
                 <CardHeader>
-                  <CardTitle className="relative w-full">
+                  <CardTitle className="relative text-base w-full">
                     Licenses
                     <Link
                       href={
@@ -297,48 +299,59 @@ const Index: FunctionComponent = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="flex -mt-4 flex-col">
-                    {licenseLoading
-                      ? Array.from(Array(5).keys()).map((_, i, arr) => (
-                          <Skeleton
-                            className={classNames(
-                              "h-[46px]",
-                              i === arr.length - 1 ? "mt-4" : "border-b my-4",
-                            )}
-                            key={i}
-                          />
-                        ))
-                      : (licenses || []).slice(0, 5).map((el, i, arr) => (
-                          <div
-                            className={
-                              i === arr.length - 1 ? "pt-4" : "border-b py-4"
-                            }
-                            key={el.license.licenseId}
-                          >
-                            <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                              <span className="capitalize">
-                                {el.license.licenseId}
-                              </span>
-                              <div className="flex flex-row flex-wrap gap-2">
-                                {el.license.isOsiApproved ? (
-                                  <Badge variant={"secondary"}>
-                                    <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-success" />
-                                    OSI Approved
-                                  </Badge>
-                                ) : (
-                                  <Badge variant={"secondary"}>
-                                    <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-warning" />
-                                  </Badge>
-                                )}
-                              </div>
+                    {licenseLoading ? (
+                      Array.from(Array(5).keys()).map((_, i, arr) => (
+                        <Skeleton
+                          className={classNames(
+                            "h-[46px]",
+                            i === arr.length - 1 ? "mt-4" : "border-b my-4",
+                          )}
+                          key={i}
+                        />
+                      ))
+                    ) : !hasLicenses ? (
+                      <div className="flex flex-1 flex-col items-center justify-center gap-1 py-10 text-center">
+                        <span className="text-sm font-semibold">
+                          No license information yet
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                          Licenses appear once a SBOM has been scanned
+                        </span>
+                      </div>
+                    ) : (
+                      licenses!.slice(0, 5).map((el, i, arr) => (
+                        <div
+                          className={
+                            i === arr.length - 1 ? "pt-4" : "border-b py-4"
+                          }
+                          key={el.license.licenseId}
+                        >
+                          <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                            <span className="capitalize">
+                              {el.license.licenseId}
+                            </span>
+                            <div className="flex flex-row flex-wrap gap-2">
+                              {el.license.isOsiApproved ? (
+                                <Badge variant={"secondary"}>
+                                  <CheckBadgeIcon className="-ml-1.5 mr-1 inline-block h-4 w-4 text-success" />
+                                  OSI Approved
+                                </Badge>
+                              ) : (
+                                <Badge variant={"secondary"}>
+                                  <OctagonAlertIcon className="-ml-1.5 -mr-1.5 inline-block h-4 w-4 text-warning" />
+                                </Badge>
+                              )}
                             </div>
-                            <p className="text-sm text-muted-foreground">
-                              {el.license.name
-                                ? el.license.name
-                                : "Unknown license information"}
-                              , {el.count} dependencies
-                            </p>
                           </div>
-                        ))}
+                          <p className="text-sm text-muted-foreground">
+                            {el.license.name
+                              ? el.license.name
+                              : "Unknown license information"}
+                            , {el.count} dependencies
+                          </p>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -429,7 +442,7 @@ const Index: FunctionComponent = () => {
               </div>
               <Card className="col-span-4 flex flex-col">
                 <CardHeader>
-                  <CardTitle className="relative w-full">
+                  <CardTitle className="relative text-base w-full">
                     Activity Stream
                     <Link
                       href={
@@ -454,20 +467,32 @@ const Index: FunctionComponent = () => {
                     >
                       <div className="absolute left-3 h-full border-l border-r bg-secondary" />
 
-                      {eventsLoading
-                        ? Array.from(Array(4).keys()).map((el) => (
-                            <Skeleton key={el} className="w-full h-20" />
-                          ))
-                        : events?.data.map((event, index, events) => {
-                            return (
-                              <VulnEventItem
-                                key={event.id}
-                                event={event}
-                                index={index}
-                                events={events}
-                              />
-                            );
-                          })}
+                      {eventsLoading ? (
+                        Array.from(Array(4).keys()).map((el) => (
+                          <Skeleton key={el} className="w-full h-20" />
+                        ))
+                      ) : !events?.data.length ? (
+                        <div className="flex flex-1 flex-col items-center justify-center gap-1 py-10 text-center">
+                          <span className="text-sm font-semibold">
+                            No activity yet
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            Events appear once something happens on this
+                            repository
+                          </span>
+                        </div>
+                      ) : (
+                        events.data.map((event, index, events) => {
+                          return (
+                            <VulnEventItem
+                              key={event.id}
+                              event={event}
+                              index={index}
+                              events={events}
+                            />
+                          );
+                        })
+                      )}
                     </ul>
                   </div>
                 </CardContent>

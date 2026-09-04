@@ -58,7 +58,7 @@ export function AffectedBranchesTags({
   return (
     <Card className="flex flex-1 flex-col">
       <CardHeader>
-        <CardTitle className="relative w-full">
+        <CardTitle className="relative text-base w-full">
           {type == "branch" ? "Top 5 affected Branches" : "Top 5 affected Tags"}
           {/* <Link
             href={`#`}
@@ -75,63 +75,76 @@ export function AffectedBranchesTags({
       </CardHeader>
       <CardContent>
         <div className="flex -mt-4 flex-col">
-          {isLoading
-            ? Array.from(Array(5).keys()).map((_, i, arr) => (
-                <Skeleton
-                  className={classNames(
-                    "h-[46px]",
-                    i === arr.length - 1 ? "mt-4" : "border-b my-4",
-                  )}
-                  key={i}
-                />
-              ))
-            : d.slice(0, 5).map((item, i, arr) => {
-                const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${item.refName}`;
+          {isLoading ? (
+            Array.from(Array(5).keys()).map((_, i, arr) => (
+              <Skeleton
+                className={classNames(
+                  "h-[46px]",
+                  i === arr.length - 1 ? "mt-4" : "border-b my-4",
+                )}
+                key={i}
+              />
+            ))
+          ) : !d.length ? (
+            <div className="flex flex-1 flex-col items-center justify-center gap-1 py-10 text-center">
+              <span className="text-sm font-semibold">
+                {type == "branch" ? "No affected branches" : "No affected tags"}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {type == "branch"
+                  ? "Branches appear once vulnerabilities have been found"
+                  : "Tags appear once vulnerabilities have been found"}
+              </span>
+            </div>
+          ) : (
+            d.slice(0, 5).map((item, i, arr) => {
+              const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${item.refName}`;
 
-                return (
-                  <Link
-                    key={item.refName}
-                    href={href}
-                    className="no-underline hover:bg-accent/70 transition-colors rounded-lg -mx-2 px-2 block !text-foreground"
+              return (
+                <Link
+                  key={item.refName}
+                  href={href}
+                  className="no-underline hover:bg-accent/70 transition-colors rounded-lg -mx-2 px-2 block !text-foreground"
+                >
+                  <div
+                    className={classNames(
+                      i === arr.length - 1 ? "pt-4" : "border-b py-4",
+                      "flex flex-row items-center gap-4",
+                    )}
                   >
-                    <div
-                      className={classNames(
-                        i === arr.length - 1 ? "pt-4" : "border-b py-4",
-                        "flex flex-row items-center gap-4",
+                    <div className="border border-foreground/20 rounded-lg p-1 bg-muted flex items-center justify-center w-8 h-8 aspect-square">
+                      {type == "branch" ? (
+                        <GitBranch size={20} />
+                      ) : (
+                        <TagIcon size={20} />
                       )}
-                    >
-                      <div className="border border-foreground/20 rounded-lg p-1 bg-muted flex items-center justify-center w-8 h-8 aspect-square">
-                        {type == "branch" ? (
-                          <GitBranch size={20} />
-                        ) : (
-                          <TagIcon size={20} />
-                        )}
-                      </div>
-                      <div>
-                        <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
-                          <span className="">{item.refName}</span>
-                          <div className="flex flex-row flex-wrap gap-2">
-                            <CVERainbowBadge
-                              low={item.dist.low}
-                              medium={item.dist.medium}
-                              high={item.dist.high}
-                              critical={item.dist.critical}
-                            />
-                          </div>
-                        </div>
-
-                        <p className="text-sm text-muted-foreground">
-                          {item.dist.low +
-                            item.dist.medium +
-                            item.dist.high +
-                            item.dist.critical}{" "}
-                          vulnerabilities
-                        </p>
-                      </div>
                     </div>
-                  </Link>
-                );
-              })}
+                    <div>
+                      <div className="mb-1 flex flex-row items-center gap-2 text-sm font-semibold">
+                        <span className="">{item.refName}</span>
+                        <div className="flex flex-row flex-wrap gap-2">
+                          <CVERainbowBadge
+                            low={item.dist.low}
+                            medium={item.dist.medium}
+                            high={item.dist.high}
+                            critical={item.dist.critical}
+                          />
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground">
+                        {item.dist.low +
+                          item.dist.medium +
+                          item.dist.high +
+                          item.dist.critical}{" "}
+                        vulnerabilities
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          )}
         </div>
       </CardContent>
     </Card>

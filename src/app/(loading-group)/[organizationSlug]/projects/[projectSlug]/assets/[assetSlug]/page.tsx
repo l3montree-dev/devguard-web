@@ -369,6 +369,7 @@ const Index: FunctionComponent = () => {
         devguardCIComponentBase={config.devguardCIComponentBase}
         devguardWebLatestScannerImage={latestScannerImage}
         initialSlide={riskScanningInitialSlide}
+        onboarding
       />
       <WebhookSetupTicketIntegrationDialog
         open={webhookIsOpen}

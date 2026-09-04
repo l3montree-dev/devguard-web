@@ -34,11 +34,19 @@ interface IntegrationMethodSelectionSlideProps {
   cliSlideIndex: number;
   fileUploadSlideIndex: number;
   prevIndex: number;
+  onboarding?: boolean;
 }
 
 const IntegrationMethodSelectionSlide: FunctionComponent<
   IntegrationMethodSelectionSlideProps
-> = ({ api, setVariant, cliSlideIndex, fileUploadSlideIndex, prevIndex }) => {
+> = ({
+  api,
+  setVariant,
+  cliSlideIndex,
+  fileUploadSlideIndex,
+  prevIndex,
+  onboarding,
+}) => {
   return (
     <CarouselItem>
       <div className="">
@@ -89,15 +97,17 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               </CardDescription>
             </CardHeader>
           </Card>
-          <div className="mt-4 flex flex-row gap-2 justify-end">
-            <Button
-              variant={"secondary"}
-              id="integration-method-back-to-selection"
-              onClick={() => api?.scrollTo(prevIndex)}
-            >
-              Back
-            </Button>
-          </div>
+          {!onboarding && (
+            <div className="mt-4 flex flex-row gap-2 justify-end">
+              <Button
+                variant={"secondary"}
+                id="integration-method-back-to-selection"
+                onClick={() => api?.scrollTo(prevIndex)}
+              >
+                Back
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </CarouselItem>

@@ -25,11 +25,12 @@ interface SetupInformationSourceSlideProps {
     isDefault: boolean;
     informationSources: Array<{ url: string; purl?: string }>;
   }) => Promise<void>;
+  onboarding?: boolean;
 }
 
 export const SetupInformationSourceSlide: FunctionComponent<
   SetupInformationSourceSlideProps
-> = ({ api, onInformationSourceSetup, prevIndex }) => {
+> = ({ api, onInformationSourceSetup, prevIndex, onboarding }) => {
   const form = useForm<ArtifactRequest>({
     defaultValues: {
       artifactName: "",
@@ -88,14 +89,16 @@ export const SetupInformationSourceSlide: FunctionComponent<
         >
           <ArtifactForm form={form} isEditMode={false} />
           <div className="mt-4 flex flex-wrap flex-row gap-2 justify-end">
-            <Button
-              variant={"secondary"}
-              type="button"
-              id="setup-information-sources-back-to-selection"
-              onClick={() => api?.scrollTo(prevIndex)}
-            >
-              Back
-            </Button>
+            {!onboarding && (
+              <Button
+                variant={"secondary"}
+                type="button"
+                id="setup-information-sources-back-to-selection"
+                onClick={() => api?.scrollTo(prevIndex)}
+              >
+                Back
+              </Button>
+            )}
             <Button
               isSubmitting={form.formState.isSubmitting}
               id="setup-information-sources-create"
