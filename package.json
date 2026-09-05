@@ -9,7 +9,7 @@
     "lint": "eslint . --max-warnings=0",
     "test": "jest",
     "postinstall": "patch-package",
-    "e2e": "npx playwright test --project=chromium --project=chromium-authenticated --retries 1 e2e/src/devguard-*.e2e.spec.ts",
+    "e2e": "npx playwright test --project=chromium --project=chromium-authenticated --project=firefox --project=firefox-authenticated --retries 1 e2e/src/devguard-*.e2e.spec.ts",
     "knip": "knip"
   },
   "engines": {

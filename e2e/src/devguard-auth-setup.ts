@@ -5,11 +5,10 @@ import { test as setup } from "@playwright/test";
 import path from "path";
 import fs from "fs";
 import { DevGuardPOM } from "./pom/devguard";
-import { STORAGE_STATE } from "../../playwright.config";
+import { storageStateFor } from "../../playwright.config";
 
-const authFile = STORAGE_STATE;
-
-setup("authenticate", async ({ page }) => {
+setup("authenticate", async ({ page, browserName }) => {
+  const authFile = storageStateFor(browserName);
   fs.mkdirSync(path.dirname(authFile), { recursive: true });
   const devguardPOM = new DevGuardPOM(page);
   await devguardPOM.loadAndRegister();

@@ -3,7 +3,7 @@
 
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
-import { envConfig, LoggingAnalyzer } from "../utils";
+import { envConfig, goto, LoggingAnalyzer } from "../utils";
 import path from "path";
 import { AuthFlow } from "./flows/auth";
 import { OrgFlow } from "./flows/org";
@@ -79,12 +79,12 @@ export class DevGuardPOM {
 
   async loadDevGuard() {
     await suppressOverlays(this.page);
-    await this.page.goto(this.devGuardDomain);
+    await goto(this.page, this.devGuardDomain);
     await this.verifyOnDevGuardURL();
   }
 
   async loadDevGuardNoSuppress() {
-    await this.page.goto(this.devGuardDomain);
+    await goto(this.page, this.devGuardDomain);
     await this.verifyOnDevGuardURL();
   }
 

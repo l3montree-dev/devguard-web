@@ -3,6 +3,7 @@
 
 import { expect, test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
+import { goto } from "../../utils";
 
 export class AuthFlow {
   constructor(
@@ -21,7 +22,7 @@ export class AuthFlow {
   }
 
   async loginWithOpenCode() {
-    await this.page.goto(`${this.domain}/login`);
+    await goto(this.page, `${this.domain}/login`);
     await this.page
       .getByRole("button", { name: "OpenCode Logo Sign in with" })
       .click();
