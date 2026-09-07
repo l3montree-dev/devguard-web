@@ -25,7 +25,6 @@ import type { FunctionComponent } from "react";
 import AssetTitle from "@/components/common/AssetTitle";
 import { Combobox } from "@/components/common/Combobox";
 import { Badge } from "@/components/ui/badge";
-import { CardTitle } from "@/components/ui/card";
 import {
   createLicenseRiskEvent,
   finalLicenseDecision,
@@ -63,6 +62,8 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
+
+const MAX_LENGTH = 4000;
 
 const Index: FunctionComponent = () => {
   const params = useDecodedParams();
@@ -340,11 +341,11 @@ const Index: FunctionComponent = () => {
               </div>
               <AuthGuard require="member">
                 <div>
-                  <CardTitle>
+                  <h3 className="text-xl font-semibold leading-none tracking-tight pt-6">
                     {vuln.state !== "open"
                       ? "Reopen this risk"
                       : "Add a comment"}
-                  </CardTitle>
+                  </h3>
                   {isOpen ? (
                     <form
                       className="mt-4 flex flex-col gap-4"
@@ -352,9 +353,10 @@ const Index: FunctionComponent = () => {
                     >
                       <div>
                         <MarkdownEditor
-                          placeholder="Add your comment here..."
+                          placeholder="Add a comment, or pick an assessment below…"
                           value={justification ?? ""}
                           setValue={setJustification}
+                          maxLength={MAX_LENGTH}
                         />
                       </div>
 
@@ -538,17 +540,15 @@ const Index: FunctionComponent = () => {
                     </form>
                   ) : (
                     <form
-                      className="flex flex-col gap-4"
+                      className="mt-4 flex flex-col gap-4"
                       onSubmit={(e) => e.preventDefault()}
                     >
                       <div>
-                        <label className="mb-2 block text-sm font-semibold">
-                          Comment
-                        </label>
                         <MarkdownEditor
                           value={justification ?? ""}
                           setValue={setJustification}
-                          placeholder="Add your comment here..."
+                          placeholder="Add a comment…"
+                          maxLength={MAX_LENGTH}
                         />
                       </div>
 
