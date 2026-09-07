@@ -4,6 +4,8 @@ import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import { envConfig } from "./utils";
 
+test.skip(({ browserName }) => browserName !== "chromium", "chromium only");
+
 test.describe("DevGuard multi-user: test flows", () => {
   test("invited user can join organization via invite link", async ({
     page,

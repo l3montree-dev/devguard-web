@@ -3,14 +3,14 @@
 
 import { expect, test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
-import { envConfig } from "../../utils";
+import { envConfig, goto } from "../../utils";
 import { docShot } from "../../doc-shot";
 
 export class OrgFlow {
   constructor(private page: Page) {}
 
   async createOrganization(name: string) {
-    await this.page.goto(`${envConfig.devGuard.domain}/setup`);
+    await goto(this.page, `${envConfig.devGuard.domain}/setup`);
     // Necessary timeout so the 3D interactive DevGuard card is centered
     await this.page.waitForTimeout(1_000);
     await this.page.setViewportSize({ width: 1440, height: 900 });
