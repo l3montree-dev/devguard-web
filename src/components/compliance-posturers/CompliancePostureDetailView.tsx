@@ -103,7 +103,11 @@ import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import { ChevronRightIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
+import {
+  MAX_JUSTIFICATION_LENGTH,
+  validateJustification,
+} from "@/utils/justificationValidator";
 import FrameworkIcon from "./FrameworkIcon";
 import {
   EquivalentToIcon,
@@ -120,8 +124,6 @@ const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   { ssr: false },
 );
-
-const MAX_LENGTH = 4000;
 
 const relationshipDescription: Record<ControlRelationship, string> = {
   "equivalent-to": "This control is equivalent to the related control.",
@@ -409,10 +411,8 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
       return;
     }
 
-    if (!Boolean(data.justification)) {
-      return toast("Please provide a justification", {
-        description: "You need to provide a justification for your decision.",
-      });
+    if (!validateJustification(data.justification, data.status)) {
+      return;
     }
 
     const optimisticState =
@@ -772,7 +772,7 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
                           placeholder="Add a comment…"
                           value={justification ?? ""}
                           setValue={setJustification}
-                          maxLength={MAX_LENGTH}
+                          maxLength={MAX_JUSTIFICATION_LENGTH}
                         />
                       </div>
 
@@ -932,8 +932,8 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
                         <MarkdownEditor
                           value={justification ?? ""}
                           setValue={setJustification}
+                          maxLength={MAX_JUSTIFICATION_LENGTH}
                           placeholder="Add a comment…"
-                          maxLength={MAX_LENGTH}
                         />
                       </div>
                       <p className="text-sm text-muted-foreground">

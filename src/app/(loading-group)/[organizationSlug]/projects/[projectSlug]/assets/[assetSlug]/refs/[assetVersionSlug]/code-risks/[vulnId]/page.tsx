@@ -38,6 +38,10 @@ import {
 } from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "@/lib/toast";
+import {
+  MAX_JUSTIFICATION_LENGTH,
+  validateJustification,
+} from "@/utils/justificationValidator";
 import CopyCode from "@/components/common/CopyCode";
 import VulnState from "@/components/common/VulnState";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
@@ -60,8 +64,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
-
-const MAX_LENGTH = 4000;
 
 const highlightRegex = new RegExp(/\+\+\+(.+)\+\+\+/, "gms");
 
@@ -143,10 +145,8 @@ const Index = () => {
       return;
     }
 
-    if (!Boolean(data.justification)) {
-      return toast("Please provide a justification", {
-        description: "You need to provide a justification for your decision.",
-      });
+    if (!validateJustification(data.justification, data.status)) {
+      return;
     }
 
     const optimisticState =
@@ -344,7 +344,7 @@ const Index = () => {
                           placeholder="Add a comment, or pick an assessment below…"
                           value={justification ?? ""}
                           setValue={setJustification}
-                          maxLength={MAX_LENGTH}
+                          maxLength={MAX_JUSTIFICATION_LENGTH}
                         />
                       </div>
 
@@ -516,7 +516,7 @@ const Index = () => {
                           value={justification ?? ""}
                           setValue={setJustification}
                           placeholder="Add a comment…"
-                          maxLength={MAX_LENGTH}
+                          maxLength={MAX_JUSTIFICATION_LENGTH}
                         />
                       </div>
 
