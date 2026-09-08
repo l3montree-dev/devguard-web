@@ -5,7 +5,7 @@
 
 import { useEffect } from "react";
 import type { OryMessageContentProps } from "@ory/elements-react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 
 // Track which toast IDs have been shown to prevent duplicates
 const shownToastIds = new Set<string | number>();

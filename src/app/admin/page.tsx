@@ -11,7 +11,7 @@ import { verifyAdminKey } from "@/services/adminService";
 import { ApiError } from "@/services/apiClient";
 import { importAdminKey } from "@/services/adminRequestSigning";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import Callout from "@/components/common/Callout";
 import {

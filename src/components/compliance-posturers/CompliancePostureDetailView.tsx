@@ -103,7 +103,7 @@ import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
 import { ChevronRightIcon } from "lucide-react";
 import dynamic from "next/dynamic";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import FrameworkIcon from "./FrameworkIcon";
 import {
   EquivalentToIcon,
