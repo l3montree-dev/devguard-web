@@ -125,8 +125,6 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
-const MAX_LENGTH = 4000;
-
 const relationshipDescription: Record<ControlRelationship, string> = {
   "equivalent-to": "This control is equivalent to the related control.",
   "intersects-with":
