@@ -4,6 +4,37 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.13.2] — 2026-09-08
+
+### Added
+
+- **Predefined CEL expression for path-explosion dependency vulns** — VEX rules now offer a ready-made CEL expression for the path-explosion dependency vulnerability case
+- **Playwright screenshot coverage** — added an end-to-end test that captures documentation screenshots of the artifact external sources page
+
+### Fixed
+
+- **Registration/login card spacing** — fixed spacing issues on the Ory registration and login cards
+- **Headline sizing** — adjusted an oversized headline
+- **Asset overview empty states** — added an empty-state placeholder for cards on the asset overview, and for the VEX recommendations table
+- **Onboarding back buttons** — back buttons are now optional via a new onboarding prop
+- **Disabled buttons** — all disabled buttons now consistently show a `cursor-not-allowed` cursor
+- **VEX rule path locking** — the path to a component is no longer incorrectly locked when a VEX rule applies
+- **Risk history distribution diagram** — fixed rendering/alignment issues
+- **Card alignment** — reworked layout for better alignment between related cards
+- **Group/repo settings focus** — autofocus restored for group and repo fields; removed the redundant general settings section
+- **Branch/tag sorting** — branches and tags are now sorted alphanumerically before rendering
+- **Org name truncation** — long organization names are now truncated in the dropdown
+- **Control ID path decoding** — fixed handling of special control ID names (e.g. containing `+`) that require path decoding
+
+### Changed
+
+- **API client migration** — API access now goes through the generated client; hand-written API types were dropped and zero-warning lint is enforced
+- **E2E test sharding** — introduced sharding for the end-to-end test suite to speed up CI
+- **Dependency update** — bumped `fast-uri`
+- **Lint and state-effect fixes** — resolved lint warnings and `set state in effect` errors surfaced by the stricter lint config
+
+---
+
 ## [v1.13.1] — 2026-08-31
 
 ### Added
