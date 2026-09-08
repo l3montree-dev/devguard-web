@@ -9,6 +9,7 @@ For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3mo
 ### Added
 
 - **Predefined CEL expression for path-explosion dependency vulns** — VEX rules now offer a ready-made CEL expression for the path-explosion dependency vulnerability case
+- **CVSS badge on dependency graph** — the dependency graph now shows a CVSS badge per node
 - **Playwright screenshot coverage** — added an end-to-end test that captures documentation screenshots of the artifact external sources page
 
 ### Fixed
@@ -25,11 +26,14 @@ For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3mo
 - **Branch/tag sorting** — branches and tags are now sorted alphanumerically before rendering
 - **Org name truncation** — long organization names are now truncated in the dropdown
 - **Control ID path decoding** — fixed handling of special control ID names (e.g. containing `+`) that require path decoding
+- **Dependency table tooltip** — removed a duplicated tooltip content on the dependency table
+- **Nix build hash** — fixed an incorrect Nix SHA
 
 ### Changed
 
 - **API client migration** — API access now goes through the generated client; hand-written API types were dropped and zero-warning lint is enforced
-- **E2E test sharding** — introduced sharding for the end-to-end test suite to speed up CI
+- **Code-risks and license-risk pages** — aligned styling across code-risks, license-risk, and dependency-risks pages and their states
+- **E2E test sharding** — introduced sharding for the end-to-end test suite (now running across 12 shards) to speed up CI, with a first pass at Firefox coverage
 - **Dependency update** — bumped `fast-uri`
 - **Lint and state-effect fixes** — resolved lint warnings and `set state in effect` errors surfaced by the stricter lint config
 
