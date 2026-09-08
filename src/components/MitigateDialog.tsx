@@ -18,6 +18,10 @@ import {
 import { AsyncButton, Button } from "./ui/button";
 import GitProviderIcon from "./GitProviderIcon";
 import dynamic from "next/dynamic";
+import {
+  MAX_JUSTIFICATION_LENGTH,
+  validateJustification,
+} from "@/utils/justificationValidator";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -44,6 +48,9 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
   const [justification, setJustification] = useState<string>("");
 
   const handleSubmit = async () => {
+    if (!validateJustification(justification, "mitigate")) {
+      return;
+    }
     const success = await onSubmit(justification);
     if (success) {
       setJustification("");
@@ -73,7 +80,7 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
               placeholder="Add your justification for mitigating this vulnerability..."
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
-              maxLength={4000}
+              maxLength={MAX_JUSTIFICATION_LENGTH}
             />
           </div>
           <DialogFooter>
@@ -83,7 +90,7 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
             <AsyncButton
               variant={"secondary"}
               onClick={handleSubmit}
-              disabled={justification.length > 4000}
+              disabled={justification.length > MAX_JUSTIFICATION_LENGTH}
             >
               <div className="flex flex-row items-center">
                 {integrationType === "gitlab" && (
