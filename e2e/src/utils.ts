@@ -39,6 +39,23 @@ function sleep(timeInMs: number) {
   return new Promise((resolve) => setTimeout(resolve, timeInMs));
 }
 
+export async function goto(
+  page: Page,
+  url: string,
+  options?: Parameters<Page["goto"]>[1],
+) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await page.goto(url, options);
+    } catch (error) {
+      if (attempt >= 2 || !String(error).includes("NS_BINDING_ABORTED")) {
+        throw error;
+      }
+      await sleep(500);
+    }
+  }
+}
+
 // TODO: Remove this workaround once https://github.com/l3montree-dev/devguard/issues/1193 is fixed
 export async function temporaryWorkaround(
   page: Page,

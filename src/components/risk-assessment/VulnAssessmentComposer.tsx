@@ -114,6 +114,11 @@ const VulnAssessmentComposer: FunctionComponent<
       <div className="flex flex-col gap-3 pt-6">
         <AuthGuard require="member">
           <>
+            <h3 className="mb-1 text-xl font-semibold leading-none tracking-tight">
+              {!isOpen && !isHandledByVexRule
+                ? "Reopen this risk"
+                : "Add a comment"}
+            </h3>
             <MarkdownEditor
               value={justification}
               setValue={(value) => setJustification(value ?? "")}

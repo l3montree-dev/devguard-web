@@ -199,20 +199,6 @@ const VulnWithCveTableRow = ({
                   </div>
                 </Link>
               </TooltipTrigger>
-              <TooltipContent>
-                <div className="flex flex-wrap flex-row items-start gap-2 break-all max-w-md">
-                  {vuln.vulnerabilityPath.map((el, i) => (
-                    <span className="flex flex-row items-center gap-1" key={i}>
-                      <Purl
-                        purl={el}
-                        showVersion={false}
-                        showQualifiers={false}
-                      />
-                      {i < vuln.vulnerabilityPath.length - 1 ? " → " : null}
-                    </span>
-                  ))}
-                </div>
-              </TooltipContent>
             </Tooltip>
           </div>
         </div>

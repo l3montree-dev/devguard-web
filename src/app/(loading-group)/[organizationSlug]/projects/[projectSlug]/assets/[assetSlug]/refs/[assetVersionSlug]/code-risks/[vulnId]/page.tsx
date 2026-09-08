@@ -30,13 +30,6 @@ import { useState } from "react";
 import Markdown from "@/components/common/Markdown";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 import AssetTitle from "@/components/common/AssetTitle";
 import {
@@ -67,6 +60,8 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
+
+const MAX_LENGTH = 4000;
 
 const highlightRegex = new RegExp(/\+\+\+(.+)\+\+\+/, "gms");
 
@@ -334,236 +329,225 @@ const Index = () => {
               </div>
               <AuthGuard require="member">
                 <div>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>
-                        {vuln.state === "open"
-                          ? "Add a comment"
-                          : "Reopen this vulnerability"}
-                      </CardTitle>
-                      <CardDescription></CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {vuln.state === "open" ? (
-                        <form
-                          className="flex flex-col gap-4"
-                          onSubmit={(e) => e.preventDefault()}
-                        >
-                          <div>
-                            <label className="mb-2 block text-sm font-semibold">
-                              Comment
-                            </label>
-                            <MarkdownEditor
-                              placeholder="Add your comment here..."
-                              value={justification ?? ""}
-                              setValue={setJustification}
-                            />
-                          </div>
+                  <h3 className="text-xl font-semibold leading-none tracking-tight pt-6">
+                    {vuln.state !== "open"
+                      ? "Reopen this risk"
+                      : "Add a comment"}
+                  </h3>
+                  {vuln.state === "open" ? (
+                    <form
+                      className="mt-4 flex flex-col gap-4"
+                      onSubmit={(e) => e.preventDefault()}
+                    >
+                      <div>
+                        <MarkdownEditor
+                          placeholder="Add a comment, or pick an assessment below…"
+                          value={justification ?? ""}
+                          setValue={setJustification}
+                          maxLength={MAX_LENGTH}
+                        />
+                      </div>
 
-                          <div className="flex flex-row justify-end gap-1">
-                            <div className="flex flex-row items-start gap-2">
-                              {vuln.ticketId === null &&
-                                getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                  asset,
-                                  project,
-                                ) === undefined && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <span>
-                                        <Button
-                                          variant={"ghost"}
-                                          disabled
-                                          className=""
-                                        >
-                                          <span className="ml-1 text-muted-foreground">
-                                            Create Ticket
-                                          </span>
-                                        </Button>
-                                      </span>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      No repository is linked. To create a
-                                      ticket, please integrate your issue
-                                      tracker in the {` `}
-                                      <Link
-                                        href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                        className="underline"
-                                      >
-                                        settings
-                                      </Link>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              {vuln.ticketId === null &&
-                                getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                  asset,
-                                  project,
-                                ) === "gitlab" && (
-                                  <AsyncButton
-                                    variant={"secondary"}
-                                    onClick={() =>
-                                      handleSubmit({
-                                        status: "mitigate",
-                                        justification,
-                                      })
-                                    }
-                                  >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        <GitProviderIcon
-                                          externalEntityProviderIdOrRepositoryId={
-                                            asset.externalEntityProviderId ??
-                                            "gitlab"
-                                          }
-                                        />
+                      <div className="flex flex-row justify-end gap-1">
+                        <div className="flex flex-row items-start gap-2">
+                          {vuln.ticketId === null &&
+                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                              asset,
+                              project,
+                            ) === undefined && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>
+                                    <Button
+                                      variant={"ghost"}
+                                      disabled
+                                      className=""
+                                    >
+                                      <span className="ml-1 text-muted-foreground">
                                         Create Ticket
-                                      </div>
-                                    </div>
-                                  </AsyncButton>
-                                )}
-
-                              {vuln.ticketId === null &&
-                                getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                  asset,
-                                  project,
-                                ) === "github" && (
-                                  <AsyncButton
-                                    variant={"secondary"}
-                                    onClick={() =>
-                                      handleSubmit({
-                                        status: "mitigate",
-                                        justification,
-                                      })
-                                    }
+                                      </span>
+                                    </Button>
+                                  </span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  No repository is linked. To create a ticket,
+                                  please integrate your issue tracker in the{" "}
+                                  {` `}
+                                  <Link
+                                    href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
+                                    className="underline"
                                   >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        <Image
-                                          alt="GitLab Logo"
-                                          width={15}
-                                          height={15}
-                                          className="mr-2 dark:invert"
-                                          src={"/assets/github.svg"}
-                                        />
-                                        Create GitHub Ticket
-                                      </div>
-                                    </div>
-                                  </AsyncButton>
-                                )}
-
-                              {vuln.ticketId === null &&
-                                getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                  asset,
-                                  project,
-                                ) === "jira" && (
-                                  <AsyncButton
-                                    variant={"secondary"}
-                                    onClick={() =>
-                                      handleSubmit({
-                                        status: "mitigate",
-                                        justification,
-                                      })
-                                    }
-                                  >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        <Image
-                                          alt="Jira Logo"
-                                          width={15}
-                                          height={15}
-                                          className="mr-2"
-                                          src={"/assets/jira-svgrepo-com.svg"}
-                                        />
-                                        Create Jira Ticket
-                                      </div>
-                                    </div>
-                                  </AsyncButton>
-                                )}
-
+                                    settings
+                                  </Link>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          {vuln.ticketId === null &&
+                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                              asset,
+                              project,
+                            ) === "gitlab" && (
                               <AsyncButton
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "accepted",
-                                    justification,
-                                  })
-                                }
                                 variant={"secondary"}
-                              >
-                                Accept risk
-                              </AsyncButton>
-                              <AsyncButton
                                 onClick={() =>
                                   handleSubmit({
-                                    status: "falsePositive",
+                                    status: "mitigate",
                                     justification,
                                   })
                                 }
+                              >
+                                <div className="flex flex-col">
+                                  <div className="flex">
+                                    <GitProviderIcon
+                                      externalEntityProviderIdOrRepositoryId={
+                                        asset.externalEntityProviderId ??
+                                        "gitlab"
+                                      }
+                                    />
+                                    Create Ticket
+                                  </div>
+                                </div>
+                              </AsyncButton>
+                            )}
+
+                          {vuln.ticketId === null &&
+                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                              asset,
+                              project,
+                            ) === "github" && (
+                              <AsyncButton
                                 variant={"secondary"}
-                              >
-                                False Positive
-                              </AsyncButton>
-                              <AsyncButton
                                 onClick={() =>
                                   handleSubmit({
-                                    status: "comment",
+                                    status: "mitigate",
                                     justification,
                                   })
                                 }
-                                variant={"default"}
                               >
-                                Comment
+                                <div className="flex flex-col">
+                                  <div className="flex">
+                                    <Image
+                                      alt="GitLab Logo"
+                                      width={15}
+                                      height={15}
+                                      className="mr-2 dark:invert"
+                                      src={"/assets/github.svg"}
+                                    />
+                                    Create GitHub Ticket
+                                  </div>
+                                </div>
                               </AsyncButton>
-                            </div>
-                          </div>
-                        </form>
-                      ) : (
-                        <form
-                          className="flex flex-col gap-4"
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                          }}
+                            )}
+
+                          {vuln.ticketId === null &&
+                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                              asset,
+                              project,
+                            ) === "jira" && (
+                              <AsyncButton
+                                variant={"secondary"}
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "mitigate",
+                                    justification,
+                                  })
+                                }
+                              >
+                                <div className="flex flex-col">
+                                  <div className="flex">
+                                    <Image
+                                      alt="Jira Logo"
+                                      width={15}
+                                      height={15}
+                                      className="mr-2"
+                                      src={"/assets/jira-svgrepo-com.svg"}
+                                    />
+                                    Create Jira Ticket
+                                  </div>
+                                </div>
+                              </AsyncButton>
+                            )}
+
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "accepted",
+                                justification,
+                              })
+                            }
+                            variant={"secondary"}
+                          >
+                            Accept risk
+                          </AsyncButton>
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "falsePositive",
+                                justification,
+                              })
+                            }
+                            variant={"secondary"}
+                          >
+                            False Positive
+                          </AsyncButton>
+                          <AsyncButton
+                            onClick={() =>
+                              handleSubmit({
+                                status: "comment",
+                                justification,
+                              })
+                            }
+                            variant={"default"}
+                          >
+                            Comment
+                          </AsyncButton>
+                        </div>
+                      </div>
+                    </form>
+                  ) : (
+                    <form
+                      className="mt-4 flex flex-col gap-4"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                      }}
+                    >
+                      <div>
+                        <MarkdownEditor
+                          value={justification ?? ""}
+                          setValue={setJustification}
+                          placeholder="Add a comment…"
+                          maxLength={MAX_LENGTH}
+                        />
+                      </div>
+
+                      <p className="text-sm text-muted-foreground">
+                        You can reopen this vuln, if you plan to mitigate the
+                        risk now, or accepted this vuln by accident.
+                      </p>
+                      <div className="flex flex-row justify-end">
+                        <AsyncButton
+                          onClick={() =>
+                            handleSubmit({
+                              status: "reopened",
+                              justification,
+                            })
+                          }
+                          variant={"secondary"}
+                          type="submit"
                         >
-                          <div>
-                            <label className="mb-2 block text-sm font-semibold">
-                              Comment
-                            </label>
-                            <MarkdownEditor
-                              value={justification ?? ""}
-                              setValue={setJustification}
-                              placeholder="Add your comment here..."
-                            />
-                          </div>
-
-                          <p className="text-sm text-muted-foreground">
-                            You can reopen this vuln, if you plan to mitigate
-                            the risk now, or accepted this vuln by accident.
-                          </p>
-                          <div className="flex flex-row justify-end">
-                            <AsyncButton
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "reopened",
-                                  justification,
-                                })
-                              }
-                              variant={"secondary"}
-                              type="submit"
-                            >
-                              Reopen
-                            </AsyncButton>
-                          </div>
-                        </form>
-                      )}
-                      {vuln.ticketUrl && (
-                        <small className="mt-2 block w-full text-right text-muted-foreground">
-                          Comment will be synced with{" "}
-                          <Link href={vuln.ticketUrl} target="_blank">
-                            {vuln.ticketUrl}
-                          </Link>
-                        </small>
-                      )}
-                    </CardContent>
-                  </Card>
+                          Reopen
+                        </AsyncButton>
+                      </div>
+                    </form>
+                  )}
+                  {vuln.ticketUrl && (
+                    <small className="mt-2 block w-full text-right text-muted-foreground">
+                      Comment will be synced with{" "}
+                      <Link href={vuln.ticketUrl} target="_blank">
+                        {vuln.ticketUrl}
+                      </Link>
+                    </small>
+                  )}
                 </div>
               </AuthGuard>
             </div>
