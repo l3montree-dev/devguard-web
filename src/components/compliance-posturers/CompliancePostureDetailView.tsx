@@ -121,6 +121,8 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
+const MAX_LENGTH = 4000;
+
 const relationshipDescription: Record<ControlRelationship, string> = {
   "equivalent-to": "This control is equivalent to the related control.",
   "intersects-with":
@@ -754,17 +756,23 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
                 </div>
               )}
               <AuthGuard require="member">
-                <div className="mt-10">
+                <div>
+                  <h3 className="text-xl font-semibold leading-none tracking-tight pt-6">
+                    {vuln.state !== "open"
+                      ? "Reopen this documentation"
+                      : "Add a comment"}
+                  </h3>
                   {vuln.state === "open" ? (
                     <form
-                      className="flex flex-col gap-4"
+                      className="mt-4 flex flex-col gap-4"
                       onSubmit={(e) => e.preventDefault()}
                     >
                       <div>
                         <MarkdownEditor
-                          placeholder="Add your comment here..."
+                          placeholder="Add a comment…"
                           value={justification ?? ""}
                           setValue={setJustification}
+                          maxLength={MAX_LENGTH}
                         />
                       </div>
 
@@ -917,17 +925,15 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
                     </form>
                   ) : (
                     <form
-                      className="flex flex-col gap-4"
+                      className="mt-4 flex flex-col gap-4"
                       onSubmit={(e) => e.preventDefault()}
                     >
                       <div>
-                        <label className="mb-2 block text-sm font-semibold">
-                          Comment
-                        </label>
                         <MarkdownEditor
                           value={justification ?? ""}
                           setValue={setJustification}
-                          placeholder="Add your comment here..."
+                          placeholder="Add a comment…"
+                          maxLength={MAX_LENGTH}
                         />
                       </div>
                       <p className="text-sm text-muted-foreground">
