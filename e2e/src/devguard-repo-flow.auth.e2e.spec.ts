@@ -36,7 +36,7 @@ test.describe("DevGuard repo flows", () => {
       .artifacts()
       .createNewArtifact(
         "pkg:test/artifact",
-        "http://github.com/user-attachments/files/23216827/vex_l3montree_web_reopened.json",
+        "https://api.main.devguard.org/api/v1/public/e1f24270-6e68-4571-9168-9c151c639c97/refs/v1-13-3/artifacts/pkg%3Aoci%2Fdevguard%3Frepository_url%3Dghcr.io%2Fl3montree-dev%2Fdevguard%26arch%3Damd64%26tag%3Dv1.13.3-amd64/sbom.json/",
       );
     await devguardPOM.artifacts().deleteFirstArtifact();
     await devguardPOM.artifacts().deleteFirstArtifact();
