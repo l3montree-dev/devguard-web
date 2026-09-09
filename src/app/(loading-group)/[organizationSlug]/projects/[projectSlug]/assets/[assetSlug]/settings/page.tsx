@@ -72,7 +72,7 @@ const Index: FunctionComponent = () => {
   const updateAsset = useUpdateAsset();
   const router = useRouter();
   const config = useConfig();
-  const { data: logs } = useLogs();
+  const { data: logs, isLoading: isLogsLoading } = useLogs();
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
