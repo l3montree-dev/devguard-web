@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import { Badge } from "@/components/ui/badge";
 import { LogLevel } from "@/types/view/logs";
 import type { FunctionComponent } from "react";

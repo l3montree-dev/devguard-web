@@ -5032,7 +5032,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/logs": {
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/logs/": {
     parameters: {
       query?: never;
       header?: never;
@@ -5042,7 +5042,12 @@ export interface paths {
     /** List logs */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+        };
         header?: never;
         path: {
           /** @description Organization slug */
@@ -17236,6 +17241,24 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
