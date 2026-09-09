@@ -5032,6 +5032,54 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-github_com_l3montree-dev_devguard_database_models_Log"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/members/": {
     parameters: {
       query?: never;
@@ -14898,7 +14946,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersionDTO"][];
@@ -14936,7 +14983,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersionDTO"][];
@@ -14974,7 +15020,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersionDTO"][];
@@ -16650,7 +16695,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       project: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"];
       projectId: string;
@@ -16902,6 +16946,16 @@ export interface components {
       updatedAt: string;
       vulnAssetId: string;
     };
+    "github_com_l3montree-dev_devguard_database_models.Log": {
+      assetID: string;
+      assetVersionName: string;
+      createdAt: string;
+      id: string;
+      logLevel: components["schemas"]["logger.LogLevel"];
+      message: string;
+      orgID: string;
+      projectID: string;
+    };
     "github_com_l3montree-dev_devguard_database_models.Org": {
       configFiles: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       contactPhoneNumber: string;
@@ -17119,6 +17173,12 @@ export interface components {
       pageSize: number;
       total: number;
     };
+    "github_com_l3montree-dev_devguard_shared.Paged-github_com_l3montree-dev_devguard_database_models_Log": {
+      data: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Log"][];
+      page: number;
+      pageSize: number;
+      total: number;
+    };
     "github_com_l3montree-dev_devguard_shared.Paged-github_com_l3montree-dev_devguard_database_models_Project": {
       data: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"][];
       page: number;
@@ -17135,6 +17195,8 @@ export interface components {
       referenceNumber: number;
       seeAlso: string[];
     };
+    /** @enum {integer} */
+    "logger.LogLevel": 1 | 2 | 3 | 4;
     "normalize.MinimalTree": {
       dependencies: {
         [key: string]: string[];
@@ -17145,6 +17207,7 @@ export interface components {
       howToInterpretVersionString: components["schemas"]["normalize.VersionInterpretationType"];
       namespace: string;
       normalizedVersion: string;
+      originalVersion: string;
       qualifiers: components["schemas"]["packageurl.Qualifier"][];
       /** @description purl without version and qualifiers, used for database matching */
       searchPurl: string;
@@ -17162,6 +17225,14 @@ export interface components {
     };
     /** @enum {integer} */
     "time.Duration":
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
       | -9223372036854776000
       | 9223372036854776000
       | 1
