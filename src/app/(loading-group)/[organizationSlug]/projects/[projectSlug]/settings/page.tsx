@@ -40,6 +40,8 @@ import { useUpdateProject } from "../../../../../../context/ProjectContext";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useConfig } from "../../../../../../context/ConfigContext";
 import AccessTokenManagement from "@/components/AccessTokenManagement";
+import LogsTable from "@/components/logs/LogsTable";
+import { useLogs } from "@/hooks/useLogs";
 
 const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
@@ -49,6 +51,8 @@ const Index: FunctionComponent = () => {
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const config = useConfig();
   const router = useRouter();
+
+  const { data: logs } = useLogs();
 
   let { organizationSlug, projectSlug } = useDecodedParams() as {
     organizationSlug: string;
@@ -355,6 +359,14 @@ These identifiers are managed by the external system and are treated as immutabl
         <div className="my-4">
           <hr />
         </div>
+        <Section
+          id="logs"
+          title="Logs"
+          description="Errors and events captured by DevGuard while processing this repository, such as scan failures or unexpected exceptions."
+        >
+          <LogsTable logs={logs} />
+        </Section>
+        <hr />
         <FormProvider {...form}>
           <ProjectDangerZone
             form={form}

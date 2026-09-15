@@ -17,8 +17,8 @@ export const useLogs = () => {
 
   const searchParams = useSearchParams();
   const query = searchParams?.toString();
-  const url =
-    `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/logs` +
-    (query ? `?${query}` : "");
+  const url = `/organizations/${organizationSlug}/projects/${projectSlug}${
+    assetSlug ? `/assets/${assetSlug}` : ""
+  }/logs${query ? `?${query}` : ""}`;
   return useSWR<Paged<Log>>(url, fetcher, { keepPreviousData: true });
 };
