@@ -10,6 +10,8 @@ type S = components["schemas"];
 
 export interface VexRuleVulnContext {
   cveID: string | null;
+  // Shown in the dialog's CVE info menu.
+  cveDescription?: string;
   componentPurl: string;
   // Ordered purls from the direct dependency down to the vulnerable component.
   vulnerabilityPath: string[];
