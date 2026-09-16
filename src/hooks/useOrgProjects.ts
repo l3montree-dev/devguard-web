@@ -23,13 +23,18 @@ export const useOrgProjects = (
     async (requestUrl: string) => {
       const data = await fetcher<Paged<ProjectDTO>>(requestUrl);
       // the list endpoint returns plain projects; the nested tree is fetched
-      // lazily, so drop it here rather than pretend it is the frontend shape
+      // lazily, so drop it here rather than pretend it is the frontend shape.
+      // when searching, the endpoint already returns the tree, so keep it.
       return {
         ...data,
-        data: data.data.map(({ subGroupsAndAsset: _nested, ...item }) => ({
-          ...item,
-          resourceType: "project" as const,
-        })),
+        data: data.data.map(
+          ({ subGroupsAndAsset, ...item }) =>
+            ({
+              ...item,
+              resourceType: "project" as const,
+              ...(isSearchActive ? { subGroupsAndAsset } : {}),
+            }) as SubGroupsAndAsset,
+        ),
       } satisfies Paged<SubGroupsAndAsset>;
     },
     { keepPreviousData: true },
