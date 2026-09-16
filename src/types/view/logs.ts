@@ -4,10 +4,10 @@
 // Mirrors gorm.io/gorm/logger.LogLevel - note there is no "Debug" level, and
 // the backend serializes it as a plain integer, not a string.
 export enum LogLevel {
-  Silent = 1,
-  Error = 2,
-  Warn = 3,
-  Info = 4,
+  Silent = "silent",
+  Error = "error",
+  Warn = "warn",
+  Info = "info",
 }
 
 // Mirrors the backend's database/models.Log struct.
