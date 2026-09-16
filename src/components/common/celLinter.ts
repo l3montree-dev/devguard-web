@@ -465,26 +465,17 @@ export function celParseLinter() {
     const text = view.state.doc.toString();
     if (text.trim() === "") return [];
 
-    const diagnostics: Diagnostic[] = [];
-    const lineCount = view.state.doc.lines;
+    const error = checkCelSyntax(text);
+    if (!error) return [];
 
-    for (let lineNo = 1; lineNo <= lineCount; lineNo++) {
-      const line = view.state.doc.line(lineNo);
-      const trimmed = line.text.trim();
-      if (trimmed === "" || trimmed.startsWith("//")) continue;
-
-      const error = checkCelSyntax(line.text);
-      if (error) {
-        diagnostics.push({
-          from: line.from + error.pos,
-          to: Math.min(line.to, line.from + error.pos + error.length),
-          severity: "error",
-          message: error.message,
-        });
-      }
-    }
-
-    return diagnostics;
+    return [
+      {
+        from: error.pos,
+        to: Math.min(text.length, error.pos + error.length),
+        severity: "error",
+        message: error.message,
+      },
+    ];
   };
 }
 
