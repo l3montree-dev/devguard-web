@@ -711,6 +711,7 @@ const Index: FunctionComponent = () => {
           vuln
             ? {
                 cveID: vuln.cveID,
+                cveDescription: vuln.cve?.description,
                 componentPurl: vuln.componentPurl,
                 vulnerabilityPath: vuln.vulnerabilityPath,
                 rootName: asset.name,
