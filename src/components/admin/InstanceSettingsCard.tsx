@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import { mutate } from "swr";
-import { toast } from "sonner";
+import { toast } from "@/lib/toast";
 import {
   Card,
   CardContent,

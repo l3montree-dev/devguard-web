@@ -38,6 +38,10 @@ import {
 } from "@/utils/view";
 import dynamic from "next/dynamic";
 import { toast } from "@/lib/toast";
+import {
+  MAX_JUSTIFICATION_LENGTH,
+  validateJustification,
+} from "@/utils/justificationValidator";
 import VulnState from "../../../../../../../../../../../components/common/VulnState";
 import GitProviderIcon from "../../../../../../../../../../../components/GitProviderIcon";
 
@@ -62,8 +66,6 @@ const MarkdownEditor = dynamic(
     ssr: false,
   },
 );
-
-const MAX_LENGTH = 4000;
 
 const Index: FunctionComponent = () => {
   const params = useDecodedParams();
@@ -121,10 +123,8 @@ const Index: FunctionComponent = () => {
     if (!vuln) {
       return;
     }
-    if (!Boolean(data.justification)) {
-      return toast("Please provide a justification", {
-        description: "You need to provide a justification for your decision.",
-      });
+    if (!validateJustification(data.justification, data.status)) {
+      return;
     }
 
     const optimisticState =
@@ -356,7 +356,7 @@ const Index: FunctionComponent = () => {
                           placeholder="Add a comment, or pick an assessment below…"
                           value={justification ?? ""}
                           setValue={setJustification}
-                          maxLength={MAX_LENGTH}
+                          maxLength={MAX_JUSTIFICATION_LENGTH}
                         />
                       </div>
 
@@ -548,7 +548,7 @@ const Index: FunctionComponent = () => {
                           value={justification ?? ""}
                           setValue={setJustification}
                           placeholder="Add a comment…"
-                          maxLength={MAX_LENGTH}
+                          maxLength={MAX_JUSTIFICATION_LENGTH}
                         />
                       </div>
 

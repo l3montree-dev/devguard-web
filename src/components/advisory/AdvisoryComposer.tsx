@@ -6,8 +6,11 @@
 import AuthGuard from "@/components/AuthGuard";
 import { AsyncButton, Button } from "@/components/ui/button";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import { toast } from "@/lib/toast";
 import type { AdvisoryState } from "@/types/view/advisory";
+import {
+  MAX_JUSTIFICATION_LENGTH,
+  validateJustification,
+} from "@/utils/justificationValidator";
 import { Lightbulb } from "lucide-react";
 import dynamic from "next/dynamic";
 import type { FunctionComponent } from "react";
@@ -17,8 +20,6 @@ const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
   { ssr: false },
 );
-
-const MAX_LENGTH = 4000;
 
 interface AdvisoryComposerProps {
   state: AdvisoryState;
@@ -40,16 +41,7 @@ const AdvisoryComposer: FunctionComponent<AdvisoryComposerProps> = ({
   const [justification, setJustification] = useState("");
 
   const attemptComment = async () => {
-    if (justification.trim().length === 0) {
-      toast.warning("Comment can’t be empty", {
-        description: "Write a comment before posting.",
-      });
-      return false;
-    }
-    if (justification.length > MAX_LENGTH) {
-      toast.warning("Comment is too long", {
-        description: `Please keep it under ${MAX_LENGTH} characters.`,
-      });
+    if (!validateJustification(justification, "comment")) {
       return false;
     }
 
@@ -78,7 +70,7 @@ const AdvisoryComposer: FunctionComponent<AdvisoryComposerProps> = ({
               placeholder="Add a comment…"
               value={justification}
               setValue={(value) => setJustification(value ?? "")}
-              maxLength={MAX_LENGTH}
+              maxLength={MAX_JUSTIFICATION_LENGTH}
             />
 
             <div className="flex flex-row flex-wrap items-center justify-between gap-2">
