@@ -120,7 +120,6 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
                       <td className="p-4">
                         <LogLevelBadge level={log.logLevel} />
                       </td>
-                      <td className="p-4">{log.assetVersionName || "-"}</td>
                       <td className="max-w-[560px] p-4">
                         <span className="block whitespace-pre-wrap break-words font-mono text-xs">
                           {log.message}
