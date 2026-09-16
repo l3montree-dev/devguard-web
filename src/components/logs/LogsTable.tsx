@@ -38,13 +38,6 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("assetVersionName", {
-      header: "Version",
-      id: "asset_version_name",
-      enableSorting: false,
-    }),
-  },
-  {
     ...columnHelper.accessor("message", {
       header: "Message",
       id: "message",
