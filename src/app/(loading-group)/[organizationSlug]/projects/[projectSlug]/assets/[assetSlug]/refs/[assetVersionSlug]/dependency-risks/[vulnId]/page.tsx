@@ -261,13 +261,6 @@ const Index: FunctionComponent = () => {
       return false;
     }
 
-    if (!Boolean(data.justification) && !Boolean(data.pathPattern)) {
-      toast("Please provide a justification", {
-        description: "You need to provide a justification for your decision.",
-      });
-      return false;
-    }
-
     const optimisticState =
       data.status === "falsePositive"
         ? "falsePositive"

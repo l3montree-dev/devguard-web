@@ -12,7 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Kbd, KbdGroup } from "@/components/ui/kbd";
-import { toast } from "@/lib/toast";
+import {
+  MAX_JUSTIFICATION_LENGTH,
+  validateJustification,
+} from "@/utils/justificationValidator";
 import { classNames } from "@/utils/common";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import { CheckIcon } from "@heroicons/react/24/outline";
@@ -27,7 +30,6 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
-const MAX_LENGTH = 4000;
 // The FP dropdown defaults to "Vulnerable code not in execute path".
 const DEFAULT_FP_OPTION = Object.keys(vexOptionMessages)[2];
 
@@ -71,28 +73,8 @@ const VulnAssessmentComposer: FunctionComponent<
     return success;
   };
 
-  // Actions stay enabled so the user gets explicit feedback: an empty or
-  // over-long justification is rejected with a toast rather than a silently
-  // disabled button.
   const attemptSubmit = async (data: AssessmentSubmit) => {
-    if (justification.trim().length === 0) {
-      toast.warning(
-        data.status === "comment"
-          ? "Comment can’t be empty"
-          : "Justification required",
-        {
-          description:
-            data.status === "comment"
-              ? "Write a comment before posting."
-              : "Add a justification before recording this decision.",
-        },
-      );
-      return false;
-    }
-    if (justification.length > MAX_LENGTH) {
-      toast.warning("Justification is too long", {
-        description: `Please keep it under ${MAX_LENGTH} characters.`,
-      });
+    if (!validateJustification(justification, data.status)) {
       return false;
     }
     return submit(data);
@@ -127,7 +109,7 @@ const VulnAssessmentComposer: FunctionComponent<
                   ? "Add a comment, or pick an assessment below…"
                   : "Add a comment…"
               }
-              maxLength={MAX_LENGTH}
+              maxLength={MAX_JUSTIFICATION_LENGTH}
             />
 
             {isOpen ? (
