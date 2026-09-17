@@ -343,9 +343,9 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
       userId: session?.identity.id ?? "",
       vulnType: "compliancePosture",
       originalAssetVersionName: assetVersion?.name ?? "",
-      arbitraryJSONData: {
-        componentTitle: removedStatement?.complianceComponentTitle ?? "",
-      },
+      complianceComponentId: removedStatement?.complianceComponentId ?? null,
+      complianceComponentTitle:
+        removedStatement?.complianceComponentTitle ?? "",
     } as VulnEventDTO;
 
     mutate(
@@ -719,9 +719,9 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
                         userId: session?.identity.id ?? "",
                         vulnType: "compliancePosture",
                         originalAssetVersionName: assetVersion?.name ?? "",
-                        arbitraryJSONData: {
-                          componentTitle: statement.complianceComponentTitle,
-                        },
+                        complianceComponentId: statement.complianceComponentId,
+                        complianceComponentTitle:
+                          statement.complianceComponentTitle,
                       } as VulnEventDTO;
 
                       mutate(

@@ -11,20 +11,6 @@ import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
 import type { User } from "@/types/auth";
 import { getUserFullName } from "@/utils/auth";
-export const eventMessages = (event: VulnEventDTO) => {
-  switch (event.type) {
-    case "mitigate":
-      return (
-        "Everything after this entry will be synced with the external system. The ticket can be found at [" +
-        event.arbitraryJSONData.ticketUrl +
-        "](" +
-        event.arbitraryJSONData.ticketUrl +
-        ")"
-      );
-  }
-  return event.justification;
-};
-
 export const removeUnderscores = (input: string): string => {
   return input.replace(/_/g, " ");
 };
@@ -84,19 +70,11 @@ export const violationLengthToLevel = (length: number) => {
   return "critical";
 };
 
-export const eventTypeMessages = (
-  event: VulnEventDTO,
-  flawName: string,
-  events?: VulnEventDTO[],
-) => {
+export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
   let message = "";
   switch (event.type) {
     case "licenseDecision":
-      message =
-        "made a license decision: " +
-          event.arbitraryJSONData.finalLicenseDecision ||
-        event.arbitraryJSONData.license ||
-        "unknown license";
+      message = "made a license decision";
       break;
     case "mitigate":
       message = "created a ticket for " + flawName;
@@ -114,14 +92,10 @@ export const eventTypeMessages = (
       message = "added a comment";
       break;
     case "detected":
-      if (event.arbitraryJSONData.risk === 0) {
+      if (!event.risk) {
         message = "detected " + flawName;
       } else {
-        message =
-          "detected " +
-          flawName +
-          " with a risk of " +
-          event.arbitraryJSONData.risk;
+        message = "detected " + flawName + " with a risk of " + event.risk;
       }
       break;
     case "falsePositive":
@@ -135,32 +109,15 @@ export const eventTypeMessages = (
       break;
     case "attachedComplianceComponent":
       message =
-        "attached " +
-        event.arbitraryJSONData.componentTitle +
-        " to " +
-        flawName;
+        "attached " + event.complianceComponentTitle + " to " + flawName;
       break;
     case "removedComplianceComponent":
       message =
-        "removed " +
-        event.arbitraryJSONData.componentTitle +
-        " from " +
-        flawName;
+        "removed " + event.complianceComponentTitle + " from " + flawName;
       break;
-    case "rawRiskAssessmentUpdated": {
-      const oldRisk = event.arbitraryJSONData.oldRisk;
-      if (events === undefined || (!oldRisk && oldRisk !== 0)) {
-        message =
-          "updated the risk assessment to " + event.arbitraryJSONData.risk;
-      } else {
-        message =
-          "updated the risk assessment from " +
-          oldRisk +
-          " to " +
-          event.arbitraryJSONData.risk;
-      }
+    case "rawRiskAssessmentUpdated":
+      message = "updated the risk assessment to " + event.risk;
       break;
-    }
     case "published": {
       message = "published " + flawName;
       break;

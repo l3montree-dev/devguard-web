@@ -12,7 +12,6 @@ import { UserRole } from "@/types/view/vuln";
 import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { classNames } from "@/utils/common";
 import {
-  eventMessages,
   eventTypeMessages,
   evTypeBackground,
   findUser,
@@ -135,7 +134,7 @@ const RiskFeedGroupHeader = ({
             <button className="w-full bg-card px-2 py-2 font-medium flex flex-row items-center justify-between hover:bg-muted/50 transition-colors">
               <span className="flex flex-row items-center gap-2">
                 {(() => {
-                  const msg = eventTypeMessages(groupedEvents[0], "", []);
+                  const msg = eventTypeMessages(groupedEvents[0], "");
                   return msg.charAt(0).toUpperCase() + msg.slice(1);
                 })()}
                 <Badge variant="secondary" className="text-xs font-normal">
@@ -161,7 +160,6 @@ const RiskFeedGroupHeader = ({
 
 const RiskFeedItem = ({
   event,
-  events,
   org,
   currentUser,
   vulnerabilityName,
@@ -170,7 +168,6 @@ const RiskFeedItem = ({
   inGroup,
 }: {
   event: VulnEventDTO;
-  events: VulnEventDTO[];
   org: ReturnType<typeof useActiveOrg>;
   project: ReturnType<typeof useActiveProject>;
   asset: ReturnType<typeof useActiveAsset>;
@@ -185,7 +182,7 @@ const RiskFeedItem = ({
 }) => {
   const user = findUser(event.userId, org, currentUser);
 
-  const msg = eventMessages(event);
+  const msg = event.justification;
 
   return (
     <li
@@ -259,7 +256,7 @@ const RiskFeedItem = ({
                   {event.createdByVexRule
                     ? "VEX Rule"
                     : findUser(event.userId, org, currentUser).displayName}{" "}
-                  {eventTypeMessages(event, vulnerabilityName, events)}
+                  {eventTypeMessages(event, vulnerabilityName)}
                   {event.mechanicalJustification &&
                     "- " +
                       removeUnderscores(
@@ -471,7 +468,6 @@ export default function RiskAssessmentFeed({
                               currentUserRole={currentUserRole}
                               key={event.id}
                               event={event}
-                              events={events}
                               directDependencyFixedVersion={
                                 directDependencyFixedVersion
                               }
@@ -496,7 +492,6 @@ export default function RiskAssessmentFeed({
                         currentUserRole={currentUserRole}
                         key={event.id}
                         event={event}
-                        events={events}
                         directDependencyFixedVersion={
                           directDependencyFixedVersion
                         }
@@ -530,7 +525,6 @@ export default function RiskAssessmentFeed({
                         currentUserRole={currentUserRole}
                         key={event.id}
                         event={event}
-                        events={events}
                         directDependencyFixedVersion={
                           directDependencyFixedVersion
                         }
@@ -554,7 +548,6 @@ export default function RiskAssessmentFeed({
                   currentUserRole={currentUserRole}
                   key={event.id}
                   event={event}
-                  events={events}
                   directDependencyFixedVersion={directDependencyFixedVersion}
                 />
               );

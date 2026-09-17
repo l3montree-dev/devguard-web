@@ -148,7 +148,6 @@ const Index: FunctionComponent = () => {
             vulnId: vuln.id,
             vulnType: "dependencyVuln",
             vulnerabilityName: null,
-            arbitraryJSONData: { scannerIds: "" },
             packageName: vuln.componentPurl,
             uri: null,
             createdByVexRule: false,
