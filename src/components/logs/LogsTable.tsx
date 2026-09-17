@@ -13,7 +13,6 @@ import { classNames } from "@/utils/common";
 import { formatDateTime } from "@/utils/format";
 import { flexRender } from "@tanstack/react-table";
 import type { FunctionComponent } from "react";
-import LogLevelBadge from "./LogLevelBadge";
 
 interface LogsTableProps {
   logs?: Paged<Log>;
@@ -28,6 +27,11 @@ const permalinkHref = (log: Log) => {
   return `/api/-/o/${log.orgID}`;
 };
 
+// "project / asset" - shows where the log happened, narrowing from left to
+// right. Falls back to the organization when neither is set.
+const logSource = (log: Log) =>
+  [log.projectName, log.assetName].filter(Boolean).join(" / ");
+
 const columnsDef: TableColumnDef<Log, any>[] = [
   {
     ...columnHelper.accessor("createdAt", {
@@ -37,10 +41,10 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     }),
   },
   {
-    ...columnHelper.accessor("logLevel", {
-      header: "Level",
-      id: "log_level",
-      enableSorting: true,
+    ...columnHelper.accessor("projectName", {
+      header: "Source",
+      id: "project_name",
+      enableSorting: false,
     }),
   },
   {
@@ -128,8 +132,10 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
                       <td className="whitespace-nowrap p-4 text-muted-foreground">
                         {formatDateTime(log.createdAt)}
                       </td>
-                      <td className="p-4">
-                        <LogLevelBadge level={log.logLevel} />
+                      <td className="whitespace-nowrap p-4 text-muted-foreground">
+                        {logSource(log) || (
+                          <span className="text-muted-foreground/60">-</span>
+                        )}
                       </td>
                       <td className="max-w-[560px] p-4">
                         <a
