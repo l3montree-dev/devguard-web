@@ -5047,6 +5047,12 @@ export interface paths {
           page?: number;
           /** @description Page size */
           pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
         };
         header?: never;
         path: {
@@ -5067,7 +5073,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-models_Log"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
           };
         };
       };
@@ -11675,6 +11681,52 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/resolve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Resolve a permalink
+     * @description Resolves an organization, project or asset UUID to the slugs the frontend needs to build a human readable URL. Exactly one of the query parameters must be set.
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Organization ID */
+          orgid?: string;
+          /** @description Project ID */
+          projectid?: string;
+          /** @description Asset ID */
+          assetid?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.PermalinkResponse"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/sarif-scan": {
     parameters: {
       query?: never;
@@ -15680,6 +15732,17 @@ export interface components {
       assetId: string;
       assetVersionName: string;
     };
+    "dtos.LogDTO": {
+      assetID: string;
+      assetName: string;
+      createdAt: string;
+      id: string;
+      logLevel: string;
+      message: string;
+      orgID: string;
+      projectID: string;
+      projectName: string;
+    };
     "dtos.LookupResponse": {
       asset: string;
       link: string;
@@ -15976,6 +16039,11 @@ export interface components {
       expiryDateUnix: number;
       pubKey: string;
       scopes: string;
+    };
+    "dtos.PermalinkResponse": {
+      assetSlug: string;
+      organizationSlug: string;
+      projectSlug: string;
     };
     "dtos.PolicyDTO": {
       description: string;
@@ -16842,15 +16910,6 @@ export interface components {
       updatedAt: string;
       vulnAssetId: string;
     };
-    "github_com_l3montree-dev_devguard_database_models.Log": {
-      assetID: string;
-      createdAt: string;
-      id: string;
-      logLevel: string;
-      message: string;
-      orgID: string;
-      projectID: string;
-    };
     "github_com_l3montree-dev_devguard_database_models.Org": {
       configFiles: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       contactPhoneNumber: string;
@@ -17039,6 +17098,12 @@ export interface components {
       pageSize: number;
       total: number;
     };
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO": {
+      data: components["schemas"]["dtos.LogDTO"][];
+      page: number;
+      pageSize: number;
+      total: number;
+    };
     "github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAssetDTO": {
       data: components["schemas"]["dtos.ProjectAssetDTO"][];
       page: number;
@@ -17075,12 +17140,6 @@ export interface components {
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-models_Log": {
-      data: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Log"][];
-      page: number;
-      pageSize: number;
-      total: number;
-    };
     "licenses.License": {
       detailsURL: string;
       isDeprecatedLicenseId: boolean;
@@ -17113,24 +17172,6 @@ export interface components {
     };
     /** @enum {integer} */
     "time.Duration":
-      | -9223372036854776000
-      | 9223372036854776000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000
@@ -17143,6 +17184,17 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
       | 1
       | 1000
       | 1000000
