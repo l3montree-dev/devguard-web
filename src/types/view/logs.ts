@@ -10,14 +10,17 @@ export enum LogLevel {
   Info = "info",
 }
 
-// Mirrors the backend's database/models.Log struct.
+// Mirrors the backend's dtos.LogDTO. A log is always scoped to an
+// organization; projectID and assetID narrow it further and are null for logs
+// that do not belong to one.
 export interface Log {
   id: string;
   orgID: string;
-  projectID: string;
-  assetID: string;
-  assetVersionName: string;
+  projectID: string | null;
+  assetID: string | null;
   createdAt: string;
   logLevel: LogLevel;
   message: string;
+  projectSlug?: string;
+  assetSlug?: string;
 }
