@@ -12,7 +12,9 @@ import type { Log } from "@/types/view/logs";
 import { classNames } from "@/utils/common";
 import { formatDateTime } from "@/utils/format";
 import { flexRender } from "@tanstack/react-table";
+import { usePathname } from "next/navigation";
 import type { FunctionComponent } from "react";
+import Link from "next/link";
 
 interface LogsTableProps {
   logs?: Paged<Log>;
@@ -27,8 +29,7 @@ const permalinkHref = (log: Log) => {
   return `/api/-/o/${log.orgID}`;
 };
 
-// "project / asset" - shows where the log happened, narrowing from left to
-// right. Falls back to the organization when neither is set.
+// "project / asset" - shows where the log happened
 const logSource = (log: Log) =>
   [log.projectName, log.assetName].filter(Boolean).join(" / ");
 
@@ -57,6 +58,9 @@ const columnsDef: TableColumnDef<Log, any>[] = [
 ];
 
 const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
+  const pathname = usePathname();
+  const detailsHref = `${(pathname ?? "").replace(/\/$/, "")}/logs`;
+
   const { table } = useTable({
     columnsDef,
     data: logs?.data ?? [],
@@ -120,12 +124,8 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
                     <tr
                       data-testid="log-row"
                       key={log.id}
-                      onClick={(e) => {
-                        if ((e.target as HTMLElement).closest("a")) return;
-                        window.location.href = href;
-                      }}
                       className={classNames(
-                        "cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50",
+                        "border-b last:border-0",
                         index % 2 !== 0 && "bg-card/50",
                       )}
                     >
@@ -133,17 +133,22 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
                         {formatDateTime(log.createdAt)}
                       </td>
                       <td className="whitespace-nowrap p-4 text-muted-foreground">
-                        {logSource(log) || (
+                        {logSource(log) ? (
+                          <Link
+                            href={href}
+                            className="!text-muted-foreground hover:!text-foreground"
+                            target="_blank"
+                          >
+                            {logSource(log)}
+                          </Link>
+                        ) : (
                           <span className="text-muted-foreground/60">-</span>
                         )}
                       </td>
                       <td className="max-w-[560px] p-4">
-                        <a
-                          href={href}
-                          className="block whitespace-pre-wrap break-words font-mono text-xs"
-                        >
+                        <span className="block whitespace-pre-wrap break-words font-mono text-xs">
                           {log.message}
-                        </a>
+                        </span>
                       </td>
                     </tr>
                   );
@@ -151,6 +156,15 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="mt-2 text-right text-sm text-muted-foreground">
+          <Link
+            href={detailsHref}
+            className="!text-muted-foreground hover:!text-foreground"
+            target="_blank"
+          >
+            More details
+          </Link>
         </div>
         <div className="mt-4">{logs && <CustomPagination {...logs} />}</div>
       </div>

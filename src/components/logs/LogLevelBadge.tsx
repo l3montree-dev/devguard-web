@@ -15,7 +15,9 @@ const labelAndVariant: Record<
   [LogLevel.Silent]: { label: "Silent", variant: "secondary" },
 };
 
-const LogLevelBadge: FunctionComponent<{ level: LogLevel }> = ({ level }) => {
+export const LogLevelBadge: FunctionComponent<{ level: LogLevel }> = ({
+  level,
+}) => {
   const { label, variant } = labelAndVariant[level] ?? {
     label: "Unknown",
     variant: "secondary",
