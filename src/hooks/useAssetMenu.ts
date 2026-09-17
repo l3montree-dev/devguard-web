@@ -248,7 +248,9 @@ export const useAssetMenu = () => {
           assetVersionSlug +
           "/artifacts",
         Icon: TextSelect,
-        isActive: pathname.includes("artifacts"),
+        isActive: pathname.startsWith(
+          `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/artifacts`,
+        ),
         testId: "nav-asset-artifacts",
       },
     ]);
