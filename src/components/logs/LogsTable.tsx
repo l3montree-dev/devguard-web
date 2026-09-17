@@ -22,6 +22,12 @@ interface LogsTableProps {
 
 const columnHelper = createAppColumnHelper<Log>();
 
+const permalinkHref = (log: Log) => {
+  if (log.assetID) return `/api/-/a/${log.assetID}`;
+  if (log.projectID) return `/api/-/p/${log.projectID}`;
+  return `/api/-/o/${log.orgID}`;
+};
+
 const columnsDef: TableColumnDef<Log, any>[] = [
   {
     ...columnHelper.accessor("createdAt", {
@@ -105,12 +111,17 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
               ) : (
                 table.getRowModel().rows.map((row, index) => {
                   const log = row.original;
+                  const href = permalinkHref(log);
                   return (
                     <tr
                       data-testid="log-row"
                       key={log.id}
+                      onClick={(e) => {
+                        if ((e.target as HTMLElement).closest("a")) return;
+                        window.location.href = href;
+                      }}
                       className={classNames(
-                        "border-b last:border-0",
+                        "cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50",
                         index % 2 !== 0 && "bg-card/50",
                       )}
                     >
@@ -121,9 +132,12 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
                         <LogLevelBadge level={log.logLevel} />
                       </td>
                       <td className="max-w-[560px] p-4">
-                        <span className="block whitespace-pre-wrap break-words font-mono text-xs">
+                        <a
+                          href={href}
+                          className="block whitespace-pre-wrap break-words font-mono text-xs"
+                        >
                           {log.message}
-                        </span>
+                        </a>
                       </td>
                     </tr>
                   );
