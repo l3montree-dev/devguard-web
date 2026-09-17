@@ -92,11 +92,7 @@ export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
       message = "added a comment";
       break;
     case "detected":
-      if (!event.risk) {
-        message = "detected " + flawName;
-      } else {
-        message = "detected " + flawName + " with a risk of " + event.risk;
-      }
+      message = "detected " + flawName;
       break;
     case "falsePositive":
       message = "marked " + flawName + " as false positive";
@@ -108,15 +104,13 @@ export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
       message = "marked " + flawName + " as not applicable";
       break;
     case "attachedComplianceComponent":
-      message =
-        "attached " + event.complianceComponentTitle + " to " + flawName;
+      message = "attached a component to " + flawName;
       break;
     case "removedComplianceComponent":
-      message =
-        "removed " + event.complianceComponentTitle + " from " + flawName;
+      message = "removed a component from " + flawName;
       break;
     case "rawRiskAssessmentUpdated":
-      message = "updated the risk assessment to " + event.risk;
+      message = "updated the risk assessment";
       break;
     case "published": {
       message = "published " + flawName;

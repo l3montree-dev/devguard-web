@@ -26,9 +26,6 @@ interface BaseVulnEventDTO {
   userAgent: string;
   vexRuleId?: string | null;
   vexRule?: VexRule | null;
-  risk: number | null;
-  complianceComponentId: string | null;
-  complianceComponentTitle: string | null;
 }
 
 export interface ImplementedEventDTO extends BaseVulnEventDTO {

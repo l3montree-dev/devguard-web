@@ -313,10 +313,6 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
   const [showAddComponent, setShowAddComponent] = useState(false);
 
   const handleDeleteStatement = async (statementId: string) => {
-    const removedStatement = vuln?.byComponents.find(
-      (s) => s.id === statementId,
-    );
-
     try {
       await deleteStatement(scope, statementId);
     } catch {
@@ -343,9 +339,6 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
       userId: session?.identity.id ?? "",
       vulnType: "compliancePosture",
       originalAssetVersionName: assetVersion?.name ?? "",
-      complianceComponentId: removedStatement?.complianceComponentId ?? null,
-      complianceComponentTitle:
-        removedStatement?.complianceComponentTitle ?? "",
     } as VulnEventDTO;
 
     mutate(
@@ -719,9 +712,6 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
                         userId: session?.identity.id ?? "",
                         vulnType: "compliancePosture",
                         originalAssetVersionName: assetVersion?.name ?? "",
-                        complianceComponentId: statement.complianceComponentId,
-                        complianceComponentTitle:
-                          statement.complianceComponentTitle,
                       } as VulnEventDTO;
 
                       mutate(
