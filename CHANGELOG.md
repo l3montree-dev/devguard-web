@@ -4,6 +4,28 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.14.0] — 2026-09-17
+
+### Added
+
+- **Dependency proxy menu item** — added a menu entry for the dependency proxy, linking to the correct URL
+- **CVE dropdown in VEX rule modal** — the VEX rule modal now shows a dropdown with a copyable CVE ID and description
+
+### Fixed
+
+- **Dynamic header select** — fixed a double-rendering issue in the dynamic header select
+- **Git star icon** — fixed the star icon rendering on Git-related pages
+- **Toast alignment** — fixed non-appearing toasts on multiple pages and aligned toast positioning; added a shared helper for input alignment and validation to reduce redundancy
+- **Nested project tree on search** — the org projects tree now keeps its nested structure when a search is active
+- **CEL linter multiline validation** — CEL expressions are now validated as a whole document instead of line-by-line
+- **Compliance posture comments** — aligned the compliance posture comment section styling with other pages
+
+### Changed
+
+- **Settings menu design** — removed hardcoded colors and recreated the settings menu design using Tailwind classes; adjusted the settings menu underline
+
+---
+
 ## [v1.13.2] — 2026-09-08
 
 ### Added
