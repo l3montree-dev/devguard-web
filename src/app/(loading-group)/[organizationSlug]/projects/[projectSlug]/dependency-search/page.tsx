@@ -66,7 +66,7 @@ const OrgDependencySearch: FunctionComponent = () => {
 
     columnHelper.accessor("dependencyPurl", {
       header: "Version",
-      id: "dependencyPurl",
+      id: "version",
       enableSorting: false,
       cell: (row) => (
         <span className="flex flex-row items-start gap-2">
