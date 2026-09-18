@@ -16410,9 +16410,6 @@ export interface components {
     /** @enum {string} */
     "dtos.VexRuleRecommendationType": "session" | "crowdsourced" | "upstream";
     "dtos.VulnEventDTO": {
-      arbitraryJSONData: {
-        [key: string]: unknown;
-      };
       createdAt: string;
       createdByVexRule: boolean;
       id: string;
@@ -17011,7 +17008,6 @@ export interface components {
       vexSource: string;
     };
     "github_com_l3montree-dev_devguard_database_models.VulnEvent": {
-      arbitraryJSONData: string;
       /**
        * @description set instead of DependencyVulnID for a group event applying to every
        *     DependencyVuln sharing this AssetSignature.
@@ -17175,7 +17171,17 @@ export interface components {
       | 1000000
       | 1000000000
       | 60000000000
-      | 3600000000000;
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];
