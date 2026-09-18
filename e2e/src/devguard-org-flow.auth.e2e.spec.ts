@@ -13,6 +13,7 @@ test.describe("DevGuard Org Test flows", () => {
   test("Org Double Creation", async ({ page }) => {
     const devguardPOM = new DevGuardPOM(page);
     await devguardPOM.loadDevGuard();
+    await devguardPOM.org().createOrganization("Test Org");
     await devguardPOM
       .org()
       .createSecondOrganization(
