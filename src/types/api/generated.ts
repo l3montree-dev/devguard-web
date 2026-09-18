@@ -3349,6 +3349,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/members": {
     parameters: {
       query?: never;
@@ -10043,6 +10097,60 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -17195,7 +17303,12 @@ export interface components {
       | 1000000
       | 1000000000
       | 60000000000
-      | 3600000000000;
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];
