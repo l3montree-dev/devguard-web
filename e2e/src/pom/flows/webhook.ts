@@ -3,6 +3,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
 import { DevGuardNavigationLevel } from "../devguard";
+import { clearToasts } from "./modal-helper";
 
 export interface WebhookFormValues {
   name: string;
@@ -35,6 +36,8 @@ export class WebhookFlow {
       `${level} [data-testid="${settingsTestId}"]`,
     );
     await navItem.waitFor({ state: "visible", timeout: 5_000 });
+    // The org/group creation toast lands on top of this nav item.
+    await clearToasts(this.page);
     await navItem.click({ timeout: 5_000 });
 
     await expect(this.page).toHaveURL(/\/settings/, { timeout: 10_000 });
