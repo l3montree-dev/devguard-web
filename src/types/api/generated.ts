@@ -16410,8 +16410,6 @@ export interface components {
     /** @enum {string} */
     "dtos.VexRuleRecommendationType": "session" | "crowdsourced" | "upstream";
     "dtos.VulnEventDTO": {
-      complianceComponentId: string;
-      complianceComponentTitle: string;
       createdAt: string;
       createdByVexRule: boolean;
       id: string;
@@ -16419,7 +16417,6 @@ export interface components {
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
       originalAssetVersionName: string;
       packageName: string;
-      risk: number;
       type: components["schemas"]["dtos.VulnEventType"];
       uri: string;
       userAgent: string;
@@ -17029,8 +17026,6 @@ export interface components {
        *     DependencyVuln sharing this AssetSignature.
        */
       assetSignature: number;
-      complianceComponent: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ComplianceComponent"];
-      complianceComponentId: string;
       compliancePostureId: string;
       createdAt: string;
       createdByVexRule: boolean;
@@ -17041,7 +17036,6 @@ export interface components {
       licenseRiskId: string;
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
       originalAssetVersionName: string;
-      risk: number;
       securityAdvisoryId: string;
       type: components["schemas"]["dtos.VulnEventType"];
       userAgent: string;
@@ -17195,38 +17189,6 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000;
-    "github_com_l3montree-dev_devguard_database_models.ComplianceComponent": {
-      description: string;
-      implementedControls: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ComplianceComponentImplementsControl"][];
-      title: string;
-      uuid: string;
-    };
-    "github_com_l3montree-dev_devguard_database_models.ComplianceComponentImplementsControl": {
-      complianceComponent: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ComplianceComponent"];
-      complianceComponentId: string;
-      description: string;
-      frameworkControl: components["schemas"]["github_com_l3montree-dev_devguard_database_models.FrameworkControl"];
-      frameworkControlId: string;
-    };
-    "github_com_l3montree-dev_devguard_database_models.FrameworkControl": {
-      additional: number[];
-      class: string;
-      controls: string;
-      description: string;
-      framework: string;
-      frameworkControlId: string;
-      importance: string;
-      mappedControls: components["schemas"]["github_com_l3montree-dev_devguard_database_models.MappedControl"][];
-      parentFrameworkControlId: string;
-      securityLevel: string;
-      title: string;
-    };
-    "github_com_l3montree-dev_devguard_database_models.MappedControl": {
-      frameworkControlId: string;
-      relatedControlId: string;
-      relatedFramework: string;
-      relationship: string;
-    };
   };
   responses: never;
   parameters: never;
