@@ -7149,7 +7149,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["normalize.MinimalTree"];
+            "application/json": components["schemas"]["transformer.MinimalTree"];
           };
         };
       };
@@ -16410,6 +16410,9 @@ export interface components {
     /** @enum {string} */
     "dtos.VexRuleRecommendationType": "session" | "crowdsourced" | "upstream";
     "dtos.VulnEventDTO": {
+      arbitraryJSONData: {
+        [key: string]: unknown;
+      };
       createdAt: string;
       createdByVexRule: boolean;
       id: string;
@@ -16677,7 +16680,6 @@ export interface components {
       artifacts: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"][];
       asset: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Asset"];
       assetId: string;
-      components: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ComponentDependency"][];
       createdAt: string;
       defaultBranch: boolean;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
@@ -16741,7 +16743,6 @@ export interface components {
     };
     "github_com_l3montree-dev_devguard_database_models.Component": {
       componentType: components["schemas"]["dtos.ComponentType"];
-      dependsOn: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ComponentDependency"][];
       /** @description ID might be a PURL - but not always. Sometimes it is a file path to a binary or a "fake node" we are adding during normalization */
       id: string;
       isLicenseOverwritten: boolean;
@@ -16749,17 +16750,6 @@ export interface components {
       project: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ComponentProject"];
       projectId: string;
       published: string;
-    };
-    "github_com_l3montree-dev_devguard_database_models.ComponentDependency": {
-      assetId: string;
-      assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
-      /** @description Foreign key fields for AssetVersion relationship */
-      assetVersionName: string;
-      component: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Component"];
-      /** @description will be ROOT for direct dependencies */
-      componentPurl: string;
-      dependency: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Component"];
-      dependencyPurl: string;
     };
     "github_com_l3montree-dev_devguard_database_models.ComponentProject": {
       description: string;
@@ -17021,6 +17011,7 @@ export interface components {
       vexSource: string;
     };
     "github_com_l3montree-dev_devguard_database_models.VulnEvent": {
+      arbitraryJSONData: string;
       /**
        * @description set instead of DependencyVulnID for a group event applying to every
        *     DependencyVuln sharing this AssetSignature.
@@ -17131,12 +17122,6 @@ export interface components {
       referenceNumber: number;
       seeAlso: string[];
     };
-    "normalize.MinimalTree": {
-      dependencies: {
-        [key: string]: string[];
-      };
-      nodes: string[];
-    };
     "normalize.PurlMatchContext": {
       howToInterpretVersionString: components["schemas"]["normalize.VersionInterpretationType"];
       namespace: string;
@@ -17183,12 +17168,20 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000;
+    "transformer.MinimalTree": {
+      dependencies: {
+        [key: string]: string[];
+      };
+      nodes: string[];
+    };
   };
   responses: never;
   parameters: never;
