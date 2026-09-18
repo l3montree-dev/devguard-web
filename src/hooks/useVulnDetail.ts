@@ -17,7 +17,7 @@ import type {
 } from "@/types/view/vulnEvents";
 
 // The generated event type is flat; the frontend models events as a
-// discriminated union so arbitraryJSONData is typed per event kind.
+// discriminated union on `type`.
 export const useDependencyVuln = (
   scope: AssetVersionScope,
   dependencyVulnID: string,

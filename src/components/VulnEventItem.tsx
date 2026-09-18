@@ -3,7 +3,7 @@
 
 import React, { type FunctionComponent } from "react";
 import type { VulnEventDTO } from "@/types/view/vulnEvents";
-import { eventMessages, eventTypeMessages, findUser } from "../utils/view";
+import { eventTypeMessages, findUser } from "../utils/view";
 
 import Markdown from "./common/Markdown";
 
@@ -28,7 +28,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const user = findUser(event.userId, activeOrg, currentUser);
-  const msg = eventMessages(event);
+  const msg = event.justification;
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();

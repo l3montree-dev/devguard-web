@@ -1,16 +1,10 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { RiskCalculationReport } from "@/types/view/cvss";
-
 import type { components } from "@/types/api/generated";
 import type { VexRule } from "@/types/view/vexRules";
 
 type S = components["schemas"];
-
-interface EventArbitraryJsonData {
-  scannerIds: string;
-}
 
 interface BaseVulnEventDTO {
   userId: string;
@@ -56,7 +50,6 @@ export interface FixedEventDTO extends BaseVulnEventDTO {
 
 export interface DetectedEventDTO extends BaseVulnEventDTO {
   type: "detected";
-  arbitraryJSONData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
 export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
@@ -65,10 +58,6 @@ export interface FalsePositiveEventDTO extends BaseVulnEventDTO {
 
 export interface MitigateEventDTO extends BaseVulnEventDTO {
   type: "mitigate";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    ticketUrl: string;
-    ticketId: string;
-  };
 }
 
 export interface MarkedForTransferEventDTO extends BaseVulnEventDTO {
@@ -77,7 +66,6 @@ export interface MarkedForTransferEventDTO extends BaseVulnEventDTO {
 
 export interface RiskAssessmentUpdatedEventDTO extends BaseVulnEventDTO {
   type: "rawRiskAssessmentUpdated";
-  arbitraryJSONData: EventArbitraryJsonData & RiskCalculationReport;
 }
 
 export interface CommentEventDTO extends BaseVulnEventDTO {
@@ -86,24 +74,14 @@ export interface CommentEventDTO extends BaseVulnEventDTO {
 
 export interface LicenseDecisionEventDTO extends BaseVulnEventDTO {
   type: "licenseDecision";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    finalLicenseDecision?: string;
-    license?: string;
-  };
 }
 
 export interface AttachedComplianceComponentEventDTO extends BaseVulnEventDTO {
   type: "attachedComplianceComponent";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    componentTitle: string;
-  };
 }
 
 export interface RemovedComplianceComponentEventDTO extends BaseVulnEventDTO {
   type: "removedComplianceComponent";
-  arbitraryJSONData: EventArbitraryJsonData & {
-    componentTitle: string;
-  };
 }
 
 export interface PublishedEventDTO extends BaseVulnEventDTO {
