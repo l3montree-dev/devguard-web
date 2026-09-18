@@ -3,7 +3,6 @@
 
 "use client";
 
-import CustomPagination from "@/components/common/CustomPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import useTable, { createAppColumnHelper } from "@/hooks/useTable";
 import type { TableColumnDef } from "@/hooks/useTable";
@@ -20,6 +19,8 @@ interface LogsTableProps {
   logs?: Paged<Log>;
   isLoading?: boolean;
 }
+
+const MAX_ROWS = 5;
 
 const columnHelper = createAppColumnHelper<Log>();
 
@@ -63,7 +64,7 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
 
   const { table } = useTable({
     columnsDef,
-    data: logs?.data ?? [],
+    data: logs?.data.slice(0, MAX_ROWS) ?? [],
   });
 
   return (
@@ -92,7 +93,7 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
             </thead>
             <tbody className="text-foreground">
               {isLoading ? (
-                Array.from({ length: 5 }).map((_, row) => (
+                Array.from({ length: MAX_ROWS }).map((_, row) => (
                   <tr
                     key={row}
                     className={classNames(
@@ -163,10 +164,9 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
             className="!text-muted-foreground hover:!text-foreground"
             target="_blank"
           >
-            More details
+            View all logs
           </Link>
         </div>
-        <div className="mt-4">{logs && <CustomPagination {...logs} />}</div>
       </div>
     </div>
   );

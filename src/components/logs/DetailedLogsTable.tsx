@@ -7,6 +7,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import SortingCaret from "@/components/common/SortingCaret";
 import Filter from "@/components/Filter";
 import { Skeleton } from "@/components/ui/skeleton";
+import { buttonVariants } from "@/components/ui/button";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable, { createAppColumnHelper } from "@/hooks/useTable";
 import type { TableColumnDef } from "@/hooks/useTable";
@@ -22,6 +23,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { FunctionComponent } from "react";
 import LogLevelBadge from "./LogLevelBadge";
+import Image from "next/image";
 
 interface DetailedLogsTableProps {
   logs?: Paged<Log>;
@@ -82,6 +84,68 @@ const IdCell: FunctionComponent<{ value: string | null }> = ({ value }) => {
     </span>
   );
 };
+
+const reportIssueUrl = (log: Log) => {
+  const base = "https://github.com/l3montree-dev/devguard/issues/new/";
+
+  const title = `[${log.logLevel}] ${log.message.split("\n")[0].slice(0, 120)}`;
+
+  const body = [
+    "### What happened?",
+    "",
+    "<!-- Please add any context that helps us reproduce this. -->",
+    "",
+    "### Log details",
+    "",
+    `| Field | Value |`,
+    `| --- | --- |`,
+    `| Log ID | \`${log.id}\` |`,
+    `| Time | ${log.createdAt} |`,
+    `| Level | ${log.logLevel} |`,
+    `| Organization ID | \`${log.orgID}\` |`,
+    `| Project | ${log.projectName ?? "-"} (\`${log.projectID ?? "-"}\`) |`,
+    `| Repository | ${log.assetName ?? "-"} (\`${log.assetID ?? "-"}\`) |`,
+    "",
+    "### Message",
+    "",
+    "```",
+    log.message,
+    "```",
+  ].join("\n");
+
+  const params = new URLSearchParams({
+    title,
+    body,
+    labels: "bug",
+  });
+
+  return `${base}?${params.toString()}`;
+};
+
+const ReportCell: FunctionComponent<{ log: Log }> = ({ log }) => (
+  <Link
+    href={reportIssueUrl(log)}
+    target="_blank"
+    rel="noreferrer"
+    aria-label="Report this log on GitHub"
+    title="Report this log on GitHub"
+    className={classNames(
+      buttonVariants({ variant: "outline", size: "sm" }),
+      "whitespace-nowrap",
+    )}
+  >
+    <div className="flex items-center gap-1">
+      <Image
+        alt="GitLab Logo"
+        width={15}
+        height={15}
+        className="dark:invert"
+        src={"/assets/github.svg"}
+      />
+      <div className="text-xs shrink-0 pr-2">Report</div>
+    </div>
+  </Link>
+);
 
 const filterOptions: FilterOption[] = [
   {
@@ -196,14 +260,18 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     header: "Message",
     id: "message",
     enableSorting: false,
-    meta: { className: "w-full min-w-[420px]" },
+    meta: { className: "w-full" },
     cell: (info) => (
-      <div className="pr-16">
-        <span className="block max-h-[200px] overflow-y-auto font-mono text-xs whitespace-pre-wrap break-words">
-          {info.getValue()}
-        </span>
-      </div>
+      <span className="block max-h-[200px] overflow-y-auto font-mono text-xs whitespace-pre-wrap">
+        {info.getValue()}
+      </span>
     ),
+  }),
+  columnHelper.display({
+    header: "Report",
+    id: "report",
+    meta: { className: "whitespace-nowrap" },
+    cell: (info) => <ReportCell log={info.row.original} />,
   }),
 ];
 
