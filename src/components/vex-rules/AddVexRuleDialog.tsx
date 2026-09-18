@@ -31,10 +31,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FieldDescription } from "@/components/ui/field";
-import { ChevronDown, CircleAlert } from "lucide-react";
+import { Check, ChevronDown, CircleAlert, Copy, InfoIcon } from "lucide-react";
 import { removeUnderscores, vexOptionMessages } from "@/utils/view";
 import type { MechanicalJustificationType } from "@/types/view/vuln";
 
+import Markdown from "@/components/common/Markdown";
 import { checkCelSyntax } from "@/components/common/celLinter";
 
 import type { AssetScope } from "@/services/vexRuleService";
@@ -43,6 +44,79 @@ const MECHANICAL_JUSTIFICATIONS = Object.keys(
   vexOptionMessages,
 ) as MechanicalJustificationType[];
 const DEFAULT_MECHANICAL_JUSTIFICATION = MECHANICAL_JUSTIFICATIONS[2];
+
+const DESCRIPTION_PREVIEW_LENGTH = 500;
+
+const CveInfoMenu: FunctionComponent<{
+  cveID: string;
+  description?: string;
+}> = ({ cveID, description }) => {
+  const [copied, setCopied] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+
+  const copy = () => {
+    if (typeof navigator === "undefined" || !navigator.clipboard) return;
+    navigator.clipboard.writeText(cveID).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const isLongDescription =
+    (description?.length ?? 0) > DESCRIPTION_PREVIEW_LENGTH;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-auto gap-1 bg-card px-3 data-[state=open]:bg-accent"
+        >
+          <InfoIcon className="h-4 w-4" />
+          CVE Info
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className="max-h-[var(--radix-dropdown-menu-content-available-height)] max-w-xl overflow-y-auto"
+      >
+        <DropdownMenuItem
+          aria-label={`Copy ${cveID}`}
+          className="text-md cursor-pointer gap-1.5 font-semibold w-fit"
+          onSelect={(e) => {
+            e.preventDefault();
+            copy();
+          }}
+        >
+          {cveID}
+          {copied ? (
+            <Check className="h-3.5 w-3.5 text-success" />
+          ) : (
+            <Copy className="h-3.5 w-3.5" />
+          )}
+        </DropdownMenuItem>
+        {description && (
+          <div className="break-words px-2 pb-1 text-sm">
+            <Markdown>
+              {descriptionExpanded || !isLongDescription
+                ? description
+                : `${description.slice(0, DESCRIPTION_PREVIEW_LENGTH)}...`}
+            </Markdown>
+            {isLongDescription && (
+              <button
+                type="button"
+                onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+                className="cursor-pointer text-sm text-link hover:opacity-80"
+              >
+                {descriptionExpanded ? "Show less" : "Read more"}
+              </button>
+            )}
+          </div>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 interface AddVexRuleDialogProps {
   open: boolean;
@@ -163,20 +237,34 @@ const AddVexRuleDialog: FunctionComponent<AddVexRuleDialogProps> = ({
             value={eventType}
             onValueChange={(value) => setEventType(value as VexRuleEventType)}
           >
-            <TabsList>
-              <TabsTrigger
-                data-testid="vex-rule-tab-false-positive"
-                value="falsePositive"
-              >
-                False positive
-              </TabsTrigger>
-              <TabsTrigger data-testid="vex-rule-tab-accepted" value="accepted">
-                Accept risk
-              </TabsTrigger>
-              <TabsTrigger data-testid="vex-rule-tab-reopened" value="reopened">
-                Reopen
-              </TabsTrigger>
-            </TabsList>
+            <div className="flex flex-row flex-wrap justify-between gap-2">
+              <TabsList>
+                <TabsTrigger
+                  data-testid="vex-rule-tab-false-positive"
+                  value="falsePositive"
+                >
+                  False positive
+                </TabsTrigger>
+                <TabsTrigger
+                  data-testid="vex-rule-tab-accepted"
+                  value="accepted"
+                >
+                  Accept risk
+                </TabsTrigger>
+                <TabsTrigger
+                  data-testid="vex-rule-tab-reopened"
+                  value="reopened"
+                >
+                  Reopen
+                </TabsTrigger>
+              </TabsList>
+              {currentVuln?.cveID && (
+                <CveInfoMenu
+                  cveID={currentVuln.cveID}
+                  description={currentVuln.cveDescription}
+                />
+              )}
+            </div>
             <TabsContent value={eventType} className="flex flex-col gap-4">
               <VexRuleForm
                 scope={scope}
