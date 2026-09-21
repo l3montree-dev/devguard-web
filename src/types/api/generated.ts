@@ -2547,10 +2547,17 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Search component occurrences within a organization */
+    /** Search component occurrences within an organization */
     get: {
       parameters: {
-        query?: never;
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+        };
         header?: never;
         path: {
           /** @description Organization slug */
@@ -15301,6 +15308,7 @@ export interface components {
       assetName: string;
       assetSlug: string;
       assetVersionName: string;
+      assetVersionSlug: string;
       componentDependencyId: string;
       componentPurl: string;
       componentVersion: string;
@@ -17097,14 +17105,27 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
-      | 3600000000000;
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];
