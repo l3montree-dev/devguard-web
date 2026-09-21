@@ -14,10 +14,11 @@ import { Input, type InputProps } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { classNames } from "@/utils/common";
 import Image from "next/image";
-import type { FunctionComponent } from "react";
+import { useState, type FunctionComponent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { createUpdateHandler } from "../AssetForm";
 import type { AssetFormValues } from "@/types/view/asset";
+import { SquareOff } from "lucide-react";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -32,7 +33,8 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
   onUpdate: handleUpdate,
   inputVariant,
 }) => {
-  const gitInstance = form.watch("repositoryProvider");
+  const [noProvider, setNoProvider] = useState(false);
+  const gitInstance = noProvider ? "none" : form.watch("repositoryProvider");
   const externalEntityProviderId = form.watch("externalEntityProviderId");
   return (
     <>
@@ -94,6 +96,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 gitInstance === "github" && "border !border-primary",
               )}
               onClick={() => {
+                setNoProvider(false);
                 form.setValue("repositoryProvider", "github", {
                   shouldDirty: true,
                 });
@@ -117,6 +120,7 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 gitInstance === "gitlab" && "!border-primary",
               )}
               onClick={() => {
+                setNoProvider(false);
                 form.setValue("repositoryProvider", "gitlab", {
                   shouldDirty: true,
                 });
@@ -131,7 +135,28 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
               />
               GitLab
             </Button>
+            <Button
+              variant={"secondary"}
+              type="button"
+              className={classNames(
+                "w-full border",
+                gitInstance === "none" && "!border-primary",
+              )}
+              onClick={() => {
+                setNoProvider(true);
+                form.setValue("repositoryProvider", "github", {
+                  shouldDirty: true,
+                });
+              }}
+            >
+              <SquareOff className="mr-2 w-5 h-5" />
+              None
+            </Button>
           </div>
+          <span className="text-sm text-muted-foreground">
+            Optional: you can use DevGuard without connecting a GitHub or GitLab
+            repository.
+          </span>
         </>
       )}
       {handleUpdate && (
