@@ -7,11 +7,13 @@ import {
   ShieldCheck,
   BrickWallFireIcon,
   type LucideProps,
+  FolderSearch,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useActiveOrg } from "./useActiveOrg";
 import useDecodedParams from "./useDecodedParams";
 import { isAdmin, useCurrentUserRole } from "./useUserRole";
+import useDecodedPathname from "./useDecodedPathname";
 
 const ThinBrickWallFireIcon = (props: LucideProps) =>
   createElement(BrickWallFireIcon, { strokeWidth: 1.75, ...props });
@@ -27,7 +29,7 @@ export const useOrganizationMenu = () => {
   // decode the path name and the org slug
   const decodedPathName = decodeURIComponent(pathName);
   const decodedOrgSlug = decodeURIComponent(orgSlug);
-
+  const pathname = useDecodedPathname();
   const org = useActiveOrg();
   const menu = [];
 
@@ -60,6 +62,13 @@ export const useOrganizationMenu = () => {
             "/" + decodedOrgSlug + "/compliance-postures",
           ),
           testId: "nav-org-compliance-postures",
+        },
+        {
+          title: "Package Search",
+          href: "/" + orgSlug + "/dependency-search",
+          Icon: FolderSearch,
+          isActive: pathname === `/${orgSlug}/dependency-search`,
+          testId: "nav-group-package-search",
         },
         {
           title: "Dependency Proxy",
