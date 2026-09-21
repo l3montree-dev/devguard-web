@@ -415,7 +415,7 @@ const OverviewPage = () => {
 
               <Card className="col-span-2">
                 <CardHeader>
-                  <CardTitle className="relative w-full">
+                  <CardTitle className="relative w-full text-base">
                     Vulnerable Artifacts
                     <Link
                       href={
@@ -449,7 +449,7 @@ const OverviewPage = () => {
                             "flex items-center flex-row gap-4",
                           )}
                         >
-                          <div className="justify-left">
+                          <div className="justify-left flex-shrink-0">
                             <Avatar
                               name={
                                 r.artifactName
