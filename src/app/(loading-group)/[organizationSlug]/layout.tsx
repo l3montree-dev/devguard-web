@@ -3,8 +3,6 @@
 
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React, { Suspense } from "react";
-import { fetchContentTree } from "../../../data-fetcher/fetchContentTree";
-
 import OrgHeader from "@/components/common/OrgHeader";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
@@ -42,9 +40,8 @@ async function OrganizationShell({
   try {
     const { organizationSlug: slug } = await params;
     organizationSlug = slug;
-    [org, contentTree] = await Promise.all([
+    [org] = await Promise.all([
       fetchOrganization(decodeURIComponent(organizationSlug)),
-      fetchContentTree(decodeURIComponent(organizationSlug)),
     ]);
   } catch (error) {
     handleHttpError(error, organizationSlug);
@@ -55,7 +52,6 @@ async function OrganizationShell({
       Provider={OrganizationProvider}
       value={{
         organization: org,
-        contentTree,
       }}
     >
       <OrgHeader />

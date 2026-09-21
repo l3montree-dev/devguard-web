@@ -15,7 +15,6 @@ import { writeLocalStorage } from "@/hooks/useLocalStorage";
 const OrganizationContext = createContext<WithUpdater<OrgContextParams>>({
   v: {
     organization: null,
-    contentTree: [],
   },
   update: () => {},
 });

@@ -38,7 +38,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "../../../../../../components/ui/tooltip";
-import { useOrganization } from "../../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../../context/ProjectContext";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
@@ -46,6 +45,7 @@ import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
 import { downloadFile } from "@/services/apiClient";
+import { useAssets } from "@/hooks/useAssets";
 import { useReleases } from "@/hooks/useReleases";
 import {
   useReleaseAverageFixingTime,
@@ -53,11 +53,7 @@ import {
 } from "@/hooks/useReleaseStats";
 
 import { beautifyPurl, classNames } from "../../../../../../utils/common";
-import {
-  normalizeContentTree,
-  reduceRiskHistories,
-  sortRisk,
-} from "../../../../../../utils/view";
+import { reduceRiskHistories, sortRisk } from "../../../../../../utils/view";
 
 const OverviewPage = () => {
   const search = useSearchParams();
@@ -76,6 +72,15 @@ const OverviewPage = () => {
 
   const releaseScope = { organization: organizationSlug, projectSlug };
   const { data: releases } = useReleases(releaseScope);
+  const { data: assets } = useAssets(releaseScope);
+
+  const assetsById = useMemo(() => {
+    const map: Record<string, NonNullable<typeof assets>[number]> = {};
+    (assets ?? []).forEach((asset) => {
+      map[asset.id] = asset;
+    });
+    return map;
+  }, [assets]);
 
   const pushQuery = useRouterQuery();
   let releaseId: string | undefined = undefined;
@@ -118,11 +123,6 @@ const OverviewPage = () => {
   const activeOrg = useActiveOrg();
   const projectMenu = useProjectMenu();
   const router = useRouter();
-  const contentTree = useOrganization().contentTree;
-
-  const normalizedContentTree = useMemo(() => {
-    return normalizeContentTree(contentTree || []);
-  }, [contentTree]);
 
   const criticalAmount = useMemo(() => {
     if (completeRiskHistory.length === 0) return 0;
@@ -435,7 +435,7 @@ const OverviewPage = () => {
                 <CardContent>
                   <div className="flex flex-col gap-2">
                     {vulnerableArtifacts.map((r, i, arr) => {
-                      const asset = normalizedContentTree[r.assetId || ""];
+                      const asset = assetsById[r.assetId || ""];
 
                       return (
                         <div

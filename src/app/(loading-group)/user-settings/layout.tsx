@@ -26,7 +26,6 @@ export default async function RootLayout({
           name: "User Settings",
           slug: "/",
         } as OrganizationDetailsDTO,
-        contentTree: [],
       }}
     >
       <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
