@@ -127,10 +127,14 @@ const OrgDependencySearch: FunctionComponent = () => {
           </div>
         </div>
 
-        {!components?.data.length ? (
+        {!isLoading && !components?.data.length ? (
           <EmptyParty
             title="No matching results."
-            description={`The package ${searchParams?.get("search")} could not be found in any repository currently associated with your organization.`}
+            description={
+              searchParams?.get("search")
+                ? `The package ${searchParams.get("search")} could not be found in any repository currently associated with your organization.`
+                : "No dependencies are currently associated with your organization."
+            }
           />
         ) : (
           <div className="overflow-hidden rounded-lg border shadow-sm">
@@ -184,17 +188,11 @@ const OrgDependencySearch: FunctionComponent = () => {
                       <td className="p-4">
                         <Skeleton className="w-full h-[40px]" />
                       </td>
-                      <td className="p-4">
-                        <Skeleton className="w-1/2 h-[20px]" />
-                      </td>
-                      <td className="p-4">
-                        <Skeleton className="w-1/2 h-[20px]" />
-                      </td>
                     </tr>
                   ))}
                 {table.getRowModel().rows.map((row, index, arr) => (
                   <a
-                    href={`/${organizationSlug}/projects/${row.original.projectSlug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionName}/dependencies`}
+                    href={`/${organizationSlug}/projects/${row.original.projectSlug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionSlug}/dependencies`}
                     className={classNames(
                       "relative cursor-pointer table-row bg-background align-top transition-all ",
                       index === arr.length - 1 ? "" : "border-b",
