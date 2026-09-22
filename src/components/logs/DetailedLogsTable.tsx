@@ -118,7 +118,7 @@ const reportIssueUrl = (log: Log) => {
     `| Log ID | \`${log.id}\` |`,
     `| Time | ${log.createdAt} |`,
     `| Level | ${log.logLevel} |`,
-    `| Organization  | ${log.orgName ?? "-"} \`${shortId(log.orgID)}\` |`,
+    `| Organization  | ${log.orgName ?? "-"} (\`${shortId(log.orgID)}\`) |`,
     `| Project | ${log.projectName ?? "-"} (\`${shortId(log.projectID)}\`) |`,
     `| Repository | ${log.assetName ?? "-"} (\`${shortId(log.assetID)}\`) |`,
     "",
