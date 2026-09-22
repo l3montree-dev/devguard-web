@@ -530,6 +530,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/admin/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/organizations/{orgID}/": {
     parameters: {
       query?: never;
@@ -17296,8 +17343,6 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000
@@ -17307,8 +17352,7 @@ export interface components {
       | 1
       | 1000
       | 1000000
-      | 1000000000
-      | 60000000000;
+      | 1000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];

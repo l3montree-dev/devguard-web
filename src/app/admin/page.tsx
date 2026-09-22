@@ -32,11 +32,13 @@ import InstanceDashboard from "@/components/admin/InstanceDashboard";
 import InstanceTechnicalInfo from "@/components/admin/InstanceTechnicalInfo";
 import type {
   InstanceDashboardHandle,
+  InstanceLogsHandle,
   InstanceTechnicalInfoHandle,
 } from "@/types/view/admin";
 import AdminTools from "@/components/admin/AdminTools";
 import Section from "@/components/common/Section";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
+import InstanceLogs from "@/components/admin/InstanceLogs";
 
 export default function InstanceAdminPage() {
   const { isAuthenticated, authenticate, logout } = useInstanceAdmin();
@@ -45,6 +47,7 @@ export default function InstanceAdminPage() {
   const [mounted, setMounted] = useState(false);
   const techInfoRef = useRef<InstanceTechnicalInfoHandle>(null);
   const dashboardRef = useRef<InstanceDashboardHandle>(null);
+  const logsRef = useRef<InstanceLogsHandle>(null);
 
   useEffect(() => {
     // Avoid hydration mismatch: window.location.host is only available client-side.
@@ -228,6 +231,24 @@ export default function InstanceAdminPage() {
         }
       >
         <InstanceDashboard ref={dashboardRef} />
+      </Section>
+
+      <Section
+        title="Instance Logs"
+        description="Errors and events captured by DevGuard while processing this instance, such as scan failures or unexpected exceptions."
+        forceVertical
+        Button={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => logsRef.current?.refresh()}
+          >
+            <ArrowPathIcon className="mr-1.5 h-3.5 w-3.5" />
+            Refresh
+          </Button>
+        }
+      >
+        <InstanceLogs ref={logsRef} />
       </Section>
     </div>
   );
