@@ -45,6 +45,8 @@ export class ComplianceFlow {
     await expect(
       this.page.getByRole("heading", { level: 1, name: title }),
     ).toBeVisible({ timeout: 10_000 });
+
+    await docShot(this.page, test.info(), "compliance-posture-subpage");
   }
 
   private async openCompliancePostures(
