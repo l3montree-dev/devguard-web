@@ -10,19 +10,6 @@ export type CvssMetric = {
   description?: string;
 };
 
-export interface RiskCalculationReport {
-  epss: number;
-  baseScore: number;
-  exploitExists: boolean;
-  verifiedExploitExists: boolean;
-  underAttack: boolean;
-  confidentialityRequirement: string;
-  integrityRequirement: string;
-  availabilityRequirement: string;
-  risk: number;
-  oldRisk?: number;
-}
-
 export interface CVE {
   attackComplexity: string;
   attackVector: string;

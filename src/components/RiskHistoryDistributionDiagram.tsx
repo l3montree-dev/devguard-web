@@ -39,13 +39,26 @@ export function RiskHistoryDistributionDiagram({
         <CardDescription>
           How the number of vulnerabilities per{" "}
           {mode === "risk" ? "risk" : "CVSS"} severity develops over time.
-          {data.length < 3 &&
-            " At least 3 days of data are needed for a more meaningful trend."}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="w-full h-[300px]" />
+        ) : data.length < 3 ? (
+          <div className="flex h-[300px] w-full flex-col items-center justify-center gap-2 text-center">
+            <span className="font-medium">Not enough history yet</span>
+            <span className="max-w-base text-sm text-muted-foreground">
+              At least 3 days of data are needed for a more meaningful trend.
+              Check back{" "}
+              {data.length < 1
+                ? "in 3 days"
+                : data.length < 2
+                  ? "in 2 days"
+                  : "tomorrow"}{" "}
+              to see how your {mode === "risk" ? "risk" : "CVSS"} distribution
+              develops.
+            </span>
+          </div>
         ) : (
           <ChartContainer
             className="h-[300px] w-full"

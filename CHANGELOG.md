@@ -4,6 +4,21 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.14.1] — 2026-09-18
+
+### Fixed
+
+- **Dependency search version column** — the version column now uses its own unique column id instead of reusing the dependency PURL id
+- **E2E toast interference** — added a `clearToasts` helper for specs that keep toasts visible for screenshots, so the org/group creation toast no longer covers the settings nav item
+
+### Changed
+
+- **Vulnerability event data** — event messages are now taken from the API's `justification` field instead of being reconstructed client-side from arbitrary event JSON; the local `EventArbitraryJsonData` and `RiskCalculationReport` types and the `eventMessages` helper were dropped
+- **Generated API client** — re-synced the generated types and added an `API Client` CI job that runs `make api-client-check` on `main` to keep them consistent
+- **Dependency updates**
+
+---
+
 ## [v1.14.0] — 2026-09-17
 
 ### Added

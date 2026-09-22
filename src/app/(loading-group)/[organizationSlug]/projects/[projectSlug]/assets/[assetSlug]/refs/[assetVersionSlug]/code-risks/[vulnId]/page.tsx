@@ -173,7 +173,6 @@ const Index = () => {
             vulnType: "firstPartyVuln",
             vulnerabilityName: vuln.ruleId,
             originalAssetVersionName: assetVersion?.name ?? "",
-            arbitraryJSONData: { scannerIds: "" },
             packageName: null,
             uri: vuln.uri,
             createdByVexRule: false,
