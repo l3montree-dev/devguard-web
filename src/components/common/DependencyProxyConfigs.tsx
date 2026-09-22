@@ -121,6 +121,40 @@ const getEcosystemContent = (key: string, url: string) => {
         </div>
       );
     }
+    case "maven": {
+      return (
+        <div>
+          <InputWithButton
+            label="Maven Repository URL"
+            message="Add this mirror to your ~/.m2/settings.xml to route Maven Central downloads through the dependency proxy."
+            value={url}
+            nameKey="maven-proxy-url"
+            copyable
+          />
+          <p className="my-4 text-sm">
+            <span className="font-medium mb-1 block">settings.xml</span>
+            <CopyCodeFragment
+              codeString={`<settings>
+  <mirrors>
+    <mirror>
+      <id>devguard</id>
+      <name>DevGuard Dependency Proxy</name>
+      <mirrorOf>central</mirrorOf>
+      <url>${url}</url>
+    </mirror>
+  </mirrors>
+</settings>`}
+            />
+          </p>
+          <Callout intent="warning">
+            <code className="font-mono text-sm">mirrorOf</code> only redirects
+            Maven Central. Dependencies resolved from other repositories
+            declared in your <code className="font-mono text-sm">pom.xml</code>{" "}
+            bypass the proxy unless you list them as well.
+          </Callout>
+        </div>
+      );
+    }
     case "oci": {
       return (
         <div>
