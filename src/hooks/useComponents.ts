@@ -57,3 +57,12 @@ export const useProjectComponentList = (
     `/organizations/${scope.organization}/projects/${scope.projectSlug}/components?${query.toString()}`,
     fetcher,
   );
+
+export const useOrganizationComponentList = (
+  scope: { organization: string },
+  query: URLSearchParams,
+) =>
+  useSWR<Paged<ProjectDependency>>(
+    `/organizations/${scope.organization}/components?${query.toString()}`,
+    fetcher,
+  );
