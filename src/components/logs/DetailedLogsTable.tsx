@@ -33,9 +33,9 @@ interface DetailedLogsTableProps {
 const NameLink: FunctionComponent<{
   name?: string | null;
   id: string | null;
-  kind: "p" | "a";
+  kind: "o" | "p" | "a";
 }> = ({ name, id, kind }) => {
-  if (!name) return <span className="text-muted-foreground/60">-</span>;
+  if (!name) return <span className="text-muted-foreground/60 ">-</span>;
   if (!id) return <>{name}</>;
   return (
     <Link
@@ -67,7 +67,10 @@ const IdCell: FunctionComponent<{ value: string | null }> = ({ value }) => {
   if (!value) return <span className="text-muted-foreground/60">-</span>;
   return (
     <span className="flex items-center gap-1">
-      <span className="max-w-[150px] overflow-x-auto whitespace-nowrap">
+      <span
+        title={value}
+        className="max-w-[120px] truncate font-mono text-xs text-muted-foreground"
+      >
         {value}
       </span>
       <button
@@ -84,6 +87,19 @@ const IdCell: FunctionComponent<{ value: string | null }> = ({ value }) => {
     </span>
   );
 };
+
+const NameIdCell: FunctionComponent<{
+  name?: string | null;
+  id: string | null;
+  kind: "o" | "p" | "a";
+}> = ({ name, id, kind }) => (
+  <span className="flex flex-col gap-0.5">
+    <NameLink name={name} id={id} kind={kind} />
+    <IdCell value={id} />
+  </span>
+);
+
+const shortId = (id?: string | null) => (id ? `${id.split("-")[0]}-****` : "-");
 
 const reportIssueUrl = (log: Log) => {
   const base = "https://github.com/l3montree-dev/devguard/issues/new/";
@@ -102,9 +118,9 @@ const reportIssueUrl = (log: Log) => {
     `| Log ID | \`${log.id}\` |`,
     `| Time | ${log.createdAt} |`,
     `| Level | ${log.logLevel} |`,
-    `| Organization ID | \`${log.orgID}\` |`,
-    `| Project | ${log.projectName ?? "-"} (\`${log.projectID ?? "-"}\`) |`,
-    `| Repository | ${log.assetName ?? "-"} (\`${log.assetID ?? "-"}\`) |`,
+    `| Organization  | ${log.orgName ?? "-"} \`${shortId(log.orgID)}\` |`,
+    `| Project | ${log.projectName ?? "-"} (\`${shortId(log.projectID)}\`) |`,
+    `| Repository | ${log.assetName ?? "-"} (\`${shortId(log.assetID)}\`) |`,
     "",
     "### Message",
     "",
@@ -134,16 +150,13 @@ const ReportCell: FunctionComponent<{ log: Log }> = ({ log }) => (
       "whitespace-nowrap",
     )}
   >
-    <div className="flex items-center gap-1">
-      <Image
-        alt="GitLab Logo"
-        width={15}
-        height={15}
-        className="dark:invert"
-        src={"/assets/github.svg"}
-      />
-      <div className="text-xs shrink-0 pr-2">Report</div>
-    </div>
+    <Image
+      alt="GitLab Logo"
+      width={15}
+      height={15}
+      className="dark:invert"
+      src={"/assets/github.svg"}
+    />
   </Link>
 );
 
@@ -216,12 +229,18 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     meta: { className: "whitespace-nowrap" },
     cell: (info) => <LogLevelBadge level={info.getValue()} />,
   }),
-  columnHelper.accessor("projectID", {
-    header: "Project ID",
-    id: "project_id",
-    enableSorting: false,
-    meta: { className: "font-mono text-xs text-muted-foreground" },
-    cell: (info) => <IdCell value={info.getValue()} />,
+  columnHelper.accessor("orgName", {
+    header: "Organization",
+    id: "org_name",
+    enableSorting: true,
+    meta: { className: "whitespace-nowrap text-muted-foreground" },
+    cell: (info) => (
+      <NameIdCell
+        name={info.getValue()}
+        id={info.row.original.orgID}
+        kind="o"
+      />
+    ),
   }),
   columnHelper.accessor("projectName", {
     header: "Project",
@@ -229,19 +248,12 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     enableSorting: true,
     meta: { className: "whitespace-nowrap text-muted-foreground" },
     cell: (info) => (
-      <NameLink
+      <NameIdCell
         name={info.getValue()}
         id={info.row.original.projectID}
         kind="p"
       />
     ),
-  }),
-  columnHelper.accessor("assetID", {
-    header: "Repository ID",
-    id: "asset_id",
-    enableSorting: false,
-    meta: { className: "font-mono text-xs text-muted-foreground" },
-    cell: (info) => <IdCell value={info.getValue()} />,
   }),
   columnHelper.accessor("assetName", {
     header: "Repository",
@@ -249,7 +261,7 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     enableSorting: true,
     meta: { className: "whitespace-nowrap text-muted-foreground" },
     cell: (info) => (
-      <NameLink
+      <NameIdCell
         name={info.getValue()}
         id={info.row.original.assetID}
         kind="a"

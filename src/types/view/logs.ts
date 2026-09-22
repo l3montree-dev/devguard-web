@@ -21,8 +21,7 @@ export interface Log {
   createdAt: string;
   logLevel: LogLevel;
   message: string;
+  orgName?: string | null;
   projectName?: string | null;
   assetName?: string | null;
-  projectSlug?: string;
-  assetSlug?: string;
 }

@@ -30,9 +30,8 @@ const permalinkHref = (log: Log) => {
   return `/api/-/o/${log.orgID}`;
 };
 
-// "project / asset" - shows where the log happened
 const logSource = (log: Log) =>
-  [log.projectName, log.assetName].filter(Boolean).join(" / ");
+  [log.orgName, log.projectName, log.assetName].filter(Boolean).join(" / ");
 
 const columnsDef: TableColumnDef<Log, any>[] = [
   {
