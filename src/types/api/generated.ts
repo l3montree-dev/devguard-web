@@ -2587,6 +2587,52 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/components": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Search component occurrences within an organization */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrenceDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/config-files/{config-file}": {
     parameters: {
       query?: never;
@@ -15514,6 +15560,7 @@ export interface components {
       assetName: string;
       assetSlug: string;
       assetVersionName: string;
+      assetVersionSlug: string;
       componentDependencyId: string;
       componentPurl: string;
       componentVersion: string;
@@ -17339,28 +17386,38 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
-      | 1000000000;
+      | 1000000000
+      | 60000000000
+      | 3600000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];
