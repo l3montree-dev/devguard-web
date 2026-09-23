@@ -2633,52 +2633,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/components": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Search component occurrences within an organization */
-    get: {
-      parameters: {
-        query?: {
-          /** @description Page number */
-          page?: number;
-          /** @description Page size */
-          pageSize?: number;
-          /** @description Search term */
-          search?: string;
-        };
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrenceDTO"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/config-files/{config-file}": {
     parameters: {
       query?: never;
@@ -8944,13 +8898,6 @@ export interface paths {
              */
             file: string;
           };
-          "multipart/form-data": {
-            /**
-             * Format: binary
-             * @description SBOM file
-             */
-            file: string;
-          };
         };
       };
       responses: {
@@ -13933,7 +13880,6 @@ export interface components {
       /** @description New in 1.7 */
       destructionDate: string;
       /** @description New in 1.7 */
-      /** @description New in 1.7 */
       fingerprint: components["schemas"]["cyclonedx.Hash"];
       issuerName: string;
       notValidAfter: string;
@@ -14715,7 +14661,6 @@ export interface components {
       licenses: components["schemas"]["cyclonedx.LicenseChoice"][];
       lifecycles: components["schemas"]["cyclonedx.Lifecycle"][];
       /** @description Deprecated: Use Component Manufacturer instead. */
-      /** @description Deprecated: Use Component Manufacturer instead. */
       manufacture: components["schemas"]["cyclonedx.OrganizationalEntity"];
       manufacturer: components["schemas"]["cyclonedx.OrganizationalEntity"];
       properties: components["schemas"]["cyclonedx.Property"][];
@@ -14806,7 +14751,6 @@ export interface components {
       algorithmRef: string;
       creationDate: string;
       expirationDate: string;
-      /** @description New in 1.7 */
       /** @description New in 1.7 */
       fingerprint: components["schemas"]["cyclonedx.Hash"];
       format: string;
@@ -15611,7 +15555,6 @@ export interface components {
       assetSlug: string;
       assetVersionName: string;
       assetVersionSlug: string;
-      assetVersionSlug: string;
       componentDependencyId: string;
       componentPurl: string;
       componentVersion: string;
@@ -15660,7 +15603,6 @@ export interface components {
       /** @description only relevant for csaf references - NEEDS TO BE A VALID PURL */
       csafPackageScope: string;
       /** @enum {unknown} */
-      /** @enum {unknown} */
       type: components["schemas"]["dtos.ExternalReferenceType"];
       url: string;
     };
@@ -15673,7 +15615,6 @@ export interface components {
     };
     "dtos.CreateVEXRuleRequest": {
       celExpression: string;
-      /** @enum {unknown} */
       /** @enum {unknown} */
       eventType: components["schemas"]["dtos.VulnEventType"];
       justification: string;
@@ -15863,7 +15804,6 @@ export interface components {
     };
     /** @enum {string} */
     "dtos.ExternalReferenceType": "cyclonedx" | "csaf" | "openvex" | "unknown";
-    "dtos.ExternalReferenceType": "cyclonedx" | "csaf" | "openvex" | "unknown";
     "dtos.ExternalSubprojectRequestDTO": {
       artifact: string;
       assetDescription: string;
@@ -16047,27 +15987,20 @@ export interface components {
     };
     /** @enum {string} */
     "dtos.ModifiedAttackComplexity": "low" | "high" | "X";
-    "dtos.ModifiedAttackComplexity": "low" | "high" | "X";
     /** @enum {string} */
     "dtos.ModifiedAttackVector":
       "network" | "adjacent" | "local" | "physical" | "X";
-      "network" | "adjacent" | "local" | "physical" | "X";
     /** @enum {string} */
-    "dtos.ModifiedPrivilegesRequired": "none" | "low" | "high" | "X";
     "dtos.ModifiedPrivilegesRequired": "none" | "low" | "high" | "X";
     /** @enum {string} */
     "dtos.ModifiedRequirementLevel": "X" | "none" | "low" | "high";
-    "dtos.ModifiedRequirementLevel": "X" | "none" | "low" | "high";
     /** @enum {string} */
     "dtos.ModifiedScope": "unchanged" | "changed" | "X";
-    "dtos.ModifiedScope": "unchanged" | "changed" | "X";
     /** @enum {string} */
-    "dtos.ModifiedUserInteraction": "X" | "none" | "required";
     "dtos.ModifiedUserInteraction": "X" | "none" | "required";
     "dtos.OSV": {
       affected: components["schemas"]["dtos.Affected"][];
       aliases: string[];
-      /** @description specific additional information, not standardized */
       /** @description specific additional information, not standardized */
       database_specific: components["schemas"]["dtos.DatabaseSpecifics"];
       details: string;
@@ -16375,7 +16308,6 @@ export interface components {
       isPublic: boolean;
       name: string;
       /** @description recursive structure */
-      /** @description recursive structure */
       parent: components["schemas"]["dtos.ProjectDTO"];
       parentId: string;
       repositoryId: string;
@@ -16399,7 +16331,6 @@ export interface components {
       isPublic: boolean;
       members: components["schemas"]["dtos.UserDTO"][];
       name: string;
-      /** @description recursive structure */
       /** @description recursive structure */
       parent: components["schemas"]["dtos.ProjectDTO"];
       parentId: string;
@@ -16497,7 +16428,6 @@ export interface components {
       fixedPercentage: number;
     };
     /** @enum {string} */
-    "dtos.RequirementLevel": "low" | "medium" | "high";
     "dtos.RequirementLevel": "low" | "medium" | "high";
     "dtos.RevokeByPrivateKeyRequest": {
       privkey: string;
@@ -16640,7 +16570,6 @@ export interface components {
     "dtos.TestVEXRulesRequest": {
       celExpression: string[];
       /** @enum {unknown} */
-      /** @enum {unknown} */
       eventType: components["schemas"]["dtos.VulnEventType"];
     };
     "dtos.UpdateAssetRequest": {
@@ -16737,7 +16666,6 @@ export interface components {
       | "attachedComplianceComponent"
       | "removedComplianceComponent"
       | "detected"
-      | "rawRiskAssessmentUpdated";
       | "rawRiskAssessmentUpdated";
     "dtos.VulnInPackageDTO": {
       cveId: string;
@@ -16979,7 +16907,6 @@ export interface components {
       "branch" | "tag";
     "github_com_l3montree-dev_devguard_database_models.Attestation": {
       /** @description Ensure foreign key field order matches Artifact primary key: ArtifactName, AssetVersionName, AssetID */
-      /** @description Ensure foreign key field order matches Artifact primary key: ArtifactName, AssetVersionName, AssetID */
       artifact: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"];
       artifactName: string;
       assetId: string;
@@ -17023,10 +16950,6 @@ export interface components {
       source_cve: string;
       /** @description the official CVE-XXXX-...  the external CVE-ID relates to */
       target_cve: string;
-      /**
-       * @description TargetCVEData is populated by GORM nested preload. It is nil when the target
-       *     CVE does not exist in this database — no DB-level FK constraint is added.
-       */
       /**
        * @description TargetCVEData is populated by GORM nested preload. It is nil when the target
        *     CVE does not exist in this database — no DB-level FK constraint is added.
@@ -17278,7 +17201,6 @@ export interface components {
     };
     "github_com_l3montree-dev_devguard_database_models.VEXRule": {
       /** @description Relationships */
-      /** @description Relationships */
       asset: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Asset"];
       /** @description Composite key components (for indexing and queries) */
       assetId: string;
@@ -17451,18 +17373,24 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
