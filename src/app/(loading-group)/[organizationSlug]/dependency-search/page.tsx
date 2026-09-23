@@ -20,23 +20,66 @@ import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/dist/client/components/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import { useProjectComponentList } from "@/hooks/useComponents";
-import EmptyParty from "../../../../../../components/common/EmptyParty";
-import useDecodedParams from "../../../../../../hooks/useDecodedParams";
-import { useOrganizationMenu } from "../../../../../../hooks/useOrganizationMenu";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import { Badge } from "@/components/ui/badge";
 import { buildFilterSearchParams } from "@/utils/url";
-import { useActiveProject } from "../../../../../../hooks/useActiveProject";
+import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import useDecodedParams from "@/hooks/useDecodedParams";
+import { useOrganizationComponentList } from "@/hooks/useComponents";
+import EmptyParty from "@/components/common/EmptyParty";
+
+const columnHelper = createAppColumnHelper<ProjectDependency>();
+
+const columnsDef: TableColumnDef<ProjectDependency, any>[] = [
+  columnHelper.accessor("dependencyPurl", {
+    header: "Package",
+    id: "dependencyPurl",
+    enableSorting: false,
+    cell: (row) => (
+      <span className="flex flex-row gap-2">
+        <div className="flex h-5 w-5 flex-row items-center justify-center">
+          <EcosystemImage packageName={row.getValue()} />
+        </div>
+        <div className="flex-1">{beautifyPurl(row.getValue())}</div>
+      </span>
+    ),
+  }),
+
+  columnHelper.accessor("dependencyPurl", {
+    header: "Version",
+    id: "version",
+    enableSorting: false,
+    cell: (row) => (
+      <span className="flex flex-row items-start gap-2">
+        <Badge variant={"secondary"}> {extractVersion(row.getValue())}</Badge>
+      </span>
+    ),
+  }),
+  columnHelper.accessor("projectName", {
+    header: "Project",
+    id: "projectName",
+    enableSorting: false,
+    cell: (row) => (
+      <span className="flex flex-row items-start gap-2">{row.getValue()}</span>
+    ),
+  }),
+  columnHelper.accessor("assetName", {
+    header: "Repository",
+    id: "assetName",
+    enableSorting: false,
+    cell: (row) => (
+      <span className="flex flex-row items-start gap-2">{row.getValue()}</span>
+    ),
+  }),
+];
 
 const OrgDependencySearch: FunctionComponent = () => {
   const menu = useOrganizationMenu();
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
-  const project = useActiveProject();
   const handleSearch = useDebouncedQuerySearch();
 
   const searchParams = useSearchParams();
@@ -47,57 +90,8 @@ const OrgDependencySearch: FunctionComponent = () => {
     return params;
   }, [searchParams]);
 
-  const columnHelper = createAppColumnHelper<ProjectDependency>();
-
-  const columnsDef: TableColumnDef<ProjectDependency, any>[] = [
-    columnHelper.accessor("dependencyPurl", {
-      header: "Package",
-      id: "dependencyPurl",
-      enableSorting: false,
-      cell: (row) => (
-        <span className="flex flex-row gap-2">
-          <div className="flex h-5 w-5 flex-row items-center justify-center">
-            <EcosystemImage packageName={row.getValue()} />
-          </div>
-          <div className="flex-1">{beautifyPurl(row.getValue())}</div>
-        </span>
-      ),
-    }),
-
-    columnHelper.accessor("dependencyPurl", {
-      header: "Version",
-      id: "version",
-      enableSorting: false,
-      cell: (row) => (
-        <span className="flex flex-row items-start gap-2">
-          <Badge variant={"secondary"}> {extractVersion(row.getValue())}</Badge>
-        </span>
-      ),
-    }),
-    columnHelper.accessor("projectName", {
-      header: "Project",
-      id: "projectName",
-      enableSorting: false,
-      cell: (row) => (
-        <span className="flex flex-row items-start gap-2">
-          {row.getValue()}
-        </span>
-      ),
-    }),
-    columnHelper.accessor("assetName", {
-      header: "Repository",
-      id: "assetName",
-      enableSorting: false,
-      cell: (row) => (
-        <span className="flex flex-row items-start gap-2">
-          {row.getValue()}
-        </span>
-      ),
-    }),
-  ];
-
-  const { data: components, isLoading } = useProjectComponentList(
-    { organization: organizationSlug, projectSlug: project?.slug ?? "" },
+  const { data: components, isLoading } = useOrganizationComponentList(
+    { organization: organizationSlug },
     params,
   );
 
@@ -194,7 +188,7 @@ const OrgDependencySearch: FunctionComponent = () => {
                   ))}
                 {table.getRowModel().rows.map((row, index, arr) => (
                   <a
-                    href={`/${organizationSlug}/projects/${project.slug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionSlug}/dependencies`}
+                    href={`/${organizationSlug}/projects/${row.original.projectSlug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionSlug}/dependencies`}
                     className={classNames(
                       "relative cursor-pointer table-row bg-background align-top transition-all ",
                       index === arr.length - 1 ? "" : "border-b",

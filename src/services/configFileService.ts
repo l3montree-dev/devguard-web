@@ -61,6 +61,12 @@ export const readConfigFile = (scope: ConfigScope, configFile: string) => {
   }
 };
 
+const rawText = {
+  ...text,
+  bodySerializer: (body: string) => body,
+  headers: { "Content-Type": "text/plain" },
+};
+
 export const writeConfigFile = (
   scope: ConfigScope,
   configFile: string,
@@ -72,7 +78,7 @@ export const writeConfigFile = (
       return browserClient.PUT(
         "/organizations/{organization}/config-files/{config-file}",
         {
-          ...text,
+          ...rawText,
           params: { path: { ...params, organization: scope.organization } },
           body,
         },
@@ -81,7 +87,7 @@ export const writeConfigFile = (
       return browserClient.PUT(
         "/organizations/{organization}/projects/{projectSlug}/config-files/{config-file}",
         {
-          ...text,
+          ...rawText,
           params: {
             path: {
               ...params,
@@ -96,7 +102,7 @@ export const writeConfigFile = (
       return browserClient.PUT(
         "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/config-files/{config-file}",
         {
-          ...text,
+          ...rawText,
           params: {
             path: {
               ...params,
