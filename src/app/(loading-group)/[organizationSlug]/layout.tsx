@@ -36,7 +36,6 @@ async function OrganizationShell({
 }) {
   let organizationSlug = "";
   let org;
-  let contentTree;
   try {
     const { organizationSlug: slug } = await params;
     organizationSlug = slug;

@@ -23,7 +23,6 @@ import { groupBy } from "lodash";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
-import { toast } from "@/lib/toast";
 import SortingCaret from "../../../../../../../components/common/SortingCaret";
 import { Skeleton } from "../../../../../../../components/ui/skeleton";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
@@ -255,9 +254,12 @@ const Index: FunctionComponent = () => {
                         const assetSlug =
                           assetSlugById[data.risk.assetId || ""];
                         if (assetSlug === undefined) {
-                          toast.error(
-                            `Asset with id ${data.risk.assetId} not found - maybe missing permission`,
-                          );
+                          // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+                          window.location.href =
+                            `/api/-/a/${data.risk.assetId}` +
+                            (data.risk.assetVersionName
+                              ? `/refs/${encodeURIComponent(data.risk.assetVersionName)}`
+                              : "");
                           return;
                         }
                         router.push(
