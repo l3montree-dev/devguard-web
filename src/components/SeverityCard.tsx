@@ -51,7 +51,7 @@ const SeverityCard: FunctionComponent<Props> = ({
   const applySQLFilter = (
     variant: Props["variant"],
   ): { [key: string]: string } => {
-    const property = mode === "risk" ? "raw_risk_assessment" : "CVE.cvss";
+    const property = mode === "risk" ? "risk_assessment" : "CVE.cvss";
     const result: { [key: string]: string } = {};
 
     switch (variant) {
