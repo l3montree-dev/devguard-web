@@ -3449,7 +3449,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** List logs */
+    /** List organization logs */
     get: {
       parameters: {
         query?: {
@@ -3468,10 +3468,6 @@ export interface paths {
         path: {
           /** @description Organization slug */
           organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
         };
         cookie?: never;
       };
@@ -5186,7 +5182,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** List logs */
+    /** List asset logs */
     get: {
       parameters: {
         query?: {
@@ -10202,7 +10198,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** List logs */
+    /** List project logs */
     get: {
       parameters: {
         query?: {
@@ -10223,8 +10219,6 @@ export interface paths {
           organization: string;
           /** @description Project slug */
           projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
         };
         cookie?: never;
       };
@@ -17379,25 +17373,38 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
-      | 60000000000;
+      | 60000000000
+      | 3600000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];
