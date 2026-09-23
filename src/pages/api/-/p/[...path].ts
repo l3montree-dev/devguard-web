@@ -3,5 +3,5 @@
 
 import { createPermalinkHandler } from "@/server/permalink";
 
-// /api/-/p/<uuid> -> /<organization>/projects/<project>
+// /api/-/p/<uuid>/<rest> -> /<organization>/projects/<project>/<rest>
 export default createPermalinkHandler("projectid");

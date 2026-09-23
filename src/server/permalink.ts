@@ -25,7 +25,16 @@ export const createPermalinkHandler =
       return res.status(405).end();
     }
 
-    const { id } = req.query as { id: string };
+    // catch all route: the first segment is the uuid, the rest is the deep link
+    // into the entity we are about to resolve
+    const segments = req.query.path;
+    const [id, ...rest] = Array.isArray(segments)
+      ? segments
+      : [segments].filter((s): s is string => Boolean(s));
+
+    if (!id) {
+      return res.redirect(302, "/?error=not-found");
+    }
 
     const resp = await fetch(
       `${appConfig.devGuardApiUrl}/api/v1/resolve/?${queryParam}=${encodeURIComponent(id)}`,
@@ -53,9 +62,14 @@ export const createPermalinkHandler =
       organizationSlug,
       projectSlug && `projects/${projectSlug}`,
       assetSlug && `assets/${assetSlug}`,
+      ...rest.map(encodeURIComponent),
     ]
       .filter(Boolean)
       .join("/");
 
-    return res.redirect(302, `/${path}`);
+    const query = req.url?.includes("?")
+      ? req.url.slice(req.url.indexOf("?"))
+      : "";
+
+    return res.redirect(302, `/${path}${query}`);
   };
