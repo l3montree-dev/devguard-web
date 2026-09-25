@@ -6,7 +6,8 @@
   "ignoreDependencies": [
     "sharp",
     "@typescript/native",
-    "@typescript/typescript6"
+    "@typescript/typescript6",
+    "openapi-typescript"
   ],
   "ignoreIssues": {
     "src/types/api/**": ["exports", "types", "enumMembers"],
