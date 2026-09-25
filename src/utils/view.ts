@@ -277,7 +277,20 @@ export const findUser = (
 export const reduceRiskHistories = (
   histories: RiskHistoryPoint[][],
 ): RiskHistoryPoint[] => {
-  return histories.map((dayHistories) => {
+  // Filter out any histories that are shorter than the previous one, as they are likely incomplete.
+  const validHistories: RiskHistoryPoint[][] = [];
+
+  for (let i = 0; i < histories.length; i++) {
+    const current = histories[i];
+
+    if (i > 0 && current.length < histories[i - 1].length) {
+      break;
+    }
+
+    validHistories.push(current);
+  }
+
+  return validHistories.map((dayHistories) => {
     return dayHistories.reduce(
       (acc, curr) => {
         acc.cvePurlLow += curr.cvePurlLow;
