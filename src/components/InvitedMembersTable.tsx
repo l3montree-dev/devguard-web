@@ -29,7 +29,7 @@ const InvitedMembersTable: FunctionComponent<Props> = ({
 }) => {
   return (
     <div>
-      <div className="overflow-hidden rounded-lg border shadow-sm">
+      <div className="overflow-hidden rounded-lg border">
         <table className="w-full text-sm">
           <thead className={classNames("w-full text-left", "border-b bg-card")}>
             <tr className="">
@@ -40,6 +40,13 @@ const InvitedMembersTable: FunctionComponent<Props> = ({
             </tr>
           </thead>
           <tbody>
+            {!members?.length && (
+              <tr>
+                <td className="p-4 text-muted-foreground" colSpan={4}>
+                  No pending invitations.
+                </td>
+              </tr>
+            )}
             {members?.map((m, i, arr) => {
               return (
                 <tr

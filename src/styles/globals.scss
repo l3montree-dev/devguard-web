@@ -258,6 +258,35 @@ button:disabled {
     .font-black {
         font-weight: var(--font-weight-black);
     }
+
+    .scrollbar-subtle {
+        scrollbar-width: thin;
+        scrollbar-color: hsl(var(--border)) transparent;
+
+        &:hover {
+            scrollbar-color: hsl(var(--muted-foreground) / 0.5) transparent;
+        }
+
+        @supports not (scrollbar-color: auto) {
+            &::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                border-radius: 9999px;
+                background: hsl(var(--border));
+            }
+
+            &:hover::-webkit-scrollbar-thumb {
+                background: hsl(var(--muted-foreground) / 0.5);
+            }
+        }
+    }
 }
 
 .animated-outline {

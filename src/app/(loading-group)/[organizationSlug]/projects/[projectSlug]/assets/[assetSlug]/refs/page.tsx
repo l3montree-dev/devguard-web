@@ -148,7 +148,7 @@ const RefsPage = () => {
         }
         title="Tags"
       >
-        <div className="overflow-hidden rounded-lg border shadow-sm">
+        <div className="overflow-hidden rounded-lg border">
           <div className="overflow-auto">
             <table className="w-full table-fixed overflow-x-auto text-sm">
               <thead className="border-b bg-card text-foreground">
@@ -235,7 +235,7 @@ const RefsPage = () => {
           </AuthGuard>
         }
       >
-        <div className="overflow-hidden rounded-lg border shadow-sm">
+        <div className="overflow-hidden rounded-lg border">
           <div className="overflow-auto">
             <table className="w-full table-fixed overflow-x-auto text-sm">
               <thead className="border-b bg-card text-foreground">

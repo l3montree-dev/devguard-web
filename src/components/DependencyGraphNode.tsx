@@ -1,6 +1,8 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+/* eslint-disable local/no-shadow-class -- nodes and their badges are dragged over a React Flow canvas */
+
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import type { FunctionComponent } from "react";

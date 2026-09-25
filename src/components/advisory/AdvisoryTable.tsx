@@ -134,7 +134,7 @@ const AdvisoryTable: FunctionComponent<AdvisoryTableProps> = ({
 
   return (
     <div>
-      <div className="overflow-hidden rounded-lg border shadow-sm">
+      <div className="overflow-hidden rounded-lg border">
         <div className="overflow-auto">
           <table className="w-full overflow-x-auto text-sm">
             <thead className="border-b bg-card text-foreground">

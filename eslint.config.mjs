@@ -13,6 +13,7 @@ import noDataFetchingInView from "./eslint-rules/no-data-fetching-in-view.mjs";
 import filenameConvention from "./eslint-rules/filename-convention.mjs";
 import noDirectLocalStorage from "./eslint-rules/no-direct-local-storage.mjs";
 import noDirectSessionStorage from "./eslint-rules/no-direct-session-storage.mjs";
+import noShadowClass from "./eslint-rules/no-shadow-class.mjs";
 
 const local = {
   rules: {
@@ -24,6 +25,7 @@ const local = {
     "filename-convention": filenameConvention,
     "no-direct-local-storage": noDirectLocalStorage,
     "no-direct-session-storage": noDirectSessionStorage,
+    "no-shadow-class": noShadowClass,
   },
 };
 
@@ -172,6 +174,15 @@ export default tseslint.config([
     ignores: [...NOT_OURS, ...TESTS, "src/hooks/useSessionStorage.ts"],
     rules: {
       "local/no-direct-session-storage": "warn",
+    },
+  },
+
+  // Surfaces are flat. The shadcn primitives in ui/ float and keep theirs.
+  {
+    files: OURS,
+    ignores: [...NOT_OURS, ...TESTS, "src/components/ui/**"],
+    rules: {
+      "local/no-shadow-class": "warn",
     },
   },
 

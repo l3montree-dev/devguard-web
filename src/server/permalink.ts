@@ -9,7 +9,7 @@ import { config as appConfig } from "@/config";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 // the query parameter /api/v1/resolve/ expects for each entity level
-export type PermalinkQueryParam = "orgid" | "projectid" | "assetid";
+export type PermalinkQueryParam = "orgId" | "projectId" | "assetId";
 
 interface Resolved {
   organizationSlug: string;

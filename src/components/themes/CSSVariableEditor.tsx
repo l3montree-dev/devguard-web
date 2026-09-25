@@ -500,6 +500,7 @@ export function CSSVariableEditor() {
   }
 
   return (
+    // eslint-disable-next-line local/no-shadow-class -- fixed overlay panel above the page
     <div className="fixed bottom-0 right-0 z-[9999] flex h-[80vh] w-96 flex-col rounded-tl-lg border border-border bg-card shadow-2xl">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border px-3 py-2">

@@ -161,7 +161,6 @@ const LogsTable: FunctionComponent<LogsTableProps> = ({ logs, isLoading }) => {
           <Link
             href={detailsHref}
             className="!text-muted-foreground hover:!text-foreground"
-            target="_blank"
           >
             View all logs
           </Link>

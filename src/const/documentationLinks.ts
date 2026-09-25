@@ -26,4 +26,6 @@ export const documentationLinks = {
     "https://docs.devguard.org/explanations/supply-chain-security/transitive-vulnerability-path-analysis/#transitive-vulnerability-path-analysis-the-quickfix-algorithm",
   mitigationStrategies:
     "https://docs.devguard.org/explanations/vulnerability-management/mitigation-strategies/",
+  releaseAssets:
+    "https://docs.devguard.org/how-to-guides/vex/multi-level-vexing/#multi-level-vexing-for-releases",
 };

@@ -695,7 +695,7 @@ const Index: FunctionComponent = () => {
         </div>
       ) : (
         <div>
-          <div className="rounded-lg overflow-hidden border shadow-sm">
+          <div className="rounded-lg overflow-hidden border">
             <div>
               <table className="w-full text-left text-sm table-fixed">
                 <colgroup>
@@ -839,7 +839,7 @@ const Index: FunctionComponent = () => {
                   {!table.getRowModel().rows &&
                     isLoading &&
                     Array.from(Array(5).keys()).map((el) => (
-                      <tr key={el} className="border-b">
+                      <tr key={el} className="border-b last:border-0">
                         <td className="p-4" colSpan={4}>
                           <Skeleton className="w-full h-[40px]" />
                         </td>

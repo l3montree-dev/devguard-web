@@ -4,4 +4,4 @@
 import { createPermalinkHandler } from "@/server/permalink";
 
 // /api/-/a/<uuid>/<rest> -> /<organization>/projects/<project>/assets/<asset>/<rest>
-export default createPermalinkHandler("assetid");
+export default createPermalinkHandler("assetId");

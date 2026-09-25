@@ -274,7 +274,7 @@ const columnsDef: TableColumnDef<Log, any>[] = [
     enableSorting: false,
     meta: { className: "w-full" },
     cell: (info) => (
-      <span className="block max-h-[200px] overflow-y-auto font-mono text-xs whitespace-pre-wrap">
+      <span className="scrollbar-subtle block max-h-26 overflow-y-auto pr-2 font-mono text-xs whitespace-pre-wrap">
         {info.getValue()}
       </span>
     ),

@@ -21,6 +21,7 @@ export function TourCard({
   const step = steps[currentStep];
 
   return (
+    // eslint-disable-next-line local/no-shadow-class -- tour popover floats over the page
     <div className="bg-card text-card-foreground rounded-lg border border-border p-5 shadow-lg w-72">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">

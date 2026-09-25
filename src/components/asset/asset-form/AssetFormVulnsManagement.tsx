@@ -176,11 +176,7 @@ const CVSSBadgePreview: FunctionComponent<{
 
   return (
     <div className="flex flex-row items-center gap-3 rounded-md border bg-background p-2 justify-between">
-      <img
-        src={badgePreviewUrl}
-        alt="CVSS Badge"
-        className="rounded-md shadow-sm"
-      />
+      <img src={badgePreviewUrl} alt="CVSS Badge" className="rounded-md" />
       <div className="flex items-center gap-2">
         <Button
           type="button"

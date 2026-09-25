@@ -96,6 +96,7 @@ const MostUsedEcosystems: FunctionComponent<Props> = ({ ecosystems }) => {
                   if (!active || !payload?.length) return null;
                   const entry = payload[0].payload;
                   return (
+                    // eslint-disable-next-line local/no-shadow-class -- chart tooltip floats over the chart
                     <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
                       <div className="flex items-center gap-2">
                         <div

@@ -63,7 +63,7 @@ const WebhooksTable: FunctionComponent<Props> = ({
   return (
     <>
       <div
-        className="overflow-hidden rounded-lg border shadow-sm"
+        className="overflow-hidden rounded-lg border"
         data-testid="webhooks-section"
       >
         <div className="overflow-x-auto">

@@ -124,7 +124,7 @@ const VulnWithCveTableRow = ({
   const router = useRouter();
   return (
     <tr
-      className="border-b border-border hover:bg-muted/50 cursor-pointer"
+      className="border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer"
       key={vuln.id}
       onClick={(e) => {
         // Don't navigate if clicking on checkbox
@@ -276,7 +276,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
       <tr
         data-testid="package-row"
         className={classNames(
-          "cursor-pointer hover:bg-muted/50 border-b",
+          "cursor-pointer hover:bg-muted/50 border-b last:border-0",
           index % 2 !== 0 && "bg-card/50",
         )}
         onClick={() => setIsPackageOpen((prev) => !prev)}
@@ -383,7 +383,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               {/* CVE subheader */}
               <tr
                 data-testid="cve-row"
-                className="bg-muted/30 border-b border-border hover:bg-muted/50 cursor-pointer"
+                className="bg-muted/30 border-b border-border last:border-0 hover:bg-muted/50 cursor-pointer"
                 onClick={(e) => {
                   // Don't act if clicking on checkbox or button
                   if (

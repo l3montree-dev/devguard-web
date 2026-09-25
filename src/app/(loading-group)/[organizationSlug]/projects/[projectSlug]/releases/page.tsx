@@ -3,9 +3,12 @@
 
 "use client";
 import type { ReleaseItem } from "@/types/view/release";
+import Link from "next/link";
 import React from "react";
 import { toast } from "@/lib/toast";
+import { documentationLinks } from "@/const/documentationLinks";
 import Alert from "../../../../../../components/common/Alert";
+import Callout from "../../../../../../components/common/Callout";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import ListItem from "../../../../../../components/common/ListItem";
 import ListRenderer from "../../../../../../components/common/ListRenderer";
@@ -97,6 +100,22 @@ const Releases = () => {
               </AuthGuard>
             }
           >
+            <Callout intent="warning" showIcon>
+              <p className="font-medium">Releases are deprecated</p>
+              <p className="mt-1">
+                Releases will be removed in a future version. Use a release
+                asset instead: a repository that references the SBOMs of the
+                components it bundles, so one VEX decision covers the whole
+                product.{" "}
+                <Link
+                  href={documentationLinks.releaseAssets}
+                  target="_blank"
+                  className="font-medium !text-current underline underline-offset-2"
+                >
+                  Learn how to set up a release asset
+                </Link>
+              </p>
+            </Callout>
             <ListRenderer
               data={releases?.data}
               isLoading={isLoading}

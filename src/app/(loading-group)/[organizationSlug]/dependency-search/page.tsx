@@ -133,7 +133,7 @@ const OrgDependencySearch: FunctionComponent = () => {
             }
           />
         ) : (
-          <div className="overflow-hidden rounded-lg border shadow-sm">
+          <div className="overflow-hidden rounded-lg border">
             <table className="w-full table-fixed overflow-x-auto text-sm">
               <thead className="border-b bg-card text-foreground">
                 {table.getHeaderGroups().map((headerGroup) => (

@@ -99,6 +99,7 @@ const RemediationTypeDistribution: FunctionComponent<Props> = ({
                     chartConfig[entry.type as keyof typeof chartConfig]
                       ?.label ?? entry.type;
                   return (
+                    // eslint-disable-next-line local/no-shadow-class -- chart tooltip floats over the chart
                     <div className="rounded-lg border bg-background px-3 py-2 text-xs shadow-xl">
                       <div className="flex items-center gap-2">
                         <div
