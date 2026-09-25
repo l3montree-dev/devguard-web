@@ -8,6 +8,8 @@ import type {
   InstanceUsageStatistics,
   OrgAdmin,
 } from "@/types/view/admin";
+import type { Log } from "@/types/view/logs";
+import type { Paged } from "@/types/view/pagination";
 
 /** Confirms the signing key is accepted, so the admin UI can unlock. */
 export const verifyAdminKey = async (key: CryptoKey) =>
@@ -68,3 +70,13 @@ export const patchInstanceSettings = async (
       body: { disable_org_creation: disableOrgCreation },
     }),
   );
+
+export const fetchInstanceLogs = async (
+  key: CryptoKey,
+  query?: string,
+): Promise<Paged<Log>> =>
+  unwrap(
+    await adminClient(key).GET("/admin/logs/", {
+      querySerializer: () => query ?? "",
+    }),
+  ) as unknown as Paged<Log>;

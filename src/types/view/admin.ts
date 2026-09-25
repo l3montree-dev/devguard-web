@@ -23,6 +23,10 @@ export interface InstanceTechnicalInfoHandle {
   refresh: () => void;
 }
 
+export interface InstanceLogsHandle {
+  refresh: () => void;
+}
+
 export interface Daemon {
   id: string;
   label: string;

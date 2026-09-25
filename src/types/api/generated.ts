@@ -530,6 +530,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/admin/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/organizations/{orgID}/": {
     parameters: {
       query?: never;
@@ -3395,6 +3442,56 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List organization logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/members": {
     parameters: {
       query?: never;
@@ -5072,6 +5169,60 @@ export interface paths {
         };
       };
     };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List asset logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -10040,6 +10191,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/logs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List project logs */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+          /** @description Search term */
+          search?: string;
+          /** @description Sort query, e.g. sort[createdAt]=desc */
+          sort?: string;
+          /** @description Filter query, e.g. filterQuery[logs.log_level][is]=error */
+          filterQuery?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/members": {
     parameters: {
       query?: never;
@@ -11661,6 +11864,52 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["dtos.Recommendation"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/resolve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Resolve a permalink
+     * @description Resolves an organization, project or asset UUID to the slugs the frontend needs to build a human readable URL. Exactly one of the query parameters must be set.
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Organization ID */
+          orgid?: string;
+          /** @description Project ID */
+          projectid?: string;
+          /** @description Asset ID */
+          assetid?: string;
+        };
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.PermalinkResponse"];
           };
         };
       };
@@ -14951,7 +15200,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersionDTO"][];
@@ -14989,7 +15237,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersionDTO"][];
@@ -15027,7 +15274,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersionDTO"][];
@@ -15682,6 +15928,18 @@ export interface components {
       assetId: string;
       assetVersionName: string;
     };
+    "dtos.LogDTO": {
+      assetID: string;
+      assetName: string;
+      createdAt: string;
+      id: string;
+      logLevel: string;
+      message: string;
+      orgID: string;
+      orgName: string;
+      projectID: string;
+      projectName: string;
+    };
     "dtos.LookupResponse": {
       asset: string;
       link: string;
@@ -15978,6 +16236,11 @@ export interface components {
       expiryDateUnix: number;
       pubKey: string;
       scopes: string;
+    };
+    "dtos.PermalinkResponse": {
+      assetSlug: string;
+      organizationSlug: string;
+      projectSlug: string;
     };
     "dtos.PolicyDTO": {
       description: string;
@@ -16598,7 +16861,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineError: string;
       pipelineLastRun: string;
       project: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"];
       projectId: string;
@@ -17029,6 +17291,12 @@ export interface components {
       pageSize: number;
       total: number;
     };
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO": {
+      data: components["schemas"]["dtos.LogDTO"][];
+      page: number;
+      pageSize: number;
+      total: number;
+    };
     "github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAssetDTO": {
       data: components["schemas"]["dtos.ProjectAssetDTO"][];
       page: number;
@@ -17105,27 +17373,38 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
-      | 1000000;
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];

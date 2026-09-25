@@ -10,7 +10,7 @@
         ../package-lock.json
       ];
     };
-    hash = "sha256-O0zYpLQsndb99k76NdjcqiD5xcs/cYR5VdnVE+pU3MM=";
+    hash = "sha256-RIsInXbZ0y8lMZ1a23iuNpd7O4UJeMZSIrnmlNfx00I=";
   };
 
   node_modules = pkgs.runCommand "node-modules" {

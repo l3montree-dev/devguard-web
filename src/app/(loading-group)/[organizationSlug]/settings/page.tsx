@@ -62,6 +62,8 @@ import { orgSettingsTourSteps } from "@/components/common/tours/orgSettingsTour"
 import InvitedMembersTable from "@/components/InvitedMembersTable";
 import AccessTokenManagement from "@/components/AccessTokenManagement";
 import useDecodedParams from "@/hooks/useDecodedParams";
+import LogsTable from "@/components/logs/LogsTable";
+import { useLogs } from "@/hooks/useLogs";
 
 const Home = () => {
   let { organizationSlug } = useDecodedParams() as {
@@ -81,6 +83,7 @@ const Home = () => {
   const pathName = usePathname();
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [isSavingVisibility, setIsSavingVisibility] = useState(false);
+  const { data: logs } = useLogs();
 
   const form = useForm<OrganizationDetailsDTO>({
     defaultValues: activeOrg,
@@ -559,6 +562,14 @@ const Home = () => {
           }}
         />
       </div>
+      <hr />
+      <Section
+        id="logs"
+        title="Logs"
+        description="Errors and events captured by DevGuard while processing this repository, such as scan failures or unexpected exceptions."
+      >
+        <LogsTable logs={logs} />
+      </Section>
       <hr />
       <FormProvider {...form}>
         <div data-tour="visibility">

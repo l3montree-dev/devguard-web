@@ -4,7 +4,6 @@
 import { useEffect } from "react";
 import useSWRMutation from "swr/mutation";
 
-import { useUpdateOrganization } from "@/context/OrganizationContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
 import { toast } from "@/lib/toast";
@@ -14,18 +13,12 @@ const SYNC_INTERVAL_MS = 1000 * 60 * 60;
 
 export const useOrgTriggerSync = (onSynced: () => void) => {
   const activeOrg = useActiveOrg();
-  const updateOrganization = useUpdateOrganization();
 
   const { trigger, isMutating } = useSWRMutation(
     `/organizations/${activeOrg.slug}/trigger-sync`,
     async () => {
       unwrap(
         await browserClient.GET("/organizations/{organization}/trigger-sync", {
-          params: { path: { organization: activeOrg.slug } },
-        }),
-      );
-      return unwrap(
-        await browserClient.GET("/organizations/{organization}/content-tree", {
           params: {
             path: { organization: decodeURIComponent(activeOrg.slug) },
           },
@@ -33,8 +26,7 @@ export const useOrgTriggerSync = (onSynced: () => void) => {
       );
     },
     {
-      onSuccess: (contentTree) => {
-        updateOrganization((prev) => ({ ...prev, contentTree }));
+      onSuccess: () => {
         toast.success("Sync triggered successfully!");
         onSynced();
       },

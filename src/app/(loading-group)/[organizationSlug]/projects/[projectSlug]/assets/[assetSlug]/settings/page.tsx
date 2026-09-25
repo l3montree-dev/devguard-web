@@ -8,6 +8,7 @@ import AssetForm from "@/components/asset/AssetForm";
 import type { AssetFormValues, SecretType } from "@/types/view/asset";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
+import LogsTable from "@/components/logs/LogsTable";
 import { repoSettingsTourSteps } from "@/components/common/tours/repoSettingsTour";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -53,6 +54,8 @@ import {
   generateNewSecret,
   getParentRepositoryIdAndName,
 } from "../../../../../../../../utils/view";
+import { formatDateTime } from "@/utils/format";
+import { useLogs } from "@/hooks/useLogs";
 
 const firstOrUndefined = (el?: number[]): number | undefined => {
   if (!el) {
@@ -69,6 +72,7 @@ const Index: FunctionComponent = () => {
   const updateAsset = useUpdateAsset();
   const router = useRouter();
   const config = useConfig();
+  const { data: logs } = useLogs();
 
   // fetch the project
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
@@ -402,6 +406,14 @@ const Index: FunctionComponent = () => {
           </Card>
         </Section>
         <hr />
+        <Section
+          id="logs"
+          title="Logs"
+          description="Errors and events captured by DevGuard while processing this repository, such as scan failures or unexpected exceptions."
+        >
+          <LogsTable logs={logs} />
+        </Section>
+        <hr />
       </div>
 
       <div data-tour="repo-settings-danger">
@@ -475,10 +487,8 @@ const Index: FunctionComponent = () => {
             </Button>
             <br />
             <small className="mt-4 block text-muted-foreground">
-              Last Run: {asset.pipelineLastRun}
+              Last Run: {formatDateTime(asset.pipelineLastRun)}
               <br />
-              Error: <br />
-              {asset.pipelineError ?? "No errors"}
             </small>
           </div>
         </CollapsibleContent>
