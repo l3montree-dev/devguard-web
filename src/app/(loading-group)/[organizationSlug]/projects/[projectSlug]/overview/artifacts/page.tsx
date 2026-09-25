@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
+import { useAssets } from "@/hooks/useAssets";
 import { useRelease } from "@/hooks/useReleases";
 import { useReleaseRiskHistory } from "@/hooks/useReleaseStats";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
 import Page from "@/components/Page";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
-import { useOrganization } from "@/context/OrganizationContext";
 import useTable from "@/hooks/useTable";
 import { createAppColumnHelper } from "@/hooks/useTable";
 import type { TableColumnDef } from "@/hooks/useTable";
@@ -27,7 +27,7 @@ import { toast } from "@/lib/toast";
 import SortingCaret from "../../../../../../../components/common/SortingCaret";
 import { Skeleton } from "../../../../../../../components/ui/skeleton";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
-import { RedirectorBuilder, sortRisk } from "../../../../../../../utils/view";
+import { sortRisk } from "../../../../../../../utils/view";
 import {
   Tabs,
   TabsList,
@@ -93,10 +93,17 @@ const Index: FunctionComponent = () => {
     projectSlug: string;
   };
 
-  const organization = useOrganization();
-
   const releaseScope = { organization: organizationSlug, projectSlug };
   const { data: release } = useRelease(releaseScope, releaseId);
+  const { data: assets } = useAssets(releaseScope);
+
+  const assetSlugById = useMemo(() => {
+    const map: Record<string, string> = {};
+    (assets ?? []).forEach((asset) => {
+      map[asset.id] = asset.slug;
+    });
+    return map;
+  }, [assets]);
 
   // fetch all the data
   const { data: riskHistory, isLoading: riskHistoryLoading } =
@@ -245,18 +252,17 @@ const Index: FunctionComponent = () => {
                       key={cell.id}
                       onClick={() => {
                         const data = row.original;
-                        try {
-                          const redirect = new RedirectorBuilder()
-                            .setOrganizationSlug(organizationSlug)
-                            .setProjectSlug(projectSlug)
-                            .setAssetId(data.risk.assetId)
-                            .setAssetVersionName(data.risk.assetVersionName)
-                            .setContentTree(organization.contentTree)
-                            .build();
-                          router.push(redirect);
-                        } catch (error) {
-                          toast.error((error as Error).message);
+                        const assetSlug =
+                          assetSlugById[data.risk.assetId || ""];
+                        if (assetSlug === undefined) {
+                          toast.error(
+                            `Asset with id ${data.risk.assetId} not found - maybe missing permission`,
+                          );
+                          return;
                         }
+                        router.push(
+                          `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${data.risk.assetVersionName}`,
+                        );
                       }}
                     >
                       {flexRender(cell.column.columnDef.cell, {

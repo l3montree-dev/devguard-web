@@ -12,5 +12,4 @@ export type ContentTreeElement = components["schemas"]["dtos.ProjectDTO"];
 
 export type OrgContextParams = {
   organization: OrganizationDetailsDTO | null;
-  contentTree: ContentTreeElement[];
 };
