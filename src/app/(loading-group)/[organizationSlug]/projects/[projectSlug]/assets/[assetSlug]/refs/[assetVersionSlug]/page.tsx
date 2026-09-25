@@ -99,7 +99,7 @@ const Index: FunctionComponent = () => {
     useRiskHistory(
       versionScope,
       extractDateOnly(last3Month),
-      extractDateOnly(yesterday),
+      extractDateOnly(today),
       selectedArtifact,
     );
 
@@ -144,6 +144,13 @@ const Index: FunctionComponent = () => {
   const latest = riskHistory?.length
     ? riskHistory[riskHistory.length - 1]
     : null;
+
+  // the current day is still in progress - drop it from the chart so the
+  // trend does not dip on a partially collected day. `latest` keeps using it.
+  const chartRiskHistory = useMemo(
+    () => (riskHistory.length > 1 ? riskHistory.slice(0, -1) : riskHistory),
+    [riskHistory],
+  );
 
   return (
     <Page
@@ -374,7 +381,7 @@ const Index: FunctionComponent = () => {
             </div>
             <RiskHistoryDistributionDiagram
               isLoading={riskHistoryLoading}
-              data={riskHistory}
+              data={chartRiskHistory}
               mode={mode}
             />
             <div className="grid grid-cols-8 gap-4">
@@ -511,3 +518,4 @@ const yesterday = new Date();
 yesterday.setDate(yesterday.getDate() - 1);
 const last3Month = new Date(yesterday);
 last3Month.setMonth(last3Month.getMonth() - 3);
+const today = new Date();
