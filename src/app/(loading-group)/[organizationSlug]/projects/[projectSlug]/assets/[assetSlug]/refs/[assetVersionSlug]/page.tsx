@@ -99,7 +99,7 @@ const Index: FunctionComponent = () => {
     useRiskHistory(
       versionScope,
       extractDateOnly(last3Month),
-      extractDateOnly(yesterday),
+      extractDateOnly(today),
       selectedArtifact,
     );
 
@@ -507,7 +507,6 @@ const Index: FunctionComponent = () => {
 export default Index;
 
 const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
-const yesterday = new Date();
-yesterday.setDate(yesterday.getDate() - 1);
-const last3Month = new Date(yesterday);
+const today = new Date();
+const last3Month = new Date(today);
 last3Month.setMonth(last3Month.getMonth() - 3);
