@@ -187,7 +187,7 @@ const VexSourcesTable: FunctionComponent<VexSourcesTableProps> = ({
                         </Badge>
                       </td>
                       <td className="max-w-[420px] p-4">
-                        <span className="block truncate font-mono text-xs text-muted-foreground">
+                        <span className="block max-w-[420px] overflow-x-auto whitespace-nowrap font-mono text-xs text-muted-foreground">
                           {source.url}
                         </span>
                       </td>
