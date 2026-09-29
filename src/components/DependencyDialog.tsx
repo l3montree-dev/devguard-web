@@ -71,7 +71,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
   );
 
   const graphData = useMemo(
-    () => (paths ? convertPathsToTree(paths as never, []) : null),
+    () => (paths ? convertPathsToTree(paths as never) : null),
     [paths],
   );
 
@@ -114,13 +114,7 @@ const DependencyDialog: FunctionComponent<Props> = ({
           <div className="mt-4">
             <span className="font-semibold mb-2 block">Path to component</span>
             <div className={"h-72 w-full rounded-lg border bg-muted"}>
-              <DependencyGraph
-                variant="compact"
-                width={100}
-                height={200}
-                vulns={[]}
-                graph={graphData}
-              />
+              <DependencyGraph height={200} graph={graphData} />
             </div>
           </div>
         )}
