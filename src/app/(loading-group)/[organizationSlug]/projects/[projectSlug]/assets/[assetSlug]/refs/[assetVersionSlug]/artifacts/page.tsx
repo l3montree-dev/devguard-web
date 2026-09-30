@@ -90,6 +90,8 @@ const Artifacts = () => {
       assetVersionSlug: string;
     };
 
+  const assetVersionPath = `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}`;
+
   const versionScope = {
     organization: organizationSlug,
     projectSlug,
@@ -455,6 +457,7 @@ const Artifacts = () => {
                             artifact={artifact}
                             index={i}
                             rootNodes={rootNodes![artifact.artifactName] || []}
+                            href={`${assetVersionPath}?artifact=${encodeURIComponent(artifact.artifactName)}`}
                             selectedSourceUrls={selectedSourceUrls}
                             onToggleSource={handleToggleSource}
                             onToggleAllSources={handleToggleAllSources}

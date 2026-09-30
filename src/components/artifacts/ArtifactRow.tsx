@@ -11,6 +11,7 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   EllipsisHorizontalIcon,
+  ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import { Tooltip } from "@radix-ui/react-tooltip";
 import { AlertTriangle } from "lucide-react";
@@ -28,11 +29,13 @@ import {
 } from "../ui/dropdown-menu";
 import { TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import AuthGuard from "../AuthGuard";
+import Link from "next/link";
 
 interface Props {
   artifact: ArtifactDTO;
   index: number;
   rootNodes: InformationSource[];
+  href: string;
   selectedSourceUrls: Set<string>;
   onToggleSource: (url: string) => void;
   onToggleAllSources: (urls: string[]) => void;
@@ -54,6 +57,7 @@ const ArtifactRow: FunctionComponent<Props> = ({
   artifact,
   index,
   rootNodes,
+  href,
   selectedSourceUrls,
   onToggleSource,
   onToggleAllSources,
@@ -83,10 +87,10 @@ const ArtifactRow: FunctionComponent<Props> = ({
           index % 2 !== 0 && "bg-card/50",
         )}
         onClick={(e) => {
-          // Don't toggle if clicking on checkbox
+          // Don't toggle if clicking on checkbox or link icon
           if (
             (e.target as HTMLElement).closest(
-              'button, input, [role="checkbox"]',
+              'button, input, [role="checkbox"], a',
             )
           )
             return;
@@ -116,6 +120,13 @@ const ArtifactRow: FunctionComponent<Props> = ({
               </div>
             )}
             <span className="font-medium">{artifact.artifactName}</span>
+            <Link
+              className="-translate-y-px rounded p-1 -m-1 hover:bg-muted"
+              href={href}
+              aria-label={`"Navigate to artifact ${artifact.artifactName}"`}
+            >
+              <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+            </Link>
             {!valid.isValid && (
               <Tooltip>
                 <TooltipTrigger>
