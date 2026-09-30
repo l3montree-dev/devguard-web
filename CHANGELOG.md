@@ -4,6 +4,31 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.15.0] — 2026-09-30
+
+### Added
+
+- **Instance logs / error log storage** — added log tables (organization, project, and asset level) with a detailed logs page, GitHub report button, log-level badges, and permalink redirects for log rows; added an instance logs view to the admin page
+- **Org-wide dependency search** — added a page to search dependencies across an entire organization
+### Fixed
+
+- **VEX source URL overflow** — long VEX source URLs are now horizontally scrollable instead of being truncated
+- **Risk history incomplete days** — risk history now includes today and skips incomplete days; adjusted risk history calculation and copy for newly created assets
+- **Config file content type** — config files are now sent as a raw `text/plain` body instead of JSON
+- **Dependency search** — corrected the loading state, empty state, and asset version link at the project level
+- **`raw_risk_assessment` naming issue** — fixed an incorrect field reference
+- **Distribution trend history** — fixed an issue with the distribution trend history calculation
+
+### Changed
+
+- **Removed bulk vulnerability reopen** — the bulk "reopen" action for dependency risks was removed
+- **Removed content tree** — dropped the legacy content tree in favor of permalink redirects for artifacts, including support for deep links
+- **Generated API client** — re-synced generated API types multiple times to stay in sync with the backend
+- **Dependency search column defs** — hoisted dependency search column definitions to module scope
+- **Dependency updates**
+
+---
+
 ## [v1.14.1] — 2026-09-18
 
 ### Fixed
