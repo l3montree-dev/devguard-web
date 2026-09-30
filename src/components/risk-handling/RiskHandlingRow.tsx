@@ -27,6 +27,7 @@ interface Props {
   index: number;
   arrLength: number;
   selectedVulnIds: Set<string>;
+  selectable?: boolean;
   onToggleVuln: (id: string) => void;
   onToggleAll: (ids: string[]) => void;
   onBulkAction: (params: {
@@ -226,6 +227,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
   selectedVulnIds,
   onToggleVuln,
   onToggleAll,
+  selectable = true,
 }) => {
   const isMemberRole = isMember(useCurrentUserRole());
   const [isPackageOpen, setIsPackageOpen] = useState(false);
@@ -250,7 +252,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
       row.original.vulns.filter((v) => v.state !== "fixed").map((v) => v.id),
     [row.original.vulns],
   );
-  const showPackageSelectAll = packageSelectableIds.length > 0;
+
   const allPackageSelected =
     packageSelectableIds.length > 0 &&
     packageSelectableIds.every((id) => selectedVulnIds.has(id));
@@ -288,7 +290,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             ) : (
               <ChevronRightIcon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             )}
-            {showPackageSelectAll ? (
+            {selectable && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="flex">
@@ -313,8 +315,6 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                   package
                 </TooltipContent>
               </Tooltip>
-            ) : (
-              <div className="size-4 shrink-0" />
             )}
             <Purl purl={row.original.packageName} />
             {isActivelyExploited ? (
@@ -401,7 +401,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
               >
                 <td className="py-3 px-4 pl-10">
                   <div className="flex flex-row items-center gap-3">
-                    {!pathExplosionOrOnlySinglePath && (
+                    {pathExplosionOrOnlySinglePath ? (
+                      <div className="size-5 shrink-0" />
+                    ) : (
                       <button
                         className="p-0.5 hover:bg-muted rounded"
                         onClick={(e) => {
@@ -422,19 +424,20 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                         )}
                       </button>
                     )}
-                    <SelectionCheckbox
-                      className={pathExplosionOrOnlySinglePath ? "ml-8" : ""}
-                      checked={
-                        allSelected
-                          ? true
-                          : someSelected
-                            ? "indeterminate"
-                            : false
-                      }
-                      onToggle={() => onToggleAll(selectableIds)}
-                      disabled={!isMemberRole}
-                      ariaLabel={`Select all paths of ${cveID}`}
-                    />
+                    {selectable && (
+                      <SelectionCheckbox
+                        checked={
+                          allSelected
+                            ? true
+                            : someSelected
+                              ? "indeterminate"
+                              : false
+                        }
+                        onToggle={() => onToggleAll(selectableIds)}
+                        disabled={!isMemberRole}
+                        ariaLabel={`Select all paths of ${cveID}`}
+                      />
+                    )}
                     {pathExplosionOrOnlySinglePath ? (
                       <Link
                         href={vulnDetailHref}
@@ -516,7 +519,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                     vuln={vuln}
                     key={vuln.id}
                     href={pathname + "/../dependency-risks/" + vuln.id}
-                    selectable={vuln.state !== "fixed"}
+                    selectable={selectable && vuln.state !== "fixed"}
                     selected={selectedVulnIds.has(vuln.id)}
                     onToggle={() => onToggleVuln(vuln.id)}
                   />

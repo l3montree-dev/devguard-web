@@ -16,7 +16,7 @@ import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RiskHandlingRow from "@/components/risk-handling/RiskHandlingRow";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AsyncButton, Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -235,9 +235,7 @@ const Index: FunctionComponent = () => {
           ? "falsePositive"
           : params.status === "accepted"
             ? "accepted"
-            : params.status === "reopened"
-              ? "open"
-              : undefined;
+            : undefined;
 
       const optimisticData =
         optimisticState && vulns
@@ -431,11 +429,11 @@ const Index: FunctionComponent = () => {
 
   const hasRecommendations = (recommendationsResponse?.data.length ?? 0) > 0;
 
-  // Compute selected open/closed IDs for batch actions
+  // Compute selected open IDs for batch actions
   const vulnData = vulns?.data;
 
-  const { selectedOpenIds, selectedClosedIds } = useMemo(() => {
-    if (!vulnData) return { selectedOpenIds: [], selectedClosedIds: [] };
+  const selectedOpenIds = useMemo(() => {
+    if (!vulnData) return [];
 
     const vulnById = new Map<string, { state: string }>();
     vulnData.forEach((pkg) => {
@@ -445,21 +443,15 @@ const Index: FunctionComponent = () => {
     });
 
     const openIds: string[] = [];
-    const closedIds: string[] = [];
 
     selectedVulnIds.forEach((id) => {
       const vuln = vulnById.get(id);
       if (vuln?.state === "open") {
         openIds.push(id);
-      } else if (
-        vuln?.state === "accepted" ||
-        vuln?.state === "falsePositive"
-      ) {
-        closedIds.push(id);
       }
     });
 
-    return { selectedOpenIds: openIds, selectedClosedIds: closedIds };
+    return openIds;
   }, [vulnData, selectedVulnIds]);
 
   return (
@@ -705,31 +697,13 @@ const Index: FunctionComponent = () => {
                   <col className="w-[220px]" />
                 </colgroup>
                 <thead className="border-b bg-card text-foreground sticky top-0 z-10">
-                  {/* Batch action row - shown when items are selected and user is logged in */}
+                  {/* Batch action row - shown in Open tab when items are selected and user is logged in */}
                   <AuthGuard require="member">
-                    {selectedVulnIds.size > 0 && (
+                    {!isClosed && selectedVulnIds.size > 0 && (
                       <tr className="bg-muted/50">
                         <td colSpan={4} className="px-4 py-2">
                           <div className="flex flex-row items-center justify-end">
                             <div className="flex flex-row items-center gap-2">
-                              {selectedClosedIds.length > 0 && (
-                                <AsyncButton
-                                  variant="secondary"
-                                  onClick={async () => {
-                                    const count = selectedClosedIds.length;
-                                    await handleBulkAction({
-                                      vulnIds: selectedClosedIds,
-                                      status: "reopened",
-                                      justification: "",
-                                    });
-                                    toast("Reopened", {
-                                      description: `${count} vulnerability path${count !== 1 ? "s" : ""} reopened.`,
-                                    });
-                                  }}
-                                >
-                                  Reopen ({selectedClosedIds.length})
-                                </AsyncButton>
-                              )}
                               {selectedOpenIds.length > 0 && (
                                 <>
                                   <Button
@@ -852,6 +826,7 @@ const Index: FunctionComponent = () => {
                       arrLength={arr.length}
                       key={row.original.packageName}
                       selectedVulnIds={selectedVulnIds}
+                      selectable={!isClosed}
                       onToggleVuln={handleToggleVuln}
                       onToggleAll={handleToggleAll}
                       onBulkAction={handleBulkAction}
