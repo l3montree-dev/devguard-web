@@ -3,7 +3,7 @@
 "use client";
 
 import { acceptInvitation } from "@/services/organizationService";
-import Head from "next/head";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 import Footer from "@/components/misc/Footer";
 import ContainerYardScene from "@/components/threejs/ContainerYardScene";
 import Image from "next/image";
@@ -27,6 +27,8 @@ import type { InvitationFormValues } from "@/types/view/invitation";
 
 const AcceptInvitation = () => {
   const user = useCurrentUser();
+
+  useDocumentTitle("Accept Invitation");
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -85,119 +87,113 @@ const AcceptInvitation = () => {
   }, [code, form, handleJoinOrganization]);
 
   return (
-    <>
-      <Head>
-        <title>Accept Invitation</title>
-        <meta name="description" content="Accept your DevGuard invitation" />
-      </Head>
-      <div className="relative flex min-h-screen flex-col bg-background">
-        <FourSideGridPattern />
-        <div className="flex flex-1 items-center justify-center flex-col pt-8">
-          <div className="w-full max-w-6xl">
-            <Card className="overflow-hidden p-0">
-              <CardContent className="grid p-0 md:grid-cols-5">
-                {/* Left: invitation content */}
-                <div className="flex flex-col justify-center p-8 col-span-2">
-                  <div className="mb-6 flex justify-center">
-                    <Image
-                      className="hidden h-16 w-auto dark:block"
-                      src={"/logo_inverse_horizontal.svg"}
-                      alt="DevGuard by l3montree Logo"
-                      width={200}
-                      height={200}
-                    />
-                    <Image
-                      className="h-10 w-auto dark:hidden"
-                      src={"/logo_horizontal.svg"}
-                      alt="DevGuard by l3montree Logo"
-                      width={200}
-                      height={200}
-                    />
+    <div className="relative flex min-h-screen flex-col bg-background">
+      <FourSideGridPattern />
+      <div className="flex flex-1 items-center justify-center flex-col pt-8">
+        <div className="w-full max-w-6xl">
+          <Card className="overflow-hidden p-0">
+            <CardContent className="grid p-0 md:grid-cols-5">
+              {/* Left: invitation content */}
+              <div className="flex flex-col justify-center p-8 col-span-2">
+                <div className="mb-6 flex justify-center">
+                  <Image
+                    className="hidden h-16 w-auto dark:block"
+                    src={"/logo_inverse_horizontal.svg"}
+                    alt="DevGuard by l3montree Logo"
+                    width={200}
+                    height={200}
+                  />
+                  <Image
+                    className="h-10 w-auto dark:hidden"
+                    src={"/logo_horizontal.svg"}
+                    alt="DevGuard by l3montree Logo"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+
+                <h2 className="text-center text-xl font-semibold leading-normal">
+                  Join your organization
+                </h2>
+                <p className="mt-4 text-center text-sm text-muted-foreground">
+                  Paste the invitation link you received by e-mail. It is bound
+                  to a specific e-mail address, so you need to be logged in with
+                  the invited account.
+                </p>
+
+                <hr className="my-8 border-t" />
+
+                {!user ? (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      You are not logged in. Please log in to accept the
+                      invitation.
+                    </p>
+                    <div className="mt-8 flex flex-row">
+                      <Link href="/login">
+                        <Button>Login</Button>
+                      </Link>
+                    </div>
                   </div>
-
-                  <h2 className="text-center text-xl font-semibold leading-normal">
-                    Join your organization
-                  </h2>
-                  <p className="mt-4 text-center text-sm text-muted-foreground">
-                    Paste the invitation link you received by e-mail. It is
-                    bound to a specific e-mail address, so you need to be logged
-                    in with the invited account.
-                  </p>
-
-                  <hr className="my-8 border-t" />
-
-                  {!user ? (
-                    <div>
-                      <p className="text-sm text-muted-foreground">
-                        You are not logged in. Please log in to accept the
-                        invitation.
-                      </p>
-                      <div className="mt-8 flex flex-row">
-                        <Link href="/login">
-                          <Button>Login</Button>
-                        </Link>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      {failed && (
-                        <Alert variant="destructive" className="mb-6">
-                          <AlertTitle>
-                            That invitation could not be accepted
-                          </AlertTitle>
-                          <AlertDescription>
-                            It may have expired, already been used, or belong to
-                            a different e-mail address.
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                      <Form {...form}>
-                        <form
-                          onSubmit={form.handleSubmit(handleJoinOrganization)}
+                ) : (
+                  <div>
+                    {failed && (
+                      <Alert variant="destructive" className="mb-6">
+                        <AlertTitle>
+                          That invitation could not be accepted
+                        </AlertTitle>
+                        <AlertDescription>
+                          It may have expired, already been used, or belong to a
+                          different e-mail address.
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    <Form {...form}>
+                      <form
+                        onSubmit={form.handleSubmit(handleJoinOrganization)}
+                      >
+                        <InvitationForm
+                          title="Invitation"
+                          description="Enter the invitation link or code you received."
+                          inputVariant="onCard"
+                          className="pb-2"
+                        />
+                        <Button
+                          className="w-full"
+                          disabled={form.formState.isSubmitting}
+                          isSubmitting={form.formState.isSubmitting}
+                          type="submit"
                         >
-                          <InvitationForm
-                            title="Invitation"
-                            description="Enter the invitation link or code you received."
-                            inputVariant="onCard"
-                            className="pb-2"
-                          />
-                          <Button
-                            className="w-full"
-                            disabled={form.formState.isSubmitting}
-                            isSubmitting={form.formState.isSubmitting}
-                            type="submit"
-                          >
-                            Join Organization
-                          </Button>
-                        </form>
-                      </Form>
-                      <div className="mt-8 flex flex-row items-center justify-between gap-4">
-                        <LoggedInAs user={user} />
-                        <Button variant="secondary" onClick={handleLogout}>
-                          Logout
+                          Join Organization
                         </Button>
-                      </div>
+                      </form>
+                    </Form>
+                    <div className="mt-8 flex flex-row items-center justify-between gap-4">
+                      <LoggedInAs user={user} />
+                      <Button variant="secondary" onClick={handleLogout}>
+                        Logout
+                      </Button>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+              </div>
 
-                {/* Right: container yard scene */}
-                <div
-                  className="col-span-3 relative hidden border-l md:block"
-                  style={{ background: "hsl(var(--harbor-background))" }}
-                  id="container-yard-scene"
-                >
-                  <ContainerYardScene />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-        <div className="pb-14">
-          <Footer />
+              {/* Right: container yard scene */}
+              <div
+                className="col-span-3 relative hidden border-l md:block"
+                style={{ background: "hsl(var(--harbor-background))" }}
+                id="container-yard-scene"
+              >
+                <ContainerYardScene />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </>
+      <div className="pb-14">
+        <Footer />
+      </div>
+    </div>
   );
 };
 

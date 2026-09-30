@@ -3,7 +3,7 @@
 
 "use client";
 import { useGlobalNotice } from "@/hooks/useGlobalNotice";
-import Head from "next/head";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 import React, { type PropsWithChildren, useEffect } from "react";
 import { classNames } from "../utils/common";
 import Main from "./Main";
@@ -50,32 +50,29 @@ const Page = (props: PropsWithChildren<PageProps>) => {
       },
     });
   }, [notice]);
-  return (
-    <>
-      <Head>
-        <title>{props.title}</title>
-      </Head>
 
-      <div>
-        <div className={classNames(props.Sidebar ? "lg:pr-80" : "")}>
-          <Main
-            breadcrumbs={props.breadcrumbs}
-            fullscreen={props.fullscreen}
-            Menu={props.Menu}
-            Button={props.Button}
-            Title={props.Title}
-            title={props.title}
-          >
-            {props.children}
-          </Main>
-        </div>
-        {!!props.Sidebar && (
-          <aside className="bottom-0 right-0 top-0 hidden w-80 flex-1 overflow-y-auto border-l bg-card dark:text-white md:fixed lg:block">
-            {props.Sidebar}
-          </aside>
-        )}
+  useDocumentTitle(props.title);
+
+  return (
+    <div>
+      <div className={classNames(props.Sidebar ? "lg:pr-80" : "")}>
+        <Main
+          breadcrumbs={props.breadcrumbs}
+          fullscreen={props.fullscreen}
+          Menu={props.Menu}
+          Button={props.Button}
+          Title={props.Title}
+          title={props.title}
+        >
+          {props.children}
+        </Main>
       </div>
-    </>
+      {!!props.Sidebar && (
+        <aside className="bottom-0 right-0 top-0 hidden w-80 flex-1 overflow-y-auto border-l bg-card dark:text-white md:fixed lg:block">
+          {props.Sidebar}
+        </aside>
+      )}
+    </div>
   );
 };
 
