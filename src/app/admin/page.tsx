@@ -39,6 +39,7 @@ import AdminTools from "@/components/admin/AdminTools";
 import Section from "@/components/common/Section";
 import { ArrowPathIcon } from "@heroicons/react/20/solid";
 import InstanceLogs from "@/components/admin/InstanceLogs";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 
 export default function InstanceAdminPage() {
   const { isAuthenticated, authenticate, logout } = useInstanceAdmin();
@@ -54,6 +55,7 @@ export default function InstanceAdminPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional one-time flag
     setMounted(true);
   }, []);
+  useDocumentTitle("Admin Dashboard");
 
   const handleAuthenticate = useCallback(async () => {
     const trimmedKey = keyInput.trim();

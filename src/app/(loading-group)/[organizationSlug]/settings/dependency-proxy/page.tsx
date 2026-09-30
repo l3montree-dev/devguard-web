@@ -28,8 +28,7 @@ const Config = () => {
           href: "",
         },
       ]}
-      Title={null}
-      title={""}
+      title={"Dependency Proxy Settings"}
       Menu={orgMenu}
     >
       <DependencyProxyConfigs scope={scope} />

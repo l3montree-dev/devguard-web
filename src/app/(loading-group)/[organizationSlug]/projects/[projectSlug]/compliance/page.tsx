@@ -19,11 +19,13 @@ import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
 import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import { useProjectPolicies } from "@/hooks/useProjectPolicies";
+import { useActiveProject } from "@/hooks/useActiveProject";
 import { DocDrawer } from "@/components/common/DocDrawer";
 
 const ComplianceIndex = () => {
   const menu = useProjectMenu();
   const activeOrg = useActiveOrg();
+  const project = useActiveProject();
 
   // fetch the compliance stats
   const { organizationSlug, projectSlug } = useDecodedParams() as {
@@ -51,7 +53,11 @@ const ComplianceIndex = () => {
   };
 
   return (
-    <Page Menu={menu} Title={<ProjectTitle />} title="Compliance Controls">
+    <Page
+      Menu={menu}
+      Title={<ProjectTitle />}
+      title={project?.name + " Compliance Controls"}
+    >
       <div className="flex flex-row">
         <div className="flex-1">
           <Section

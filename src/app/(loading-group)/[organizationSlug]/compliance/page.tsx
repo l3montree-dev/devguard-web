@@ -106,7 +106,7 @@ const ComplianceIndex: FunctionComponent = () => {
   };
 
   return (
-    <Page Menu={menu} Title={null} title="">
+    <Page Menu={menu} title="Compliance Controls">
       <div className="flex flex-row">
         <div className="flex-1">
           <Section
