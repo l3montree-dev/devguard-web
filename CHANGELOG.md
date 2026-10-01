@@ -4,6 +4,14 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.15.1] — 2026-10-01
+
+### Changed
+
+- **Next.js updated to 16.3.6** — bumped the `next` dependency and refreshed the accompanying patch-package patch to match
+
+---
+
 ## [v1.15.0] — 2026-09-30
 
 ### Added
