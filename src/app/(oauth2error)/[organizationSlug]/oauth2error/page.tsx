@@ -6,6 +6,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,6 +17,7 @@ export default function OAuth2ErrorPage({
 }: {
   params: Promise<{ organizationSlug: string }>;
 }) {
+  useDocumentTitle("Reauthorization required");
   const { organizationSlug } = use(params);
 
   const providerId = decodeURIComponent(organizationSlug).replace("@", "");

@@ -253,7 +253,11 @@ const OverviewPage = () => {
 
   if (releases?.data.length === 0) {
     return (
-      <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
+      <Page
+        title={project.name + " Group Overview"}
+        Menu={projectMenu}
+        Title={<ProjectTitle />}
+      >
         <EmptyParty
           title={"No data available for this group yet..."}
           Button={

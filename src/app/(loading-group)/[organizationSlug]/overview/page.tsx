@@ -64,7 +64,7 @@ const OrganizationOverview: FunctionComponent = () => {
   return (
     <Page
       Menu={orgMenu}
-      title="Overview"
+      title={activeOrg.name + " Overview"}
       description="Displays an overview about the stats of the org"
     >
       <div className="mb-6 flex flex-row items-center justify-between">

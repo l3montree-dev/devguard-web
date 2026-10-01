@@ -101,7 +101,7 @@ const OrgDependencySearch: FunctionComponent = () => {
   });
 
   return (
-    <Page Menu={menu} Title={null} title="">
+    <Page Menu={menu} title="Dependency Search">
       <Section
         primaryHeadline
         forceVertical
