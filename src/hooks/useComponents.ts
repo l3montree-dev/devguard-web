@@ -22,24 +22,6 @@ export const useComponentList = (
     { keepPreviousData: true },
   );
 
-export const useAffectedComponents = (scope: AssetVersionScope) =>
-  useApiQuery(
-    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/affected-components/",
-    { params: { path: scope } },
-  );
-
-// `all` is applied client side, so it deliberately stays out of the request.
-export const useDependencyGraphData = (
-  scope: AssetVersionScope,
-  artifactName?: string,
-  origin?: string,
-) =>
-  useApiQuery(
-    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-graph/",
-    { params: { path: scope, query: { artifactName, origin } } },
-    { revalidateOnFocus: false, revalidateIfStale: false },
-  );
-
 export const usePurlInspect = (purl: string | undefined) =>
   useApiQuery(
     purl ? "/vulndb/purl-inspect/{purl}" : null,
