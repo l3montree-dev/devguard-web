@@ -6,7 +6,6 @@ import type { FunctionComponent } from "react";
 import { UserRole } from "@/types/view/vuln";
 import type { UseFormReturn } from "react-hook-form";
 import Section from "../common/Section";
-import React from "react";
 import ConnectToRepoSection from "../ConnectToRepoSection";
 import { AssetFormRequirements } from "./asset-form/AssetFormRequirements";
 import { AssetFormGeneral } from "./asset-form/AssetFormGeneral";
