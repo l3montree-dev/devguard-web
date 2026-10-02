@@ -121,6 +121,42 @@ const getEcosystemContent = (key: string, url: string) => {
         </div>
       );
     }
+    case "composer": {
+      return (
+        <div>
+          <InputWithButton
+            label="Composer Repository URL"
+            message="Run this command in your project root to replace Packagist with the dependency proxy in your composer.json."
+            value={`composer config repo.packagist composer ${url}`}
+            nameKey="composer-proxy-url"
+            copyable
+          />
+          <p className="my-4 text-sm">
+            <span className="font-medium mb-1 block">composer.json</span>
+            <CopyCodeFragment
+              codeString={JSON.stringify(
+                {
+                  repositories: {
+                    packagist: { type: "composer", url },
+                  },
+                },
+                null,
+                2,
+              )}
+            />
+          </p>
+          <Callout intent="warning">
+            If your project already has a{" "}
+            <code className="font-mono text-sm">composer.lock</code>, it still
+            contains the original download URLs and{" "}
+            <code className="font-mono text-sm">composer install</code> will
+            bypass the proxy. Run{" "}
+            <code className="font-mono text-sm">composer update</code> once to
+            rewrite the lock file with the proxy URLs.
+          </Callout>
+        </div>
+      );
+    }
     case "oci": {
       return (
         <div>
