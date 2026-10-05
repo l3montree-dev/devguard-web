@@ -45,8 +45,8 @@ test.describe("DevGuard repo flows", () => {
       .isVisible();
   });
 
-  test("test dependency graph", async () => {
+  test("test dependency insights", async () => {
     await devguardPOM.setupSbomUpload();
-    await devguardPOM.repo().openDependencyGraph();
+    await devguardPOM.repo().openDependencyInsights();
   });
 });

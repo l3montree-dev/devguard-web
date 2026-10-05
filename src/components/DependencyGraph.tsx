@@ -1,14 +1,9 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { beautifyPurl, classNames } from "@/utils/common";
+import { classNames } from "@/utils/common";
 
-import {
-  MiniMap,
-  ReactFlow,
-  useEdgesState,
-  useNodesState,
-} from "@xyflow/react";
+import { ReactFlow, useEdgesState, useNodesState } from "@xyflow/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FunctionComponent } from "react";
 
@@ -16,105 +11,34 @@ import type { FunctionComponent } from "react";
 import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
-  InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import "@xyflow/react/dist/base.css";
-import { useTheme } from "next-themes";
 import {
   autoExpandToMinimum,
   getLayoutedElements,
   INITIAL_CHILDREN_TO_SHOW,
   MAX_CHILDREN_PER_PAGE,
   populateChildCounts,
-  propagateHighlighting,
-  traverseDownward,
-  traverseUpward,
 } from "../utils/dependencyGraphHelpers";
-import type {
-  ContextMenuState,
-  VexSelection,
-  ViewDependencyTreeNode,
-} from "../types/view/dependencyGraph";
+import type { ViewDependencyTreeNode } from "../types/view/dependencyGraph";
 import { DependencyGraphNode, LoadMoreNode } from "./DependencyGraphNode";
 import { Button } from "./ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Move } from "lucide-react";
-import type { VexRule } from "@/types/view/vexRules";
-import type { DependencyVuln } from "@/types/dto";
 
-// Returns the suffix of the path starting at nodeId going toward the leaf.
-// Uses highlightPath if the node appears in it; otherwise falls back to
-// traversing down via parentToChildEdges (first child at each step).
-function getPathSuffix(
-  nodeId: string,
-  highlightPath: string[] | undefined,
-  parentToChildEdges: Map<string, Array<{ edgeId: string; child: string }>>,
-): string[] {
-  if (highlightPath && highlightPath.length > 0) {
-    const idx = highlightPath.indexOf(nodeId);
-    if (idx !== -1) return highlightPath.slice(idx);
-  }
-  const path: string[] = [nodeId];
-  const visited = new Set<string>([nodeId]);
-  let current = nodeId;
-  while (true) {
-    const children = parentToChildEdges.get(current);
-    if (!children || children.length === 0) break;
-    const child = children[0].child;
-    if (visited.has(child)) break;
-    visited.add(child);
-    path.push(child);
-    current = child;
-  }
-  return path;
-}
-
-// Types for the context menu
 const nodeTypes = {
   customNode: DependencyGraphNode,
   loadMoreNode: LoadMoreNode,
 };
 
 const DependencyGraph: FunctionComponent<{
-  width: number;
   height: number;
-  enableContextMenu?: boolean;
-  variant?: "compact";
-  vulns: Array<DependencyVuln>;
   graph: ViewDependencyTreeNode;
-  // Handler for context-menu VEX actions. Can be async and should return `true` if it handled the action
-  // (for example by creating a false-positive rule). If it returns falsy / undefined, component will still close the menu.
-  onVexSelect?: (selection: VexSelection) => Promise<boolean> | void;
-  highlightPath?: string[];
-  vexRules?: VexRule[];
-  onReady?: () => void;
-}> = ({
-  graph,
-  width,
-  height,
-  vulns,
-  variant,
-  onVexSelect,
-  enableContextMenu,
-  highlightPath,
-  vexRules,
-  onReady,
-}) => {
+}> = ({ graph, height }) => {
   const isFirstRender = useRef(true);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const [viewPort, setViewPort] = useState({ x: 0, y: 0, zoom: 1 });
   const [isDependencyGraphFullscreen, setIsDependencyGraphFullscreen] =
     useState(false);
-
-  // Context menu state
-  const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
 
   // Pre-compute child counts for auto-expansion
   const childCountMap = useMemo(() => {
@@ -122,27 +46,6 @@ const DependencyGraph: FunctionComponent<{
     populateChildCounts(graph, counts);
     return counts;
   }, [graph]);
-
-  // Compute direct dependencies with available patches
-  const directDepsWithPatches = useMemo(() => {
-    const set = new Set<string>();
-    vulns.forEach((vuln) => {
-      if (
-        vuln.directDependencyFixedVersion &&
-        vuln.vulnerabilityPath &&
-        vuln.vulnerabilityPath.length > 0
-      ) {
-        // The direct dependency is the first element in the path
-        set.add(vuln.vulnerabilityPath[0]);
-      } else if (
-        vuln.componentFixedVersion &&
-        vuln.vulnerabilityPath.length === 1
-      ) {
-        set.add(vuln.vulnerabilityPath[0]);
-      }
-    });
-    return set;
-  }, [vulns]);
 
   // Auto-expand nodes until we have at least MIN_VISIBLE_NODES
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(() => {
@@ -181,7 +84,6 @@ const DependencyGraph: FunctionComponent<{
   const [initialNodes, initialEdges, rootNode] = useMemo(() => {
     const [nodes, edges] = getLayoutedElements(
       graph,
-      vulns,
       "LR",
       300,
       75,
@@ -189,171 +91,21 @@ const DependencyGraph: FunctionComponent<{
       childrenLimitMap,
       previousNodesRef.current,
       handleExpansionToggle,
-      enableContextMenu,
-      directDepsWithPatches,
     );
     previousNodesRef.current = nodes;
 
     // get the root node - we use it for the initial position of the viewport
     const rootNode = nodes.find((n) => n.id === graph.id);
     return [nodes, edges, rootNode];
-  }, [
-    graph,
-    vulns,
-    expandedNodes,
-    childrenLimitMap,
-    handleExpansionToggle,
-    enableContextMenu,
-    directDepsWithPatches,
-  ]);
+  }, [graph, expandedNodes, childrenLimitMap, handleExpansionToggle]);
   /* eslint-enable react-hooks/refs */
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Precompute edge lookup maps for O(1) access during hover
-  const edgeMaps = useMemo(() => {
-    const strokeMap = new Map<string, string>();
-    const strokeWidthMap = new Map<string, number>();
-    const highlightPathEdges = new Set<string>();
-    const falsePositiveEdges = new Set<string>();
-
-    // A node can have multiple parents in a DAG, so store all parent edges
-    const childToParentEdges = new Map<
-      string,
-      Array<{ edgeId: string; parent: string }>
-    >();
-    // Also store parent -> children edges for outgoing traversal
-    const parentToChildEdges = new Map<
-      string,
-      Array<{ edgeId: string; child: string }>
-    >();
-
-    // Build a set of VEX rule parent patterns for quick lookup
-    // pathPattern [parentName, "*"] -> mark all edges FROM parentName
-    // pathPattern [nodeName] -> mark all edges TO nodeName
-    const vexParentPatterns = new Set<string>();
-    const vexNodePatterns = new Set<string>();
-    if (vexRules) {
-      for (const rule of vexRules) {
-        if (!rule.pathPattern || rule.pathPattern.length === 0) continue;
-        if (rule.pathPattern.length >= 2 && rule.pathPattern[1] === "*") {
-          vexParentPatterns.add(rule.pathPattern[0]);
-        } else if (rule.pathPattern.length === 1) {
-          vexNodePatterns.add(rule.pathPattern[0]);
-        }
-      }
-    }
-
-    for (const edge of initialEdges) {
-      // Check if edge is in highlight path
-      let isHighlightEdge = false;
-      if (highlightPath && highlightPath.length > 0) {
-        const parentIndex = highlightPath.indexOf(edge.target);
-        const childIndex = highlightPath.indexOf(edge.source);
-        isHighlightEdge =
-          parentIndex !== -1 &&
-          childIndex !== -1 &&
-          parentIndex === childIndex - 1;
-        if (isHighlightEdge) {
-          highlightPathEdges.add(edge.id);
-        }
-      }
-
-      // Check if edge matches a VEX rule (false positive)
-      // edge.target = parent node, edge.source = child node
-      if (
-        vexParentPatterns.has(edge.target) ||
-        vexNodePatterns.has(edge.source)
-      ) {
-        falsePositiveEdges.add(edge.id);
-      }
-
-      // Determine base stroke based on FP/highlight status
-      const isFp = falsePositiveEdges.has(edge.id);
-
-      // Store original or highlighted stroke
-      strokeMap.set(
-        edge.id,
-        isFp
-          ? "#a1a1aa"
-          : isHighlightEdge
-            ? "#3b82f6"
-            : edge.style?.stroke || "#a1a1aa",
-      );
-      strokeWidthMap.set(
-        edge.id,
-        isHighlightEdge ? 3 : edge.style?.strokeWidth || 1,
-      );
-
-      // child -> parent (for upward traversal)
-      const existingParents = childToParentEdges.get(edge.source) || [];
-      existingParents.push({ edgeId: edge.id, parent: edge.target });
-      childToParentEdges.set(edge.source, existingParents);
-
-      // parent -> child (for downward traversal)
-      const existingChildren = parentToChildEdges.get(edge.target) || [];
-      existingChildren.push({ edgeId: edge.id, child: edge.source });
-      parentToChildEdges.set(edge.target, existingChildren);
-    }
-
-    return {
-      strokeMap,
-      strokeWidthMap,
-      childToParentEdges,
-      parentToChildEdges,
-      highlightPathEdges,
-      falsePositiveEdges,
-    };
-  }, [initialEdges, highlightPath, vexRules]);
-
   useEffect(() => {
     setNodes(initialNodes);
-    // Apply highlighting and FP styling to edges
-    const styledEdges = initialEdges.map((edge) => {
-      const isFp = edgeMaps.falsePositiveEdges.has(edge.id);
-
-      // Check if this edge is part of the vulnerability path
-      let isInPath = false;
-      if (highlightPath && highlightPath.length > 0) {
-        const parentIndex = highlightPath.indexOf(edge.target);
-        const childIndex = highlightPath.indexOf(edge.source);
-        isInPath =
-          parentIndex !== -1 &&
-          childIndex !== -1 &&
-          parentIndex === childIndex - 1;
-      }
-
-      if (isFp) {
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: "#a1a1aa",
-            strokeWidth: 2,
-            strokeDasharray: "6 4",
-            opacity: 0.7,
-          },
-          zIndex: isInPath ? 999 : 0,
-        };
-      }
-
-      if (isInPath) {
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: "#3b82f6", // blue-500
-            strokeWidth: 3,
-          },
-          zIndex: 999,
-        };
-      }
-
-      return edge;
-    });
-
-    setEdges(styledEdges);
+    setEdges(initialEdges);
 
     if (isFirstRender.current && rootNode) {
       isFirstRender.current = false;
@@ -363,87 +115,9 @@ const DependencyGraph: FunctionComponent<{
         zoom: 1,
       });
     }
-  }, [
-    initialNodes,
-    initialEdges,
-    setNodes,
-    setEdges,
-    rootNode,
-    height,
-    width,
-    highlightPath,
-    edgeMaps.falsePositiveEdges,
-  ]);
+  }, [initialNodes, initialEdges, setNodes, setEdges, rootNode, height]);
 
-  const { theme } = useTheme();
-
-  // Helper function to apply hover highlighting to edges
-  const applyHoverHighlight = useCallback(
-    (pathEdgeIds: Set<string>) => {
-      setEdges((currentEdges) =>
-        currentEdges.map((e) => {
-          const isOnPath = pathEdgeIds.has(e.id);
-          const isHighlightPath = edgeMaps.highlightPathEdges.has(e.id);
-          const isFp = edgeMaps.falsePositiveEdges.has(e.id);
-          const originalStroke = edgeMaps.strokeMap.get(e.id) || "#a1a1aa";
-          const originalStrokeWidth = edgeMaps.strokeWidthMap.get(e.id) || 1;
-
-          if (isOnPath) {
-            return {
-              ...e,
-              style: {
-                ...e.style,
-                // Use purple for highlighted path on hover, yellow for normal hover
-                stroke: isHighlightPath ? "#a855f7" : "#F8BD25",
-                strokeWidth: originalStrokeWidth + 2,
-                strokeDasharray: isFp ? "6 4" : undefined,
-                opacity: isFp ? 0.7 : undefined,
-              },
-              zIndex: 1000,
-            };
-          }
-
-          return {
-            ...e,
-            style: {
-              ...e.style,
-              stroke: originalStroke,
-              strokeWidth: edgeMaps.strokeWidthMap.get(e.id) || 1,
-              strokeDasharray: isFp ? "6 4" : undefined,
-              opacity: isFp ? 0.7 : undefined,
-            },
-            zIndex: isHighlightPath ? 999 : 0,
-          };
-        }),
-      );
-    },
-    [edgeMaps, setEdges],
-  );
-
-  // Helper function to reset edges to original styles
-  const resetEdgesToOriginal = useCallback(() => {
-    setEdges((currentEdges) =>
-      currentEdges.map((edge) => {
-        const isHighlightPath = edgeMaps.highlightPathEdges.has(edge.id);
-        const isFp = edgeMaps.falsePositiveEdges.has(edge.id);
-        const originalStroke = edgeMaps.strokeMap.get(edge.id) || "#a1a1aa";
-        const originalStrokeWidth = edgeMaps.strokeWidthMap.get(edge.id) || 1;
-        return {
-          ...edge,
-          style: {
-            ...edge.style,
-            stroke: originalStroke,
-            strokeWidth: originalStrokeWidth,
-            strokeDasharray: isFp ? "6 4" : undefined,
-            opacity: isFp ? 0.7 : undefined,
-          },
-          zIndex: isHighlightPath ? 999 : 0,
-        };
-      }),
-    );
-  }, [edgeMaps, setEdges]);
-
-  const handleNodeClick = (event: React.MouseEvent, node: any) => {
+  const handleNodeClick = (_event: React.MouseEvent, node: any) => {
     const nodeData = node.data;
 
     // Handle load more node clicks
@@ -459,242 +133,11 @@ const DependencyGraph: FunctionComponent<{
         );
         return next;
       });
-      return;
     }
-    if (!enableContextMenu) return;
-
-    const path = getPathSuffix(
-      node.id,
-      highlightPath,
-      edgeMaps.parentToChildEdges,
-    );
-    setContextMenu({
-      type: "node",
-      x: event.clientX,
-      y: event.clientY,
-      path,
-    });
-  };
-
-  const handleNodeMouseEnter = useCallback(
-    (_event: React.MouseEvent, node: any) => {
-      if (!enableContextMenu) return;
-
-      const pathEdgeIds = new Set<string>();
-
-      // Don't highlight for load more nodes
-      if (node.data.isLoadMoreNode) return;
-
-      const currentNode = node.id;
-
-      // Get all incoming edges to the hovered node
-      const incomingEdges = edgeMaps.childToParentEdges.get(currentNode);
-      if (incomingEdges) {
-        for (const { edgeId } of incomingEdges) {
-          pathEdgeIds.add(edgeId);
-        }
-      }
-
-      // Get all outgoing edges from the hovered node
-      const outgoingEdges = edgeMaps.parentToChildEdges.get(currentNode);
-      if (outgoingEdges) {
-        for (const { edgeId } of outgoingEdges) {
-          pathEdgeIds.add(edgeId);
-        }
-      }
-
-      // Collect nodes for upward traversal (parents with single outgoing edge)
-      const upwardStartNodes: string[] = [];
-      if (incomingEdges) {
-        for (const { parent } of incomingEdges) {
-          const parentOutgoing = edgeMaps.parentToChildEdges.get(parent);
-          if (parentOutgoing && parentOutgoing.length === 1) {
-            upwardStartNodes.push(parent);
-          }
-        }
-      }
-      traverseUpward(upwardStartNodes, pathEdgeIds, edgeMaps);
-
-      // Collect nodes for downward traversal (children with single incoming edge)
-      const downwardStartNodes: string[] = [];
-      if (outgoingEdges) {
-        for (const { child } of outgoingEdges) {
-          const childIncoming = edgeMaps.childToParentEdges.get(child);
-          if (childIncoming && childIncoming.length === 1) {
-            downwardStartNodes.push(child);
-          }
-        }
-      }
-      traverseDownward(downwardStartNodes, pathEdgeIds, edgeMaps);
-
-      // Propagate highlighting
-      propagateHighlighting(pathEdgeIds, edgeMaps);
-
-      applyHoverHighlight(pathEdgeIds);
-    },
-    [edgeMaps, applyHoverHighlight, enableContextMenu],
-  );
-
-  const handleNodeMouseLeave = useCallback(() => {
-    if (!enableContextMenu) return;
-    resetEdgesToOriginal();
-  }, [resetEdgesToOriginal, enableContextMenu]);
-
-  // Edge hover handler - highlight incoming edges recursively
-  // Always highlight all incoming edges to the parent of the hovered edge
-  // Then recursively continue for grandparents only if they have one outgoing edge
-  const handleEdgeMouseEnter = useCallback(
-    (_event: React.MouseEvent, edge: any) => {
-      if (!enableContextMenu) return;
-
-      const pathEdgeIds = new Set<string>();
-
-      // When a highlight path is active, only highlight the single hovered edge (and only if it's blue)
-      if (highlightPath && highlightPath.length > 0) {
-        if (!edgeMaps.highlightPathEdges.has(edge.id)) return;
-        pathEdgeIds.add(edge.id);
-        applyHoverHighlight(pathEdgeIds);
-        return;
-      }
-
-      // No highlight path: use full traversal behavior
-      pathEdgeIds.add(edge.id);
-
-      const parentNode = edge.target;
-      const childNode = edge.source;
-
-      const parentOutgoing = edgeMaps.parentToChildEdges.get(parentNode);
-      const isOnlyChild =
-        !parentOutgoing ||
-        (parentOutgoing.length === 1 && parentOutgoing[0].child === childNode);
-
-      if (isOnlyChild) {
-        traverseUpward([parentNode], pathEdgeIds, edgeMaps);
-      }
-
-      const childIncoming = edgeMaps.childToParentEdges.get(childNode);
-      const isOnlyParent =
-        !childIncoming ||
-        (childIncoming.length === 1 && childIncoming[0].parent === parentNode);
-
-      if (isOnlyParent) {
-        traverseDownward([childNode], pathEdgeIds, edgeMaps);
-      }
-
-      propagateHighlighting(pathEdgeIds, edgeMaps);
-
-      applyHoverHighlight(pathEdgeIds);
-    },
-    [edgeMaps, applyHoverHighlight, highlightPath, enableContextMenu],
-  );
-
-  const handleEdgeMouseLeave = useCallback(() => {
-    if (!enableContextMenu) return;
-    resetEdgesToOriginal();
-  }, [resetEdgesToOriginal, enableContextMenu]);
-
-  // Edge click handler - show context menu
-  const handleEdgeClick = useCallback(
-    (event: React.MouseEvent, edge: any) => {
-      if (!enableContextMenu) return;
-      event.stopPropagation();
-      const parentName = edge.target;
-      const childName = edge.source;
-
-      const path = getPathSuffix(
-        parentName,
-        highlightPath,
-        edgeMaps.parentToChildEdges,
-      );
-      setContextMenu({
-        type: "edge",
-        x: event.clientX,
-        y: event.clientY,
-        childIndex: path.indexOf(childName),
-        path,
-      });
-    },
-    [enableContextMenu, edgeMaps, highlightPath],
-  );
-
-  // Node context menu click handler
-  const handleNodeContextClick = useCallback(
-    (event: React.MouseEvent, node: any) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      // Don't show menu for load more nodes
-      if (node.data.isLoadMoreNode || !enableContextMenu) return;
-
-      const path = getPathSuffix(
-        node.id,
-        highlightPath,
-        edgeMaps.parentToChildEdges,
-      );
-      setContextMenu({
-        type: "node",
-        x: event.clientX,
-        y: event.clientY,
-        path,
-      });
-    },
-    [enableContextMenu, edgeMaps, highlightPath],
-  );
-
-  // Close context menu
-  const closeContextMenu = useCallback(() => {
-    setContextMenu(null);
-  }, []);
-
-  // Handle VEX selection from context menu
-  const handleVexOptionClick = useCallback(
-    async (justification: string) => {
-      if (!contextMenu) return;
-
-      if (!onVexSelect) {
-        closeContextMenu();
-        return;
-      }
-
-      const path = contextMenu.path ?? [];
-      const selection: VexSelection =
-        contextMenu.type === "edge"
-          ? {
-              type: "edge",
-              justification,
-              path,
-              childIndex: path.length - 1,
-            }
-          : {
-              type: "node",
-              justification,
-              path,
-            };
-
-      try {
-        const res = await onVexSelect(selection);
-        if (res === true) {
-          closeContextMenu();
-          return;
-        }
-      } catch (err) {
-        // swallow error and continue to close menu
-      }
-
-      // Ensure menu is closed in all cases
-      closeContextMenu();
-    },
-    [contextMenu, onVexSelect, closeContextMenu],
-  );
-
-  // Helper to beautify node names for display
-  const getDisplayName = (name: string) => {
-    return beautifyPurl(name);
   };
 
   return (
     <div
-      ref={containerRef}
       className={
         isDependencyGraphFullscreen
           ? "fixed bg-background left-0 top-0 z-50 h-screen w-screen"
@@ -707,72 +150,6 @@ const DependencyGraph: FunctionComponent<{
           isDependencyGraphFullscreen ? "right-8 top-4" : "right-2 top-2",
         )}
       >
-        <Popover>
-          <PopoverTrigger asChild className="bg-background">
-            <Button variant={"outline"} size={"icon"}>
-              <InformationCircleIcon className="h-5 w-5" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto max-w-2xl" align="end">
-            <div className="text-xs">
-              <div className="font-semibold mb-3">Legend</div>
-              <div className="gap-6 flex flex-row">
-                {/* Node Types */}
-                <div className="space-y-2">
-                  <div className="font-medium text-muted-foreground">Nodes</div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-red-500 rounded bg-card flex-shrink-0"></div>
-                    <span>Vulnerable - Contains known vulnerability</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-border rounded bg-card flex-shrink-0"></div>
-                    <span>Normal - Standard dependency</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 border-2 border-border rounded bg-card flex-shrink-0"></div>
-                    <span>False positive - Marked as not exploitable</span>
-                  </div>
-                </div>
-
-                {/* Edge Colors */}
-                <div className="space-y-2">
-                  <div className="font-medium text-muted-foreground">Edges</div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-info flex-shrink-0"></div>
-                    <span>Vulnerability path</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-accent flex-shrink-0"></div>
-                    <span>Vulnerability path (hover)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-8 h-0.5 flex-shrink-0"
-                      style={{ backgroundColor: "#F8BD25" }}
-                    ></div>
-                    <span>Dependency path (hover)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-0.5 bg-muted-foreground flex-shrink-0"></div>
-                    <span>Normal edge</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-8 flex-shrink-0"
-                      style={{
-                        height: 2,
-                        backgroundImage:
-                          "repeating-linear-gradient(to right, #6b7280 0, #6b7280 6px, transparent 6px, transparent 10px)",
-                        opacity: 0.7,
-                      }}
-                    ></div>
-                    <span>False positive (VEX rule applied)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
         <Button
           onClick={() => setIsDependencyGraphFullscreen((prev) => !prev)}
           variant={"outline"}
@@ -792,11 +169,9 @@ const DependencyGraph: FunctionComponent<{
           You can interact with this graph
         </span>
       </div>
-      {/* Todo: Find a better way to disable edge cursor pointer when context menu
-      is disabled. This is a bit hacky but works for now. Issue 1708 */}
-      {!enableContextMenu && (
-        <style>{`.react-flow__edge.selectable { cursor: grab !important; }`}</style>
-      )}
+      {/* Todo: Find a better way to disable edge cursor pointer. This is a bit
+      hacky but works for now. Issue 1708 */}
+      <style>{`.react-flow__edge.selectable { cursor: grab !important; }`}</style>
       <ReactFlow
         nodes={nodes}
         nodeTypes={nodeTypes}
@@ -812,145 +187,7 @@ const DependencyGraph: FunctionComponent<{
         viewport={viewPort}
         onViewportChange={setViewPort}
         onNodeClick={handleNodeClick}
-        onNodeMouseEnter={handleNodeMouseEnter}
-        onNodeMouseLeave={handleNodeMouseLeave}
-        onNodeContextMenu={handleNodeContextClick}
-        onEdgeMouseEnter={handleEdgeMouseEnter}
-        onEdgeMouseLeave={handleEdgeMouseLeave}
-        onEdgeClick={handleEdgeClick}
-        onInit={
-          onReady
-            ? () => requestAnimationFrame(() => requestAnimationFrame(onReady))
-            : undefined
-        }
-      >
-        {variant !== "compact" && (
-          <MiniMap
-            maskColor="rgba(0, 0, 0, 0.3)"
-            zoomable
-            style={{
-              backgroundColor:
-                theme === "dark"
-                  ? "rgba(255, 255, 255, 0.5)"
-                  : "rgba(255, 255, 255, 0.5)",
-            }}
-          />
-        )}
-      </ReactFlow>
-      {/* Context Menu with DropdownMenu */}
-      <DropdownMenu
-        open={!!contextMenu}
-        onOpenChange={(open) => !open && closeContextMenu()}
-      >
-        {contextMenu && (
-          <>
-            {/* Invisible trigger positioned at click location */}
-            <DropdownMenuTrigger asChild>
-              <div
-                style={{
-                  position: "fixed",
-                  left: contextMenu.x,
-                  top: contextMenu.y,
-                  width: 0,
-                  height: 0,
-                  pointerEvents: "none",
-                }}
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              className="w-80"
-              align="start"
-              side="bottom"
-              sideOffset={5}
-            >
-              {contextMenu.type === "edge" && contextMenu.path.length >= 2 && (
-                <>
-                  <DropdownMenuItem
-                    data-testid="vex-does-not-call-vulnerable-function"
-                    className="flex-col items-start gap-1 py-3"
-                    onClick={() =>
-                      handleVexOptionClick("does_not_call_vulnerable_function")
-                    }
-                  >
-                    <span className="font-medium leading-none">
-                      Does Not Call Vulnerable Function
-                    </span>
-                    <span className="text-xs text-muted-foreground leading-snug">
-                      {getDisplayName(contextMenu.path[0])} does not call
-                      vulnerable code in{" "}
-                      {getDisplayName(
-                        contextMenu.path[
-                          contextMenu.childIndex ?? contextMenu.path.length - 1
-                        ],
-                      )}
-                    </span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex-col items-start gap-1 py-3"
-                    onClick={() => handleVexOptionClick("inline_mitigations")}
-                  >
-                    <span className="font-medium leading-none">
-                      Inline Mitigations
-                    </span>
-                    <span className="text-xs text-muted-foreground leading-snug">
-                      {getDisplayName(contextMenu.path[0])} implements
-                      safeguards against vulnerable code
-                    </span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex-col items-start gap-1 py-3"
-                    onClick={() =>
-                      handleVexOptionClick("uncontrollable_by_attacker")
-                    }
-                  >
-                    <span className="font-medium leading-none">
-                      Uncontrollable by Attacker
-                    </span>
-                    <span className="text-xs text-muted-foreground leading-snug">
-                      {getDisplayName(contextMenu.path[0])} makes sure, that
-                      vulnerable code cannot be exploited in this context
-                    </span>
-                  </DropdownMenuItem>
-                </>
-              )}
-
-              {contextMenu.type === "node" && contextMenu.path.length > 0 && (
-                <>
-                  <DropdownMenuItem
-                    className="flex-col items-start gap-1 py-3"
-                    onClick={() => handleVexOptionClick("not_present")}
-                  >
-                    <span className="font-medium leading-none">
-                      Not Present
-                    </span>
-                    <span className="text-xs text-muted-foreground leading-snug">
-                      Wrong version matching - dependency not present
-                    </span>
-                  </DropdownMenuItem>
-
-                  {highlightPath &&
-                    contextMenu.path[0] ===
-                      highlightPath[highlightPath.length - 1] && (
-                      <DropdownMenuItem
-                        className="flex-col items-start gap-1 py-3"
-                        onClick={() =>
-                          handleVexOptionClick("no_vulnerable_code")
-                        }
-                      >
-                        <span className="font-medium leading-none">
-                          No Vulnerable Code
-                        </span>
-                        <span className="text-xs text-muted-foreground leading-snug">
-                          This version does not include vulnerable code
-                        </span>
-                      </DropdownMenuItem>
-                    )}
-                </>
-              )}
-            </DropdownMenuContent>
-          </>
-        )}
-      </DropdownMenu>
+      />
     </div>
   );
 };

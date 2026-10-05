@@ -1,16 +1,9 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-/* eslint-disable local/no-shadow-class -- nodes and their badges are dragged over a React Flow canvas */
-
-import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
+import { beautifyPurl, extractVersion } from "@/utils/common";
 import { Handle, Position } from "@xyflow/react";
 import type { FunctionComponent } from "react";
-import {
-  getSeverityBorderClassName,
-  getSeverityClassNames,
-  riskToSeverity,
-} from "./common/Severity";
 
 export const LoadMoreNode: FunctionComponent<{
   data: {
@@ -48,29 +41,19 @@ export const LoadMoreNode: FunctionComponent<{
 };
 
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { ArrowLeft, ArrowRight, ArrowUp } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import EcosystemImage from "./common/EcosystemImage";
 import { Badge } from "./ui/badge";
-import type { DependencyVuln } from "@/types/dto";
 
 export interface DependencyGraphNodeProps {
   data: {
     label: string;
-    vuln: DependencyVuln[];
-    risk: number;
     nodeWidth: number;
     nodeHeight: number;
     childCount?: number;
     isExpanded?: boolean;
-    shownCount?: number;
-    hasMore?: boolean;
-    propagationCount?: number;
-    propagationRatio?: number;
-    flow?: number;
-    enableContextMenu?: boolean;
     onExpansionToggle?: (nodeId: string) => void;
-    hasPatch?: boolean;
   };
   id: string;
 }
@@ -81,7 +64,6 @@ export const DependencyGraphNode: FunctionComponent<
   const hasChildren = (props.data.childCount ?? 0) > 0;
   const isExpanded = props.data.isExpanded ?? false;
   const version = extractVersion(props.data.label);
-  const propagationRatio = props.data.propagationRatio || 0;
 
   const handleArrowClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -90,32 +72,12 @@ export const DependencyGraphNode: FunctionComponent<
     }
   };
 
-  const vulns = props.data.vuln ?? [];
-  const openVulns = vulns.filter(
-    (v) => v.state !== "falsePositive" && v.state !== "accepted",
-  );
-  const maxCvss = Math.max(0, ...openVulns.map((v) => v.cve?.cvss ?? 0));
-  const severity = riskToSeverity(maxCvss);
-  const badgeClasses = getSeverityClassNames(severity, false);
-
   return (
     <div
       style={{
         width: props.data.nodeWidth,
       }}
-      className={classNames(
-        "relative border-2 rounded-lg p-3 text-xs text-card-foreground bg-card transition-all",
-        props.data.enableContextMenu
-          ? "cursor-pointer active:cursor-grabbing"
-          : "cursor-grab active:cursor-grabbing",
-        props.data.hasPatch
-          ? "border-success"
-          : props.data.vuln
-            ? openVulns.length === 0
-              ? "border-border shadow-md"
-              : classNames(getSeverityBorderClassName(severity), "shadow-lg")
-            : "border-border",
-      )}
+      className="relative border-2 border-border rounded-lg p-3 text-xs text-card-foreground bg-card transition-all cursor-grab active:cursor-grabbing"
     >
       <Handle
         className="rounded-full !bg-border !border-2 !border-background !w-3 !h-3"
@@ -123,38 +85,6 @@ export const DependencyGraphNode: FunctionComponent<
         position={Position.Right}
       />
       <div className="flex flex-col gap-2">
-        {(props.data.vuln || props.data.hasPatch) && (
-          <div className="absolute -top-2 -right-2 z-10">
-            {props.data.hasPatch ? (
-              <Badge
-                variant="outline"
-                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-success text-white border-success flex items-center gap-1"
-              >
-                <ArrowUp className="h-3 w-3" />
-                Upgradeable
-              </Badge>
-            ) : props.data.vuln.every((v) => v.state === "falsePositive") ? (
-              <Badge
-                variant="outline"
-                className="text-[10px] px-1.5 py-0 font-semibold shadow-md bg-muted text-muted-foreground border-border"
-              >
-                False Positive
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className={classNames(
-                  "text-[10px] px-1.5 py-0 font-semibold shadow-md border-transparent",
-                  badgeClasses,
-                )}
-                title={`Marking this node's dependencies as false positive would affect ${Math.round(propagationRatio * 100)}% of the graph`}
-              >
-                Vulnerable ({maxCvss})
-                {openVulns.length > 1 && ` | ${openVulns.length} CVEs`}
-              </Badge>
-            )}
-          </div>
-        )}
         <div className="flex items-center justify-between flex-row gap-2">
           <div className="flex gap-2 flex-row items-start">
             {props.data.label.startsWith("pkg:") && (

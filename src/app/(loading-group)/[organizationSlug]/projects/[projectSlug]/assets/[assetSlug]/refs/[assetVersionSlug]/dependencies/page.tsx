@@ -63,14 +63,7 @@ import {
 import { flexRender } from "@tanstack/react-table";
 
 import "@xyflow/react/dist/style.css";
-import {
-  ChevronDownIcon,
-  GitBranch,
-  GitBranchIcon,
-  Loader2,
-  Loader2Icon,
-} from "lucide-react";
-import Link from "next/link";
+import { ChevronDownIcon, GitBranch, Loader2, Loader2Icon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
@@ -85,7 +78,6 @@ import { Badge } from "../../../../../../../../../../components/ui/badge";
 import {
   AsyncButton,
   Button,
-  buttonVariants,
 } from "../../../../../../../../../../components/ui/button";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import {
@@ -509,39 +501,6 @@ const Index: FunctionComponent = () => {
           <Button variant={"secondary"} onClick={() => setShowVexModal(true)}>
             Share your VEX
           </Button>
-
-          <Link
-            data-testid="open-dependency-graph"
-            className={classNames(
-              buttonVariants({ variant: "default" }),
-              "!text-primary-foreground",
-            )}
-            href={
-              `/${activeOrg?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/dependencies/graph?` +
-              new URLSearchParams(
-                (() => {
-                  if (searchParams?.has("artifact")) {
-                    const params: Record<string, string> = {
-                      artifact: searchParams.get("artifact") as string,
-                    };
-                    if (searchParams?.has("origin")) {
-                      params.origin = searchParams.get("origin") as string;
-                    }
-                    return params;
-                  } else if (artifacts && artifacts.length > 0) {
-                    return {
-                      artifact: artifacts[0].artifactName,
-                    };
-                  } else {
-                    return {};
-                  }
-                })(),
-              ).toString()
-            }
-          >
-            <GitBranchIcon className="mr-2 h-4 w-4" />
-            Open Dependency Graph
-          </Link>
         </div>
       </div>
 

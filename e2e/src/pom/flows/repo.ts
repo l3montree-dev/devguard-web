@@ -80,12 +80,10 @@ export class RepoFlow {
       .click();
   }
 
-  async openDependencyGraph() {
+  async openDependencyInsights() {
     await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
     await this.page.getByTestId("nav-asset-dependency-insights").click();
     await docShot(this.page, test.info(), "dependency-insights-overview");
-    await this.page.getByTestId("open-dependency-graph").click();
-    await docShot(this.page, test.info(), "dependency-insights-graph");
   }
 
   async openDependencyRiskTable() {
