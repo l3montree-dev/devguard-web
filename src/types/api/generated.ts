@@ -1089,6 +1089,84 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/dependency-proxy/composer/{path}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Proxy Composer repository request */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description dependency proxy secret */
+          secret: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/dependency-proxy/deb/{path}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Proxy Debian repository request */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description dependency proxy secret */
+          secret: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/dependency-proxy/go": {
     parameters: {
       query?: never;
@@ -1524,6 +1602,84 @@ export interface paths {
           };
           content: {
             "application/json": string;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/dependency-proxy/{secret}/composer/{path}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Proxy Composer repository request */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description dependency proxy secret */
+          secret: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/dependency-proxy/{secret}/deb/{path}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Proxy Debian repository request */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description dependency proxy secret */
+          secret: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
           };
         };
       };
@@ -17517,6 +17673,8 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
@@ -17527,10 +17685,14 @@ export interface components {
       | 1000
       | 1000000
       | 1000000000
+      | 60000000000
+      | 3600000000000
       | 1
       | 1000
       | 1000000
-      | 1000000000;
+      | 1000000000
+      | 60000000000
+      | 3600000000000;
     "transformer.MinimalTree": {
       dependencies: {
         [key: string]: string[];
