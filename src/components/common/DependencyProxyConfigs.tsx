@@ -14,7 +14,7 @@ import { toast } from "@/lib/toast";
 import { InputWithButton } from "../ui/input-with-button";
 import type { Diagnostic } from "@codemirror/lint";
 import Section from "./Section";
-import { CopyCodeFragment } from "./CopyCode";
+import CopyCode, { CopyCodeFragment } from "./CopyCode";
 import Callout from "./Callout";
 import { DocDrawer } from "./DocDrawer";
 
@@ -133,7 +133,8 @@ const getEcosystemContent = (key: string, url: string) => {
           />
           <p className="my-4 text-sm">
             <span className="font-medium mb-1 block">settings.xml</span>
-            <CopyCodeFragment
+            <CopyCode
+              language="xml"
               codeString={`<settings>
   <mirrors>
     <mirror>

@@ -9,9 +9,9 @@ import { toast } from "@/lib/toast";
 import { Copy } from "lucide-react";
 const Highlighter = dynamic(() => import("./Highlighter"), { ssr: false });
 
-export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
-  codeString,
-}) => {
+export const CopyCodeFragment: FunctionComponent<{
+  codeString: string;
+}> = ({ codeString }) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(codeString);
     toast("Copied to clipboard", {
@@ -37,7 +37,8 @@ export const CopyCodeFragment: FunctionComponent<{ codeString: string }> = ({
 
 interface Props {
   codeString: string;
-  language?: "yaml" | "shell" | "rego";
+  language?:
+    "yaml" | "shell" | "rego" | "xml" | "json" | "typescript" | "javascript";
   startingLineNumber?: number;
   highlightRegexPattern?: RegExp;
 }
