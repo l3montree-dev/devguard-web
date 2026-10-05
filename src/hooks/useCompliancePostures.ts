@@ -33,35 +33,3 @@ export const useCompliancePostures = (
 
   return { postures, stats };
 };
-
-export const useOrgPolicies = (organization: string) =>
-  useApiQuery("/organizations/{organization}/policies", {
-    params: { path: { organization } },
-  });
-
-export const useAssetVersionCompliance = (scope: {
-  organization: string;
-  projectSlug: string;
-  assetSlug: string;
-  assetVersionSlug: string;
-}) =>
-  useApiQuery(
-    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance",
-    { params: { path: scope } },
-  );
-
-export const usePolicyEvaluation = (
-  scope: {
-    organization: string;
-    projectSlug: string;
-    assetSlug: string;
-    assetVersionSlug: string;
-  },
-  policy: string | undefined,
-) =>
-  useApiQuery(
-    policy
-      ? "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance/{policy}"
-      : null,
-    { params: { path: { ...scope, policy: policy ?? "" } } },
-  );
