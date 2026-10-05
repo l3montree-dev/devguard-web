@@ -7,6 +7,7 @@ import CodeEditor from "@/components/common/CodeEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ProxyScope } from "@/hooks/useDependencyProxy";
 import { useDependencyProxy } from "@/hooks/useDependencyProxy";
@@ -84,33 +85,80 @@ const defaultConfig: DependencyProxyConfig = {
   minReleaseAge: 60,
 };
 
+const ecosystemIcons: Record<string, string> = {
+  npm: "/logos/npm-svgrepo-com.svg",
+  go: "/logos/golang-svgrepo-com.svg",
+  pypi: "/logos/pypi-svgrepo-com.svg",
+  maven: "/logos/maven-svgrepo-com.svg",
+  composer: "/logos/composer-svgrepo-com.svg",
+  oci: "/assets/oci-icon-pantone.svg",
+  debian: "/logos/deb-svgrepo-com.svg",
+};
+
 const getEcosystemContent = (key: string, url: string) => {
   switch (key) {
     case "npm":
       return (
-        <InputWithButton
-          label="npm Registry URL"
-          message="Create a .npmrc file in your project root with this content to enable proxying for npm packages."
-          value={`registry=${url}`}
-          nameKey="npm-proxy-url"
-          copyable
-        />
+        <div>
+          <InputWithButton
+            label="npm Registry URL"
+            message="Create a .npmrc file in your project root with this content to enable proxying for npm packages."
+            value={`registry=${url}`}
+            nameKey="npm-proxy-url"
+            copyable
+          />
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">
+              Alternatively, set it via the CLI
+            </span>
+            <CopyCodeFragment codeString={`npm config set registry ${url}`} />
+          </div>
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">
+              .yarnrc.yml (Yarn Berry)
+            </span>
+            <CopyCode
+              language="yaml"
+              codeString={`npmRegistryServer: "${url}"`}
+            />
+          </div>
+          <Callout intent="warning">
+            If your project already has a{" "}
+            <code className="font-mono text-sm">package-lock.json</code>, it may
+            still contain the original download URLs. Delete the lock file and
+            run <code className="font-mono text-sm">npm install</code> once to
+            rewrite it with the proxy URLs.
+          </Callout>
+        </div>
       );
 
     case "go":
       return (
-        <InputWithButton
-          label="Go Module Proxy"
-          message="Set this environment variable or add it to your shell profile (.bashrc, .zshrc) to route Go module downloads through the dependency proxy."
-          value={`export GOPROXY="${url}"`}
-          nameKey="go-proxy-url"
-          copyable
-        />
+        <div>
+          <InputWithButton
+            label="Go Module Proxy"
+            message="Set this environment variable or add it to your shell profile (.bashrc, .zshrc) to route Go module downloads through the dependency proxy."
+            value={`export GOPROXY="${url}"`}
+            nameKey="go-proxy-url"
+            copyable
+          />
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">
+              Alternatively, persist it in the Go environment
+            </span>
+            <CopyCodeFragment codeString={`go env -w GOPROXY=${url}`} />
+          </div>
+          <Callout intent="warning">
+            Do not append <code className="font-mono text-sm">,direct</code> to
+            the value. Falling back to direct downloads would bypass the proxy
+            for blocked modules.
+          </Callout>
+        </div>
       );
 
     case "pypi": {
       return (
-        <div className="flex flex-col">
+        <div>
           <InputWithButton
             label="Index URL"
             message="Set as index-url in pip.conf under [global], or export as PIP_INDEX_URL."
@@ -118,6 +166,28 @@ const getEcosystemContent = (key: string, url: string) => {
             nameKey="pypi-index-url"
             copyable
           />
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">pip.conf</span>
+            <CopyCode
+              language="shell"
+              codeString={`[global]
+index-url = ${url}`}
+            />
+          </div>
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">uv (pyproject.toml)</span>
+            <CopyCode
+              language="shell"
+              codeString={`[[tool.uv.index]]
+url = "${url}"
+default = true`}
+            />
+          </div>
+          <Callout intent="warning">
+            Do not configure{" "}
+            <code className="font-mono text-sm">extra-index-url</code> with the
+            public PyPI. Packages resolved from it bypass the proxy.
+          </Callout>
         </div>
       );
     }
@@ -382,7 +452,16 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
               <TabsList>
                 {proxyUrls &&
                   Object.keys(proxyUrls).map((key) => (
-                    <TabsTrigger key={key} value={key}>
+                    <TabsTrigger className="capitalize" key={key} value={key}>
+                      {ecosystemIcons[key] && (
+                        <Image
+                          src={ecosystemIcons[key]}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className="mr-1 inline-block h-4 w-4"
+                        />
+                      )}
                       {key}
                     </TabsTrigger>
                   ))}
