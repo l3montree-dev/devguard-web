@@ -50,6 +50,7 @@ import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import { defaultScanner } from "../../../../../../../../../../utils/view";
 import Filter from "@/components/Filter";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const columnHelper = createAppColumnHelper<FirstPartyVuln>();
 
@@ -291,6 +292,7 @@ const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const config = useConfig();
   const latestScannerImage = useScannerImage();
+  const asset = useActiveAsset();
 
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -310,7 +312,11 @@ const Index: FunctionComponent = () => {
   );
 
   return (
-    <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"Code Risks (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex gap-2">

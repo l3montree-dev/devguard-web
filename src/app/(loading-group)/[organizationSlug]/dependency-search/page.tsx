@@ -28,6 +28,7 @@ import { buildFilterSearchParams } from "@/utils/url";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { useOrganizationComponentList } from "@/hooks/useComponents";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 import EmptyParty from "@/components/common/EmptyParty";
 
 const columnHelper = createAppColumnHelper<ProjectDependency>();
@@ -80,6 +81,7 @@ const OrgDependencySearch: FunctionComponent = () => {
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
+  const activeOrg = useActiveOrg();
   const handleSearch = useDebouncedQuerySearch();
 
   const searchParams = useSearchParams();
@@ -101,7 +103,7 @@ const OrgDependencySearch: FunctionComponent = () => {
   });
 
   return (
-    <Page Menu={menu} Title={null} title="">
+    <Page Menu={menu} title={"Package Search (" + activeOrg.name + ")"}>
       <Section
         primaryHeadline
         forceVertical

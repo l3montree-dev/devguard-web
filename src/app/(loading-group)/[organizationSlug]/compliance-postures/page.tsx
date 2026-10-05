@@ -6,6 +6,7 @@
 import CompliancePosturesListView from "@/components/compliance-posturers/CompliancePosturesListView";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 const Index = () => {
   const { organizationSlug } = useDecodedParams() as {
@@ -13,13 +14,21 @@ const Index = () => {
   };
 
   const orgMenu = useOrganizationMenu();
+  const activeOrg = useActiveOrg();
+  const orgName = activeOrg.name;
 
   const scope = {
     level: "organization",
     organization: organizationSlug,
   } as const;
 
-  return <CompliancePosturesListView scope={scope} Menu={orgMenu} />;
+  return (
+    <CompliancePosturesListView
+      scope={scope}
+      Menu={orgMenu}
+      contextName={orgName}
+    />
+  );
 };
 
 export default Index;

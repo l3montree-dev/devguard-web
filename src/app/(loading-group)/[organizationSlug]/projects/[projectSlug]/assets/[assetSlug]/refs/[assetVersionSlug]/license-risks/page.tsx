@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/collapsible";
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import Filter from "@/components/Filter";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const columnHelper = createAppColumnHelper<LicenseRiskDTO>();
 
@@ -257,12 +258,17 @@ const Index: FunctionComponent = () => {
   });
 
   const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
 
   const { branches, tags } = useAssetBranchesAndTags();
   const push = useRouterQuery();
 
   return (
-    <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"License Risks (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
       </div>

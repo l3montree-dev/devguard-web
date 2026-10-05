@@ -36,6 +36,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState, type FunctionComponent } from "react";
 import useVexRuleRecommendations from "@/hooks/useVexRuleRecommendations";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const sourcesFilterOptions = [
   {
@@ -137,6 +138,7 @@ const VexRulesPage: FunctionComponent = () => {
 
   const activeTab = searchParams?.get("tab") ?? "rules";
   const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
 
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
     organizationSlug: string;
@@ -251,18 +253,26 @@ const VexRulesPage: FunctionComponent = () => {
 
   if (error) {
     return (
-      <Page Menu={assetMenu} title="VEX rules" Title={<AssetTitle />}>
+      <Page
+        Menu={assetMenu}
+        title={"VEX Rules (" + asset.name + ")"}
+        Title={<AssetTitle />}
+      >
         <Err />
       </Page>
     );
   }
 
   return (
-    <Page Menu={assetMenu} title="Manage VEX rules" Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"VEX Rules (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       <Section
         primaryHeadline
         forceVertical
-        title="VEX rules"
+        title="VEX Rules"
         description="VEX rules decide how vulnerabilities of this repository are handled - dismissed as a false positive, accepted as a known risk, or reopened. Rules are either written here or synced from an upstream supplier."
         className="mb-6 mt-4"
         Button={

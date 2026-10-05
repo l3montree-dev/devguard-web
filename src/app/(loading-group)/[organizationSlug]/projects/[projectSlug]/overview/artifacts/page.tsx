@@ -32,6 +32,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../../../../components/ui/tabs";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 const columnHelper = createAppColumnHelper<{
   risk: RiskHistory;
@@ -91,6 +92,7 @@ const Index: FunctionComponent = () => {
     organizationSlug: string;
     projectSlug: string;
   };
+  const project = useActiveProject();
 
   const releaseScope = { organization: organizationSlug, projectSlug };
   const { data: release } = useRelease(releaseScope, releaseId);
@@ -154,7 +156,7 @@ const Index: FunctionComponent = () => {
 
   return (
     <Page
-      title="Artifacts"
+      title={"Artifacts (" + project.name + ")"}
       description="Artifacts of the Release"
       Title={<AssetTitle />}
     >

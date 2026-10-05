@@ -20,6 +20,7 @@ import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import type { FunctionComponent } from "react";
 import { useState } from "react";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const TABS = [
   { value: "draft", label: "Draft" },
@@ -34,6 +35,7 @@ const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const push = useRouterQuery();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams();
+  const asset = useActiveAsset();
 
   const { advisories, isLoading, state, createAdvisory } = useAdvisoryList();
 
@@ -42,7 +44,11 @@ const Index: FunctionComponent = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
-    <Page Menu={assetMenu} title={"Security Advisory"} Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"Security Advisories (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       {dialogOpen && (
         <AdvisoryDialog
           open={dialogOpen}

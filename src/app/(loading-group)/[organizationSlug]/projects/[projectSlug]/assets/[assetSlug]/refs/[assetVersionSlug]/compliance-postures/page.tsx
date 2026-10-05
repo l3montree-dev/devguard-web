@@ -5,6 +5,7 @@
 
 import AssetTitle from "@/components/common/AssetTitle";
 import CompliancePosturesListView from "@/components/compliance-posturers/CompliancePosturesListView";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
@@ -18,6 +19,8 @@ const Index = () => {
     };
 
   const assetMenu = useAssetMenu();
+  const asset = useActiveAsset();
+  const assetName = asset.name;
 
   const scope = {
     level: "assetVersion",
@@ -32,6 +35,7 @@ const Index = () => {
       scope={scope}
       Menu={assetMenu}
       Title={<AssetTitle />}
+      contextName={assetName}
     />
   );
 };

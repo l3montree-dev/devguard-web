@@ -107,7 +107,7 @@ const OrgDependencySearch: FunctionComponent = () => {
   });
 
   return (
-    <Page Menu={menu} Title={null} title="">
+    <Page Menu={menu} title={"Package Search (" + project.name + ")"}>
       <Section
         primaryHeadline
         forceVertical

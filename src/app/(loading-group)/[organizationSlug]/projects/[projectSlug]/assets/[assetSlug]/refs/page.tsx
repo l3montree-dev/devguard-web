@@ -47,6 +47,7 @@ import { classNames } from "../../../../../../../../utils/common";
 import { eventBus } from "@/events";
 import { readLocalStorage, removeLocalStorage } from "@/hooks/useLocalStorage";
 import AuthGuard from "../../../../../../../../components/AuthGuard";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const RefsPage = () => {
   const assetMenu = useAssetMenu();
@@ -57,6 +58,7 @@ const RefsPage = () => {
     projectSlug: string;
     assetSlug: string;
   };
+  const asset = useActiveAsset();
 
   const refScope = {
     organization: params.organizationSlug,
@@ -132,7 +134,7 @@ const RefsPage = () => {
   return (
     <Page
       Menu={assetMenu}
-      title="Overview"
+      title={"Branches + Tags (" + asset.name + ")"}
       description="Overview of the repository"
       Title={<AssetTitle />}
     >

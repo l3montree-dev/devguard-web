@@ -6,6 +6,7 @@
 import CompliancePosturesListView from "@/components/compliance-posturers/CompliancePosturesListView";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 const Index = () => {
   const { organizationSlug, projectSlug } = useDecodedParams() as {
@@ -14,6 +15,8 @@ const Index = () => {
   };
 
   const projectMenu = useProjectMenu();
+  const project = useActiveProject();
+  const projectName = project.name;
 
   const scope = {
     level: "project",
@@ -21,7 +24,13 @@ const Index = () => {
     projectSlug,
   } as const;
 
-  return <CompliancePosturesListView scope={scope} Menu={projectMenu} />;
+  return (
+    <CompliancePosturesListView
+      scope={scope}
+      Menu={projectMenu}
+      contextName={projectName}
+    />
+  );
 };
 
 export default Index;

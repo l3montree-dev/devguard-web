@@ -485,7 +485,7 @@ const Index: FunctionComponent = () => {
   return (
     <Page
       Menu={assetMenu}
-      title="Dependencies"
+      title={"Dependencies (" + asset.name + ")"}
       description="Dependencies of the asset"
       Title={<AssetTitle />}
     >

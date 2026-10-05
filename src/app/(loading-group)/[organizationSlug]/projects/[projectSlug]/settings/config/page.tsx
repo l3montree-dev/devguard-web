@@ -36,7 +36,7 @@ const Config = () => {
           href: "",
         },
       ]}
-      title={""}
+      title={"Configuration Files (" + project.name + ")"}
       Menu={projectMenu}
       Title={<ProjectTitle />}
     >
