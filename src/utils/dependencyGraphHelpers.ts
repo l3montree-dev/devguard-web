@@ -2,13 +2,8 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import dagre, { graphlib } from "@dagrejs/dagre";
-import type { DependencyTreeNode } from "@/types/view/dependencyGraph";
-import type { DependencyVuln, MinimalDependencyTree } from "@/types/dto";
 
-import type {
-  EdgeMaps,
-  ViewDependencyTreeNode,
-} from "../types/view/dependencyGraph";
+import type { ViewDependencyTreeNode } from "../types/view/dependencyGraph";
 // Pagination settings
 export const MAX_CHILDREN_PER_PAGE = 50;
 export const INITIAL_CHILDREN_TO_SHOW = 20;
@@ -70,7 +65,6 @@ export const addRecursive = (
   expandedNodes: Set<string>,
   childCountMap: Map<string, number>,
   childrenLimitMap: Map<string, number>,
-  riskMap: Map<string, number>,
   visited: Set<string> = new Set(),
   nameMap: Map<string, string> = new Map(),
 ) => {
@@ -84,9 +78,6 @@ export const addRecursive = (
       width: nodeWidth,
       height: nodeHeight,
     });
-    // Store risk for this node
-    riskMap.set(node.id, node.risk ?? 0);
-
     // Only process children if this node is expanded
     const isExpanded = expandedNodes.has(node.id);
 
@@ -132,7 +123,6 @@ export const addRecursive = (
                     expandedNodes,
                     childCountMap,
                     childrenLimitMap,
-                    riskMap,
                     visited,
                     nameMap,
                   );
@@ -161,7 +151,6 @@ export const addRecursive = (
             expandedNodes,
             childCountMap,
             childrenLimitMap,
-            riskMap,
             visited,
             nameMap,
           );
@@ -175,14 +164,12 @@ export const addRecursive = (
       dagreGraph.setNode(loadMoreId, { width: nodeWidth, height: nodeHeight });
       dagreGraph.setEdge(node.id, loadMoreId);
       childCountMap.set(loadMoreId, 0); // Load more node has no children
-      riskMap.set(loadMoreId, 0);
     }
   }
 };
 
 export const getLayoutedElements = (
   tree: ViewDependencyTreeNode,
-  vulns: Array<DependencyVuln> = [],
   direction = "LR",
   nodeWidth: number,
   nodeHeight: number,
@@ -190,8 +177,6 @@ export const getLayoutedElements = (
   childrenLimitMap: Map<string, number>,
   previousNodes: Array<any> = [],
   onExpansionToggle?: (nodeId: string) => void,
-  enableContextMenu?: boolean,
-  directDepsWithPatches?: Set<string>,
 ): [
   Array<{
     id: string;
@@ -204,22 +189,10 @@ export const getLayoutedElements = (
     target: string;
     animated: boolean;
     style: { stroke: string; strokeWidth: number };
-    className?: string;
   }>,
 ] => {
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
-  // build a map of all affected packages
-  const vulnMap = vulns.reduce(
-    (acc, cur) => {
-      if (!acc[cur.componentPurl!]) {
-        acc[cur.componentPurl!] = [];
-      }
-      acc[cur.componentPurl!].push(cur);
-      return acc;
-    },
-    {} as { [key: string]: DependencyVuln[] },
-  );
 
   dagreGraph.setGraph({
     rankdir: direction,
@@ -232,7 +205,6 @@ export const getLayoutedElements = (
 
   const infoSourceMap = new Map<string, Set<string>>();
   const childCountMap = new Map<string, number>();
-  const riskMap = new Map<string, number>();
   const nameMap = new Map<string, string>();
 
   // Pre-populate child counts for all nodes
@@ -247,7 +219,6 @@ export const getLayoutedElements = (
     expandedNodes,
     childCountMap,
     childrenLimitMap,
-    riskMap,
     new Set(),
     nameMap,
   );
@@ -297,8 +268,6 @@ export const getLayoutedElements = (
       position,
       data: {
         label: nameMap.get(el) ?? el,
-        risk: riskMap.get(el) ?? 0,
-        vuln: vulnMap[nameMap.get(el) ?? el],
         nodeWidth,
         nodeHeight,
         infoSources: infoSourceMap.get(el),
@@ -308,52 +277,21 @@ export const getLayoutedElements = (
         hasMore: childCount > shownCount,
         isLoadMoreNode,
         parentId,
-        enableContextMenu,
         remainingCount: parentId
           ? (childCountMap.get(parentId) || 0) -
             (childrenLimitMap.get(parentId) || INITIAL_CHILDREN_TO_SHOW)
           : 0,
         onExpansionToggle,
-        hasPatch: directDepsWithPatches?.has(el) ?? false,
       },
     };
-  });
-
-  // Build edge lookup maps for impact calculation
-  const childToParentEdges = new Map<
-    string,
-    Array<{ parent: string; edgeId: string }>
-  >();
-  const parentToChildEdges = new Map<
-    string,
-    Array<{ child: string; edgeId: string }>
-  >();
-
-  dagreGraph.edges().forEach((el) => {
-    const source = el.v; // parent
-    const target = el.w; // child
-    const edgeId = `${source}-${target}`;
-
-    const existingParents = childToParentEdges.get(target) || [];
-    existingParents.push({ parent: source, edgeId });
-    childToParentEdges.set(target, existingParents);
-
-    const existingChildren = parentToChildEdges.get(source) || [];
-    existingChildren.push({ child: target, edgeId });
-    parentToChildEdges.set(source, existingChildren);
   });
 
   const edges = dagreGraph.edges().map((el) => {
     const source = el.v; // parent
     const target = el.w; // child
-    const edgeId = `${source}-${target}`;
 
-    // Calculate stroke width based on flow
-    // Edges with more vulnerability flow get thicker
-
-    // High impact edges get thicker stroke and special styling
     return {
-      id: edgeId,
+      id: `${source}-${target}`,
       target: source,
       source: target,
       animated: false,
@@ -364,15 +302,7 @@ export const getLayoutedElements = (
     };
   });
 
-  // Update nodes to mark critical ones and add propagation data
-  const updatedNodes = nodes.map((node) => {
-    return {
-      ...node,
-      data: node.data,
-    };
-  });
-
-  return [updatedNodes, edges];
+  return [nodes, edges];
 };
 
 // Auto-expand nodes breadth-first until we have at least MIN_VISIBLE_NODES
@@ -440,239 +370,13 @@ export const autoExpandToMinimum = (
   return expanded;
 };
 
-/**
- * Performs downward traversal from starting nodes
- * Continues only if child has a single incoming edge and is a package node
- */
-export const traverseDownward = (
-  startNodes: string[],
-  pathEdgeIds: Set<string>,
-  edgeMaps: EdgeMaps,
-): void => {
-  const visitedDown = new Set<string>();
-  const queueDown: string[] = [...startNodes];
-
-  while (queueDown.length > 0) {
-    const currentNode = queueDown.shift()!;
-    if (visitedDown.has(currentNode)) continue;
-    visitedDown.add(currentNode);
-
-    const childEdges = edgeMaps.parentToChildEdges.get(currentNode);
-    if (childEdges) {
-      for (const { edgeId, child } of childEdges) {
-        pathEdgeIds.add(edgeId);
-        const incomingToChild = edgeMaps.childToParentEdges.get(child);
-        if (incomingToChild && incomingToChild.length === 1) {
-          queueDown.push(child);
-        }
-      }
-    }
-  }
-};
-
-/**
- * Performs upward traversal from starting nodes
- * Continues only if parent has a single outgoing edge and is a package node
- */
-export const traverseUpward = (
-  startNodes: string[],
-  pathEdgeIds: Set<string>,
-  edgeMaps: EdgeMaps,
-): void => {
-  const visitedUp = new Set<string>();
-  const queueUp: string[] = [...startNodes];
-
-  while (queueUp.length > 0) {
-    const currentNode = queueUp.shift()!;
-    if (visitedUp.has(currentNode)) continue;
-    visitedUp.add(currentNode);
-
-    const parentEdges = edgeMaps.childToParentEdges.get(currentNode);
-    if (parentEdges) {
-      for (const { edgeId, parent } of parentEdges) {
-        pathEdgeIds.add(edgeId);
-        const outgoing = edgeMaps.parentToChildEdges.get(parent);
-        if (outgoing && outgoing.length === 1) {
-          queueUp.push(parent);
-        }
-      }
-    }
-  }
-};
-
-/**
- * Propagates highlighting bidirectionally:
- * 1. If ALL incoming edges (from children toward parents) of a node are highlighted,
- *    that node would be removed, so mark ALL its outgoing edges (to children)
- * 2. If ALL outgoing edges (to children) of a node are highlighted,
- *    that node is "useless" (all dependants removed), so mark ALL its incoming edges (to parents)
- */
-export const propagateHighlighting = (
-  pathEdgeIds: Set<string>,
-  edgeMaps: EdgeMaps,
-): void => {
-  let changed = true;
-  while (changed) {
-    changed = false;
-
-    const removedNodes = new Set<string>();
-
-    // Check if all edges TO PARENTS are marked (original behavior)
-    // childToParentEdges.get(node) = edges from node to its parents
-    edgeMaps.childToParentEdges.forEach((edgesToParents, nodeId) => {
-      const allToParentsMarked = edgesToParents.every(({ edgeId }) =>
-        pathEdgeIds.has(edgeId),
-      );
-      if (allToParentsMarked) {
-        removedNodes.add(nodeId);
-      }
-    });
-
-    // Check if all edges TO CHILDREN are marked (node is useless - all dependants gone)
-    // parentToChildEdges.get(node) = edges from node to its children
-    edgeMaps.parentToChildEdges.forEach((edgesToChildren, nodeId) => {
-      const allToChildrenMarked = edgesToChildren.every(({ edgeId }) =>
-        pathEdgeIds.has(edgeId),
-      );
-      if (allToChildrenMarked) {
-        removedNodes.add(nodeId);
-      }
-    });
-
-    // For removed nodes, mark all their edges in both directions
-    removedNodes.forEach((nodeId) => {
-      // Mark all outgoing edges (to children)
-      const edgesToChildren = edgeMaps.parentToChildEdges.get(nodeId);
-      if (edgesToChildren) {
-        edgesToChildren.forEach(({ edgeId }) => {
-          if (!pathEdgeIds.has(edgeId)) {
-            pathEdgeIds.add(edgeId);
-            changed = true;
-          }
-        });
-      }
-
-      // Mark all incoming edges (to parents)
-      const edgesToParents = edgeMaps.childToParentEdges.get(nodeId);
-      if (edgesToParents) {
-        edgesToParents.forEach(({ edgeId }) => {
-          if (!pathEdgeIds.has(edgeId)) {
-            pathEdgeIds.add(edgeId);
-            changed = true;
-          }
-        });
-      }
-    });
-  }
-};
-
-/**
- * Propagates risk upward through the dependency tree
- */
-const propagateRiskUpward = (
-  node: ViewDependencyTreeNode,
-  riskToAdd: number,
-  visited: Set<ViewDependencyTreeNode> = new Set(),
-) => {
-  if (!node.parents || node.parents.length === 0) return;
-
-  const riskPerParent = riskToAdd / node.parents.length;
-
-  node.parents.forEach((parent) => {
-    if (parent && !visited.has(parent)) {
-      visited.add(parent);
-
-      const newRisk = parent.risk ? parent.risk + riskPerParent : riskPerParent;
-
-      // Cap risk at 100 - represents maximum vulnerability exposure
-      parent.risk = newRisk;
-      // Recursively propagate to parent's parents
-      propagateRiskUpward(parent, riskPerParent, visited);
-    }
-  });
-};
-
-export const recursiveAddRisk = (
-  node: ViewDependencyTreeNode,
-  vulns: Array<DependencyVuln>,
-) => {
-  // Track which nodes we've already processed to avoid double-counting
-  const processedNodes = new Set<ViewDependencyTreeNode>();
-  // Global visited set for risk propagation - ensures each node is updated only once
-  const propagationVisited = new Set<ViewDependencyTreeNode>();
-
-  // Track recursion stack for cycle detection using node id (not name) so that
-  // distinct nodes with the same name (e.g. multiple "*" wildcards) are not
-  // falsely treated as cycles.
-  const recursionStack: ViewDependencyTreeNode[] = [];
-  const recursionSet = new Set<string>();
-
-  const markCycleFromIndex = (startIdx: number) => {
-    for (let i = startIdx; i < recursionStack.length; i++) {
-      recursionStack[i].hasCycle = true;
-    }
-  };
-
-  // Then recursively process the tree
-  const processNode = (n: ViewDependencyTreeNode) => {
-    // If the node is already on the current recursion stack -> we've found a cycle
-    if (recursionSet.has(n.id)) {
-      const idx = recursionStack.findIndex((x) => x.id === n.id);
-      if (idx !== -1) {
-        // Mark all nodes that are part of the cycle
-        markCycleFromIndex(idx);
-      }
-      // Stop further traversal along this path to avoid infinite recursion
-      return;
-    }
-
-    // Skip if already processed (handles diamond dependencies)
-    if (processedNodes.has(n)) return;
-    processedNodes.add(n);
-
-    // Push onto recursion stack
-    recursionSet.add(n.id);
-    recursionStack.push(n);
-
-    const nodeFlaws = vulns.filter((p) => p.componentPurl === n.name);
-
-    // Set risk to 100 if this node has vulnerabilities
-    if (nodeFlaws.length > 0) {
-      n.risk = 100;
-      propagationVisited.add(n);
-      // Propagate risk upward through all ancestors
-      // Use the GLOBAL visited set to ensure each ancestor is only updated once
-      propagateRiskUpward(n, n.risk, propagationVisited);
-    }
-
-    // Recursively process all children
-    for (const child of n.children) {
-      // If child is already known to participate in a cycle, skip descending into it
-      if (child.hasCycle) continue;
-      processNode(child);
-    }
-
-    // Pop from recursion stack
-    recursionStack.pop();
-    recursionSet.delete(n.id);
-  };
-
-  processNode(node);
-  return node;
-};
-
 export const convertPathsToTree = (
   paths: Array<Array<string>>,
-  vulns: Array<DependencyVuln>,
-  addRoot = true,
 ): ViewDependencyTreeNode => {
   const root: ViewDependencyTreeNode = {
     id: "ROOT",
     name: "ROOT",
     children: [],
-    risk: 0,
-    parents: [],
-    nodeType: "root",
   };
 
   const nodeMap = new Map<string, ViewDependencyTreeNode>();
@@ -690,7 +394,6 @@ export const convertPathsToTree = (
       if (part === "*") {
         const wildcardNode = pathEntryToViewNode(part);
         currentNode.children.push(wildcardNode);
-        wildcardNode.parents.push(currentNode);
         currentNode = wildcardNode;
         continue;
       }
@@ -701,7 +404,6 @@ export const convertPathsToTree = (
         // already exists, move to that node
         if (!currentNode.children.includes(node)) {
           currentNode.children.push(node);
-          node.parents.push(currentNode);
         }
 
         currentNode = node;
@@ -713,142 +415,21 @@ export const convertPathsToTree = (
         currentNode.children.find((child) => child.name === part);
       if (!childNode) {
         childNode = pathEntryToViewNode(part);
-        // since we add our own root element, we filter out every root node types
         currentNode.children.push(childNode);
-        childNode.parents.push(currentNode);
         nodeMap.set(part, childNode);
       }
       currentNode = childNode;
     }
   }
-  recursiveAddRisk(root, vulns);
-
-  if (!addRoot && root.children.length > 0) {
-    const newRoot = root.children[0];
-    newRoot.parents = newRoot.parents.filter((p) => p !== root);
-    return newRoot;
-  }
 
   return root;
 };
 
-export function minimalTreeToViewDependencyTreeNode(
-  tree?: MinimalDependencyTree,
-): ViewDependencyTreeNode {
-  if (!tree) {
-    return {
-      id: "ROOT",
-      name: "ROOT",
-      risk: 0,
-      parents: [],
-      children: [],
-      nodeType: "component",
-    };
-  }
-
-  const nodes = new Map<string, ViewDependencyTreeNode>();
-
-  // Create all nodes
-  for (const entry of tree.nodes) {
-    nodes.set(entry, pathEntryToViewNode(entry));
-  }
-
-  // now recursively add children
-  for (const [parentEntry, childEntries] of Object.entries(tree.dependencies)) {
-    const parentNode = nodes.get(parentEntry);
-    if (parentNode) {
-      for (const childEntry of childEntries) {
-        const childNode = nodes.get(childEntry);
-        if (childNode) {
-          parentNode.children.push(childNode);
-          childNode.parents.push(parentNode);
-        }
-      }
-    }
-  }
-
-  return nodes.get("")!;
-}
-
-export const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
-  if (!entry.includes(":")) {
-  }
-  const parts = entry.split(":");
-  let nodeType: "root" | "artifact" | "component" | "infosource";
-  let infoSourceType: "sbom" | "csaf" | "vex" | undefined = undefined;
-  if (parts.length === 1) {
-    nodeType = "root";
-  } else {
-    const prefix = parts[0];
-    switch (prefix) {
-      case "artifact":
-        nodeType = "artifact";
-        break;
-      case "sbom":
-        nodeType = "infosource";
-        infoSourceType = "sbom";
-        break;
-      case "vex":
-        nodeType = "infosource";
-        infoSourceType = "vex";
-        break;
-      case "csaf":
-        nodeType = "infosource";
-        infoSourceType = "csaf";
-        break;
-      default:
-        nodeType = "component";
-    }
-  }
-
+const pathEntryToViewNode = (entry: string): ViewDependencyTreeNode => {
   const name = entry === "" ? "ROOT" : entry;
   return {
     id: name === "*" ? crypto.randomUUID() : name,
     name,
     children: [],
-    risk: 0,
-    parents: [],
-    nodeType,
-    infoSourceType,
   };
-};
-
-export const convertGraph = (
-  graph: DependencyTreeNode,
-  parent: ViewDependencyTreeNode | null = null,
-): ViewDependencyTreeNode => {
-  const convertedNode = pathEntryToViewNode(graph.name);
-  if (parent !== null && !convertedNode.parents.includes(parent))
-    convertedNode.parents.push(parent);
-  convertedNode.children = graph.children.map((child) =>
-    convertGraph(child, convertedNode),
-  );
-  return convertedNode;
-};
-
-export const recursiveRemoveWithoutRisk = (
-  node: ViewDependencyTreeNode,
-  recursionSet: Set<string> = new Set(),
-) => {
-  // Detect cycles by id so that distinct nodes with the same name (e.g. "*") are not falsely treated as cycles.
-  if (recursionSet.has(node.id)) {
-    node.hasCycle = true;
-    return node;
-  }
-
-  recursionSet.add(node.id);
-
-  // If this node has no risk, prune it (and its subtree)
-  if (node.risk === 0) {
-    recursionSet.delete(node.id);
-    return null;
-  }
-
-  // Recurse into children safely, passing down the same recursion set
-  node.children = node.children
-    .map((c) => recursiveRemoveWithoutRisk(c, recursionSet))
-    .filter((n): n is ViewDependencyTreeNode => n !== null);
-
-  recursionSet.delete(node.id);
-  return node;
 };
