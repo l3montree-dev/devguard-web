@@ -6,6 +6,10 @@ import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
 import yaml from "react-syntax-highlighter/dist/esm/languages/hljs/yaml";
 import shell from "react-syntax-highlighter/dist/esm/languages/hljs/bash";
 import basic from "react-syntax-highlighter/dist/esm/languages/hljs/basic";
+import xml from "react-syntax-highlighter/dist/esm/languages/hljs/xml";
+import json from "react-syntax-highlighter/dist/esm/languages/hljs/json";
+import typescript from "react-syntax-highlighter/dist/esm/languages/hljs/typescript";
+import javascript from "react-syntax-highlighter/dist/esm/languages/hljs/javascript";
 import github from "react-syntax-highlighter/dist/esm/styles/hljs/github";
 import anOldHope from "react-syntax-highlighter/dist/esm/styles/hljs/an-old-hope";
 import { useTheme } from "next-themes";
@@ -13,6 +17,10 @@ import { useTheme } from "next-themes";
 SyntaxHighlighter.registerLanguage("yaml", yaml);
 SyntaxHighlighter.registerLanguage("shell", shell);
 SyntaxHighlighter.registerLanguage("rego", basic);
+SyntaxHighlighter.registerLanguage("xml", xml);
+SyntaxHighlighter.registerLanguage("json", json);
+SyntaxHighlighter.registerLanguage("typescript", typescript);
+SyntaxHighlighter.registerLanguage("javascript", javascript);
 
 const githubLightTheme = {
   ...github,
@@ -24,7 +32,8 @@ const githubLightTheme = {
 
 const Highlighter: FunctionComponent<{
   codeString: string;
-  language?: "yaml" | "shell" | "rego";
+  language?:
+    "yaml" | "shell" | "rego" | "xml" | "json" | "typescript" | "javascript";
   startingLineNumber?: number;
   startingHighlightLineNumber?: number | null;
 }> = ({
