@@ -14,10 +14,11 @@ import { Input, type InputProps } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { classNames } from "@/utils/common";
 import Image from "next/image";
-import type { FunctionComponent } from "react";
+import { type FunctionComponent } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { createUpdateHandler } from "../AssetForm";
 import type { AssetFormValues } from "@/types/view/asset";
+import { SquareOff } from "lucide-react";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -131,7 +132,27 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
               />
               GitLab
             </Button>
+            <Button
+              variant={"secondary"}
+              type="button"
+              className={classNames(
+                "w-full border",
+                !gitInstance && "!border-primary",
+              )}
+              onClick={() => {
+                form.setValue("repositoryProvider", "", {
+                  shouldDirty: true,
+                });
+              }}
+            >
+              <SquareOff className="mr-2 w-5 h-5" />
+              None
+            </Button>
           </div>
+          <span className="text-sm text-muted-foreground">
+            Optional: you can use DevGuard without connecting a GitHub or GitLab
+            repository.
+          </span>
         </>
       )}
       {handleUpdate && (
