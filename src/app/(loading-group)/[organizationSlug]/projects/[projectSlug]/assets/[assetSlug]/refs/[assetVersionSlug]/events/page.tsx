@@ -17,6 +17,7 @@ import useDecodedParams from "@/hooks/useDecodedParams";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSearchParams } from "next/navigation";
 import Err from "@/components/common/Err";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const Index = () => {
   const params = useDecodedParams();
@@ -39,6 +40,7 @@ const Index = () => {
 
   const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
+  const asset = useActiveAsset();
 
   // Show loading skeleton if data is loading
   if (isLoading || !events) {
@@ -60,14 +62,22 @@ const Index = () => {
   // Show error state
   if (error) {
     return (
-      <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+      <Page
+        Menu={assetMenu}
+        title={"Events (" + asset.name + ")"}
+        Title={<AssetTitle />}
+      >
         <Err />
       </Page>
     );
   }
 
   return (
-    <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"Events (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       <BranchTagSelector branches={branches} tags={tags} />
 
       <Section

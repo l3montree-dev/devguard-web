@@ -36,7 +36,7 @@ const Config = () => {
           href: "",
         },
       ]}
-      title={project.name + " Group Dependency Proxy"}
+      title={"Dependency Proxy (" + project.name + ")"}
       Menu={projectMenu}
       Title={<ProjectTitle />}
     >

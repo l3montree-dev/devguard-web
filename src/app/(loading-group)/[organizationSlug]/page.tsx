@@ -185,7 +185,7 @@ const OrganizationHomePage: FunctionComponent = () => {
         onStartTour={() => handleStartTour(startTour)}
         onSkip={handleSkip}
       />
-      <Page title={activeOrg.name + " Organization"} Menu={orgMenu}>
+      <Page title={"Groups (" + activeOrg.name + ")"} Menu={orgMenu}>
         <CreateGroupForm
           variant="dialog"
           open={open}

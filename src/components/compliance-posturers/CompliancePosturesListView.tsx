@@ -58,6 +58,7 @@ const columnHelper = createAppColumnHelper<CompliancePostureWithControlDTO>();
 
 interface Props {
   scope: PostureScope;
+  contextName: string;
   Menu?: any[];
   Title?: ReactNode;
 }
@@ -66,6 +67,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   scope,
   Menu,
   Title,
+  contextName,
 }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -365,7 +367,11 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   }, [isClosed, frameworks]);
 
   return (
-    <Page Menu={Menu} title={"Compliance Postures"} Title={Title}>
+    <Page
+      Menu={Menu}
+      title={"Compliance Postures (" + contextName + ")"}
+      Title={Title}
+    >
       <div className="flex flex-row items-center justify-between">
         {asset && <BranchTagSelector branches={branches} tags={tags} />}
         <div className="ml-auto flex flex-row gap-2">

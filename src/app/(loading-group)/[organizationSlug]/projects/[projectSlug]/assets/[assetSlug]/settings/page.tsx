@@ -268,7 +268,7 @@ const Index: FunctionComponent = () => {
   return (
     <Page
       Menu={assetMenu}
-      title={asset.name + " Settings"}
+      title={"Settings (" + asset.name + ")"}
       description="Update the settings of this repository"
       Title={<AssetTitle />}
     >

@@ -263,7 +263,7 @@ const Home = () => {
   const config = useConfig();
 
   return (
-    <Page title={"Organization Settings"} Menu={orgMenu}>
+    <Page title={"Settings (" + activeOrg.name + ")"} Menu={orgMenu}>
       <div className="flex flex-row justify-between">
         <h1 className="text-2xl font-semibold">Organization Settings</h1>
       </div>

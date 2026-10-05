@@ -8,10 +8,12 @@ import Section from "@/components/common/Section";
 import DetailedLogsTable from "@/components/logs/DetailedLogsTable";
 import { useLogs } from "@/hooks/useLogs";
 import { useProjectMenu } from "@/hooks/useProjectMenu";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 const Logs = () => {
   const projectMenu = useProjectMenu();
   const { data: logs, isLoading } = useLogs();
+  const project = useActiveProject();
 
   return (
     <Page
@@ -19,7 +21,7 @@ const Logs = () => {
         { title: "Settings", href: "./" },
         { title: "Logs", href: "" },
       ]}
-      title={"Project Logs"}
+      title={"Group Logs (" + project.name + ")"}
       Menu={projectMenu}
     >
       <Section

@@ -18,6 +18,7 @@ import ListRenderer from "../../../../../../../../../../components/common/ListRe
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { violationLengthToLevel } from "../../../../../../../../../../utils/view";
 import { DocDrawer } from "@/components/common/DocDrawer";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const ComplianceIndex: FunctionComponent = () => {
   const menu = useAssetMenu();
@@ -41,9 +42,14 @@ const ComplianceIndex: FunctionComponent = () => {
   });
 
   const pathname = usePathname();
+  const asset = useActiveAsset();
 
   return (
-    <Page Menu={menu} Title={<AssetTitle />} title="Compliance Controls">
+    <Page
+      Menu={menu}
+      Title={<AssetTitle />}
+      title={"Compliance Controls (" + asset.name + ")"}
+    >
       <div className="flex flex-row">
         <div className="flex-1">
           <Section

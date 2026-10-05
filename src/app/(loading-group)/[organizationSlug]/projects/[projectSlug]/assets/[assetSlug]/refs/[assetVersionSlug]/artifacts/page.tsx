@@ -47,6 +47,7 @@ import {
 } from "../../../../../../../../../../context/AssetVersionContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const Artifacts = () => {
   const assetMenu = useAssetMenu();
@@ -54,6 +55,8 @@ const Artifacts = () => {
   const artifacts = useArtifacts();
 
   const updateAssetVersionState = useUpdateAssetVersionState();
+
+  const asset = useActiveAsset();
 
   const [dialogState, setDialogState] = useState<{
     isOpen: boolean;
@@ -358,7 +361,11 @@ const Artifacts = () => {
   };
 
   return (
-    <Page Menu={assetMenu} title={"Manage Artifacts"} Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"Artifacts (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       <div className="flex flex-row">
         <div className="flex-1">
           <div className="mb-4 flex items-center justify-between">

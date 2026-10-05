@@ -31,6 +31,7 @@ import {
   deleteRelease as deleteReleaseRequest,
 } from "@/services/releaseService";
 import { useReleaseCandidates, useReleases } from "@/hooks/useReleases";
+import { useActiveProject } from "@/hooks/useActiveProject";
 
 import type { ReleaseDTO } from "@/types/dto";
 
@@ -42,6 +43,7 @@ const Releases = () => {
     organizationSlug: string;
     projectSlug: string;
   };
+  const project = useActiveProject();
 
   const releaseScope = { organization: organizationSlug, projectSlug };
 
@@ -84,7 +86,11 @@ const Releases = () => {
   };
 
   return (
-    <Page Menu={menu} Title={<ProjectTitle />} title="Releases">
+    <Page
+      Menu={menu}
+      Title={<ProjectTitle />}
+      title={"Releases (" + project.name + ")"}
+    >
       <div className="flex flex-row">
         <div className="flex-1">
           <Section

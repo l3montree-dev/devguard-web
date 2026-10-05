@@ -56,7 +56,7 @@ const ComplianceIndex = () => {
     <Page
       Menu={menu}
       Title={<ProjectTitle />}
-      title={project?.name + " Compliance Controls"}
+      title={"Compliance Controls (" + project.name + ")"}
     >
       <div className="flex flex-row">
         <div className="flex-1">

@@ -8,8 +8,10 @@ import Section from "@/components/common/Section";
 import DetailedLogsTable from "@/components/logs/DetailedLogsTable";
 import { useLogs } from "@/hooks/useLogs";
 import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 const Logs = () => {
+  const activeOrg = useActiveOrg();
   const orgMenu = useOrganizationMenu();
   const { data: logs, isLoading } = useLogs();
 
@@ -19,7 +21,7 @@ const Logs = () => {
         { title: "Settings", href: "./" },
         { title: "Logs", href: "" },
       ]}
-      title={"Organization Logs"}
+      title={"Organization Logs (" + activeOrg.name + ")"}
       Menu={orgMenu}
     >
       <Section

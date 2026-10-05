@@ -39,7 +39,7 @@ const Config = () => {
           href: "",
         },
       ]}
-      title={asset?.name + " Dependency Proxy"}
+      title={"Dependency Proxy (" + asset.name + ")"}
       Menu={assetMenu}
       Title={<AssetTitle />}
     >

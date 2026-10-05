@@ -179,7 +179,7 @@ const Index: FunctionComponent = () => {
 
   return (
     <Page
-      title={project?.name + " Group Settings"}
+      title={"Settings (" + project.name + ")"}
       Menu={projectMenu}
       Title={<ProjectTitle />}
     >

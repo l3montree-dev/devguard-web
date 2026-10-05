@@ -455,7 +455,11 @@ const Index: FunctionComponent = () => {
   }, [vulnData, selectedVulnIds]);
 
   return (
-    <Page Menu={assetMenu} title={"Risk Handling"} Title={<AssetTitle />}>
+    <Page
+      Menu={assetMenu}
+      title={"Dependency Risks (" + asset.name + ")"}
+      Title={<AssetTitle />}
+    >
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">

@@ -39,7 +39,7 @@ const Config = () => {
           href: "",
         },
       ]}
-      title={asset?.name + " Configuration Files"}
+      title={"Configuration Files (" + asset.name + ")"}
       Menu={assetMenu}
       Title={<AssetTitle />}
     >

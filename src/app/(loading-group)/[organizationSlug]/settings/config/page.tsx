@@ -28,7 +28,7 @@ const Config = () => {
           href: "",
         },
       ]}
-      title={"Configuration Files"}
+      title={"Configuration Files (" + org.name + ")"}
       Menu={orgMenu}
     >
       <ConfigFileEditor scope={scope} />

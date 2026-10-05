@@ -254,7 +254,7 @@ const OverviewPage = () => {
   if (releases?.data.length === 0) {
     return (
       <Page
-        title={project.name + " Group Overview"}
+        title={"Group Overview (" + project.name + ")"}
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >
@@ -280,7 +280,11 @@ const OverviewPage = () => {
   }
 
   return (
-    <Page title={project.name} Menu={projectMenu} Title={<ProjectTitle />}>
+    <Page
+      title={"Group Overview (" + project.name + ")"}
+      Menu={projectMenu}
+      Title={<ProjectTitle />}
+    >
       <div className="mb-4 flex flex-row items-start justify-between">
         <div className="flex items-center gap-2">
           <QueryArtifactSelector

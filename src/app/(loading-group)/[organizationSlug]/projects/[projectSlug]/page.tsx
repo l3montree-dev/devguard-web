@@ -232,7 +232,7 @@ export default function RepositoriesPage() {
             <Button onClick={() => setShowModal(true)}>New Asset</Button>
           )
         }
-        title={project.name}
+        title={"Repositories (" + project.name + ")"}
         Menu={projectMenu}
         Title={<ProjectTitle />}
       >

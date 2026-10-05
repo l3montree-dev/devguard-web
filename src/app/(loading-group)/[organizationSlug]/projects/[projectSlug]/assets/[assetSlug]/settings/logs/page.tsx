@@ -8,10 +8,12 @@ import Section from "@/components/common/Section";
 import DetailedLogsTable from "@/components/logs/DetailedLogsTable";
 import { useLogs } from "@/hooks/useLogs";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
+import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const Logs = () => {
   const assetMenu = useAssetMenu();
   const { data: logs, isLoading } = useLogs();
+  const asset = useActiveAsset();
 
   return (
     <Page
@@ -19,7 +21,7 @@ const Logs = () => {
         { title: "Settings", href: "./" },
         { title: "Logs", href: "" },
       ]}
-      title={"Repository Logs"}
+      title={"Repository Logs (" + asset.name + ")"}
       Menu={assetMenu}
     >
       <Section
