@@ -6,8 +6,6 @@ import type { components } from "@/types/api/generated";
 type Schemas = components["schemas"];
 
 export type AssetDTO = Schemas["dtos.AssetDTO"];
-export type Policy =
-  Schemas["github_com_l3montree-dev_devguard_database_models.Policy"];
 export type JiraIntegrationDTO = Schemas["dtos.JiraIntegrationDTO"];
 export type AverageVulnEventsPerWeek = Schemas["dtos.AverageVulnEventsPerWeek"];
 export type InviteRequest = Schemas["dtos.InviteRequest"];
