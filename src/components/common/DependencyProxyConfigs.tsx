@@ -223,6 +223,48 @@ const getEcosystemContent = (key: string, url: string) => {
       );
     }
 
+    case "debian": {
+      return (
+        <div>
+          <InputWithButton
+            label="Debian Repository URL"
+            message="Replace the URIs in /etc/apt/sources.list.d/debian.sources with this URL to route apt downloads through the dependency proxy."
+            value={url}
+            nameKey="deb-proxy-url"
+            copyable
+          />
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">
+              Example /etc/apt/sources.list.d/debian.sources
+            </span>
+            <CopyCode
+              language="yaml"
+              codeString={`Types: deb
+URIs: ${url}
+Suites: trixie trixie-updates
+Components: main
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: ${url}-security
+Suites: trixie-security
+Components: main
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg`}
+            />
+          </div>
+          <Callout intent="warning">
+            apt verifies the signed repository metadata, so the proxy cannot
+            hide blocked or too new versions. apt fails with a 403 when it tries
+            to download them. Pin an allowed version explicitly, for example{" "}
+            <code className="font-mono text-sm">
+              apt-get install curl=&lt;version&gt;
+            </code>
+            .
+          </Callout>
+        </div>
+      );
+    }
+
     default:
       return (
         <InputWithButton
