@@ -110,6 +110,7 @@
     "js-yaml": "4.3.2",
     "postcss": "^8.5.28",
     "fast-uri": "3.1.8",
+    "source-map-js": "1.2.2",
     "openapi-typescript": {
       "typescript": "6.0.2"
     }
