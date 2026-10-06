@@ -36,11 +36,17 @@ const NameLink: FunctionComponent<{
   kind: "o" | "p" | "a";
 }> = ({ name, id, kind }) => {
   if (!name) return <span className="text-muted-foreground/60 ">-</span>;
-  if (!id) return <>{name}</>;
+  if (!id)
+    return (
+      <span title={name} className="truncate">
+        {name}
+      </span>
+    );
   return (
     <Link
       href={`/api/-/${kind}/${id}`}
-      className="!text-muted-foreground hover:!text-foreground"
+      title={name}
+      className="truncate !text-muted-foreground hover:!text-foreground"
       target="_blank"
     >
       {name}
@@ -93,7 +99,7 @@ const NameIdCell: FunctionComponent<{
   id: string | null;
   kind: "o" | "p" | "a";
 }> = ({ name, id, kind }) => (
-  <span className="flex flex-col gap-0.5">
+  <span className="flex max-w-[180px] flex-col gap-0.5">
     <NameLink name={name} id={id} kind={kind} />
     <IdCell value={id} />
   </span>
@@ -316,104 +322,102 @@ const DetailedLogsTable: FunctionComponent<DetailedLogsTableProps> = ({
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         )}
       </div>
-      <div className="overflow-x-auto">
-        <div className="overflow-hidden rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="border-b bg-card text-foreground">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    const sortable = header.column.columnDef.enableSorting;
-                    return (
-                      <th
-                        key={header.id}
-                        onClick={
-                          sortable
-                            ? header.column.getToggleSortingHandler()
-                            : undefined
-                        }
-                        className={classNames(
-                          "whitespace-nowrap p-4 text-left font-medium",
-                          sortable && "cursor-pointer",
+      <div className="overflow-x-auto rounded-lg border">
+        <table className="w-full text-sm">
+          <thead className="border-b bg-card text-foreground">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const sortable = header.column.columnDef.enableSorting;
+                  return (
+                    <th
+                      key={header.id}
+                      onClick={
+                        sortable
+                          ? header.column.getToggleSortingHandler()
+                          : undefined
+                      }
+                      className={classNames(
+                        "whitespace-nowrap p-4 text-left font-medium",
+                        sortable && "cursor-pointer",
+                      )}
+                    >
+                      <div className="flex flex-row items-center gap-2">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                        {sortable && (
+                          <SortingCaret
+                            sortDirection={header.column.getIsSorted()}
+                          />
                         )}
-                      >
-                        <div className="flex flex-row items-center gap-2">
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                          {sortable && (
-                            <SortingCaret
-                              sortDirection={header.column.getIsSorted()}
-                            />
-                          )}
-                        </div>
-                      </th>
-                    );
-                  })}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="text-foreground">
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, row) => (
+                <tr
+                  key={row}
+                  className={classNames(
+                    "border-b last:border-0",
+                    row % 2 !== 0 && "bg-card/50",
+                  )}
+                >
+                  {columnsDef.map((_column, cell) => (
+                    <td key={cell} className="p-4">
+                      <Skeleton className="h-4 w-full" />
+                    </td>
+                  ))}
                 </tr>
-              ))}
-            </thead>
-            <tbody className="text-foreground">
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, row) => (
-                  <tr
-                    key={row}
-                    className={classNames(
-                      "border-b last:border-0",
-                      row % 2 !== 0 && "bg-card/50",
-                    )}
-                  >
-                    {columnsDef.map((_column, cell) => (
-                      <td key={cell} className="p-4">
-                        <Skeleton className="h-4 w-full" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : !logs || logs.data.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={columnsDef.length}
-                    className="p-4 text-center text-muted-foreground"
-                  >
-                    No logs found.
-                  </td>
+              ))
+            ) : !logs || logs.data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columnsDef.length}
+                  className="p-4 text-center text-muted-foreground"
+                >
+                  No logs found.
+                </td>
+              </tr>
+            ) : (
+              table.getRowModel().rows.map((row, index) => (
+                <tr
+                  data-testid="detailed-log-row"
+                  key={row.original.id}
+                  className={classNames(
+                    "border-b last:border-0",
+                    index % 2 !== 0 && "bg-card/50",
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className={classNames(
+                        "p-4",
+                        (cell.column.columnDef.meta as any)?.className,
+                      )}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </td>
+                  ))}
                 </tr>
-              ) : (
-                table.getRowModel().rows.map((row, index) => (
-                  <tr
-                    data-testid="detailed-log-row"
-                    key={row.original.id}
-                    className={classNames(
-                      "border-b last:border-0",
-                      index % 2 !== 0 && "bg-card/50",
-                    )}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        className={classNames(
-                          "p-4",
-                          (cell.column.columnDef.meta as any)?.className,
-                        )}
-                      >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-        <div className="mt-4">{logs && <CustomPagination {...logs} />}</div>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+      <div className="mt-4">{logs && <CustomPagination {...logs} />}</div>
     </div>
   );
 };
