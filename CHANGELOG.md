@@ -4,6 +4,28 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.16.0] — 2026-10-06
+
+### Added
+
+- **Maven, PHP (Composer) and Debian dependency proxy** — the dependency proxy settings now show the proxy URLs and setup instructions for Maven (`settings.xml` mirror), Composer (`composer.json` repository) and Debian (`debian.sources`), including warnings about the cases that bypass the proxy
+- **Config examples for all proxy ecosystems** — npm (`.npmrc`, CLI, Yarn Berry), Go (`GOPROXY`, `go env -w`) and PyPI (`pip.conf`, uv) now come with config examples and warnings as well
+- **Artifact link icon** — artifact table entries show a link icon
+
+### Changed
+
+- **Removed the dependency graph page** — only the path view in the dependency dialog is kept
+- **Removed the old compliance pages** — deleted the legacy `/compliance` routes and pages, along with the components and dead code only they used
+- **Consistent titles** — remaining page titles follow one style
+- **Dependency updates**
+
+### Fixed
+
+- **Empty state provider** — adjusted the provider so a genuinely empty state is shown correctly
+- **Page titles** — most pages now have a working title tag
+
+---
+
 ## [v1.15.1] — 2026-10-01
 
 ### Changed
