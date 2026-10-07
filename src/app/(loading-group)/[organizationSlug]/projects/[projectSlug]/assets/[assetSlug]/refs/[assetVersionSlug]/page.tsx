@@ -144,7 +144,7 @@ const Index: FunctionComponent = () => {
   const latest = riskHistory?.length
     ? riskHistory[riskHistory.length - 1]
     : null;
-  console.log(events);
+
   return (
     <Page
       Menu={assetMenu}

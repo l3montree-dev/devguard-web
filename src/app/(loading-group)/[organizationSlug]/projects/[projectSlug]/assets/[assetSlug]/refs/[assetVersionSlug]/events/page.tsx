@@ -71,7 +71,7 @@ const Index = () => {
       </Page>
     );
   }
-  console.log(events);
+
   return (
     <Page
       Menu={assetMenu}
