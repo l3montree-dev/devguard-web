@@ -85,6 +85,45 @@ const defaultConfig: DependencyProxyConfig = {
   minReleaseAge: 60,
 };
 
+const upstreamRegistries: Record<string, { key: string; defaultUrl: string }> =
+  {
+    npm: {
+      key: "npm",
+      defaultUrl: "https://registry.npmjs.org",
+    },
+    go: {
+      key: "go",
+      defaultUrl: "https://proxy.golang.org",
+    },
+    pypi: {
+      key: "pypi",
+      defaultUrl: "https://pypi.org",
+    },
+    maven: {
+      key: "maven",
+      defaultUrl: "https://repo1.maven.org/maven2",
+    },
+    composer: {
+      key: "composer",
+      defaultUrl: "https://repo.packagist.org",
+    },
+    debian: {
+      key: "deb",
+      defaultUrl: "http://deb.debian.org",
+    },
+  };
+
+const cleanRegistries = (registries: Record<string, string>) =>
+  Object.fromEntries(
+    Object.entries(registries)
+      .map(([key, value]) => [key, value.trim()] as const)
+      .filter(([, value]) => value !== ""),
+  );
+
+const sameRegistries = (a: Record<string, string>, b: Record<string, string>) =>
+  Object.keys(a).length === Object.keys(b).length &&
+  Object.keys(a).every((key) => a[key] === b[key]);
+
 const ecosystemIcons: Record<string, string> = {
   npm: "/logos/npm-svgrepo-com.svg",
   go: "/logos/golang-svgrepo-com.svg",
@@ -201,7 +240,7 @@ default = true`}
             nameKey="maven-proxy-url"
             copyable
           />
-          <p className="my-4 text-sm">
+          <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">settings.xml</span>
             <CopyCode
               language="xml"
@@ -216,12 +255,15 @@ default = true`}
   </mirrors>
 </settings>`}
             />
-          </p>
+          </div>
           <Callout intent="warning">
             <code className="font-mono text-sm">mirrorOf</code> only redirects
             Maven Central. Dependencies resolved from other repositories
             declared in your <code className="font-mono text-sm">pom.xml</code>{" "}
-            bypass the proxy unless you list them as well.
+            bypass the proxy. To route them through the proxy as well, add them
+            to <code className="font-mono text-sm">mirrorOf</code> and set an
+            upstream registry below that serves all of them, for example a Nexus
+            or Artifactory group repository.
           </Callout>
         </div>
       );
@@ -236,7 +278,7 @@ default = true`}
             nameKey="composer-proxy-url"
             copyable
           />
-          <p className="my-4 text-sm">
+          <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">composer.json</span>
             <CopyCode
               language="json"
@@ -250,7 +292,7 @@ default = true`}
                 2,
               )}
             />
-          </p>
+          </div>
           <Callout intent="warning">
             If your project already has a{" "}
             <code className="font-mono text-sm">composer.lock</code>, it still
@@ -273,12 +315,12 @@ default = true`}
             nameKey="oci-proxy-url"
             copyable
           />
-          <p className="my-4 text-sm">
+          <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">Example</span>
             <CopyCodeFragment
               codeString={`docker pull ${url}/docker.io/library/nginx:latest`}
             />
-          </p>
+          </div>
           <Callout intent="warning">
             You need to provide the full original registry and image path after
             the proxy URL. For example, if you want to pull nginx:latest from
@@ -359,6 +401,7 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
   const [minReleaseAge, setMinReleaseAge] = useState(
     defaultConfig.minReleaseAge,
   );
+  const [registries, setRegistries] = useState<Record<string, string>>({});
   const [codeError, setCodeError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [rulesHelpOpen, setRulesHelpOpen] = useState(false);
@@ -392,6 +435,7 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
       const config = data ?? defaultConfig;
       setRulesText(config.rules);
       setMinReleaseAge(config.minReleaseAge);
+      setRegistries(config.registries ?? {});
       initializedForScope.current = scopeKey;
     }
   }, [data, scopeKey]);
@@ -411,11 +455,26 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
     }
   };
 
+  const savedConfig = data ?? defaultConfig;
+  const cleanedRegistries = cleanRegistries(registries);
+  const isUnchanged =
+    rulesText === savedConfig.rules &&
+    minReleaseAge === savedConfig.minReleaseAge &&
+    sameRegistries(cleanedRegistries, savedConfig.registries ?? {});
+  const hasInvalidRegistry = Object.values(cleanedRegistries).some(
+    (value) => !/^https?:\/\/\S+$/.test(value),
+  );
+  const upstream = upstreamRegistries[selectedProxyTab];
+
   const handleSave = async () => {
     if (!scope) return;
     setIsSaving(true);
     try {
-      await saveConfig({ rules: rulesText, minReleaseAge });
+      await saveConfig({
+        rules: rulesText,
+        minReleaseAge,
+        registries: cleanedRegistries,
+      });
     } catch {
       setCodeError("Failed to save dependency proxy settings");
       toast.error("Failed to save dependency proxy settings");
@@ -621,8 +680,8 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
                 onSave={
                   codeError ||
                   isSaving ||
-                  (rulesText === (data ?? defaultConfig).rules &&
-                    minReleaseAge === (data ?? defaultConfig).minReleaseAge) ||
+                  isUnchanged ||
+                  hasInvalidRegistry ||
                   data === undefined
                     ? undefined
                     : handleSave
@@ -663,6 +722,51 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
             </p>
           </div>
         </Section>
+        <Section
+          title="Upstream Registry"
+          description="Replace the public registry the proxy fetches packages from, for example with a private Nexus or Artifactory repository. Leave the field empty to use the public default."
+        >
+          <div className="flex flex-1 flex-col gap-4">
+            {upstream ? (
+              <div>
+                <span className="text-sm mb-2 flex items-center font-medium capitalize">
+                  {ecosystemIcons[selectedProxyTab] && (
+                    <Image
+                      src={ecosystemIcons[selectedProxyTab]}
+                      alt=""
+                      width={16}
+                      height={16}
+                      className="mr-1 inline-block h-4 w-4"
+                    />
+                  )}
+                  {selectedProxyTab} Registry URL
+                </span>
+                <Input
+                  type="url"
+                  variant="onCard"
+                  placeholder={upstream.defaultUrl}
+                  value={registries[upstream.key] ?? ""}
+                  onChange={(e) =>
+                    setRegistries((current) => ({
+                      ...current,
+                      [upstream.key]: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                OCI images are pulled from the registry named in the image
+                reference, so no upstream registry can be configured.
+              </p>
+            )}
+            {hasInvalidRegistry && (
+              <p className="text-sm text-destructive">
+                Registry URLs must start with http:// or https://.
+              </p>
+            )}
+          </div>
+        </Section>
         <div className="sticky bottom-0 flex justify-end pt-2">
           <Button
             onClick={handleSave}
@@ -670,8 +774,8 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
               isSaving ||
               data === undefined ||
               !!codeError ||
-              (rulesText === (data ?? defaultConfig).rules &&
-                minReleaseAge === (data ?? defaultConfig).minReleaseAge)
+              isUnchanged ||
+              hasInvalidRegistry
             }
           >
             {isSaving ? "Saving..." : "Save"}

@@ -10,4 +10,5 @@ export interface CheckResult {
 export interface DependencyProxyConfig {
   rules: string;
   minReleaseAge: number;
+  registries?: Record<string, string>;
 }
