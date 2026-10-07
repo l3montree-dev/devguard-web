@@ -95,7 +95,7 @@
     "rehype-external-links": "^3.0.0",
     "remark-gfm": "4.0.1",
     "sass": "^1.103.1",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "sonner": "^2.0.8",
     "swr": "^2.5.1",
     "tailwind-merge": "^3.7.0",
@@ -106,7 +106,7 @@
   },
   "overrides": {
     "react-hook-form": "7.86.0",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "js-yaml": "4.3.2",
     "postcss": "^8.5.28",
     "fast-uri": "3.1.8",
