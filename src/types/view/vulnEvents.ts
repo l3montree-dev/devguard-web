@@ -11,11 +11,7 @@ interface BaseVulnEventDTO {
   createdAt: string;
   id: string;
   vulnId: string;
-  vulnType:
-    | "dependencyVuln"
-    | "firstPartyVuln"
-    | "compliancePosture"
-    | "securityAdvisory";
+  vulnType: S["dtos.VulnType"];
   justification: string;
   mechanicalJustification: string;
   vulnerabilityName: string | null;
