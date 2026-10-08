@@ -40,7 +40,9 @@ interface Props {
   // defaults to the first step which is not done yet
   initialStepIndex?: number;
   // local storage key to remember the steps the user already continued from
-  storageKey: string;
+  storageKey?: string;
+  // the steps happen on different pages - no step navigation, the step content moves on
+  readOnly?: boolean;
 }
 
 const OnboardingSteps: FunctionComponent<Props> = ({
@@ -48,8 +50,10 @@ const OnboardingSteps: FunctionComponent<Props> = ({
   steps,
   initialStepIndex = 0,
   storageKey,
+  readOnly = false,
 }) => {
   const [completed, setCompleted] = useState<string[]>(() => {
+    if (!storageKey) return [];
     try {
       return JSON.parse(readLocalStorage(storageKey) ?? "[]");
     } catch {
@@ -64,7 +68,7 @@ const OnboardingSteps: FunctionComponent<Props> = ({
   const isLast = current === steps.length - 1;
 
   const handleContinue = () => {
-    if (!completed.includes(step.id)) {
+    if (storageKey && !completed.includes(step.id)) {
       const next = [...completed, step.id];
       setCompleted(next);
       writeLocalStorage(storageKey, JSON.stringify(next));
@@ -99,8 +103,9 @@ const OnboardingSteps: FunctionComponent<Props> = ({
                 )}
                 <button
                   type="button"
+                  disabled={readOnly}
                   onClick={() => setActiveIndex(i)}
-                  className="flex gap-4 text-left"
+                  className="flex gap-4 text-left disabled:cursor-default"
                   aria-current={isActive ? "step" : undefined}
                 >
                   <span
@@ -170,7 +175,7 @@ const OnboardingSteps: FunctionComponent<Props> = ({
             </div>
           </div>
         )}
-        {(current > 0 || !isLast || step.actions) && (
+        {!readOnly && (current > 0 || !isLast || step.actions) && (
           <div className="mt-auto flex items-center gap-2 pt-10 justify-end">
             {current > 0 && (
               <Button
