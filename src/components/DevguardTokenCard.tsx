@@ -2,35 +2,57 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import useAccessToken from "../hooks/useAccessToken";
-import CopyCode from "./common/CopyCode";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
 import { InputWithButton } from "./ui/input-with-button";
+import {
+  innerCardClassName,
+  innerInputVariant,
+  type Surface,
+} from "@/lib/surface";
 
 const DevguardTokenCard = ({
   title = "Create a new variable / secret",
+  variant,
+  description = "Your pipeline uses this token to upload the scan results to DevGuard. Create a token, copy it and store it as a masked variable/ secret. It is only shown once.",
 }: {
   title?: string;
+  description?: string;
+  // the surface the card is rendered on
+  variant?: Surface;
 }) => {
   const { accessToken: pat, onCreateAccessToken: onCreatePat } =
     useAccessToken();
   return (
-    <Card>
+    <Card className={innerCardClassName(variant)}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-2">
-          <span className="mb-2 block text-sm font-semibold">Name</span>
-          <CopyCode language="shell" codeString={`DEVGUARD_TOKEN`} />
+          <InputWithButton
+            label="Name"
+            value={`DEVGUARD_TOKEN`}
+            copyable={true}
+            copyToastDescription="The DevGuard token name has been copied to your clipboard."
+            nameKey="devguard-token-name"
+            variant={innerInputVariant(variant)}
+          />
         </div>
         <div className="mb-2">
           <InputWithButton
             label="Secret token"
             nameKey="devguard-secret-token"
+            variant={innerInputVariant(variant)}
             copyable={true}
             copyToastDescription="The DevGuard token has been copied to your clipboard."
             mutable={true}
-            variant="onCard"
             value={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
             update={{
               update: () =>

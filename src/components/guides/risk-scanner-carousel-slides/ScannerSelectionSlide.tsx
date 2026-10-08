@@ -4,6 +4,7 @@
 import { CubeTransparentIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
@@ -22,6 +23,8 @@ interface ScannerSelectionSlideProps {
   devguardCliSlideIndex: number;
   customSetupSlideIndex: number;
   informationSourceSlideIndex: number;
+  // undefined if the dialog opened on this slide - there is nothing to go back to
+  prevIndex?: number;
 }
 
 export default function ScannerSelectionSlide({
@@ -30,6 +33,7 @@ export default function ScannerSelectionSlide({
   informationSourceSlideIndex,
   devguardToolsSlideIndex,
   customSetupSlideIndex,
+  prevIndex,
 }: ScannerSelectionSlideProps) {
   return (
     <CarouselItem>
@@ -53,7 +57,7 @@ export default function ScannerSelectionSlide({
                 className="inline-block mr-2 w-4 h-4"
               />
               Devguard CI/CD Integration
-              <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+              <Badge variant="default" className="ml-auto">
                 Recommended
               </Badge>
             </CardTitle>
@@ -79,7 +83,7 @@ export default function ScannerSelectionSlide({
                 className="inline-block mr-2 w-4 h-4"
               />
               Devguard CLI
-              <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+              <Badge variant="default" className="ml-auto">
                 Recommended
               </Badge>
             </CardTitle>
@@ -103,7 +107,7 @@ export default function ScannerSelectionSlide({
                 className="inline-block mr-2 w-4 h-4"
               />
               Use your own Scanner or manually upload
-              <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
+              <Badge variant="blue" className="ml-auto">
                 Expert
               </Badge>
             </CardTitle>
@@ -123,7 +127,7 @@ export default function ScannerSelectionSlide({
             <CardTitle className="text-lg items-center flex flex-row leading-tight">
               <LinkIcon className="inline-block mr-2 w-4 h-4" />
               External SBOM URLs (URL)
-              <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
+              <Badge variant="blue" className="ml-auto">
                 Expert
               </Badge>
             </CardTitle>
@@ -134,6 +138,17 @@ export default function ScannerSelectionSlide({
           </CardHeader>
         </Card>
       </div>
+      {prevIndex !== undefined && (
+        <div className="mt-10 flex flex-row gap-2 justify-end">
+          <Button
+            variant={"secondary"}
+            id="scanner-selection-back"
+            onClick={() => api?.scrollTo(prevIndex)}
+          >
+            Back
+          </Button>
+        </div>
+      )}
     </CarouselItem>
   );
 }

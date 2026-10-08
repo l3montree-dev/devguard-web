@@ -16,12 +16,10 @@
 // limitations under the License.
 
 import type { Config } from "@/types/common";
-import { ImageZoom } from "../../common/Zoom";
-import DevguardTokenCard from "../../DevguardTokenCard";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import { useTheme } from "next-themes";
+import CiTokenSetup, { ciTokenInstructions } from "./CiTokenSetup";
 
 interface GithubTokenSlideProps {
   pat?: string;
@@ -38,44 +36,20 @@ interface GithubTokenSlideProps {
 }
 
 const GithubTokenSlide = ({
-  prevIndex,
   api,
+  prevIndex,
   yamlGeneratorSlideIndex,
 }: GithubTokenSlideProps) => {
-  const { theme } = useTheme();
-  const imageSrc =
-    theme === "dark"
-      ? "/assets/repo-secret-dark.png"
-      : "/assets/repo-secret.png";
-
   return (
     <CarouselItem>
       <DialogHeader>
-        <DialogTitle>
-          Navigate to Settings &gt; Secrets and Variables &gt; Actions. Press
-          the button &quot;New repository secret&quot;
-        </DialogTitle>
+        <DialogTitle>{ciTokenInstructions.github.title}</DialogTitle>
         <DialogDescription>
-          For example, for the DevGuard project its following url:
-          https://github.com/l3montree-dev/devguard/settings/secrets/actions
+          {ciTokenInstructions.github.description}
         </DialogDescription>
       </DialogHeader>
       <div className="mt-10">
-        <div
-          className="relative aspect-video w-full
-            max-w-4xl"
-        >
-          <ImageZoom
-            alt="Open the project settings in GitHub"
-            className="rounded-lg border object-fill"
-            src={imageSrc}
-            fill
-          />
-        </div>
-      </div>
-
-      <div className="mt-10">
-        <DevguardTokenCard />
+        <CiTokenSetup provider="github" />
       </div>
       <div className="flex mt-10 flex-row gap-2 justify-end">
         <Button

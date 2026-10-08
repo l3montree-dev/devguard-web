@@ -125,7 +125,6 @@ export class DevGuardPOM {
     const inputFile = path.isAbsolute(sbomFile)
       ? sbomFile
       : path.join(__dirname, "../../assets/", sbomFile);
-    await this.setup().setupOwnRiskScanning();
     await this.setup().uploadSbomFile(inputFile);
   }
 

@@ -11,17 +11,12 @@ export class SetupFlow {
     return new RepoFlow(this.page);
   }
 
-  async setupOwnRiskScanning() {
-    await this.page.getByTestId("manual-upload-card").click();
-    await this.page.getByTestId("upload-manually").click();
-  }
-
   async uploadSbomFile(inputFile: string) {
-    await this.page.getByTestId("sbom-tab").click();
+    // the onboarding page has a single upload field which detects the file type
     await this.page
-      .getByTestId("file-upload-input-file-upload-sbom")
+      .getByTestId("file-upload-input-onboarding-upload")
       .setInputFiles(inputFile);
-    await this.page.getByTestId("manual-integration-continue").click();
+    await this.page.getByTestId("onboarding-upload-submit").click();
   }
 
   async setupAutoRiskScanning() {
