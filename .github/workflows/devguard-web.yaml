@@ -94,7 +94,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check generated API client
+      - name: Regenerate API client and typecheck
         run: make api-client-check
 
   code-scanning:

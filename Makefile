@@ -16,8 +16,9 @@ endif
 	@echo "Wrote $(API_CLIENT_OUT)"
 
 api-client-check:: api-client
-	@test -z "$$(git status --porcelain -- $(API_CLIENT_OUT))" \
-		|| { echo "::error::$(API_CLIENT_OUT) is stale - run 'make api-client' and commit the result."; git --no-pager diff -- $(API_CLIENT_OUT); exit 1; }
+	@echo "Typechecking against regenerated $(API_CLIENT_OUT)..."
+	@npx tsc --noEmit -p tsconfig.json \
+		|| { echo "::error::Code no longer typechecks against the current API spec - run 'make api-client' and fix the type errors."; exit 1; }
 
 NIX_CACHE_BUCKET     ?= nix.garage.l3montree.cloud
 NIX_CACHE_ENDPOINT   ?= s3.garage.l3montree.cloud
