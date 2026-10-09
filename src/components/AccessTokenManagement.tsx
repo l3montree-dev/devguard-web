@@ -50,6 +50,8 @@ interface AccessTokenManagementProps {
   section: {
     title: string;
     description: string;
+    forceVertical?: boolean;
+    primaryHeadline?: boolean;
   };
 }
 
@@ -161,6 +163,8 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
         id="access-tokens"
         title={section.title}
         description={section.description}
+        forceVertical={section.forceVertical}
+        primaryHeadline={section.primaryHeadline}
       >
         <Card className="pt-6">
           <form onSubmit={handleSubmit(handleCreatePat)}>

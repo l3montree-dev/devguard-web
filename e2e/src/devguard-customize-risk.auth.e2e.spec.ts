@@ -3,6 +3,7 @@
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import { docShot } from "./doc-shot";
+import { openSettingsSection } from "./pom/flows/settings-nav";
 
 test.use({ viewport: { width: 1440, height: 900 } });
 
@@ -19,6 +20,7 @@ test.describe("DevGuard customize risk scores", () => {
     await devguardPOM.repo().openSecurityRequirements();
     await docShot(page, testInfo, "security-requirements-settings");
     await page.getByRole("button", { name: "Close" }).click();
+    await openSettingsSection(page, "vulnerability-management");
     await page.getByTestId("reporting-range").click();
     await page.mouse.wheel(0, 200);
     await docShot(page, testInfo, "reporting-range-settings");

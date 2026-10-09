@@ -195,10 +195,10 @@ const ScanFileUpload: FunctionComponent<Props> = ({
         dropzone={dropzone}
       />
       {file && (
-        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           Detected file type:
           <Badge variant="secondary">{kindLabels[file.kind]}</Badge>
-        </p>
+        </div>
       )}
       {showOptions && (
         <ManualUploadOptionsFields

@@ -12,7 +12,8 @@ import {
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Button } from "../ui/button";
-import AssetForm from "./AssetForm";
+import Section from "../common/Section";
+import { AssetFormGeneral } from "./asset-form/AssetFormGeneral";
 import type { AssetFormValues } from "@/types/view/asset";
 
 const defaultTitle = "Create new repository";
@@ -63,13 +64,12 @@ export const CreateRepositoryForm: FunctionComponent<Props> = ({
   const formElement = (
     <FormProvider {...form}>
       <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-        <AssetForm
-          forceVerticalSections
-          form={form}
-          showVulnsManagement={false}
-          showSecurityRequirements={false}
-          inputVariant={variant === "inline" ? "onCard" : "default"}
-        />
+        <Section forceVertical>
+          <AssetFormGeneral
+            form={form}
+            inputVariant={variant === "inline" ? "onCard" : "default"}
+          />
+        </Section>
         {variant === "dialog" ? (
           <DialogFooter>{submitButton}</DialogFooter>
         ) : (

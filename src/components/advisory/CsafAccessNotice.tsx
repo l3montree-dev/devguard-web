@@ -16,7 +16,7 @@ export const useCsafAccess = () => {
 
   return {
     sharesInformation: asset?.sharesInformation ?? false,
-    settingsHref: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings#vulnerability-management`,
+    settingsHref: `/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings/vulnerability-management`,
   };
 };
 

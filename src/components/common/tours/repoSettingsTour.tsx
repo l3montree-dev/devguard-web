@@ -10,18 +10,18 @@ export const repoSettingsTourSteps: ConditionalStep[] = [
   {
     selector: '[data-tour="repo-settings-header"]',
     content:
-      "Welcome to Repository Settings. Here you can configure all aspects of this repository inside DevGuard — from general metadata to integrations and access control.",
+      "Welcome to Repository Settings. Use this navigation to configure all aspects of this repository inside DevGuard — from general metadata to integrations and access control.",
   },
   {
     selector: '[data-tour="repo-settings-vuln-management"]',
     content:
-      "Enable public access here to share this repository's vulnerability data via a public link — no login required. This lets you share reports or dashboards with external stakeholders directly.",
+      "Open Vulnerability management to enable public access and share this repository's vulnerability data via a public link — no login required. This lets you share reports or dashboards with external stakeholders directly.",
   },
   {
     selector: '[data-tour="repo-settings-webhook"]',
     content: (
       <>
-        Copy the{" "}
+        Open Webhooks to copy the{" "}
         <TourLink href={`${DOCS}/explanations/integrations/webhook-system`}>
           Webhook URL and Secret
         </TourLink>{" "}

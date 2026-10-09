@@ -3,37 +3,15 @@
 
 "use client";
 
-import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
-import Page from "@/components/Page";
+import DependencyProxySection from "@/components/common/settings/DependencyProxySection";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 
-const Config = () => {
-  const org = useActiveOrg();
-  const orgMenu = useOrganizationMenu();
-
-  const scope = org
-    ? ({ level: "organization", organization: org.slug } as const)
-    : null;
+export default function OrgDependencyProxyPage() {
+  const { slug } = useActiveOrg();
 
   return (
-    <Page
-      breadcrumbs={[
-        {
-          title: "Settings",
-          href: "./",
-        },
-        {
-          title: "Dependency Proxy",
-          href: "",
-        },
-      ]}
-      title={"Dependency Proxy (" + org.name + ")"}
-      Menu={orgMenu}
-    >
-      <DependencyProxyConfigs scope={scope} />
-    </Page>
+    <DependencyProxySection
+      scope={{ level: "organization", organization: slug }}
+    />
   );
-};
-
-export default Config;
+}

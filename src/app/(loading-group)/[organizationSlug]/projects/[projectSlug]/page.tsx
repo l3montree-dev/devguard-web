@@ -145,6 +145,8 @@ export default function RepositoriesPage() {
   const handleCreateAsset = async (data: AssetFormValues) => {
     const modifiedData = {
       ...data,
+      // "None" is stored as "", but the API only accepts github/gitlab or no value
+      repositoryProvider: data.repositoryProvider || undefined,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
         ? data.cvssAutomaticTicketThreshold[0]
         : 2,

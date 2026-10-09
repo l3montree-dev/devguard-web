@@ -17,6 +17,7 @@ export class SetupFlow {
       .getByTestId("file-upload-input-onboarding-upload")
       .setInputFiles(inputFile);
     await this.page.getByTestId("onboarding-upload-submit").click();
+    await this.page.waitForURL(/\/(dependency-risks|code-risks|vex-rules)/);
   }
 
   async setupAutoRiskScanning() {
