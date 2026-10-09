@@ -80,7 +80,9 @@ export const useProjectMenu = () => {
           title: "Settings",
           href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
           Icon: CogIcon,
-          isActive: pathname === `/${orgSlug}/projects/${projectSlug}/settings`,
+          isActive: pathname.startsWith(
+            `/${orgSlug}/projects/${projectSlug}/settings`,
+          ),
           testId: "nav-group-settings",
         },
       ],

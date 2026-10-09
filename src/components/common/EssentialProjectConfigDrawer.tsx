@@ -48,7 +48,7 @@ export function EssentialProjectConfigContent({
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold">Repository Access Token</p>
             <Link
-              href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings#access-tokens`}
+              href={`/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/settings/access-tokens`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-foreground underline"

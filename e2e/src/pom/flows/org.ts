@@ -5,6 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
 import { envConfig, goto } from "../../utils";
 import { docShot } from "../../doc-shot";
+import { openSettingsSection } from "./settings-nav";
 
 export class OrgFlow {
   constructor(private page: Page) {}
@@ -56,6 +57,7 @@ export class OrgFlow {
 
   async inviteUserOrg(mail: string) {
     await this.page.getByTestId("nav-org-settings").click();
+    await openSettingsSection(this.page, "members");
     await this.page
       .getByTestId("add-member-button")
       .waitFor({ state: "visible", timeout: 10_000 });
@@ -88,6 +90,8 @@ export class OrgFlow {
 
   async verifyMemberInSettings(memberName: string) {
     await this.page.getByTestId("nav-org-settings").click();
+    await openSettingsSection(this.page, "members");
+    await this.page.waitForURL(/\/settings\/members/);
     await this.page.reload();
     await expect(this.page.locator("tbody").getByText(memberName)).toBeVisible({
       timeout: 30_000,
@@ -132,6 +136,7 @@ export class OrgFlow {
 
   async publishOrg() {
     await this.page.getByTestId("nav-org-settings").click();
+    await openSettingsSection(this.page, "danger-zone");
     await this.page.getByTestId("public-org-switch").click();
   }
 }

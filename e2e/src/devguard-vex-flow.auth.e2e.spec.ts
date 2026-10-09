@@ -140,25 +140,24 @@ test.describe("DevGuard handle vuln flows", () => {
     const sbomUrlRepo2 = await devguardPOM.repo().copyPublishedSBOMUrl();
     await devguardPOM.repo().navigateToGroup();
 
-    // Setup release asset
+    // Setup release asset - onboarding has no external SBOM entry anymore, so
+    // upload an SBOM to get a ref and add the external URLs via the artifacts page
     await devguardPOM
       .repo()
       .createGitHubRepo(
         `Release Asset`,
         "This repo contains top secret release information.",
       );
-    await docShot(page, testInfo, "upstream-url-field");
-    await page.getByTestId("external-url-card").click();
-    await page.getByTestId("artifact-name-input").click();
+    await devguardPOM.setupSbomUpload();
+    await page.getByTestId("nav-asset-artifacts").click();
+    await page.getByTestId("create-artifact-button").click();
     await page.getByTestId("artifact-name-input").fill("pkg:oci/release-asset");
     await page.getByTestId("sbom-url-upload-button").click();
-    await page.getByTestId("upstream-url-field").click({
-      modifiers: ["ControlOrMeta"],
-    });
     await page.getByTestId("upstream-url-field").fill(sbomUrlRepo1);
+    await docShot(page, testInfo, "upstream-url-field");
     await page.getByTestId("sbom-url-upload-button").click();
     await page.getByTestId("upstream-url-field").nth(1).fill(sbomUrlRepo2);
     await docShot(page, testInfo, "create-release-asset");
-    await page.getByTestId("setup-information-sources-create").click();
+    await page.getByTestId("submit-artifact-button").click();
   });
 });

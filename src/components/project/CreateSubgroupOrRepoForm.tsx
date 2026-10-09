@@ -24,7 +24,7 @@ export const CreateSubgroupOrRepoForm: FunctionComponent<Props> = ({
 
   return (
     <Tabs
-      className="w-full max-w-6xl"
+      className="w-full"
       value={tab}
       onValueChange={(value) => setTab(value as "repository" | "subgroup")}
     >
@@ -40,10 +40,10 @@ export const CreateSubgroupOrRepoForm: FunctionComponent<Props> = ({
           Create new Subgroup
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="repository">
+      <TabsContent value="repository" className="mt-6">
         <CreateRepositoryForm variant="inline" onSubmit={onCreateRepository} />
       </TabsContent>
-      <TabsContent value="subgroup">
+      <TabsContent value="subgroup" className="mt-6">
         <CreateGroupForm
           variant="inline"
           onSubmit={onCreateSubgroup}

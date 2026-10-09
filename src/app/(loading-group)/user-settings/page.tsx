@@ -1,20 +1,13 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { fetchSession } from "@/data-fetcher/fetchSession";
+import Section from "@/components/common/Section";
+import UserSettings from "@/components/UserSettings";
 import oryConfig from "@/ory.config";
 import { getSettingsFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
-import { redirect } from "next/navigation";
-import Page from "../../../components/Page";
-import UserSettings from "../../../components/UserSettings";
-import PatManagementSection from "./PatManagementSection";
 
-const SettingsPage = async (props: OryPageParams) => {
-  if (!(await fetchSession())) {
-    redirect("/login?return_to=/user-settings");
-  }
-
+export default async function AccountSettingsPage(props: OryPageParams) {
   const flow = await getSettingsFlow(oryConfig, props.searchParams);
 
   if (!flow) {
@@ -22,13 +15,15 @@ const SettingsPage = async (props: OryPageParams) => {
   }
 
   return (
-    <Page title="Profile Management and Security Settings">
+    <Section
+      forceVertical
+      primaryHeadline
+      title="Account"
+      description="Manage your profile, password and two-factor authentication."
+    >
       <div className="dark:text-white">
         <UserSettings flow={flow as any} config={oryConfig} />
-        <PatManagementSection />
       </div>
-    </Page>
+    </Section>
   );
-};
-
-export default SettingsPage;
+}

@@ -74,7 +74,12 @@ export function OrySettingsSectionContent({
   description,
 }: OryFormSectionContentProps) {
   return (
-    <Section Title={title} description={description} className="space-y-4">
+    <Section
+      forceVertical
+      Title={title}
+      description={description}
+      className="space-y-4"
+    >
       <Card className="p-6 flex flex-col gap-4">{children}</Card>
     </Section>
   );

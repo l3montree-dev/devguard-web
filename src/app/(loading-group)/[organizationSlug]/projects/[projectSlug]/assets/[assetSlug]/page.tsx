@@ -4,7 +4,6 @@
 "use client";
 import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
-import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 import Page from "@/components/Page";
 import PageSkeleton from "@/components/PageSkeleton";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
@@ -13,41 +12,95 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import type { FunctionComponent } from "react";
 import Autosetup from "../../../../../../../components/Autosetup";
-import RiskScannerDialog from "../../../../../../../components/RiskScannerDialog";
 import { useAsset } from "../../../../../../../context/AssetContext";
 import { useConfig } from "../../../../../../../context/ConfigContext";
 import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
-import { externalProviderIdToIntegrationName } from "../../../../../../../utils/externalProvider";
 import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
-import { SearchCode, Code, Blocks, Upload, Link2 } from "lucide-react";
-import { Badge, type BadgeProps } from "@/components/ui/badge";
+import {
+  Boxes,
+  Code,
+  Blocks,
+  KeyRound,
+  ListChecks,
+  Ship,
+  FolderGit2,
+  Ticket,
+  Webhook,
+  Workflow,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import IssueTrackerConnect from "@/components/onboarding/IssueTrackerConnect";
+import RepositorySelector from "@/components/guides/webhook-setup-carousel-slides/RepositorySelector";
+import WebhookSecretSetup, {
+  webhookInstructions,
+} from "@/components/guides/webhook-setup-carousel-slides/WebhookSecretSetup";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { ChevronDownIcon } from "lucide-react";
-import { EssentialProjectConfigContent } from "@/components/common/EssentialProjectConfigDrawer";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemGroup,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item";
 import { useActiveOrg } from "../../../../../../../hooks/useActiveOrg";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoSetupTourSteps } from "@/components/common/tours/repoSetupTour";
+import OnboardingSteps from "@/components/onboarding/OnboardingSteps";
+import ScanFileUpload from "@/components/onboarding/ScanFileUpload";
+import ScannerOptionsFields from "@/components/guides/risk-scanner-carousel-slides/ScannerOptionsFields";
+import CiTokenSetup, {
+  ciTokenInstructions,
+  type CiProvider,
+} from "@/components/guides/risk-scanner-carousel-slides/CiTokenSetup";
+import PipelineSnippet, {
+  pipelineFileHint,
+} from "@/components/guides/risk-scanner-carousel-slides/PipelineSnippet";
+import type { Config } from "@/types/common";
+
+const DOCS = "https://docs.devguard.org";
+
+const alternatives = [
+  {
+    icon: Code,
+    title: "DevGuard CLI",
+    description:
+      "Run the same scans locally or in any other CI system and upload the results.",
+    href: `${DOCS}/how-to-guides/scanning/scan-your-project/`,
+  },
+  {
+    icon: Boxes,
+    title: "DevGuard API",
+    description: "Integrate DevGuard into your own tooling.",
+    href: `${DOCS}/getting-started/use-devguard-api/`,
+  },
+  {
+    icon: Ship,
+    title: "Integrations and Connectors (e.g. Kubernetes)",
+    description:
+      "Wire it into your registry, bring it into your editor, or let AI agents work with it.",
+    href: `https://devguard.org/ecosystem-projects`,
+  },
+];
 
 const Index: FunctionComponent = () => {
   const assetMenu = useAssetMenu();
   const role = useCurrentUserRole();
-  const [riskScanningIsOpen, setRiskScanningOpen] = useState(false);
-  const [riskScanningInitialSlide, setRiskScanningInitialSlide] = useState<
-    number | undefined
-  >(undefined);
-  const [webhookIsOpen, setWebhookIsOpen] = useState(false);
   const config = useConfig();
   const latestScannerImage = useScannerImage();
   const autosetup = useAutosetup(
-    !riskScanningIsOpen,
+    true,
     config.devguardApiUrlPublicInternet,
     "full",
   );
@@ -61,6 +114,22 @@ const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   // check if we can redirect to the first ref
   const asset = useAsset();
+
+  const [scannerConfig, setScannerConfig] = useState<Config>({
+    "secret-scanning": true,
+    sast: true,
+    iac: true,
+    sca: true,
+    build: true,
+    "container-scanning": true,
+    push: true,
+    sign: true,
+    attest: true,
+    sbom: false,
+    sarif: false,
+  });
+  // undefined until the user picks one - defaults to the repository provider
+  const [ciProviderChoice, setCiProvider] = useState<CiProvider>();
 
   useEffect(() => {
     if (!asset || asset.refs.length === 0) {
@@ -101,6 +170,178 @@ const Index: FunctionComponent = () => {
     return <PageSkeleton />;
   }
 
+  const onUploaded = (destination: string) => {
+    // hard navigation - a fresh asset has a cached 404 for its refs
+    window.location.href = destination;
+  };
+
+  // assets synced from an external entity provider - gitlab and opencode, both are GitLab instances
+  const isSyncedFromGitLab = Boolean(asset.externalEntityProviderId);
+  const isGitLab = isSyncedFromGitLab || asset.repositoryProvider === "gitlab";
+
+  const ciProvider: CiProvider =
+    ciProviderChoice ?? (isGitLab ? "gitlab" : "github");
+  const gitInstance = ciProvider === "github" ? "GitHub" : "Gitlab";
+
+  const customSetup = (
+    <div data-tour="onboarding-steps">
+      <OnboardingSteps
+        hint="Integrate DevGuard into your CI/CD pipeline to scan on every push."
+        storageKey={`devguard:onboarding:${asset.id}`}
+        steps={[
+          {
+            id: "build-platform",
+            icon: Blocks,
+            title: "Choose your build platform",
+            summary: "Where does your CI/CD pipeline run?",
+            description:
+              "DevGuard generates the pipeline configuration for the platform you choose.",
+            content: (
+              <ToggleGroup
+                type="single"
+                variant="outline"
+                className="justify-start"
+                value={ciProvider}
+                onValueChange={(v) => v && setCiProvider(v as CiProvider)}
+              >
+                <ToggleGroupItem
+                  value="github"
+                  className="data-[state=on]:border-primary"
+                >
+                  GitHub Actions
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="gitlab"
+                  className="data-[state=on]:border-primary"
+                >
+                  GitLab CI/CD
+                </ToggleGroupItem>
+              </ToggleGroup>
+            ),
+          },
+          {
+            id: "select-scans",
+            icon: ListChecks,
+            title: "Select your scans",
+            summary: "Choose the scans DevGuard should run in your pipeline.",
+            description:
+              "Choose from our curated list of scan and scanner setups to integrate.",
+            content: (
+              <ScannerOptionsFields
+                config={scannerConfig}
+                setConfig={setScannerConfig}
+                variant="onCard"
+              />
+            ),
+          },
+          {
+            id: "add-token",
+            icon: KeyRound,
+            title: "Add the DevGuard token",
+            summary:
+              "Store a DevGuard token as a secret in your CI/CD settings.",
+            description: (
+              <>
+                <span className="font-medium text-foreground">
+                  {ciTokenInstructions[ciProvider].title}
+                </span>
+                <br />
+                {ciTokenInstructions[ciProvider].description}
+              </>
+            ),
+            content: <CiTokenSetup provider={ciProvider} variant="onCard" />,
+          },
+          {
+            id: "add-pipeline",
+            icon: Workflow,
+            title: "Add the pipeline",
+            summary:
+              "Add the DevGuard jobs to your pipeline and push to run your first scan.",
+            description: pipelineFileHint,
+            content: (
+              <PipelineSnippet
+                scannerImage={latestScannerImage}
+                gitInstance={gitInstance}
+                config={scannerConfig}
+                orgSlug={activeOrg.slug}
+                projectSlug={params.projectSlug}
+                assetSlug={asset.slug}
+                apiUrl={config.devguardApiUrlPublicInternet}
+                frontendUrl={config.frontendUrl}
+                devguardCIComponentBase={config.devguardCIComponentBase}
+                variant="onCard"
+              />
+            ),
+            docs: [
+              ciProvider === "github"
+                ? {
+                    label: "Scan with GitHub Actions",
+                    href: `${DOCS}/how-to-guides/scanning/scan-with-github-actions/`,
+                  }
+                : {
+                    label: "Scan with GitLab CI",
+                    href: `${DOCS}/how-to-guides/scanning/scan-with-gitlab-ci/`,
+                  },
+              {
+                label: "Branches, tags and artifacts",
+                href: `${DOCS}/how-to-guides/scanning/branches-tags-and-artifacts/`,
+              },
+            ],
+          },
+          {
+            id: "issue-tracker",
+            icon: Ticket,
+            title: "Connect your issue tracker",
+            summary: "Let DevGuard create tickets in GitHub, GitLab or Jira.",
+            description: isSyncedFromGitLab
+              ? "Whenever DevGuard detects a new risk, it creates a ticket in your project. Invite the DevGuard Bot, so it is allowed to do so."
+              : "Whenever DevGuard detects a new risk, it creates a ticket in your issue tracker. There you can work on the risk and even use slash commands to apply mitigation strategies.",
+            content: <IssueTrackerConnect variant="onCard" />,
+            docs: [
+              {
+                label: "Jira Integration",
+                href: `${DOCS}/explanations/integrations/jira-integration/`,
+              },
+              {
+                label: "GitLab Ticket Sync",
+                href: `${DOCS}/how-to-guides/integrations/gitlab/ticket-sync/`,
+              },
+            ],
+          },
+          // synced assets are already linked to their repository
+          ...(isSyncedFromGitLab
+            ? []
+            : [
+                {
+                  id: "select-repository",
+                  icon: FolderGit2,
+                  title: "Select the repository",
+                  summary:
+                    "Choose where DevGuard creates the tickets for this repository.",
+                  description:
+                    "Connect this repository with a repository or project of your issue tracker.",
+                  content: (
+                    <RepositorySelector
+                      repositoryId={asset.repositoryId}
+                      repositoryName={asset.repositoryName}
+                      variant="onCard"
+                    />
+                  ),
+                },
+              ]),
+          {
+            id: "add-webhook",
+            icon: Webhook,
+            title: "Add the webhook",
+            summary: "Keep tickets and risks in sync in both directions.",
+            description: webhookInstructions,
+            content: <WebhookSecretSetup variant="onCard" />,
+          },
+        ]}
+      />
+    </div>
+  );
+
   return (
     <Page
       Menu={assetMenu}
@@ -110,246 +351,81 @@ const Index: FunctionComponent = () => {
     >
       {isLoggedIn(role) ? (
         <Section primaryHeadline forceVertical title="Welcome to DevGuard 🚀">
-          {((asset?.externalEntityProviderId &&
-            externalProviderIdToIntegrationName(
-              asset.externalEntityProviderId,
-            ) === "gitlab") ||
-            asset?.repositoryProvider === "gitlab") && (
-            <>
-              <div className="mb-8">
-                {asset?.externalEntityId || asset?.repositoryId ? (
-                  activeOrg.gitLabIntegrations.length > 0 ||
-                  asset.externalEntityProviderId ? (
-                    <Autosetup {...autosetup} />
-                  ) : (
-                    <div className="flex flex-col gap-4 rounded-lg border bg-card p-8">
-                      <div className="flex flex-col gap-2">
-                        <span className="font-semibold text-foreground">
-                          GitLab Integration required for Auto Setup
-                        </span>
-                        <span className="text-sm text-muted-foreground">
-                          To use the Auto Setup feature, you need to configure a
-                          GitLab integration for your organization first.
-                        </span>
-                      </div>
-                      <Button
-                        className="self-start"
-                        onClick={() => {
-                          setRiskScanningInitialSlide(2);
-                          setRiskScanningOpen(true);
-                        }}
-                      >
-                        Set up GitLab Integration
-                      </Button>
-                    </div>
-                  )
-                ) : (
-                  // No repository connected yet — guide the user to connect one
-                  <div className="flex flex-col gap-4 rounded-lg border bg-card p-8">
-                    <div className="flex flex-col gap-2">
-                      <span className="font-semibold text-foreground">
-                        Connect a GitLab repository for Auto Setup
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        Link this asset to a GitLab repository to use the Auto
-                        Setup feature.
-                      </span>
-                    </div>
-                    <Button
-                      data-testid="gitlab-connect-repository"
-                      className="self-start"
-                      onClick={() => {
-                        // ProviderSetupSlide (slide 3) if integration exists, else GitLabIntegrationSlide (slide 2)
-                        setRiskScanningInitialSlide(
-                          activeOrg.gitLabIntegrations.length > 0 ? 3 : 2,
-                        );
-                        setRiskScanningOpen(true);
-                      }}
-                    >
-                      Connect Repository
-                    </Button>
-                  </div>
-                )}
-              </div>
-              <hr className="mb-8" />
-            </>
+          {isSyncedFromGitLab ? (
+            // assets of external entity providers support the auto-setup, which
+            // takes care of all onboarding steps at once - the custom setup is the manual alternative
+            <Tabs defaultValue="auto-setup">
+              <TabsList>
+                <TabsTrigger value="auto-setup">Auto-Setup</TabsTrigger>
+                <TabsTrigger value="custom-setup">Custom setup</TabsTrigger>
+              </TabsList>
+              <TabsContent value="auto-setup" className="mt-4">
+                <Autosetup {...autosetup} />
+              </TabsContent>
+              <TabsContent value="custom-setup" className="mt-4">
+                {customSetup}
+              </TabsContent>
+            </Tabs>
+          ) : (
+            customSetup
           )}
-          <Card className="space-y-1.5 p-6 shadow-none">
-            <div className="flex gap-x-3 items-top">
-              <div className="flex items-center justify-center w-10 h-10 rounded-md bg-secondary">
-                <SearchCode className="w-5 h-5 text-secondary-foreground/70" />
-              </div>
-              <div className="flex-1">
-                <span className="font-semibold text-foreground">
-                  Check your Code for Risks
-                </span>
-                <div className="text-sm text-muted-foreground">
-                  Scan your code, dependencies, and infrastructure for
-                  vulnerabilities, leaked secrets, bad practices, and license
-                  issues. <br /> Connect your CI/CD pipeline to scan on every
-                  push.
-                </div>
-                {(() => {
-                  const isGitLab =
-                    (asset?.externalEntityProviderId &&
-                      externalProviderIdToIntegrationName(
-                        asset.externalEntityProviderId,
-                      ) === "gitlab") ||
-                    asset?.repositoryProvider === "gitlab";
-
-                  // Slide indices in RiskScannerDialog carousel:
-                  // 7  = ScannerOptionsSelectionSlide (CI/CD tools)
-                  // 16 = DevGuardCliSlide
-                  // 11 = IntegrationMethodSelectionSlide (manual upload)
-                  // 15 = SetupInformationSourceSlide (supplier URL)
-                  const allCards: {
-                    icon: React.ReactNode;
-                    name: string;
-                    sub: string;
-                    badge?: { label: string; variant: BadgeProps["variant"] };
-                    githubOnly: boolean;
-                    slide: number;
-                    testId: string;
-                    tour: string;
-                    docsLink?: string;
-                  }[] = [
-                    {
-                      icon: <Blocks />,
-                      name: "DevGuard CI/CD Integration",
-                      sub: "From our curated list of scans and scanners, select the ones you want to use.",
-                      badge: { label: "Recommended", variant: "default" },
-                      githubOnly: false,
-                      slide: 7,
-                      testId: "own-setup-card",
-                      tour: "setup-risk-scan",
-                    },
-                    {
-                      icon: <Code />,
-                      name: "DevGuard CLI",
-                      sub: "Use the DevGuard CLI to run scans and upload the results to DevGuard.",
-                      githubOnly: false,
-                      slide: 16,
-                      testId: "devguard-cli-card",
-                      tour: "setup-devguard-cli",
-                    },
-                    {
-                      icon: <Upload />,
-                      name: "Manually Upload",
-                      sub: "You already have a SARIF/ SBOM file and want to scan for known vulnerabilities or manage your findings.",
-                      githubOnly: false,
-                      slide: 11,
-                      testId: "manual-upload-card",
-                      tour: "setup-manual-upload",
-                    },
-                    {
-                      icon: <Link2 />,
-                      name: "External SBOM URLs",
-                      sub: "Bundle several component SBOMs into one release asset, or link a supplier's. Fetched and updated periodically.",
-                      githubOnly: false,
-                      slide: 15,
-                      testId: "external-url-card",
-                      tour: "setup-external-url",
-                      docsLink:
-                        "https://docs.devguard.org/how-to-guides/vex/multi-level-vexing/",
-                    },
-                  ];
-
-                  const cards = allCards.filter((c) =>
-                    isGitLab ? !c.githubOnly : true,
-                  );
-
-                  return (
-                    <div
-                      className={`grid gap-4 mt-4 ${cards.length === 3 ? "grid-cols-3" : "grid-cols-4"}`}
-                    >
-                      {cards.map(
-                        ({
-                          icon,
-                          name,
-                          sub,
-                          badge,
-                          slide,
-                          testId,
-                          docsLink,
-                          tour,
-                        }) => (
-                          <div
-                            key={name}
-                            data-testid={testId}
-                            data-tour={tour}
-                            className={`relative flex flex-col gap-1.5 rounded-lg border hover:bg-muted p-4 text-left ${
-                              badge?.variant === "default"
-                                ? "border-primary"
-                                : "border-secondary"
-                            }`}
-                          >
-                            <button
-                              type="button"
-                              aria-label={name}
-                              className="absolute inset-0 cursor-pointer rounded-lg"
-                              onClick={() => {
-                                setRiskScanningInitialSlide(slide);
-                                setRiskScanningOpen(true);
-                              }}
-                            />
-                            <div className="flex items-center justify-between">
-                              {icon}
-                              {badge && (
-                                <Badge variant={badge.variant}>
-                                  {badge.label}
-                                </Badge>
-                              )}
-                            </div>
-                            <span className="text-base font-medium">
-                              {name}
-                            </span>
-                            <span className="text-sm leading-relaxed text-muted-foreground">
-                              {sub}{" "}
-                              {docsLink && (
-                                <a
-                                  href={docsLink}
-                                  target="_blank"
-                                  className="relative text-primary"
-                                >
-                                  Learn more
-                                </a>
-                              )}
-                            </span>
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  );
-                })()}
-              </div>
-            </div>
-          </Card>
-          <Collapsible className="mb-6 mt-4 pb-6 cursor-pointer border rounded-lg p-6 bg-card">
-            <CollapsibleTrigger className="flex w-full items-center justify-between group cursor-pointer">
-              <div className="text-left">
-                <h2 className="text-base font-semibold leading-7 text-foreground">
-                  Project Config
-                </h2>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  These values are required to connect your CI/CD pipeline or
-                  tooling to this asset.
-                </p>
-              </div>
-              <ChevronDownIcon className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="mt-4">
-                <EssentialProjectConfigContent
-                  organizationSlug={params.organizationSlug}
-                  projectSlug={params.projectSlug}
-                  assetSlug={params.assetSlug}
-                  repositoryProvider={
-                    asset.repositoryProvider as "github" | "gitlab" | undefined
-                  }
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card data-tour="onboarding-upload" className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Already have a report?
+                </CardTitle>
+                <CardDescription>
+                  Upload a CycloneDX SBOM, a SARIF report or a VEX document. The
+                  file type is detected automatically.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-1 flex-col">
+                <ScanFileUpload
+                  onUploaded={onUploaded}
+                  showOptions={false}
+                  variant="onCard"
                 />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+              </CardContent>
+            </Card>
+            <Card data-tour="onboarding-alternatives">
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Other ways to get started
+                </CardTitle>
+                <CardDescription>
+                  Not using GitHub Actions or GitLab CI/CD? These guides show
+                  alternative setups.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ItemGroup className="gap-2">
+                  {alternatives.map((a) => (
+                    <Item key={a.title} variant="outline" size="sm">
+                      <ItemMedia variant="icon">
+                        <a.icon />
+                      </ItemMedia>
+                      <ItemContent>
+                        <ItemTitle>{a.title}</ItemTitle>
+                        <ItemDescription>{a.description}</ItemDescription>
+                      </ItemContent>
+                      <ItemActions>
+                        <Button size="xs" variant="outline" asChild>
+                          <a
+                            href={a.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Docs
+                          </a>
+                        </Button>
+                      </ItemActions>
+                    </Item>
+                  ))}
+                </ItemGroup>
+              </CardContent>
+            </Card>
+          </div>
         </Section>
       ) : (
         <Section
@@ -361,20 +437,6 @@ const Index: FunctionComponent = () => {
           <div></div>
         </Section>
       )}
-      <RiskScannerDialog
-        open={riskScanningIsOpen}
-        onOpenChange={setRiskScanningOpen}
-        apiUrl={config.devguardApiUrlPublicInternet}
-        frontendUrl={config.frontendUrl}
-        devguardCIComponentBase={config.devguardCIComponentBase}
-        devguardWebLatestScannerImage={latestScannerImage}
-        initialSlide={riskScanningInitialSlide}
-        onboarding
-      />
-      <WebhookSetupTicketIntegrationDialog
-        open={webhookIsOpen}
-        onOpenChange={setWebhookIsOpen}
-      />
     </Page>
   );
 };

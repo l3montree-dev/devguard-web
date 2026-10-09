@@ -65,7 +65,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <CommandLineIcon className="inline-block mr-2 w-4 h-4" />
                 Use our CLI
-                <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                <Badge variant="default" className="ml-auto">
                   Recommended
                 </Badge>
               </CardTitle>
@@ -87,7 +87,7 @@ const IntegrationMethodSelectionSlide: FunctionComponent<
               <CardTitle className="text-lg items-center flex flex-row leading-tight">
                 <DocumentArrowUpIcon className="inline-block mr-2 w-4 h-4" />
                 Upload manually
-                <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
+                <Badge variant="blue" className="ml-auto">
                   File Upload
                 </Badge>
               </CardTitle>

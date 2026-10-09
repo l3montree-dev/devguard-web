@@ -4,6 +4,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
 import { DevGuardNavigationLevel } from "../devguard";
 import { clearToasts } from "./modal-helper";
+import { openSettingsSection } from "./settings-nav";
 
 export interface WebhookFormValues {
   name: string;
@@ -41,6 +42,7 @@ export class WebhookFlow {
     await navItem.click({ timeout: 5_000 });
 
     await expect(this.page).toHaveURL(/\/settings/, { timeout: 10_000 });
+    await openSettingsSection(this.page, "webhooks");
 
     const webhookSection = this.page.getByTestId("webhooks-section");
     await webhookSection.scrollIntoViewIfNeeded();
