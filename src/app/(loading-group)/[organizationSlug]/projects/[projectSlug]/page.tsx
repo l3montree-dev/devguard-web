@@ -43,6 +43,7 @@ import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
 import { useAutoTour } from "@/hooks/useAutoTour";
+import { truncateEnd } from "@/utils/common";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -90,6 +91,7 @@ export default function RepositoriesPage() {
   const [showProjectModal, setShowProjectModal] = useState(false);
 
   const projectMenu = useProjectMenu();
+  const truncatedProjectName = truncateEnd(project.name, 65);
 
   // a filtered list that comes back empty means "no matches", not "nothing created yet",
   // so the inline create form is only offered on the unfiltered, genuinely empty group
@@ -263,10 +265,10 @@ export default function RepositoriesPage() {
           }
           primaryHeadline
           description={
-            "Repositories managed by the " + project.name + " group."
+            "Repositories managed by the " + truncatedProjectName + " group."
           }
           forceVertical
-          title={project.name}
+          title={truncatedProjectName}
         >
           {!showInlineCreateForm && (
             <>

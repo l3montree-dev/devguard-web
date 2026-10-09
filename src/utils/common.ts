@@ -313,6 +313,12 @@ export const truncateMiddle = (
   return text.slice(0, start) + "..." + text.slice(-end);
 };
 
+export const truncateEnd = (text: string, maxLength: number = 50): string => {
+  if (text.length <= maxLength) return text;
+
+  return text.slice(0, maxLength) + "...";
+};
+
 export const formatPurlQualifiers = (purl: string, maxLength = 48) =>
   truncateMiddle(extractPurlQualifiers(purl), maxLength);
 
