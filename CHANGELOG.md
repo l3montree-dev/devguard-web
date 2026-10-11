@@ -4,6 +4,18 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.16.1] — 2026-10-09
+
+### Changed
+
+- **Generated API types check** — CI now type-checks the generated API types instead of diffing them against the committed files
+
+### Fixed
+
+- **Long names in project view** — long project names in the project view title and description are now cut off after 65 characters
+
+---
+
 ## [v1.16.0] — 2026-10-06
 
 ### Added
