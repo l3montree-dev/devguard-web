@@ -5,7 +5,7 @@
 import { createContext, useContext } from "react";
 import type { InformationSource } from "@/services/artifactService";
 import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
-import { NoopUpdater } from "./NoopUpdater";
+import { NoopUpdater } from "./noopUpdater";
 import type { WithUpdater } from "@/types/view/context";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";

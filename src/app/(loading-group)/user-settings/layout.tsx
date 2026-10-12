@@ -5,7 +5,7 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React from "react";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import type { OrganizationDetailsDTO } from "@/types/dto";
-import { NoopUpdater } from "@/context/NoopUpdater";
+import { NoopUpdater } from "@/context/noopUpdater";
 
 export default async function RootLayout({
   // Layouts must accept a children prop.

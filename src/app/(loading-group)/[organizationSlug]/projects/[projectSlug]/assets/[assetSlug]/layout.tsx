@@ -4,7 +4,7 @@
 import AssetHeader from "@/components/common/AssetHeader";
 import React, { Suspense } from "react";
 import { AssetContext } from "../../../../../../../context/AssetContext";
-import { NoopUpdater } from "../../../../../../../context/NoopUpdater";
+import { NoopUpdater } from "../../../../../../../context/noopUpdater";
 import { fetchAsset } from "../../../../../../../data-fetcher/fetchAsset";
 import { handleHttpError } from "../../../../../../../data-fetcher/handleHttpError";
 

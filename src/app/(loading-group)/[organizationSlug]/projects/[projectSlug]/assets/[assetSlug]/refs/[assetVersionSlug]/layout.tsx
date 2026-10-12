@@ -4,7 +4,7 @@
 import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
 import React, { Suspense } from "react";
 import { AssetVersionContext } from "../../../../../../../../../context/AssetVersionContext";
-import { NoopUpdater } from "../../../../../../../../../context/NoopUpdater";
+import { NoopUpdater } from "../../../../../../../../../context/noopUpdater";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { handleHttpError } from "../../../../../../../../../data-fetcher/handleHttpError";
 

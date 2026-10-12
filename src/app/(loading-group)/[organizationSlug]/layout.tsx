@@ -4,7 +4,7 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React, { Suspense } from "react";
 import OrgHeader from "@/components/common/OrgHeader";
-import { NoopUpdater } from "../../../context/NoopUpdater";
+import { NoopUpdater } from "../../../context/noopUpdater";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
 import { handleHttpError } from "../../../data-fetcher/handleHttpError";

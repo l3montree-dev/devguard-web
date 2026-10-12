@@ -3,7 +3,7 @@
 
 import ProjectHeader from "@/components/common/ProjectHeader";
 import React, { Suspense } from "react";
-import { NoopUpdater } from "../../../../../context/NoopUpdater";
+import { NoopUpdater } from "../../../../../context/noopUpdater";
 import { ProjectContext } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
 import { handleHttpError } from "../../../../../data-fetcher/handleHttpError";

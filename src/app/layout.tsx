@@ -13,7 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
 import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
-import { NoopUpdater } from "../context/NoopUpdater";
+import { NoopUpdater } from "../context/noopUpdater";
 import { ConfigContext } from "../context/ConfigContext";
 import { SessionContext } from "../context/SessionContext";
 import { fetchInstanceSettings } from "../data-fetcher/fetchInstanceSettings";
