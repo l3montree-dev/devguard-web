@@ -5,32 +5,15 @@
 
 import { InputWithButton } from "@/components/ui/input-with-button";
 import { useConfig } from "@/context/ConfigContext";
-import { useUpdateAsset } from "@/context/AssetContext";
-import { useAssetScope } from "@/hooks/useAssetScope";
-import { useAssetSecrets } from "@/hooks/useAssetSecrets";
-import { patchAsset } from "@/services/assetService";
-import type { AssetDetailsWithSecretsDTO } from "@/types/dto";
-import { generateNewSecret } from "@/utils/view";
+import useAssetSecrets from "@/hooks/useAssetSecrets";
 
 const WebhookSettings = () => {
   const config = useConfig();
-  const scope = useAssetScope();
-  const updateAsset = useUpdateAsset();
-  const { data: secrets, mutate } = useAssetSecrets(scope);
 
-  const handleGenerateNewSecret = async () => {
-    const webhookSecret = generateNewSecret();
-    await mutate(
-      async () => {
-        const asset = (await patchAsset(scope, {
-          webhookSecret,
-        })) as AssetDetailsWithSecretsDTO;
-        updateAsset(asset);
-        return { webhookSecret: asset.webhookSecret };
-      },
-      { optimisticData: { webhookSecret }, revalidate: false },
-    );
-  };
+  const {
+    assetSecrets: secrets,
+    onGenerateNewSecret: handleGenerateNewSecret,
+  } = useAssetSecrets();
 
   return (
     <div className="space-y-2 rounded-xl border bg-card px-6 pb-6 pt-4">

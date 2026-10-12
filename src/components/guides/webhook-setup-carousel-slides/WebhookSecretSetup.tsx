@@ -9,21 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { InputWithButton } from "@/components/ui/input-with-button";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { patchAsset } from "@/services/assetService";
 import Image from "next/image";
-import { useState } from "react";
-import { toast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 import {
   innerCardClassName,
   innerInputVariant,
   type Surface,
 } from "@/lib/surface";
-import { useUpdateAsset } from "../../../context/AssetContext";
 import { useConfig } from "../../../context/ConfigContext";
+import useAssetSecrets from "@/hooks/useAssetSecrets";
 
 export const webhookInstructions =
   "Go to your GitLab/ openCode project settings and add a webhook with the following URL and secret (“Settings” → “Webhooks”). Ensure that you select the Issue and comment event trigger checkboxes like shown in the screenshot below. You must set a secret token.";
@@ -35,39 +29,10 @@ export default function WebhookSecretSetup({
   // the surface the setup is rendered on
   variant?: Surface;
 }) {
-  const generateNewSecret = (): string => {
-    return crypto.randomUUID();
-  };
-  const [webhookSecret, setWebhookSecret] = useState<string | null>(null);
-  const updateAsset = useUpdateAsset();
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
-  const asset = useActiveAsset();
-
-  const handleGenerateNewSecret = async () => {
-    let r;
-    try {
-      r = (await patchAsset(
-        {
-          organization: activeOrg.slug,
-          projectSlug: project!.slug,
-          assetSlug: asset.slug,
-        },
-        { webhookSecret: generateNewSecret() } as never,
-      )) as { webhookSecret: string };
-    } catch {
-      r = null;
-    }
-
-    if (r) {
-      setWebhookSecret(r.webhookSecret);
-      updateAsset({ ...asset, webhookSecret: r.webhookSecret });
-      navigator.clipboard.writeText(r.webhookSecret);
-      toast.success("New webhook secret generated and copied to clipboard");
-    } else {
-      toast.error("Could not generate new secret");
-    }
-  };
+  const {
+    assetSecrets: secrets,
+    onGenerateNewSecret: handleGenerateNewSecret,
+  } = useAssetSecrets();
 
   const config = useConfig();
 
@@ -105,7 +70,7 @@ export default function WebhookSecretSetup({
             copyable
             copyToastDescription="The webhook secret has been copied to your clipboard."
             mutable
-            value={webhookSecret ?? ""}
+            value={secrets?.webhookSecret ?? ""}
             placeholder='Click "Generate secret" to create your secret'
             update={{
               label: "Generate secret",
