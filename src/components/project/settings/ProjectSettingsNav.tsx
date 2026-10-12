@@ -12,7 +12,7 @@ import {
   Cable,
   FileCog,
   KeyRound,
-  Package,
+  BrickWallFireIcon,
   ScrollText,
   Settings,
   TriangleAlert,
@@ -40,7 +40,11 @@ const groups: SettingsNavGroup[] = [
     title: "Configuration",
     items: [
       { title: "Configuration files", segment: "config", Icon: FileCog },
-      { title: "Dependency proxy", segment: "dependency-proxy", Icon: Package },
+      {
+        title: "Dependency proxy",
+        segment: "dependency-proxy",
+        Icon: BrickWallFireIcon,
+      },
       { title: "Logs", segment: "logs", Icon: ScrollText },
     ],
   },

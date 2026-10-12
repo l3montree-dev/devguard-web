@@ -19,7 +19,7 @@ import {
 const DevguardTokenCard = ({
   title = "Create a new variable / secret",
   variant,
-  description = "Your pipeline uses this token to upload the scan results to DevGuard. Create a token, copy it and store it as a masked variable/ secret. It is only shown once.",
+  description = "Your pipeline uses this token to upload the scan results to DevGuard. Click 'Generate token', copy the token and store it as a masked variable/ secret. It is only shown once.",
 }: {
   title?: string;
   description?: string;
@@ -53,8 +53,10 @@ const DevguardTokenCard = ({
             copyable={true}
             copyToastDescription="The DevGuard token has been copied to your clipboard."
             mutable={true}
-            value={pat?.privKey ?? "<PERSONAL ACCESS TOKEN>"}
+            value={pat?.privKey ?? ""}
+            placeholder='Click "Generate token" to create your token'
             update={{
+              label: "Generate token",
               update: () =>
                 onCreatePat({
                   scopes: "scan",

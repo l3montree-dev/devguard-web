@@ -18,11 +18,14 @@ import { useAutosetup } from "../../../../../../../hooks/useAutosetup";
 import useDecodedParams from "../../../../../../../hooks/useDecodedParams";
 import { isLoggedIn, useCurrentUserRole } from "@/hooks/useUserRole";
 import {
+  ArrowDown,
   Boxes,
   Code,
   Blocks,
   KeyRound,
   ListChecks,
+  PartyPopper,
+  RefreshCw,
   Ship,
   FolderGit2,
   Ticket,
@@ -38,6 +41,8 @@ import WebhookSecretSetup, {
 } from "@/components/guides/webhook-setup-carousel-slides/WebhookSecretSetup";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -197,26 +202,57 @@ const Index: FunctionComponent = () => {
             description:
               "DevGuard generates the pipeline configuration for the platform you choose.",
             content: (
-              <ToggleGroup
-                type="single"
-                variant="outline"
-                className="justify-start"
-                value={ciProvider}
-                onValueChange={(v) => v && setCiProvider(v as CiProvider)}
-              >
-                <ToggleGroupItem
-                  value="github"
-                  className="data-[state=on]:border-primary"
+              <div className="flex flex-col gap-6">
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  className="grid max-w-xl gap-3 sm:grid-cols-2"
+                  value={ciProvider}
+                  onValueChange={(v) => v && setCiProvider(v as CiProvider)}
                 >
-                  GitHub Actions
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="gitlab"
-                  className="data-[state=on]:border-primary"
+                  {[
+                    {
+                      value: "github",
+                      logo: "/assets/github.svg",
+                      title: "GitHub Actions",
+                      description: "Adds a workflow to .github/workflows",
+                    },
+                    {
+                      value: "gitlab",
+                      logo: "/assets/gitlab.svg",
+                      title: "GitLab CI/CD",
+                      description: "Adds jobs to your .gitlab-ci.yml",
+                    },
+                  ].map((p) => (
+                    <ToggleGroupItem
+                      key={p.value}
+                      value={p.value}
+                      className="h-auto flex-col gap-1.5 px-4 py-3 data-[state=on]:border-primary data-[state=on]:bg-primary/5"
+                    >
+                      <img
+                        src={p.logo}
+                        alt=""
+                        className={cn(
+                          "mb-1 h-6 w-6",
+                          p.value === "github" && "dark:invert",
+                        )}
+                      />
+                      <span className="text-sm font-semibold">{p.title}</span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        {p.description}
+                      </span>
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+                <a
+                  href="#onboarding-alternatives"
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  GitLab CI/CD
-                </ToggleGroupItem>
-              </ToggleGroup>
+                  <ArrowDown className="h-4 w-4" />
+                  Using another CI system or already have a report? See the
+                  alternatives below.
+                </a>
+              </div>
             ),
           },
           {
@@ -335,7 +371,25 @@ const Index: FunctionComponent = () => {
             title: "Add the webhook",
             summary: "Keep tickets and risks in sync in both directions.",
             description: webhookInstructions,
-            content: <WebhookSecretSetup variant="onCard" />,
+            content: (
+              <div className="flex flex-col gap-6">
+                <WebhookSecretSetup variant="onCard" />
+                <Alert className="border-primary/40 bg-primary/5">
+                  <PartyPopper />
+                  <AlertTitle>You are all set!</AlertTitle>
+                  <AlertDescription>
+                    Once your pipeline has finished running, reload this page to
+                    see the first results.
+                  </AlertDescription>
+                </Alert>
+              </div>
+            ),
+            actions: (
+              <Button onClick={() => window.location.reload()}>
+                <RefreshCw className="mr-1 h-4 w-4" />
+                Reload page
+              </Button>
+            ),
           },
         ]}
       />
@@ -369,7 +423,10 @@ const Index: FunctionComponent = () => {
           ) : (
             customSetup
           )}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div
+            id="onboarding-alternatives"
+            className="grid scroll-mt-24 gap-6 lg:grid-cols-2"
+          >
             <Card data-tour="onboarding-upload" className="flex flex-col">
               <CardHeader>
                 <CardTitle className="text-lg">

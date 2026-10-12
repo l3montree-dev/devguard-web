@@ -13,7 +13,7 @@ import {
   FileCog,
   FolderGit2,
   KeyRound,
-  Package,
+  BrickWallFireIcon,
   ScrollText,
   Settings,
   ShieldCheck,
@@ -73,7 +73,7 @@ const groups: SettingsNavGroup[] = [
       {
         title: "Dependency proxy",
         segment: "dependency-proxy",
-        Icon: Package,
+        Icon: BrickWallFireIcon,
         tour: "repo-settings-dependency-proxy",
       },
       { title: "Logs", segment: "logs", Icon: ScrollText },

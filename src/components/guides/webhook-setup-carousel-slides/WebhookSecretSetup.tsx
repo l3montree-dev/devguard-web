@@ -84,9 +84,9 @@ export default function WebhookSecretSetup({
         <CardHeader>
           <CardTitle className="text-lg">Create a new webhook</CardTitle>
           <CardDescription>
-            Your issue tracker sends ticket updates to this URL. Create a
-            secret, copy it and paste it as the secret token of the webhook. It
-            is only shown once.
+            Your issue tracker sends ticket updates to this URL. Click
+            &quot;Generate secret&quot;, copy it and paste it as the secret
+            token of the webhook. It is only shown once.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,8 +105,10 @@ export default function WebhookSecretSetup({
             copyable
             copyToastDescription="The webhook secret has been copied to your clipboard."
             mutable
-            value={webhookSecret ?? "<WEBHOOK SECRET>"}
+            value={webhookSecret ?? ""}
+            placeholder='Click "Generate secret" to create your secret'
             update={{
+              label: "Generate secret",
               update: handleGenerateNewSecret,
               updateConfirmTitle: "Create new webhook secret",
               updateConfirmDescription:

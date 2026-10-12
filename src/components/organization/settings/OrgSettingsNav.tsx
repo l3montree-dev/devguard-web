@@ -11,7 +11,7 @@ import {
   Blocks,
   FileCog,
   KeyRound,
-  Package,
+  BrickWallFireIcon,
   ScrollText,
   Settings,
   TriangleAlert,
@@ -57,7 +57,7 @@ const groups: SettingsNavGroup[] = [
       {
         title: "Dependency proxy",
         segment: "dependency-proxy",
-        Icon: Package,
+        Icon: BrickWallFireIcon,
         tour: "dependency-proxy",
       },
       { title: "Logs", segment: "logs", Icon: ScrollText },
