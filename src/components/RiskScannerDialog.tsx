@@ -413,7 +413,9 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   useEffect(() => {
     api?.reInit();
-  }, [selectedScanner, accessToken.accessToken, api, config]);
+    // do not depend on the selected scanner - selecting one starts the slide transition,
+    // a reInit in the middle of it would cancel the animation
+  }, [accessToken.accessToken, api, config]);
 
   const getStartIndex = () => {
     // display the update repository provider slide if asset is not connected already
@@ -555,6 +557,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               devguardCliSlideIndex={16}
               devguardToolsSlideIndex={7}
               customSetupSlideIndex={11}
+              prevIndex={slideHistory.length > 1 ? prevIndex : undefined}
             />
             <ScannerOptionsSelectionSlide
               config={config}

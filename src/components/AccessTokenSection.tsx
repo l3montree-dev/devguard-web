@@ -22,7 +22,7 @@ const AccessTokenSection = ({ description }: { description: string }) => {
   const { accessToken: pat, onCreateAccessToken: onCreatePat } =
     useAccessToken();
 
-  const manageTokensHref = `/${org.slug}/projects/${project.slug}/assets/${asset.slug}/settings#access-tokens`;
+  const manageTokensHref = `/${org.slug}/projects/${project.slug}/assets/${asset.slug}/settings/access-tokens`;
 
   return (
     <Section

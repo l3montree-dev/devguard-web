@@ -5,7 +5,6 @@ import { SparklesIcon } from "@heroicons/react/20/solid";
 import { FlaskConical } from "lucide-react";
 import type { FunctionComponent } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -45,6 +44,20 @@ export const SetupMethodSelectionSlide: FunctionComponent<
   autosetupSlideIndex,
   selectScannerSlideIndex,
 }) => {
+  // selecting a setup route directly continues with its first slide
+  const handleSelect = (
+    scanner: "custom-setup" | "auto-setup" | "information-source",
+  ) => {
+    setSelectedScanner(scanner);
+    api?.scrollTo(
+      scanner === "auto-setup"
+        ? autosetupSlideIndex
+        : scanner === "information-source"
+          ? setupInformationSourceSlideIndex
+          : selectScannerSlideIndex,
+    );
+  };
+
   return (
     <CarouselItem>
       <DialogHeader>
@@ -54,12 +67,12 @@ export const SetupMethodSelectionSlide: FunctionComponent<
         {(asset?.repositoryProvider === "gitlab" ||
           asset?.externalEntityId) && (
           <Card
-            onClick={() => setSelectedScanner("auto-setup")}
+            onClick={() => handleSelect("auto-setup")}
             className={classNames(
               "col-span-2 cursor-pointer",
               selectedScanner === "auto-setup"
                 ? "border border-primary"
-                : "border border-transparent",
+                : "border border-transparent hover:border-primary",
             )}
           >
             <CardContent data-testid="auto-setup-gitlab" className="p-0">
@@ -67,7 +80,7 @@ export const SetupMethodSelectionSlide: FunctionComponent<
                 <CardTitle className="text-lg items-center flex flex-row leading-tight">
                   <SparklesIcon className="inline-block mr-2 w-4 h-4" />
                   Auto Setup
-                  <Badge className="top-10 ml-4 bg-primary/20 ring-1 ring-primary text-primary-content">
+                  <Badge variant="default" className="ml-auto">
                     Recommended
                   </Badge>
                 </CardTitle>
@@ -85,15 +98,15 @@ export const SetupMethodSelectionSlide: FunctionComponent<
           "cursor-pointer mt-2   ",
           selectedScanner === "custom-setup"
             ? "border border-primary"
-            : "border border-transparent",
+            : "border border-transparent hover:border-primary",
         )}
-        onClick={() => setSelectedScanner("custom-setup")}
+        onClick={() => handleSelect("custom-setup")}
       >
         <CardHeader>
           <CardTitle className="text-lg items-center flex flex-row leading-tight">
             <FlaskConical className="inline-block mr-2 w-4 h-4" />
             Custom Setup
-            <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
+            <Badge variant="blue" className="ml-auto">
               Expert
             </Badge>
           </CardTitle>
@@ -108,15 +121,15 @@ export const SetupMethodSelectionSlide: FunctionComponent<
           "cursor-pointer mt-2   ",
           selectedScanner === "information-source"
             ? "border border-primary"
-            : "border border-transparent",
+            : "border border-transparent hover:border-primary",
         )}
-        onClick={() => setSelectedScanner("information-source")}
+        onClick={() => handleSelect("information-source")}
       >
         <CardHeader>
           <CardTitle className="text-lg items-center flex flex-row leading-tight">
             <LinkIcon className="inline-block mr-2 w-4 h-4" />
             External SBOM URLs (URL)
-            <Badge className="ml-4 ring-1 ring-accent text-secondary-content bg-accent-muted">
+            <Badge variant="blue" className="ml-auto">
               Expert
             </Badge>
           </CardTitle>
@@ -126,23 +139,6 @@ export const SetupMethodSelectionSlide: FunctionComponent<
           </CardDescription>
         </CardHeader>
       </Card>
-      <div className="mt-10 flex flex-wrap flex-row gap-2 justify-end">
-        <Button
-          disabled={selectedScanner === undefined}
-          data-testid="setup-method-continue"
-          onClick={() => {
-            const targetSlide =
-              selectedScanner === "auto-setup"
-                ? autosetupSlideIndex
-                : selectedScanner === "information-source"
-                  ? setupInformationSourceSlideIndex
-                  : selectScannerSlideIndex;
-            api?.scrollTo(targetSlide);
-          }}
-        >
-          {selectedScanner === undefined ? "Select an Setup Route" : "Continue"}
-        </Button>
-      </div>
     </CarouselItem>
   );
 };

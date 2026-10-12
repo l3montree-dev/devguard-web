@@ -4,6 +4,7 @@
 import { test, type Page } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
 import { docShot } from "../../doc-shot";
+import { openSettingsSection } from "./settings-nav";
 
 export class GroupFlow {
   constructor(private page: Page) {}
@@ -75,6 +76,7 @@ export class GroupFlow {
 
   async publishGroup() {
     await this.page.getByTestId("nav-group-settings").click();
+    await openSettingsSection(this.page, "danger-zone");
     await this.page.getByTestId("public-group-switch").click();
   }
 }

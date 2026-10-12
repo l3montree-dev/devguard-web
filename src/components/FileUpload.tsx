@@ -1,14 +1,18 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import type { Surface } from "@/lib/surface";
+import { cn } from "@/lib/utils";
 import type { DropzoneState } from "react-dropzone";
 
 interface Props {
   dropzone: DropzoneState;
   files: string[];
   id?: string;
+  // the surface the dropzone is rendered on
+  variant?: Surface;
 }
-export default function FileUpload({ dropzone, files, id }: Props) {
+export default function FileUpload({ dropzone, files, id, variant }: Props) {
   return (
     <div
       id={id}
@@ -16,7 +20,10 @@ export default function FileUpload({ dropzone, files, id }: Props) {
     >
       <div
         {...dropzone.getRootProps()}
-        className="flex h-20 bg-card cursor-pointer items-center justify-center rounded dash-border"
+        className={cn(
+          "flex h-20 cursor-pointer items-center justify-center rounded dash-border",
+          variant === "onCard" ? "bg-background" : "bg-card",
+        )}
       >
         <input
           {...dropzone.getInputProps()}

@@ -26,10 +26,10 @@ import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
-import { AlertTriangle, ChevronDown } from "lucide-react";
+import { AlertTriangle, ChevronDown, Ticket } from "lucide-react";
 import React, { type FunctionComponent, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { createUpdateHandler } from "../AssetForm";
+import { createUpdateHandler } from "./createUpdateHandler";
 import type { AssetFormValues } from "@/types/view/asset";
 import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
 
@@ -41,6 +41,7 @@ import { toast } from "@/lib/toast";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
 import { Badge } from "@/components/ui/badge";
+import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -48,10 +49,11 @@ interface Props {
   onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
 }
 
-const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
+const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
   const enableTicketRange = form.watch("enableTicketRange");
   const cvssValue = form.watch("cvssAutomaticTicketThreshold");
   const riskValue = form.watch("riskAutomaticTicketThreshold");
+  const [ticketSyncDialogOpen, setTicketSyncDialogOpen] = useState(false);
 
   return (
     <FormField
@@ -60,14 +62,54 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
       render={({ field }) => (
         <FormItem>
           <ListItem
-            Description={
-              <>
-                Enables automatic ticket creation for vulnerabilities. Be aware
-                that this will create tickets for all vulnerabilities that
-                exceed the defined thresholds, which may result in a large
-                number of tickets being created.
+            Description="Enables automatic ticket creation for vulnerabilities. Be aware that this will create tickets for all vulnerabilities that exceed the defined thresholds, which may result in a large number of tickets being created."
+            Title="Reporting range"
+            Button={
+              <FormControl>
+                <Switch
+                  data-testid="reporting-range"
+                  checked={field.value}
+                  onCheckedChange={(v) => {
+                    form.setValue("enableTicketRange", v, {
+                      shouldDirty: true,
+                    });
+                    if (v) {
+                      form.setValue("cvssAutomaticTicketThreshold", [8], {
+                        shouldDirty: true,
+                      });
+                      form.setValue("riskAutomaticTicketThreshold", [8], {
+                        shouldDirty: true,
+                      });
+                    } else {
+                      form.resetField("cvssAutomaticTicketThreshold");
+                      form.resetField("riskAutomaticTicketThreshold");
+                    }
+                  }}
+                />
+              </FormControl>
+            }
+          >
+            {(assetId || enableTicketRange) && (
+              <div className="space-y-6">
+                {assetId && (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setTicketSyncDialogOpen(true)}
+                    >
+                      <Ticket className="mr-2 h-4 w-4" />
+                      Set up ticket sync
+                    </Button>
+                    <WebhookSetupTicketIntegrationDialog
+                      open={ticketSyncDialogOpen}
+                      onOpenChange={setTicketSyncDialogOpen}
+                    />
+                  </>
+                )}
                 {enableTicketRange && (
-                  <div className="mt-6 space-y-6">
+                  <div className="space-y-6">
                     <FormField
                       name="cvssAutomaticTicketThreshold"
                       control={form.control}
@@ -118,34 +160,9 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form }) => {
                     />
                   </div>
                 )}
-              </>
-            }
-            Title="Reporting range"
-            Button={
-              <FormControl>
-                <Switch
-                  data-testid="reporting-range"
-                  checked={field.value}
-                  onCheckedChange={(v) => {
-                    form.setValue("enableTicketRange", v, {
-                      shouldDirty: true,
-                    });
-                    if (v) {
-                      form.setValue("cvssAutomaticTicketThreshold", [8], {
-                        shouldDirty: true,
-                      });
-                      form.setValue("riskAutomaticTicketThreshold", [8], {
-                        shouldDirty: true,
-                      });
-                    } else {
-                      form.resetField("cvssAutomaticTicketThreshold");
-                      form.resetField("riskAutomaticTicketThreshold");
-                    }
-                  }}
-                />
-              </FormControl>
-            }
-          />
+              </div>
+            )}
+          </ListItem>
           <FormMessage />
         </FormItem>
       )}
@@ -497,7 +514,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
         />
       )}
 
-      <EnableTicketRange form={form} />
+      <EnableTicketRange form={form} assetId={assetId} />
 
       <VulnAutoReopenAfterDays form={form} />
 

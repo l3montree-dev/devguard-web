@@ -3,49 +3,16 @@
 
 "use client";
 
-import ConfigFileEditor from "@/components/common/ConfigFileEditor";
-import Page from "@/components/Page";
-import AssetTitle from "@/components/common/AssetTitle";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
+import ConfigFilesSection from "@/components/common/settings/ConfigFilesSection";
+import { useAssetScope } from "@/hooks/useAssetScope";
 
-const Config = () => {
-  const org = useActiveOrg();
-  const project = useActiveProject();
-  const asset = useActiveAsset();
-  const assetMenu = useAssetMenu();
-
-  const scope =
-    org && project && asset
-      ? ({
-          level: "asset",
-          organization: org.slug,
-          projectSlug: project.slug,
-          assetSlug: asset.slug,
-        } as const)
-      : null;
+export default function ConfigPage() {
+  const scope = useAssetScope();
 
   return (
-    <Page
-      breadcrumbs={[
-        {
-          title: "Settings",
-          href: "./",
-        },
-        {
-          title: "Config",
-          href: "",
-        },
-      ]}
-      title={"Configuration Files (" + asset.name + ")"}
-      Menu={assetMenu}
-      Title={<AssetTitle />}
-    >
-      <ConfigFileEditor scope={scope} />
-    </Page>
+    <ConfigFilesSection
+      scope={{ level: "asset", ...scope }}
+      description="View and edit configuration files for this repository, including scanner tool settings. These configurations override project-level settings for this specific repository."
+    />
   );
-};
-
-export default Config;
+}

@@ -3,37 +3,16 @@
 
 "use client";
 
-import ConfigFileEditor from "@/components/common/ConfigFileEditor";
-import Page from "@/components/Page";
+import ConfigFilesSection from "@/components/common/settings/ConfigFilesSection";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 
-const Config = () => {
-  const org = useActiveOrg();
-  const orgMenu = useOrganizationMenu();
-
-  const scope = org
-    ? ({ level: "organization", organization: org.slug } as const)
-    : null;
+export default function OrgConfigPage() {
+  const { slug } = useActiveOrg();
 
   return (
-    <Page
-      breadcrumbs={[
-        {
-          title: "Settings",
-          href: "./",
-        },
-        {
-          title: "Config",
-          href: "",
-        },
-      ]}
-      title={"Configuration Files (" + org.name + ")"}
-      Menu={orgMenu}
-    >
-      <ConfigFileEditor scope={scope} />
-    </Page>
+    <ConfigFilesSection
+      scope={{ level: "organization", organization: slug }}
+      description="View and edit configuration files for your organization, including scanner tool settings. These configurations are inherited by all projects and repositories in your organization and can be overridden at the project or repository level."
+    />
   );
-};
-
-export default Config;
+}

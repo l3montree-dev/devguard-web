@@ -263,8 +263,9 @@ export const useAssetMenu = () => {
         pathname.startsWith(
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}`,
         ) &&
-        pathname !==
+        !pathname.startsWith(
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
+        ),
       testId: "nav-asset-onboarding",
     });
   }
@@ -282,9 +283,9 @@ export const useAssetMenu = () => {
           assetSlug +
           "/settings",
         Icon: CogIcon,
-        isActive:
-          pathname ===
+        isActive: pathname.startsWith(
           `/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings`,
+        ),
         testId: "repository-settings",
       },
     ]);

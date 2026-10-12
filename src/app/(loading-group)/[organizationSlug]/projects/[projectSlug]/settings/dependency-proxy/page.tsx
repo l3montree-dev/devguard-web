@@ -3,46 +3,11 @@
 
 "use client";
 
-import Page from "@/components/Page";
-import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
-import ProjectTitle from "@/components/common/ProjectTitle";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useProjectMenu } from "@/hooks/useProjectMenu";
+import DependencyProxySection from "@/components/common/settings/DependencyProxySection";
+import { useProjectScope } from "@/hooks/useProjectScope";
 
-const Config = () => {
-  const org = useActiveOrg();
-  const project = useActiveProject();
-  const projectMenu = useProjectMenu();
+export default function ProjectDependencyProxyPage() {
+  const scope = useProjectScope();
 
-  const scope =
-    org && project
-      ? ({
-          level: "project",
-          organization: org.slug,
-          projectSlug: project.slug,
-        } as const)
-      : null;
-
-  return (
-    <Page
-      breadcrumbs={[
-        {
-          title: "Settings",
-          href: "./",
-        },
-        {
-          title: "Dependency Proxy",
-          href: "",
-        },
-      ]}
-      title={"Dependency Proxy (" + project.name + ")"}
-      Menu={projectMenu}
-      Title={<ProjectTitle />}
-    >
-      <DependencyProxyConfigs scope={scope} />
-    </Page>
-  );
-};
-
-export default Config;
+  return <DependencyProxySection scope={{ level: "project", ...scope }} />;
+}
