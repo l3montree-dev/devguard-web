@@ -405,7 +405,7 @@ const Index: FunctionComponent = () => {
     >
       {isLoggedIn(role) ? (
         <Section primaryHeadline forceVertical title="Welcome to DevGuard 🚀">
-          {isSyncedFromGitLab ? (
+          {isGitLab ? (
             // assets of external entity providers support the auto-setup, which
             // takes care of all onboarding steps at once - the custom setup is the manual alternative
             <Tabs defaultValue="auto-setup">
