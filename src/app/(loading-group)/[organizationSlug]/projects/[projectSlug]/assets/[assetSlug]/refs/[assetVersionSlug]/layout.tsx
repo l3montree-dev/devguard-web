@@ -3,8 +3,8 @@
 
 import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
 import React, { Suspense } from "react";
-import { AssetVersionProvider } from "../../../../../../../../../context/AssetVersionContext";
-import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
+import { AssetVersionContext } from "../../../../../../../../../context/AssetVersionContext";
+import { NoopUpdater } from "../../../../../../../../../context/NoopUpdater";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { handleHttpError } from "../../../../../../../../../data-fetcher/handleHttpError";
 
@@ -66,15 +66,17 @@ async function AssetVersionShell({
   }
 
   return (
-    <ClientContextWrapper
-      Provider={AssetVersionProvider}
+    <AssetVersionContext
       value={{
-        artifacts,
-        assetVersion,
+        v: {
+          artifacts,
+          assetVersion,
+        },
+        update: NoopUpdater,
       }}
     >
       {children}
-    </ClientContextWrapper>
+    </AssetVersionContext>
   );
 }
 

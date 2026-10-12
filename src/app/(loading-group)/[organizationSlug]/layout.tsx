@@ -4,7 +4,7 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React, { Suspense } from "react";
 import OrgHeader from "@/components/common/OrgHeader";
-import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
+import { NoopUpdater } from "../../../context/NoopUpdater";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
 import { handleHttpError } from "../../../data-fetcher/handleHttpError";
@@ -47,14 +47,16 @@ async function OrganizationShell({
   }
 
   return (
-    <ClientContextWrapper
-      Provider={OrganizationProvider}
+    <OrganizationProvider
       value={{
-        organization: org,
+        v: {
+          organization: org,
+        },
+        update: NoopUpdater,
       }}
     >
       <OrgHeader />
       {children}
-    </ClientContextWrapper>
+    </OrganizationProvider>
   );
 }
