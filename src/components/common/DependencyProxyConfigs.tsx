@@ -201,7 +201,7 @@ default = true`}
             nameKey="maven-proxy-url"
             copyable
           />
-          <p className="my-4 text-sm">
+          <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">settings.xml</span>
             <CopyCode
               language="xml"
@@ -216,7 +216,7 @@ default = true`}
   </mirrors>
 </settings>`}
             />
-          </p>
+          </div>
           <Callout intent="warning">
             <code className="font-mono text-sm">mirrorOf</code> only redirects
             Maven Central. Dependencies resolved from other repositories
@@ -236,7 +236,7 @@ default = true`}
             nameKey="composer-proxy-url"
             copyable
           />
-          <p className="my-4 text-sm">
+          <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">composer.json</span>
             <CopyCode
               language="json"
@@ -250,7 +250,7 @@ default = true`}
                 2,
               )}
             />
-          </p>
+          </div>
           <Callout intent="warning">
             If your project already has a{" "}
             <code className="font-mono text-sm">composer.lock</code>, it still
@@ -273,12 +273,12 @@ default = true`}
             nameKey="oci-proxy-url"
             copyable
           />
-          <p className="my-4 text-sm">
+          <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">Example</span>
             <CopyCodeFragment
               codeString={`docker pull ${url}/docker.io/library/nginx:latest`}
             />
-          </p>
+          </div>
           <Callout intent="warning">
             You need to provide the full original registry and image path after
             the proxy URL. For example, if you want to pull nginx:latest from
@@ -350,9 +350,10 @@ Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg`}
 
 interface Props {
   scope: ProxyScope | null;
+  forceVertical?: boolean;
 }
 
-const DependencyProxyConfigs = ({ scope }: Props) => {
+const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
   const { config: data, proxyUrls, saveConfig } = useDependencyProxy(scope);
 
   const [rulesText, setRulesText] = useState("");
@@ -439,6 +440,7 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
           />
         </div>
         <Section
+          forceVertical={forceVertical}
           title="Dependency Proxy URLs"
           description="Configure your package manager to use the dependency proxy by using the URLs below. Click on each URL for specific configuration instructions for different ecosystems."
         >
@@ -476,6 +478,7 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
           </div>
         </Section>
         <Section
+          forceVertical={forceVertical}
           description="Define rules for blocking packages using gitignore-style patterns. Each line is one rule, applied top to bottom."
           title="Blocked Packages Rules"
         >
@@ -633,6 +636,7 @@ const DependencyProxyConfigs = ({ scope }: Props) => {
           {codeError && <p className="text-sm text-destructive">{codeError}</p>}
         </Section>
         <Section
+          forceVertical={forceVertical}
           title="Cooldown Period"
           description="Set a cooldown period in hours that enforces a minimum time between when a new package version is released and when it can be downloaded through the proxy. "
         >

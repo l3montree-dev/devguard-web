@@ -15,15 +15,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import type { Config } from "@/types/common";
-import { CrownIcon } from "lucide-react";
-import { ImageZoom } from "../../common/Zoom";
-import DevguardTokenCard from "../../DevguardTokenCard";
 import { Button } from "../../ui/button";
 import { CarouselItem } from "../../ui/carousel";
 import { DialogDescription, DialogHeader, DialogTitle } from "../../ui/dialog";
-import { useTheme } from "next-themes";
+import CiTokenSetup, { ciTokenInstructions } from "./CiTokenSetup";
 
 interface GitlabTokenSlideProps {
   pat?: string;
@@ -44,44 +40,16 @@ const GitlabTokenSlide = ({
   prevIndex,
   yamlGeneratorSlideIndex,
 }: GitlabTokenSlideProps) => {
-  const { theme } = useTheme();
-  const imageSrc =
-    theme === "dark"
-      ? "/assets/gitlab-token-dark.png"
-      : "/assets/gitlab-token-white.png";
-
   return (
     <CarouselItem>
       <DialogHeader>
-        <DialogTitle>
-          Navigate to CI/CD Settings &gt; Variables &gt; Expand. Press the
-          button &quot;Add variable&quot;
-        </DialogTitle>
+        <DialogTitle>{ciTokenInstructions.gitlab.title}</DialogTitle>
         <DialogDescription>
-          For example, for the DevGuard project its following URL:
-          https://gitlab.com/l3montree/example-project/-/settings/ci_cd
+          {ciTokenInstructions.gitlab.description}
         </DialogDescription>
-        <Alert className="mt-5">
-          <CrownIcon />
-          <AlertTitle>
-            You have to be at least <span className="">maintainer</span> to
-            configure variables.
-          </AlertTitle>
-        </Alert>
       </DialogHeader>
-      <div className="mt-5">
-        <div className="relative aspect-video w-full max-w-4xl">
-          <ImageZoom
-            alt="Open the CI/CD settings in GitLab"
-            className="rounded-lg border object-fill"
-            src={imageSrc}
-            fill
-          />
-        </div>
-      </div>
-
       <div className="mt-10">
-        <DevguardTokenCard />
+        <CiTokenSetup provider="gitlab" />
       </div>
       <div className="flex mt-10 flex-row gap-2 justify-end">
         <Button

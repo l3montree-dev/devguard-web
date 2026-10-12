@@ -23,8 +23,12 @@ interface Props {
   onUpdate: (
     data: Partial<{ repositoryName: string; repositoryId: string }>,
   ) => Promise<void>;
+  forceVertical?: boolean;
+  primaryHeadline?: boolean;
 }
 const ConnectToRepoSection: FunctionComponent<Props> = ({
+  forceVertical,
+  primaryHeadline,
   repositoryName,
   repositoryId,
   repositories,
@@ -60,6 +64,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
 
   return (
     <Section
+      forceVertical={forceVertical}
+      primaryHeadline={primaryHeadline}
       title="Connect to a repository"
       description="Connect this repository to a repository to enable automatic scanning and other features."
     >

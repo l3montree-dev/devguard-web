@@ -5,6 +5,7 @@
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
+import GettingStartedSteps from "@/components/onboarding/GettingStartedSteps";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
@@ -146,6 +147,8 @@ export default function RepositoriesPage() {
   const handleCreateAsset = async (data: AssetFormValues) => {
     const modifiedData = {
       ...data,
+      // "None" is stored as "", but the API only accepts github/gitlab or no value
+      repositoryProvider: data.repositoryProvider || undefined,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
         ? data.cvssAutomaticTicketThreshold[0]
         : 2,
@@ -321,10 +324,12 @@ export default function RepositoriesPage() {
               onFetchData={handleLazyDataFetching}
               Empty={
                 showInlineCreateForm ? (
-                  <CreateSubgroupOrRepoForm
-                    onCreateRepository={handleCreateAsset}
-                    onCreateSubgroup={handleCreateProject}
-                  />
+                  <GettingStartedSteps current="repository">
+                    <CreateSubgroupOrRepoForm
+                      onCreateRepository={handleCreateAsset}
+                      onCreateSubgroup={handleCreateProject}
+                    />
+                  </GettingStartedSteps>
                 ) : (
                   <EmptyParty title="No repositories found" description="" />
                 )

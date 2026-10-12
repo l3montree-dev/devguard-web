@@ -16,7 +16,7 @@ import { classNames } from "@/utils/common";
 import Image from "next/image";
 import { type FunctionComponent } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { createUpdateHandler } from "../AssetForm";
+import { createUpdateHandler } from "./createUpdateHandler";
 import type { AssetFormValues } from "@/types/view/asset";
 import { SquareOff } from "lucide-react";
 

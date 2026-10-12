@@ -4,6 +4,33 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.16.2] — 2026-10-12
+
+### Added
+
+- **Getting started steps** — creating the organization, the first group and the first repository now happens in one step-by-step onboarding flow with a short explanation and docs links for each step
+- **Repository onboarding** — new repositories show a new guided setup: choose GitHub Actions or GitLab CI/CD, select the scans, add the DevGuard token, copy the generated pipeline, connect the issue tracker and add the webhook. Next to it you can upload an existing CycloneDX SBOM, SARIF report or VEX document (the file type is detected automatically) or pick another setup (CLI, API, Kubernetes integration)
+- **Ticket sync setup from settings** — the reporting range in the vulnerability management settings has a "Set up ticket sync" button that opens the ticket integration guide
+
+### Changed
+
+- **Settings split into sub-pages** — organization, group, repository and user settings now have a sidebar with separate pages (e.g. members, access tokens, webhooks, configuration files, dependency proxy, logs, danger zone) instead of one long page. Members and repository settings are hidden for repositories synced from an external provider
+- **Removed the lanyard** — the 3D lanyard on the organization setup page and the group structure flowchart next to the create forms were removed, along with their dependencies
+- **DevGuard token card** — the token name can be copied with one click and the token field shows a "Generate token" button instead of a placeholder token
+- **Next.js updated to 16.3.8** — bumped the `next` dependency and refreshed the accompanying patch-package patch
+- **Generated API client** — re-synced the generated API types with the backend
+- **Dependency updates**
+
+### Fixed
+
+- **Creating a repository without a provider** — selecting "None" as repository provider no longer fails, since the empty value is not sent to the API anymore
+- **Settings navigation highlight** — the "Settings" entry in the main navigation stays highlighted on all settings sub-pages
+- **Dependency search rows** — result rows in the organization and group dependency search are now valid table rows instead of links wrapped around table cells
+- **Risk scanner dialog** — selecting a scanner no longer cancels the slide transition, and the back button is only shown when there is a previous slide
+- **Copy button on empty inputs** — copyable inputs no longer show a copy button while they have no value
+
+---
+
 ## [v1.16.1] — 2026-10-09
 
 ### Changed

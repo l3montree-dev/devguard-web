@@ -83,11 +83,9 @@ export const useOrganizationMenu = () => {
           title: "Settings",
           href: "/" + decodedOrgSlug + "/settings",
           Icon: CogIcon,
-          isActive:
-            decodedPathName.startsWith("/" + decodedOrgSlug + "/settings") &&
-            !decodedPathName.startsWith(
-              "/" + decodedOrgSlug + "/settings/dependency-proxy",
-            ),
+          isActive: decodedPathName.startsWith(
+            "/" + decodedOrgSlug + "/settings",
+          ),
           testId: "nav-org-settings",
         },
       ],

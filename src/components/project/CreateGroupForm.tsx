@@ -2,26 +2,17 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 import type { ProjectDTO } from "@/types/dto";
 import type { ProjectCreateRequest } from "@/services/projectService";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
-import { FormProvider, useForm, useWatch } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Button } from "../ui/button";
-import { GroupStructureFlowchart } from "./GroupStructureFlowchart";
 import { ProjectForm } from "./ProjectForm";
 
 const defaultTitle = "Create new Group";
@@ -31,7 +22,7 @@ const defaultDescription =
 interface Props {
   onSubmit: (req: ProjectCreateRequest) => Promise<void>;
   // "dialog" renders the form inside a modal controlled by open/setOpen
-  // "inline" renders it inside a card, used when there is no group yet
+  // "inline" renders just the form, used inside the getting started steps when there is no group yet
   variant: "dialog" | "inline";
   open?: boolean;
   setOpen?: Dispatch<SetStateAction<boolean>>;
@@ -48,13 +39,9 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
   title = defaultTitle,
   description = defaultDescription,
 }) => {
-  const activeOrg = useActiveOrg();
   const form = useForm<ProjectDTO>({
     mode: "onBlur",
   });
-
-  // subscribe to the name field so the flowchart can mirror it while typing
-  const groupName = useWatch({ control: form.control, name: "name" });
 
   const formElement = (
     <FormProvider {...form}>
@@ -79,18 +66,12 @@ export const CreateGroupForm: FunctionComponent<Props> = ({
 
   if (variant === "inline") {
     return (
-      <div className="grid w-full max-w-6xl gap-6 lg:grid-cols-[2fr_1fr]">
-        <Card data-testid="create-group-form" data-tour="create-group-button">
-          <CardHeader>
-            <CardTitle className="text-lg">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
-          </CardHeader>
-          <CardContent>{formElement}</CardContent>
-        </Card>
-        <GroupStructureFlowchart
-          organizationName={activeOrg?.name ?? "Your organization"}
-          groupName={groupName}
-        />
+      <div
+        className="flex flex-col gap-8"
+        data-testid="create-group-form"
+        data-tour="create-group-button"
+      >
+        {formElement}
       </div>
     );
   }

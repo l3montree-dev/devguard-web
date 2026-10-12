@@ -3,49 +3,11 @@
 
 "use client";
 
-import Page from "@/components/Page";
-import AssetTitle from "@/components/common/AssetTitle";
-import DependencyProxyConfigs from "@/components/common/DependencyProxyConfigs";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
+import DependencyProxySection from "@/components/common/settings/DependencyProxySection";
+import { useAssetScope } from "@/hooks/useAssetScope";
 
-const Config = () => {
-  const org = useActiveOrg();
-  const project = useActiveProject();
-  const asset = useActiveAsset();
-  const assetMenu = useAssetMenu();
+export default function DependencyProxyPage() {
+  const scope = useAssetScope();
 
-  const scope =
-    org && project && asset
-      ? ({
-          level: "asset",
-          organization: org.slug,
-          projectSlug: project.slug,
-          assetSlug: asset.slug,
-        } as const)
-      : null;
-
-  return (
-    <Page
-      breadcrumbs={[
-        {
-          title: "Settings",
-          href: "./",
-        },
-        {
-          title: "Dependency Proxy",
-          href: "",
-        },
-      ]}
-      title={"Dependency Proxy (" + asset.name + ")"}
-      Menu={assetMenu}
-      Title={<AssetTitle />}
-    >
-      <DependencyProxyConfigs scope={scope} />
-    </Page>
-  );
-};
-
-export default Config;
+  return <DependencyProxySection scope={{ level: "asset", ...scope }} />;
+}

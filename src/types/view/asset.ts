@@ -17,8 +17,6 @@ export type AssetFormValues = Modify<
   }
 >;
 
-export type SecretType = "webhook";
-
 export type QuickfixVuln = Pick<
   DependencyVuln,
   "directDependencyFixedVersion" | "componentFixedVersion" | "vulnerabilityPath"

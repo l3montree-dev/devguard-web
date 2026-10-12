@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { classNames } from "../../utils/common";
 import Alert from "../common/Alert";
+import { Button } from "./button";
 interface InputWithButtonProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   value: string;
@@ -24,6 +25,7 @@ interface InputWithButtonProps extends React.InputHTMLAttributes<HTMLInputElemen
   mutable?: boolean;
   update?: {
     update: () => void;
+    label?: string;
     updateConfirmTitle: string;
     updateConfirmDescription: string;
   };
@@ -72,7 +74,7 @@ const InputWithButton = (props: InputWithButtonProps) => {
             name={"input" + nameKey}
           />
           <div className="flex shrink-0 flex-row items-center gap-2">
-            {copyable && (
+            {copyable && props.value && (
               <button
                 name={"clipboard-" + nameKey}
                 className="cursor-pointer transition-all hover:opacity-100"
@@ -89,13 +91,26 @@ const InputWithButton = (props: InputWithButtonProps) => {
                 description={update.updateConfirmDescription}
                 onConfirm={() => update?.update()}
               >
-                <button
-                  name={"update-" + nameKey}
-                  className="cursor-pointer transition-all hover:opacity-100"
-                  type="button"
-                >
-                  <ArrowPathIcon className="h-4 w-4" />
-                </button>
+                {update.label ? (
+                  <Button
+                    name={"update-" + nameKey}
+                    type="button"
+                    size="xs"
+                    variant="secondary"
+                    className="h-6"
+                  >
+                    <ArrowPathIcon className="mr-1 h-3.5 w-3.5" />
+                    {update.label}
+                  </Button>
+                ) : (
+                  <button
+                    name={"update-" + nameKey}
+                    className="cursor-pointer transition-all hover:opacity-100"
+                    type="button"
+                  >
+                    <ArrowPathIcon className="h-4 w-4" />
+                  </button>
+                )}
               </Alert>
             )}
           </div>

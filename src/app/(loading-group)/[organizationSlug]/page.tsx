@@ -22,6 +22,7 @@ import CustomPagination from "@/components/common/CustomPagination";
 import { orgHomeTourSteps } from "@/components/common/tours/orgHomeTour";
 import { WelcomeModal } from "@/components/common/tours/WelcomeModal";
 import { CreateGroupForm } from "@/components/project/CreateGroupForm";
+import GettingStartedSteps from "@/components/onboarding/GettingStartedSteps";
 import Sort from "@/components/Sort";
 import SubgroupsAndAssetsList, {
   checkType,
@@ -283,10 +284,12 @@ const OrganizationHomePage: FunctionComponent = () => {
                 data={projects?.data}
                 Empty={
                   showInlineCreateForm ? (
-                    <CreateGroupForm
-                      variant="inline"
-                      onSubmit={handleCreateProject}
-                    />
+                    <GettingStartedSteps current="group">
+                      <CreateGroupForm
+                        variant="inline"
+                        onSubmit={handleCreateProject}
+                      />
+                    </GettingStartedSteps>
                   ) : (
                     <EmptyParty title={"No groups found"} description="" />
                   )

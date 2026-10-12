@@ -18,6 +18,7 @@ import { flexRender } from "@tanstack/react-table";
 
 import { Loader2 } from "lucide-react";
 import { useSearchParams } from "next/dist/client/components/navigation";
+import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { useProjectComponentList } from "@/hooks/useComponents";
@@ -37,6 +38,7 @@ const OrgDependencySearch: FunctionComponent = () => {
     organizationSlug: string;
   };
   const project = useActiveProject();
+  const router = useRouter();
   const handleSearch = useDebouncedQuerySearch();
 
   const searchParams = useSearchParams();
@@ -193,10 +195,14 @@ const OrgDependencySearch: FunctionComponent = () => {
                     </tr>
                   ))}
                 {table.getRowModel().rows.map((row, index, arr) => (
-                  <a
-                    href={`/${organizationSlug}/projects/${project.slug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionSlug}/dependencies`}
+                  <tr
+                    onClick={() =>
+                      router.push(
+                        `/${organizationSlug}/projects/${project.slug}/assets/${row.original.assetSlug}/refs/${row.original.assetVersionSlug}/dependencies`,
+                      )
+                    }
                     className={classNames(
-                      "relative cursor-pointer table-row bg-background align-top transition-all ",
+                      "relative cursor-pointer bg-background align-top transition-all",
                       index === arr.length - 1 ? "" : "border-b",
                       index % 2 != 0 && "bg-card/50",
                     )}
@@ -210,7 +216,7 @@ const OrgDependencySearch: FunctionComponent = () => {
                         )}
                       </td>
                     ))}
-                  </a>
+                  </tr>
                 ))}
               </tbody>
             </table>

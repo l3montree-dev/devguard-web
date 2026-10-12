@@ -20,6 +20,7 @@ import {
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 import { classNames } from "@/utils/common";
+import type { Surface } from "@/lib/surface";
 
 interface Props {
   onSelect: (value: string) => void;
@@ -37,6 +38,8 @@ interface Props {
   multiSelect?: boolean;
   alwaysRenderPlaceholder?: boolean; // if true, the placeholder is always rendered even if a value is selected
   "data-testid"?: string;
+  // the surface the combobox is rendered on - renders the input backgrounds. Transparent if unset.
+  variant?: Surface;
 }
 
 export function Combobox(props: Props) {
@@ -52,7 +55,11 @@ export function Combobox(props: Props) {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="-my-0.5 h-11 w-full min-w-[300px] justify-between"
+          className={classNames(
+            "-my-0.5 h-11 w-full min-w-[300px] justify-between",
+            props.variant === "onCard" && "bg-background/70",
+            props.variant === "default" && "bg-card",
+          )}
           data-testid={testId}
         >
           <span className="flex-1 overflow-hidden overflow-ellipsis text-left">

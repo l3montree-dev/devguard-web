@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import ProviderTitleIcon from "@/components/common/ProviderTitleIcon";
-import GradientText from "@/components/misc/GradientText";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CarouselItem } from "@/components/ui/carousel";
 import type { CarouselApi } from "@/components/ui/carousel";
@@ -18,15 +17,12 @@ import { ExternalTicketProviderNames } from "@/const/providers";
 import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
 import ProviderSetup from "../ProviderSetup";
+import DevGuardBotInvite from "./DevGuardBotInvite";
 import { useEffect } from "react";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { Card } from "@/components/ui/card";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/lib/toast";
 import { useActiveOrg } from "../../../hooks/useActiveOrg";
-import { useTheme } from "next-themes";
 
 interface StartSlideProps {
   setSelectedProvider: (provider: ExternalTicketProvider) => void;
@@ -58,29 +54,11 @@ export default function StartSlide({
     externalProviderIdToIntegrationName(asset.externalEntityProviderId) ===
       "gitlab";
 
-  const isOpenCode = asset?.externalEntityProviderId === "opencode";
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(isOpenCode ? "devguard" : "devguard-bot");
-    toast("Username copied to clipboard", {
-      description: "You can now paste it in your project.",
-    });
-  };
-
-  const theme = useTheme();
-
-  const greadienColors =
-    theme.theme === "dark" || theme.resolvedTheme === "dark"
-      ? ["#FEFDF8", "#FDE9B5", "#FDD36F", "#FDDA83", "#FCBF29"]
-      : ["#000000", "#333333", "#666666", "#999999", "#CCCCCC"];
-
   return (
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
-          <GradientText colors={greadienColors} animationSpeed={5} className="">
-            Let&apos;s get your Tickets in Sync with DevGuard
-          </GradientText>
+          Let&apos;s get your Tickets in Sync with DevGuard
         </DialogTitle>
 
         <Alert variant="default" className="mt-4">
@@ -90,7 +68,7 @@ export default function StartSlide({
             You can connect your repository at GitLab, openCode or GitHub with
             DevGuard to enable ticket-based risk management. Whenever DevGuard
             detects a new risk in your code, it will automatically create a
-            ticket in your issue tracker. In you issue tracker, you can then
+            ticket in your issue tracker. In your issue tracker, you can then
             work on the risk and even use slash commands to apply mitigation
             strategies.
           </AlertDescription>
@@ -99,54 +77,7 @@ export default function StartSlide({
       <div className="mt-10 px-1">
         {isExternalEntityProvider ? (
           <div className="">
-            <h3 className="font-semibold flex items-center">
-              Invite the DevGuard Bot to your{" "}
-              {isOpenCode ? "openCode" : "GitLab"} Project
-            </h3>
-            <div className="mt-4">
-              <p className="mb-4 text-sm text-muted-foreground">
-                To enable ticket creation in your{" "}
-                {isOpenCode ? "openCode" : "GitLab"} project, you need to invite
-                the DevGuard Bot user to your project. Simply by removing the
-                User from your project, you can revoke the access at any time.
-              </p>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Please ensure that you grant the DevGuard Bot user
-                <span className="font-semibold text-primary">
-                  {" Reporter "}
-                </span>
-                permissions in your project.
-              </p>
-              {/* Copy element to copy the username */}
-              <Card className="flex items-center gap-4 p-4">
-                <div className="">
-                  <Image
-                    width={40}
-                    height={40}
-                    alt="DevGuard Bot Icon"
-                    src="/logo_icon.svg"
-                    className="size-10 rounded-full bg-muted-foreground outline -outline-offset-1 outline-background/5 p-1"
-                  />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-foreground">
-                    DevGuard Bot
-                  </p>
-                  <p className="truncate text-sm text-muted-foreground">
-                    {isOpenCode ? "@devguard" : "@devguard-bot"}
-                  </p>
-                </div>
-                <div className="">
-                  <button
-                    onClick={handleCopy}
-                    type="button"
-                    className="bg-secondary !text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    Copy Username
-                  </button>
-                </div>
-              </Card>
-            </div>
+            <DevGuardBotInvite />
             <div className="mt-10 flex flex-row gap-2 justify-end">
               <Button
                 onClick={() => {
