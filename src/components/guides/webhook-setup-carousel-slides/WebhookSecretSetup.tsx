@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { InputWithButton } from "@/components/ui/input-with-button";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 import {
   innerCardClassName,
   innerInputVariant,
@@ -18,16 +17,22 @@ import {
 } from "@/lib/surface";
 import { useConfig } from "../../../context/ConfigContext";
 import useAssetSecrets from "@/hooks/useAssetSecrets";
+import type { ExternalTicketProvider } from "@/types/common";
 
 export const webhookInstructions =
   "Go to your GitLab/ openCode project settings and add a webhook with the following URL and secret (“Settings” → “Webhooks”). Ensure that you select the Issue and comment event trigger checkboxes like shown in the screenshot below. You must set a secret token.";
 
+export const jiraWebhookInstructions =
+  "In Jira, go to “Settings” → “System” and select “WebHooks” under the “Advanced” section. Click “Create a WebHook” and fill it out with the following URL and secret. Under “Events”, select Issue “updated” and “deleted” and Comment “created”.";
+
 // webhook url + secret, which allow DevGuard to receive ticket updates
 export default function WebhookSecretSetup({
   variant,
+  provider = "gitlab",
 }: {
   // the surface the setup is rendered on
   variant?: Surface;
+  provider?: ExternalTicketProvider;
 }) {
   const {
     assetSecrets: secrets,
@@ -38,14 +43,16 @@ export default function WebhookSecretSetup({
 
   return (
     <>
-      <Image
-        src="/assets/gitlab-webhooks-combined.png"
-        alt="GitLab Webhooks"
-        className="rounded-md w-full h-auto"
-        width={1280}
-        height={720}
-      />
-      <Card className={cn("mt-10", innerCardClassName(variant))}>
+      {provider !== "jira" && (
+        <Image
+          src="/assets/gitlab-webhooks-combined.png"
+          alt="GitLab Webhooks"
+          className="mb-10 rounded-md w-full h-auto"
+          width={1280}
+          height={720}
+        />
+      )}
+      <Card className={innerCardClassName(variant)}>
         <CardHeader>
           <CardTitle className="text-lg">Create a new webhook</CardTitle>
           <CardDescription>
