@@ -7,7 +7,9 @@ import type { GitInstances } from "../../../types/common";
 import { type Config } from "../../../types/common";
 import CopyCode from "../../common/CopyCode";
 import { InputWithButton } from "../../ui/input-with-button";
+import { Alert, AlertDescription, AlertTitle } from "../../ui/alert";
 import type { Surface } from "@/lib/surface";
+import { InfoIcon } from "lucide-react";
 
 export interface PipelineSnippetProps {
   scannerImage: string;
@@ -54,6 +56,21 @@ export const pipelineFileName = (gitInstance: GitInstances) =>
     ? `.${gitInstance.toLowerCase()}/workflows/devsecops.yml`
     : `.gitlab-ci.yml`;
 
+const getPipelineHeader = (gitInstance: GitInstances, config: Config) =>
+  gitInstance === "GitHub"
+    ? `# ${pipelineFileName(gitInstance)}
+name: DevGuard DevSecOps
+
+on:
+    push:
+
+permissions:
+    contents: read
+    packages: write
+
+jobs:`
+    : `# ${pipelineFileName(gitInstance)} \nstages:\n${getGitlabStages(config)} \n \ninclude:`;
+
 export const pipelineFileHint =
   "Create a new file or add the code snippet to an existing workflow file.";
 
@@ -70,21 +87,6 @@ const PipelineSnippet: FunctionComponent<PipelineSnippetProps> = ({
   variant,
 }) => {
   function codeStringBuilder() {
-    const base =
-      gitInstance === "GitHub"
-        ? `
-name: DevGuard DevSecOps
-
-on:
-    push:
-
-permissions:
-    contents: read
-    packages: write
-
-jobs:`
-        : "\ninclude:";
-
     let codeString = "";
     if (
       config["secret-scanning"] &&
@@ -137,8 +139,6 @@ jobs:`
           })[gitInstance]["sbom"]
         }`;
       }
-
-      return base + codeString;
     } else {
       codeString = Object.entries(config)
         .filter(([_, selectedOptionValue]) => selectedOptionValue)
@@ -158,7 +158,19 @@ jobs:`
         .join("\n");
     }
 
-    return base + codeString;
+    return getPipelineHeader(gitInstance, config) + codeString;
+  }
+
+  if (Object.values(config).every((v) => v === false)) {
+    return (
+      <Alert>
+        <InfoIcon />
+        <AlertTitle>No scans selected</AlertTitle>
+        <AlertDescription>
+          Select at least one scan to generate your pipeline snippet.
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   return (
@@ -172,14 +184,7 @@ jobs:`
         value={pipelineFileName(gitInstance)}
       />
       <div className="mt-4">
-        <CopyCode
-          language="yaml"
-          codeString={
-            gitInstance === "GitHub"
-              ? `# .${gitInstance.toLowerCase()}/workflows/devsecops.yml ${codeStringBuilder()} `
-              : `# .gitlab-ci.yml \nstages:\n${getGitlabStages(config)} \n ${codeStringBuilder()}`
-          }
-        />
+        <CopyCode language="yaml" codeString={codeStringBuilder()} />
       </div>
     </>
   );
