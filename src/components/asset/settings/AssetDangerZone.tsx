@@ -15,6 +15,7 @@ import { useAssetUpdate } from "@/hooks/useAssetUpdate";
 import { toast } from "@/lib/toast";
 import { deleteAsset } from "@/services/assetService";
 import { classNames } from "@/utils/common";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const AssetDangerZone = () => {
@@ -54,9 +55,18 @@ const AssetDangerZone = () => {
           />
         </div>
         {project.isPublic ? null : (
-          <small>
-            The group is not public. You can not make the repository public.
-          </small>
+          <div className="flex items-center justify-between mb-2">
+            <small>
+              The group is not public. You can not make the repository public.
+            </small>
+            <Link
+              href={`/${scope.organization}/projects/${scope.projectSlug}/settings/danger-zone`}
+
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              Go to Project Settings
+            </Link>
+          </div>
         )}
         {asset.externalEntityProviderId ? null : (
           <ListItem

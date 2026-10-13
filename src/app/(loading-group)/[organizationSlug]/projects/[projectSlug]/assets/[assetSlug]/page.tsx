@@ -36,9 +36,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import IssueTrackerConnect from "@/components/onboarding/IssueTrackerConnect";
 import RepositorySelector from "@/components/guides/webhook-setup-carousel-slides/RepositorySelector";
-import WebhookSecretSetup, {
-  webhookInstructions,
-} from "@/components/guides/webhook-setup-carousel-slides/WebhookSecretSetup";
+import WebhookConnect from "@/components/onboarding/WebhookConnect";
 import useScannerImage from "../../../../../../../hooks/useScannerImage";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -370,10 +368,11 @@ const Index: FunctionComponent = () => {
             icon: Webhook,
             title: "Add the webhook",
             summary: "Keep tickets and risks in sync in both directions.",
-            description: webhookInstructions,
+            description:
+              "Your issue tracker sends ticket updates to DevGuard via a webhook. Select your issue tracker to see how to set it up.",
             content: (
               <div className="flex flex-col gap-6">
-                <WebhookSecretSetup variant="onCard" />
+                <WebhookConnect variant="onCard" />
                 <Alert className="border-primary/40 bg-primary/5">
                   <PartyPopper />
                   <AlertTitle>You are all set!</AlertTitle>
@@ -405,7 +404,7 @@ const Index: FunctionComponent = () => {
     >
       {isLoggedIn(role) ? (
         <Section primaryHeadline forceVertical title="Welcome to DevGuard 🚀">
-          {isSyncedFromGitLab ? (
+          {isGitLab ? (
             // assets of external entity providers support the auto-setup, which
             // takes care of all onboarding steps at once - the custom setup is the manual alternative
             <Tabs defaultValue="auto-setup">

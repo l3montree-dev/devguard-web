@@ -15,6 +15,7 @@ import { useProjectUpdate } from "@/hooks/useProjectUpdate";
 import { toast } from "@/lib/toast";
 import { deleteProject } from "@/services/projectService";
 import { classNames } from "@/utils/common";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -64,9 +65,18 @@ const ProjectDangerZone = () => {
           />
         </div>
         {org.isPublic ? null : (
-          <small>
-            The organization is not public. You can not make the group public.
-          </small>
+          <div className="flex items-center justify-between mb-2">
+            <small>
+              The organization is not public. You can not make the group public.
+            </small>
+            <Link
+              href={`/${scope.organization}/settings/danger-zone`}
+
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              Go to Organization Settings
+            </Link>
+          </div>
         )}
         {project.externalEntityProviderId ? null : (
           <ListItem

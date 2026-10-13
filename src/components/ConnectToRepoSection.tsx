@@ -203,7 +203,7 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
               variant="outline"
               type="button"
               onClick={() => {
-                router.push(`/${activeOrg.slug}/settings`);
+                router.push(`/${activeOrg.slug}/settings/integrations`);
               }}
             >
               Go to Organization Settings
