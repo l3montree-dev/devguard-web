@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getSeverityClassNames } from "@/components/common/Severity";
 import { classNames, truncateMiddle } from "@/utils/common";
 import {
+  DocumentTextIcon,
   ExclamationTriangleIcon,
   ShieldExclamationIcon,
 } from "@heroicons/react/24/outline";
@@ -193,6 +194,12 @@ export default forwardRef<InstanceDashboardHandle>(
         label: "GitLab Integration",
         value: usage.NumberOfProjectsWithGitlabIntegration,
         hint: "Projects with a GitLab integration",
+      },
+      {
+        icon: DocumentTextIcon,
+        label: "Assets with SBOM",
+        value: usage.NumberOfAssetsWithSBOM,
+        hint: "Active assets with at least one uploaded SBOM",
       },
     ];
 
