@@ -46,6 +46,8 @@ export const ProjectForm: FunctionComponent<Props> = ({
                   disabled={disabled}
                   required={true}
                   variant={inputVariant}
+                  maxLength={256}
+                  type="text"
                   autoFocus
                   {...field}
                 />
