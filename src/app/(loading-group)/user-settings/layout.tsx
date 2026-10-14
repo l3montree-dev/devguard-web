@@ -6,10 +6,11 @@ import SettingsShell from "@/components/common/settings/SettingsShell";
 import UserSettingsNav from "@/components/user-settings/UserSettingsNav";
 import { fetchSession } from "@/data-fetcher/fetchSession";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
+import React from "react";
 import type { OrganizationDetailsDTO } from "@/types/dto";
+import { NoopUpdater } from "@/context/noopUpdater";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 
 export default async function UserSettingsLayout({
@@ -22,14 +23,18 @@ export default async function UserSettingsLayout({
   }
 
   return (
-    <ClientContextWrapper
-      Provider={OrganizationProvider}
+    <OrganizationProvider
       value={{
-        organization: {
-          id: "",
-          name: "User Settings",
-          slug: "/",
-        } as OrganizationDetailsDTO,
+        v: {
+          // this makes no sense right here.
+          // would be better to move the user settings into another layout which doesnt expect an organization to be set.
+          organization: {
+            id: "",
+            name: "User Settings",
+            slug: "/",
+          } as OrganizationDetailsDTO,
+        },
+        update: NoopUpdater,
       }}
     >
       <TooltipProvider delayDuration={100}>
@@ -37,6 +42,6 @@ export default async function UserSettingsLayout({
           <SettingsShell nav={<UserSettingsNav />}>{children}</SettingsShell>
         </Page>
       </TooltipProvider>
-    </ClientContextWrapper>
+    </OrganizationProvider>
   );
 }

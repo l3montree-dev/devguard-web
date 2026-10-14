@@ -5,13 +5,13 @@
 import { createContext, useContext } from "react";
 import type { InformationSource } from "@/services/artifactService";
 import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
-import { NoopUpdater } from "./ClientContextWrapper";
+import { NoopUpdater } from "./noopUpdater";
 import type { WithUpdater } from "@/types/view/context";
 import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
-const AssetVersionContext = createContext<
+export const AssetVersionContext = createContext<
   WithUpdater<{
     assetVersion: AssetVersionDTO;
     artifacts: ArtifactDTO[];
@@ -20,7 +20,6 @@ const AssetVersionContext = createContext<
   v: null,
   update: NoopUpdater,
 });
-export const AssetVersionProvider = AssetVersionContext.Provider;
 export const useAssetVersion = () =>
   useContext(AssetVersionContext).v?.assetVersion;
 export const useUpdateAssetVersionState = () =>

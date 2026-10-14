@@ -5,10 +5,10 @@
 import React from "react";
 import type { User } from "../types/auth";
 import type { OrganizationDTO } from "@/types/dto";
-import { NoopUpdater } from "./ClientContextWrapper";
+import { NoopUpdater } from "./noopUpdater";
 import type { WithUpdater } from "@/types/view/context";
 
-const SessionContext = React.createContext<
+export const SessionContext = React.createContext<
   WithUpdater<{
     session: {
       identity: User;
@@ -23,6 +23,5 @@ const SessionContext = React.createContext<
   update: NoopUpdater,
 });
 
-export const SessionProvider = SessionContext.Provider;
 export const useSession = () => React.useContext(SessionContext).v;
 export const useUpdateSession = () => React.useContext(SessionContext).update;
