@@ -24,6 +24,15 @@ interface Props {
   index: number;
   event: VulnEventDTO;
 }
+
+const routeByVulnType: Record<VulnEventDTO["vulnType"], string> = {
+  dependencyVuln: "dependency-risks",
+  firstPartyVuln: "code-risks",
+  securityAdvisory: "advisory",
+  compliancePosture: "compliance-postures",
+  licenseRisk: "license-risks",
+};
+
 const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
@@ -32,6 +41,11 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
+  const routeId =
+    event.vulnType === "compliancePosture"
+      ? (event.vulnerabilityName ?? event.vulnId)
+      : event.vulnId;
+
   return (
     <li
       className={classNames(
@@ -68,7 +82,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
             <div className="flex-1">
               <div className="w-full flex-1 overflow-hidden rounded border">
                 <Link
-                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/${event.vulnType === "dependencyVuln" ? "dependency-risks" : "code-risks"}/${event.vulnId}`}
+                  href={`/${activeOrg.slug}/projects/${project.slug}/assets/${asset?.slug}/refs/${assetVersion?.slug}/${routeByVulnType[event.vulnType]}/${routeId}`}
                   className="!text-inherit no-underline visited:text-inherit hover:text-inherit active:text-inherit"
                 >
                   <div className="w-full">
