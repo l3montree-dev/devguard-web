@@ -32,16 +32,12 @@ import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
 import { createAppColumnHelper } from "@/hooks/useTable";
 import type { TableColumnDef } from "@/hooks/useTable";
-import {
-  overwriteComponentLicense,
-  refreshComponentLicenses,
-} from "@/services/componentService";
+import { overwriteComponentLicense } from "@/services/componentService";
 import { useComponentList } from "@/hooks/useComponents";
 import { useComponentLicenses } from "@/hooks/useAssetVersionStats";
 
@@ -75,10 +71,7 @@ import DateString, {
 import OpenSsfScore from "../../../../../../../../../../components/common/OpenSsfScore";
 import SortingCaret from "../../../../../../../../../../components/common/SortingCaret";
 import { Badge } from "../../../../../../../../../../components/ui/badge";
-import {
-  AsyncButton,
-  Button,
-} from "../../../../../../../../../../components/ui/button";
+import { Button } from "../../../../../../../../../../components/ui/button";
 import { Skeleton } from "../../../../../../../../../../components/ui/skeleton";
 import {
   Tooltip,
@@ -87,7 +80,6 @@ import {
 } from "../../../../../../../../../../components/ui/tooltip";
 import { useArtifacts } from "../../../../../../../../../../context/AssetVersionContext";
 import { useActiveAsset } from "../../../../../../../../../../hooks/useActiveAsset";
-import { useActiveProject } from "../../../../../../../../../../hooks/useActiveProject";
 import useDecodedParams from "../../../../../../../../../../hooks/useDecodedParams";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { dependencyInsightsTourSteps } from "@/components/common/tours/dependencyInsightsTour";
@@ -461,26 +453,8 @@ const Index: FunctionComponent = () => {
     });
   }
 
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
-
-  const handleLicenseRefresh = async () => {
-    try {
-      await refreshComponentLicenses({
-        organization: activeOrg.slug,
-        projectSlug: project!.slug,
-        assetSlug: asset!.slug,
-        assetVersionSlug: assetVersion!.slug,
-      });
-    } catch {
-      toast.error("Failed to trigger license refresh");
-      return;
-    }
-    toast.success("License refresh triggered");
-    router.refresh();
-  };
 
   return (
     <Page
@@ -694,11 +668,6 @@ const Index: FunctionComponent = () => {
           </table>
         </div>
         {components && <CustomPagination {...componentsWithLicenses} />}
-        <div className="flex flex-row justify-end">
-          <AsyncButton onClick={handleLicenseRefresh} variant={"ghost"}>
-            Refresh Licenses
-          </AsyncButton>
-        </div>
       </Section>
 
       {datasets && datasets.project && (

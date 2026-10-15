@@ -9,14 +9,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetScope } from "@/hooks/useAssetScope";
 import { toast } from "@/lib/toast";
 import { triggerAssetPipeline } from "@/services/assetService";
-import { formatDateTime } from "@/utils/format";
 
 const BackgroundJobsDebug = () => {
-  const asset = useActiveAsset()!;
   const scope = useAssetScope();
 
   const handleTrigger = async () => {
@@ -38,9 +35,6 @@ const BackgroundJobsDebug = () => {
         <Button onClick={handleTrigger} variant="outline">
           Trigger Background jobs
         </Button>
-        <small className="mt-4 block text-muted-foreground">
-          Last Run: {formatDateTime(asset.pipelineLastRun)}
-        </small>
       </CollapsibleContent>
     </Collapsible>
   );

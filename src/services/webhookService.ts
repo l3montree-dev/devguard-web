@@ -9,11 +9,11 @@ export type WebhookScope =
   | { level: "project"; organization: string; projectSlug: string };
 
 export type WebhookSaveRequest =
-  components["schemas"]["dtos.WebhookCreateRequestDTO"];
+  components["schemas"]["dtos.WebhookCreateRequest"];
 export type WebhookUpdateRequest =
-  components["schemas"]["dtos.WebhookUpdateRequestDTO"];
+  components["schemas"]["dtos.WebhookUpdateRequest"];
 export type WebhookTestRequest =
-  components["schemas"]["dtos.WebhookTestRequestDTO"];
+  components["schemas"]["dtos.WebhookTestRequest"];
 
 export const saveWebhook = async (
   scope: WebhookScope,

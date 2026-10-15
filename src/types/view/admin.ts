@@ -7,7 +7,7 @@ import type { components } from "@/types/api/generated";
 
 type S = components["schemas"];
 
-export type OrgAdmin = Omit<S["dtos.UserDTO"], "avatarUrl"> & {
+export type OrgAdmin = Omit<S["dtos.User"], "avatarUrl"> & {
   avatarUrl: string | null;
 };
 

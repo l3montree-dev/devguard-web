@@ -74,7 +74,7 @@ export type VexRulePrefill = {
 // ever carry one of these three.
 export type VexRuleEventType = "accepted" | "falsePositive" | "reopened";
 
-export type VexRule = Omit<S["dtos.VEXRuleDTO"], "eventType"> & {
+export type VexRule = Omit<S["dtos.VEXRule"], "eventType"> & {
   eventType: VexRuleEventType;
 };
 

@@ -7545,54 +7545,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/components/licenses/refresh/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Refetch license information for all components */
-    post: {
-      parameters: {
-        query?: {
-          /** @description Artifact name */
-          artifactName?: string;
-        };
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-graph/": {
     parameters: {
       query?: never;
@@ -7733,56 +7685,6 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["dtos.DetailedDependencyVuln"][];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-vulns/sync": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Sync dependency vulnerabilities with third party integrations */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "text/plain": Record<string, never>;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
           };
         };
       };
@@ -15456,7 +15358,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersion"][];
       repositoryId: string;
@@ -15467,7 +15368,6 @@ export interface components {
       signingPubKey: string;
       slug: string;
       state: string;
-      vulnAutoReopenAfterDays: number;
     };
     "dtos.AssetChangeRoleRequest": {
       /** @enum {string} */
@@ -15523,7 +15423,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersion"][];
       repositoryId: string;
@@ -15534,7 +15433,6 @@ export interface components {
       signingPubKey: string;
       slug: string;
       state: string;
-      vulnAutoReopenAfterDays: number;
     };
     "dtos.AssetDetailsWithSecrets": {
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
@@ -15561,7 +15459,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       projectId: string;
       refs: components["schemas"]["dtos.AssetVersion"][];
       repositoryId: string;
@@ -15572,7 +15469,6 @@ export interface components {
       signingPubKey: string;
       slug: string;
       state: string;
-      vulnAutoReopenAfterDays: number;
       webhookSecret: string;
     };
     "dtos.AssetEntry": {
@@ -15614,7 +15510,6 @@ export interface components {
       repositoryProvider: "github" | "gitlab";
       riskAutomaticTicketThreshold: number;
       sharesInformation: boolean;
-      vulnAutoReopenAfterDays: number;
       webhookSecret: string;
     };
     "dtos.AssetVersion": {
@@ -17148,7 +17043,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       project: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"];
       projectId: string;
       refs: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"][];
@@ -17163,8 +17057,6 @@ export interface components {
       state: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetState"];
       type: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetType"];
       updatedAt: string;
-      /** @description Auto-reopen configuration - number of days after which closed/accepted vulnerabilities should be reopened */
-      vulnAutoReopenAfterDays: number;
       webhookSecret: string;
     };
     /** @enum {string} */
@@ -17668,24 +17560,16 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000

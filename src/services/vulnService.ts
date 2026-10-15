@@ -20,7 +20,7 @@ const LICENSE_RISK =
 export type CreateEventRequest =
   components["schemas"]["dtos.CreateEventRequest"];
 export type FirstPartyVulnStatus =
-  components["schemas"]["dtos.FirstPartyVulnStatus"];
+  components["schemas"]["dtos.FirstPartyVulnStatusRequest"];
 export type LicenseRiskStatus =
   components["schemas"]["controllers.LicenseRiskStatus"];
 export type MakeFinalLicenseDecisionRequest =
@@ -143,9 +143,9 @@ export const finalLicenseDecision = async (
   );
 
 export type BatchDependencyVulnStatus =
-  components["schemas"]["dtos.BatchDependencyVulnStatus"];
+  components["schemas"]["dtos.BatchDependencyVulnStatusRequest"];
 export type BatchFirstPartyVulnStatus =
-  components["schemas"]["dtos.BatchFirstPartyVulnStatus"];
+  components["schemas"]["dtos.BatchFirstPartyVulnStatusRequest"];
 
 export const batchUpdateDependencyVulns = async (
   scope: AssetVersionScope,

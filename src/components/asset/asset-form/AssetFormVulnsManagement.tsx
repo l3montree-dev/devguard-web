@@ -31,7 +31,6 @@ import React, { type FunctionComponent, useMemo, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { createUpdateHandler } from "./createUpdateHandler";
 import type { AssetFormValues } from "@/types/view/asset";
-import { VulnAutoReopenAfterDays } from "./VulnAutoReopenAfterDays";
 
 import { cn } from "@/lib/utils";
 import { useActiveAsset } from "../../../hooks/useActiveAsset";
@@ -516,8 +515,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
 
       <EnableTicketRange form={form} assetId={assetId} />
 
-      <VulnAutoReopenAfterDays form={form} />
-
       {handleUpdate && (
         <div className="mt-4 flex flex-row justify-end">
           <AsyncButton
@@ -527,7 +524,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               !(
                 form.formState.dirtyFields?.paranoidMode ||
                 form.formState.dirtyFields?.sharesInformation ||
-                form.formState.dirtyFields?.vulnAutoReopenAfterDays ||
                 form.formState.dirtyFields?.enableTicketRange ||
                 form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
                 form.formState.dirtyFields?.riskAutomaticTicketThreshold ||
@@ -539,7 +535,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
               [
                 "paranoidMode",
                 "sharesInformation",
-                "vulnAutoReopenAfterDays",
                 "enableTicketRange",
                 "cvssAutomaticTicketThreshold",
                 "riskAutomaticTicketThreshold",

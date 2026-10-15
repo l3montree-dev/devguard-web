@@ -21,12 +21,6 @@ export const useAssetUpdate = () => {
       ...data,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold?.[0],
       riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold?.[0],
-      vulnAutoReopenAfterDays:
-        "vulnAutoReopenAfterDays" in data
-          ? data.vulnAutoReopenAfterDays
-            ? +data.vulnAutoReopenAfterDays
-            : -1
-          : undefined,
     } as Partial<components["schemas"]["dtos.AssetPatchRequest"]>);
     updateAsset(newAsset);
     if (newAsset.slug !== asset.slug) {
