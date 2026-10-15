@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
-import { envConfig } from "./utils";
+import { envConfig, goto } from "./utils";
 
 test.skip(({ browserName }) => browserName !== "chromium", "chromium only");
 
@@ -73,7 +73,8 @@ test.describe("DevGuard multi-user: test flows", () => {
 
     await user2POM.loadAndRegister();
 
-    await page2.goto(
+    await goto(
+      page2,
       `${withoutPrefix}/${orgName}/projects/${projectName}/assets/${assetName}`,
     );
     await page2
