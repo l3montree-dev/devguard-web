@@ -81,4 +81,5 @@ export interface InstanceUsageStatistics {
   NumberOfAssetVersions: number;
   NumberOfTicketSyncedProjects: number;
   NumberOfProjectsWithGitlabIntegration: number;
+  NumberOfAssetsWithSBOM: number;
 }
