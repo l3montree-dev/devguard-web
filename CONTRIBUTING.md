@@ -19,5 +19,5 @@
 
 ## Code of Conduct
 
-The DevGuard project has a Code of Conduct
+The DevGuard project has a [Code of Conduct](CODE_OF_CONDUCT.md)
 to which all contributors must adhere.
