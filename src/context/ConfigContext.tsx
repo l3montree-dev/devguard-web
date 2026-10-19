@@ -4,7 +4,7 @@
 "use client";
 import React from "react";
 import { config } from "../config";
-import { NoopUpdater } from "./noopUpdater";
+import { NoopUpdater } from "./ClientContextWrapper";
 import type { InstanceSettings } from "@/types/dto";
 import type { WithUpdater } from "../types/view/context";
 

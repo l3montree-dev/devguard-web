@@ -3,7 +3,7 @@
 
 import ProjectHeader from "@/components/common/ProjectHeader";
 import React, { Suspense } from "react";
-import { NoopUpdater } from "../../../../../context/noopUpdater";
+import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
 import { ProjectContext } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
 import { handleHttpError } from "../../../../../data-fetcher/handleHttpError";
@@ -43,9 +43,9 @@ async function ProjectShell({
   }
 
   return (
-    <ProjectContext value={{ v: project, update: NoopUpdater }}>
+    <ClientContextWrapper Context={ProjectContext} value={project}>
       <ProjectHeader />
       {children}
-    </ProjectContext>
+    </ClientContextWrapper>
   );
 }

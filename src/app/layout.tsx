@@ -13,7 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
 import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
-import { NoopUpdater } from "../context/noopUpdater";
+import { ClientContextWrapper } from "../context/ClientContextWrapper";
 import { ConfigContext } from "../context/ConfigContext";
 import { SessionContext } from "../context/SessionContext";
 import { fetchInstanceSettings } from "../data-fetcher/fetchInstanceSettings";
@@ -144,16 +144,15 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ConfigContext
-      value={{ v: { ...config, ...instanceSettings }, update: NoopUpdater }}
+    <ClientContextWrapper
+      Context={ConfigContext}
+      value={{ ...config, ...instanceSettings }}
     >
-      <SessionContext
+      <ClientContextWrapper
+        Context={SessionContext}
         value={{
-          v: {
-            session,
-            organizations: orgs,
-          },
-          update: NoopUpdater,
+          session,
+          organizations: orgs,
         }}
       >
         <HashScroll />
@@ -162,7 +161,7 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
           <Toaster />
           {process.env.NODE_ENV === "development" && <CSSVariableEditor />}
         </TourContextProvider>
-      </SessionContext>
-    </ConfigContext>
+      </ClientContextWrapper>
+    </ClientContextWrapper>
   );
 }

@@ -4,7 +4,7 @@
 import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
 import React, { Suspense } from "react";
 import { AssetVersionContext } from "../../../../../../../../../context/AssetVersionContext";
-import { NoopUpdater } from "../../../../../../../../../context/noopUpdater";
+import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { handleHttpError } from "../../../../../../../../../data-fetcher/handleHttpError";
 
@@ -66,17 +66,15 @@ async function AssetVersionShell({
   }
 
   return (
-    <AssetVersionContext
+    <ClientContextWrapper
+      Context={AssetVersionContext}
       value={{
-        v: {
-          artifacts,
-          assetVersion,
-        },
-        update: NoopUpdater,
+        artifacts,
+        assetVersion,
       }}
     >
       {children}
-    </AssetVersionContext>
+    </ClientContextWrapper>
   );
 }
 

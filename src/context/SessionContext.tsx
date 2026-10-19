@@ -5,7 +5,7 @@
 import React from "react";
 import type { User } from "../types/auth";
 import type { OrganizationDTO } from "@/types/dto";
-import { NoopUpdater } from "./noopUpdater";
+import { NoopUpdater } from "./ClientContextWrapper";
 import type { WithUpdater } from "@/types/view/context";
 
 export const SessionContext = React.createContext<

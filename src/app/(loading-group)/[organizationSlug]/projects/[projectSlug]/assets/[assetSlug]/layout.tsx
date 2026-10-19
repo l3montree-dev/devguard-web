@@ -4,7 +4,7 @@
 import AssetHeader from "@/components/common/AssetHeader";
 import React, { Suspense } from "react";
 import { AssetContext } from "../../../../../../../context/AssetContext";
-import { NoopUpdater } from "../../../../../../../context/noopUpdater";
+import { ClientContextWrapper } from "../../../../../../../context/ClientContextWrapper";
 import { fetchAsset } from "../../../../../../../data-fetcher/fetchAsset";
 import { handleHttpError } from "../../../../../../../data-fetcher/handleHttpError";
 
@@ -53,9 +53,9 @@ async function AssetShell({
   }
 
   return (
-    <AssetContext value={{ v: asset, update: NoopUpdater }}>
+    <ClientContextWrapper Context={AssetContext} value={asset}>
       <AssetHeader />
       {children}
-    </AssetContext>
+    </ClientContextWrapper>
   );
 }
