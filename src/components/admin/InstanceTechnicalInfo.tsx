@@ -76,14 +76,16 @@ export default forwardRef<InstanceTechnicalInfoHandle>(
       null,
     );
 
-    const version = info?.build?.version;
+    const version = "1.16.0";
 
     useEffect(() => {
       if (!version) return;
       let ignore = false;
-      checkForUpdate(version).then((result) => {
-        if (!ignore) setVersionCheck(result);
-      });
+      checkForUpdate(version, "patch")
+        .then((result) => {
+          if (!ignore) setVersionCheck(result);
+        })
+        .catch(() => {});
       return () => {
         ignore = true;
       };

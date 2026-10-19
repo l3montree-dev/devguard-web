@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 /**
- * Checks the latest DevGuard release from GitHub and compares it against
+ * Checks the latest server-cached DevGuard release that was fetched from api.devguard.org and compares it against
  * the running instance version (a `git describe` string like "v1.0.1-4-g93f141ee").
  */
 
 import type { VersionCheckResult } from "@/types/view/admin";
+import { fetchLatestDevguardVersion } from "@/data-fetcher/fetchLatestDevguardVersion";
 
 export function withVPrefix(version: string): string {
   return /^v/i.test(version) ? version : `v${version}`;
@@ -54,42 +55,55 @@ export function compareSemver(a: string, b: string): number {
   if (!pa || !pb) return NaN;
   return compareSemverTuple(pa, pb);
 }
+const RELEASE_TAG_URL =
+  "https://github.com/l3montree-dev/devguard/releases/tag/";
 
-const GITHUB_RELEASES_API =
-  "https://api.github.com/repos/l3montree-dev/devguard/releases/latest";
+/** "minor" ignores patch releases (for UpdateAvailableDialog)
+ * "patch" counts them too (for InstanceTechnicalInfo)
+ */
+export type UpdateLevel = "minor" | "patch";
 
 /**
- * Fetch the latest DevGuard release from GitHub and compare it against
- * the running instance version string.
+ * Cut a version down to major.minor.
+ * "v1.16.1-53-g1ae779e6" → "1.16". Returns null on failure.
+ */
+export function toMinorVersion(version: string): string | null {
+  const parsed = parseSemver(baseTag(version));
+  return parsed ? `${parsed[0]}.${parsed[1]}` : null;
+}
+
+/**
+ * Fetch the latest DevGuard version on api.devguard.org that was cached and compare
+ * it against the running instance version string.
  */
 export async function checkForUpdate(
   currentVersion: string,
+  level: UpdateLevel,
 ): Promise<VersionCheckResult> {
-  // Runs in the client - fetches once per page load
-  const res = await fetch(GITHUB_RELEASES_API, {
-    headers: { Accept: "application/vnd.github+json" },
-  });
-
-  if (!res.ok) {
-    throw new Error(`GitHub API responded with ${res.status}`);
+  const latestVersion = await fetchLatestDevguardVersion();
+  if (!latestVersion) {
+    throw new Error(
+      "Could not fetch the latest DevGuard version from api.devguard.org/api/v1/info",
+    );
   }
 
-  const data = (await res.json()) as { tag_name: string; html_url: string };
-  const latestTag = data.tag_name;
-  const latestUrl = data.html_url;
-
+  const latestTag = baseTag(latestVersion);
   const currentParsed = parseSemver(baseTag(currentVersion));
   const latestParsed = parseSemver(latestTag);
+
+  // At "minor" level, make the patch zero so only major and minor are compared
+  const atLevel = (v: [number, number, number]): [number, number, number] =>
+    level === "minor" ? [v[0], v[1], 0] : v;
 
   // If we can't parse either version, be conservative and say no update
   const updateAvailable =
     currentParsed && latestParsed
-      ? compareSemverTuple(currentParsed, latestParsed) < 0
+      ? compareSemverTuple(atLevel(currentParsed), atLevel(latestParsed)) < 0
       : false;
 
   return {
     latestVersion: latestTag,
-    latestUrl,
+    latestUrl: RELEASE_TAG_URL + latestTag,
     updateAvailable,
   };
 }

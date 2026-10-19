@@ -63,11 +63,11 @@ export interface AdminDaemonSSEEvent {
 }
 
 export interface VersionCheckResult {
-  /** The latest release tag from GitHub, e.g. "v1.2.0" */
+  /** The latest release tag from api.devguard.org, e.g. "v1.2.0" */
   latestVersion: string;
-  /** The release URL on GitHub */
+  /** The GitHub release page for latestVersion */
   latestUrl: string;
-  /** Whether the running version is behind the latest release */
+  /** Whether the running version is behind the latest release at the checked level */
   updateAvailable: boolean;
 }
 

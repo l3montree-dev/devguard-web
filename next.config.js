@@ -52,12 +52,10 @@ const buildCsp = () => {
     "font-src": ["'self'", "data:", themeCssOrigin, themeJsOrigin],
     // Most API/Sentry/Ory traffic is proxied same-origin. Direct browser calls:
     // - blob: — Three.js/GLTF lanyard fetches its bundled model + textures.
-    // - api.github.com — client-side version check (admin instance info).
     // - raw.githubusercontent.com — docs drawers fetch MDX at runtime.
     "connect-src": [
       "'self'",
       "blob:",
-      "https://api.github.com",
       "https://raw.githubusercontent.com",
       isDev && "ws:",
       analyticsOrigin,
