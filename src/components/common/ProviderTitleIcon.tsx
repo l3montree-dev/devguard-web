@@ -62,6 +62,19 @@ export default function ProviderTitleIcon({
           openCode
         </span>
       );
+    case "redmine":
+      return (
+        <span className="inline-flex items-center gap-2">
+          <Image
+            src="/assets/provider-icons/redmine.svg"
+            alt="Redmine Icon"
+            className="h-4 w-auto"
+            width={16}
+            height={16}
+          />{" "}
+          Redmine
+        </span>
+      );
     default:
       return null;
   }
