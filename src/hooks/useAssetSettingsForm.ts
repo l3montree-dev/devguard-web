@@ -12,7 +12,6 @@ export const useAssetSettingsForm = () => {
   return useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
-      vulnAutoReopenAfterDays: asset.vulnAutoReopenAfterDays ?? -1,
       cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
         ? [asset.cvssAutomaticTicketThreshold]
         : [],

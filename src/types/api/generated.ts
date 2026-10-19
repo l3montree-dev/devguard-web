@@ -70,7 +70,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.OrgDTO"];
+            "application/json": components["schemas"]["dtos.Org"];
           };
         };
       };
@@ -564,7 +564,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Log"];
           };
         };
       };
@@ -1037,7 +1037,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentDetailsDTO"][];
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"][];
           };
         };
       };
@@ -1076,7 +1076,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentDetailsDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"];
           };
         };
       };
@@ -2248,7 +2248,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.InstanceSettingsDTO"];
+            "application/json": components["schemas"]["dtos.InstanceSettings"];
           };
         };
       };
@@ -2499,7 +2499,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.OrgDetailsDTO"];
+            "application/json": components["schemas"]["dtos.OrgDetails"];
           };
         };
       };
@@ -2554,7 +2554,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.OrgDetailsDTO"];
+            "application/json": components["schemas"]["dtos.OrgDetails"];
           };
         };
       };
@@ -2587,7 +2587,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControlDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControl"];
           };
         };
       };
@@ -2634,7 +2634,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
           };
         };
       };
@@ -2736,7 +2736,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureStatsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureStats"];
           };
         };
       };
@@ -2777,7 +2777,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetailsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
           };
         };
       };
@@ -2812,7 +2812,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetailsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
           };
         };
       };
@@ -2860,7 +2860,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
           };
         };
       };
@@ -2904,7 +2904,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrenceDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrence"];
           };
         };
       };
@@ -3014,7 +3014,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ProjectDTO"][];
+            "application/json": components["schemas"]["dtos.Project"][];
           };
         };
       };
@@ -3350,7 +3350,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.GitlabIntegrationDTO"];
+            "application/json": components["schemas"]["dtos.GitlabIntegration"];
           };
         };
       };
@@ -3438,7 +3438,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.JiraIntegrationDTO"];
+            "application/json": components["schemas"]["dtos.JiraIntegration"];
           };
         };
       };
@@ -3550,7 +3550,7 @@ export interface paths {
       /** @description Test webhook data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.WebhookTestRequestDTO"];
+          "application/json": components["schemas"]["dtos.WebhookTestRequest"];
         };
       };
       responses: {
@@ -3597,7 +3597,7 @@ export interface paths {
       /** @description Webhook data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.WebhookCreateRequestDTO"];
+          "application/json": components["schemas"]["dtos.WebhookCreateRequest"];
         };
       };
       responses: {
@@ -3607,7 +3607,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.WebhookIntegrationDTO"];
+            "application/json": components["schemas"]["dtos.WebhookIntegration"];
           };
         };
       };
@@ -3642,7 +3642,7 @@ export interface paths {
       /** @description Webhook data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.WebhookUpdateRequestDTO"];
+          "application/json": components["schemas"]["dtos.WebhookUpdateRequest"];
         };
       };
       responses: {
@@ -3652,7 +3652,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.WebhookIntegrationDTO"];
+            "application/json": components["schemas"]["dtos.WebhookIntegration"];
           };
         };
       };
@@ -3763,7 +3763,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Log"];
           };
         };
       };
@@ -3977,7 +3977,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATDTO"][];
+            "application/json": components["schemas"]["dtos.PAT"][];
           };
         };
       };
@@ -4007,7 +4007,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATCreateResponseDTO"];
+            "application/json": components["schemas"]["dtos.PATCreateResponse"];
           };
         };
       };
@@ -4103,7 +4103,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.PolicyDTO"];
+          "application/json": components["schemas"]["dtos.Policy"];
         };
       };
       responses: {
@@ -4113,7 +4113,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PolicyDTO"];
+            "application/json": components["schemas"]["dtos.Policy"];
           };
         };
       };
@@ -4173,7 +4173,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.PolicyDTO"];
+          "application/json": components["schemas"]["dtos.Policy"];
         };
       };
       responses: {
@@ -4325,7 +4325,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Project"];
           };
         };
       };
@@ -4366,7 +4366,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ProjectDetailsDTO"];
+            "application/json": components["schemas"]["dtos.ProjectDetails"];
           };
         };
       };
@@ -4425,7 +4425,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ProjectDetailsDTO"];
+            "application/json": components["schemas"]["dtos.ProjectDetails"];
           };
         };
       };
@@ -4460,7 +4460,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetDTO"][];
+            "application/json": components["schemas"]["dtos.Asset"][];
           };
         };
       };
@@ -4492,7 +4492,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetDTO"];
+            "application/json": components["schemas"]["dtos.Asset"];
           };
         };
       };
@@ -4533,7 +4533,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetDetailsDTO"];
+            "application/json": components["schemas"]["dtos.AssetDetails"];
           };
         };
       };
@@ -4596,7 +4596,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetDetailsWithSecretsDTO"];
+            "application/json": components["schemas"]["dtos.AssetDetailsWithSecrets"];
           };
         };
       };
@@ -5198,7 +5198,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ExternalReferenceDTO"][];
+            "application/json": components["schemas"]["dtos.ExternalReference"][];
           };
         };
       };
@@ -5232,7 +5232,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ExternalReferenceDTO"];
+            "application/json": components["schemas"]["dtos.ExternalReference"];
           };
         };
       };
@@ -5500,7 +5500,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Log"];
           };
         };
       };
@@ -5732,7 +5732,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATDTO"][];
+            "application/json": components["schemas"]["dtos.PAT"][];
           };
         };
       };
@@ -5766,7 +5766,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATCreateResponseDTO"];
+            "application/json": components["schemas"]["dtos.PATCreateResponse"];
           };
         };
       };
@@ -5891,7 +5891,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetVersionDTO"][];
+            "application/json": components["schemas"]["dtos.AssetVersion"][];
           };
         };
       };
@@ -5929,7 +5929,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetVersionDTO"];
+            "application/json": components["schemas"]["dtos.AssetVersion"];
           };
         };
       };
@@ -5972,7 +5972,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.AssetVersionDTO"];
+            "application/json": components["schemas"]["dtos.AssetVersion"];
           };
         };
       };
@@ -6070,7 +6070,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.AdvisoryCreate"];
+          "application/json": components["schemas"]["dtos.AdvisoryCreateRequest"];
         };
       };
       responses: {
@@ -6184,7 +6184,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.AdvisoryUpdate"];
+          "application/json": components["schemas"]["dtos.AdvisoryUpdateRequest"];
         };
       };
       responses: {
@@ -6284,7 +6284,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DependencyVulnDTO"][];
+            "application/json": components["schemas"]["dtos.DependencyVuln"][];
           };
         };
       };
@@ -6374,7 +6374,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ArtifactDTO"][];
+            "application/json": components["schemas"]["dtos.Artifact"][];
           };
         };
       };
@@ -6410,7 +6410,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ArtifactDTO"];
+            "application/json": components["schemas"]["dtos.Artifact"];
           };
         };
       };
@@ -7079,7 +7079,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControlDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControl"];
           };
         };
       };
@@ -7132,7 +7132,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
           };
         };
       };
@@ -7252,7 +7252,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureStatsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureStats"];
           };
         };
       };
@@ -7299,7 +7299,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetailsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
           };
         };
       };
@@ -7340,7 +7340,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetailsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
           };
         };
       };
@@ -7394,7 +7394,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
           };
         };
       };
@@ -7484,7 +7484,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentDependencyDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentDependency"];
           };
         };
       };
@@ -7539,54 +7539,6 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/components/licenses/refresh/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Refetch license information for all components */
-    post: {
-      parameters: {
-        query?: {
-          /** @description Artifact name */
-          artifactName?: string;
-        };
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
     delete?: never;
     options?: never;
     head?: never;
@@ -7722,7 +7674,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.BatchDependencyVulnStatus"];
+          "application/json": components["schemas"]["dtos.BatchDependencyVulnStatusRequest"];
         };
       };
       responses: {
@@ -7732,57 +7684,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedDependencyVulnDTO"][];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-vulns/sync": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Sync dependency vulnerabilities with third party integrations */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "text/plain": Record<string, never>;
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
+            "application/json": components["schemas"]["dtos.DetailedDependencyVuln"][];
           };
         };
       };
@@ -7827,7 +7729,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedDependencyVulnWithRelationsDTO"];
+            "application/json": components["schemas"]["dtos.DetailedDependencyVulnWithRelations"];
           };
         };
       };
@@ -7865,7 +7767,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedDependencyVulnDTO"];
+            "application/json": components["schemas"]["dtos.DetailedDependencyVuln"];
           };
         };
       };
@@ -7910,7 +7812,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.VulnEventDTO"][];
+            "application/json": components["schemas"]["dtos.VulnEvent"][];
           };
         };
       };
@@ -8013,7 +7915,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedDependencyVulnDTO"];
+            "application/json": components["schemas"]["dtos.DetailedDependencyVuln"];
           };
         };
       };
@@ -8061,7 +7963,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_VulnEventDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_VulnEvent"];
           };
         };
       };
@@ -8196,7 +8098,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.BatchFirstPartyVulnStatus"];
+          "application/json": components["schemas"]["dtos.BatchFirstPartyVulnStatusRequest"];
         };
       };
       responses: {
@@ -8206,7 +8108,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedFirstPartyVulnDTO"][];
+            "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"][];
           };
         };
       };
@@ -8251,7 +8153,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedFirstPartyVulnDTO"];
+            "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"];
           };
         };
       };
@@ -8279,7 +8181,7 @@ export interface paths {
       /** @description Event data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.FirstPartyVulnStatus"];
+          "application/json": components["schemas"]["dtos.FirstPartyVulnStatusRequest"];
         };
       };
       responses: {
@@ -8289,7 +8191,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedFirstPartyVulnDTO"];
+            "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"];
           };
         };
       };
@@ -8334,7 +8236,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.VulnEventDTO"][];
+            "application/json": components["schemas"]["dtos.VulnEvent"][];
           };
         };
       };
@@ -8390,7 +8292,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedFirstPartyVulnDTO"];
+            "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"];
           };
         };
       };
@@ -8564,7 +8466,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedLicenseRiskDTO"];
+            "application/json": components["schemas"]["dtos.DetailedLicenseRisk"];
           };
         };
       };
@@ -8602,7 +8504,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedLicenseRiskDTO"];
+            "application/json": components["schemas"]["dtos.DetailedLicenseRisk"];
           };
         };
       };
@@ -8654,7 +8556,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedLicenseRiskDTO"];
+            "application/json": components["schemas"]["dtos.DetailedLicenseRisk"];
           };
         };
       };
@@ -8708,7 +8610,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.DetailedLicenseRiskDTO"];
+            "application/json": components["schemas"]["dtos.DetailedLicenseRisk"];
           };
         };
       };
@@ -9087,7 +8989,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.RiskHistoryDTO"][];
+            "application/json": components["schemas"]["dtos.RiskHistory"][];
           };
         };
       };
@@ -9330,7 +9232,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.RiskHistoryWithVersionDTO"][];
+            "application/json": components["schemas"]["dtos.RiskHistoryWithVersion"][];
           };
         };
       };
@@ -9381,7 +9283,7 @@ export interface paths {
           };
           content: {
             "application/json": {
-              data?: components["schemas"]["dtos.VEXRuleDTO"][];
+              data?: components["schemas"]["dtos.VEXRule"][];
               page?: number;
               pageSize?: number;
               total?: number;
@@ -9419,7 +9321,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.VEXRuleDTO"];
+            "application/json": components["schemas"]["dtos.VEXRule"];
           };
         };
       };
@@ -9618,7 +9520,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.VEXRuleDTO"];
+            "application/json": components["schemas"]["dtos.VEXRule"];
           };
         };
       };
@@ -9727,7 +9629,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControlDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControl"];
           };
         };
       };
@@ -9776,7 +9678,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
           };
         };
       };
@@ -9884,7 +9786,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureStatsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureStats"];
           };
         };
       };
@@ -9927,7 +9829,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetailsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
           };
         };
       };
@@ -9964,7 +9866,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetailsDTO"];
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
           };
         };
       };
@@ -10014,7 +9916,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"];
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
           };
         };
       };
@@ -10053,7 +9955,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrenceDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrence"];
           };
         };
       };
@@ -10288,7 +10190,7 @@ export interface paths {
       /** @description Request body */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.ExternalSubprojectRequestDTO"];
+          "application/json": components["schemas"]["dtos.ExternalSubprojectRequest"];
         };
       };
       responses: {
@@ -10332,7 +10234,7 @@ export interface paths {
       /** @description Test webhook data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.WebhookTestRequestDTO"];
+          "application/json": components["schemas"]["dtos.WebhookTestRequest"];
         };
       };
       responses: {
@@ -10381,7 +10283,7 @@ export interface paths {
       /** @description Webhook data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.WebhookCreateRequestDTO"];
+          "application/json": components["schemas"]["dtos.WebhookCreateRequest"];
         };
       };
       responses: {
@@ -10391,7 +10293,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.WebhookIntegrationDTO"];
+            "application/json": components["schemas"]["dtos.WebhookIntegration"];
           };
         };
       };
@@ -10428,7 +10330,7 @@ export interface paths {
       /** @description Webhook data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.WebhookUpdateRequestDTO"];
+          "application/json": components["schemas"]["dtos.WebhookUpdateRequest"];
         };
       };
       responses: {
@@ -10438,7 +10340,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.WebhookIntegrationDTO"];
+            "application/json": components["schemas"]["dtos.WebhookIntegration"];
           };
         };
       };
@@ -10514,7 +10416,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Log"];
           };
         };
       };
@@ -10555,7 +10457,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.UserDTO"][];
+            "application/json": components["schemas"]["dtos.User"][];
           };
         };
       };
@@ -10695,7 +10597,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATDTO"][];
+            "application/json": components["schemas"]["dtos.PAT"][];
           };
         };
       };
@@ -10727,7 +10629,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATCreateResponseDTO"];
+            "application/json": components["schemas"]["dtos.PATCreateResponse"];
           };
         };
       };
@@ -10917,7 +10819,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ReleaseDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Release"];
           };
         };
       };
@@ -10949,7 +10851,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ReleaseDTO"];
+            "application/json": components["schemas"]["dtos.Release"];
           };
         };
       };
@@ -10991,7 +10893,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CandidatesResponseDTO"];
+            "application/json": components["schemas"]["dtos.CandidatesResponse"];
           };
         };
       };
@@ -11034,7 +10936,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ReleaseDTO"];
+            "application/json": components["schemas"]["dtos.Release"];
           };
         };
       };
@@ -11097,7 +10999,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ReleaseDTO"];
+            "application/json": components["schemas"]["dtos.Release"];
           };
         };
       };
@@ -11135,7 +11037,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.CandidatesResponseDTO"];
+            "application/json": components["schemas"]["dtos.CandidatesResponse"];
           };
         };
       };
@@ -11208,7 +11110,7 @@ export interface paths {
       /** @description Release item data */
       requestBody: {
         content: {
-          "application/json": components["schemas"]["dtos.ReleaseItemDTO"];
+          "application/json": components["schemas"]["dtos.ReleaseItem"];
         };
       };
       responses: {
@@ -11218,7 +11120,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.ReleaseItemDTO"];
+            "application/json": components["schemas"]["dtos.ReleaseItem"];
           };
         };
       };
@@ -11469,7 +11371,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.RiskHistoryDTO"][];
+            "application/json": components["schemas"]["dtos.RiskHistory"][];
           };
         };
       };
@@ -11601,7 +11503,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAssetDTO"];
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAsset"];
           };
         };
       };
@@ -11640,7 +11542,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.OrgSettingsDTO"];
+            "application/json": components["schemas"]["dtos.OrgSettings"];
           };
         };
       };
@@ -11775,7 +11677,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.PATDTO"][];
+            "application/json": components["schemas"]["dtos.PAT"][];
           };
         };
       };
@@ -12434,7 +12336,7 @@ export interface paths {
             [name: string]: unknown;
           };
           content: {
-            "application/json": components["schemas"]["dtos.OrgDTO"][];
+            "application/json": components["schemas"]["dtos.Org"][];
           };
         };
       };
@@ -14011,7 +13913,7 @@ export interface components {
       informationSources: components["schemas"]["controllers.informationSource"][];
     };
     "controllers.ArtifactUpdateResponse": {
-      artifact: components["schemas"]["dtos.ArtifactDTO"];
+      artifact: components["schemas"]["dtos.Artifact"];
       invalidURLs: components["schemas"]["dtos.ExternalReferenceError"][];
     };
     "controllers.LicenseRiskStatus": {
@@ -14020,12 +13922,12 @@ export interface components {
       status: string;
     };
     "controllers.PURLInspectResponse": {
-      affectedComponents: components["schemas"]["dtos.AffectedComponentDTO"][];
-      component: components["schemas"]["dtos.ComponentDTO"];
+      affectedComponents: components["schemas"]["dtos.AffectedComponent"][];
+      component: components["schemas"]["dtos.Component"];
       maliciousPackage: components["schemas"]["dtos.OSV"];
       matchContext: components["schemas"]["normalize.PurlMatchContext"];
       purl: string;
-      vulns: components["schemas"]["dtos.VulnInPackageDTO"][];
+      vulns: components["schemas"]["dtos.VulnInPackage"][];
     };
     "controllers.informationSource": {
       purl: string;
@@ -15368,12 +15270,12 @@ export interface components {
       code: string;
     };
     "dtos.AdminsInOrg": {
-      admins: components["schemas"]["dtos.UserDTO"][];
+      admins: components["schemas"]["dtos.User"][];
       id: string;
       instance_id: string;
       slug: string;
     };
-    "dtos.AdvisoryCreate": {
+    "dtos.AdvisoryCreateRequest": {
       affectedPackages: components["schemas"]["dtos.AffectedPackage"][];
       assetID: string;
       description: string;
@@ -15381,7 +15283,7 @@ export interface components {
       title: string;
       vectorString: string;
     };
-    "dtos.AdvisoryUpdate": {
+    "dtos.AdvisoryUpdateRequest": {
       affectedPackages: components["schemas"]["dtos.AffectedPackage"][];
       assetID: string;
       description: string;
@@ -15395,8 +15297,8 @@ export interface components {
       ranges: components["schemas"]["dtos.Range"][];
       versions: string[];
     };
-    "dtos.AffectedComponentDTO": {
-      cves: components["schemas"]["dtos.CVEDTO"][];
+    "dtos.AffectedComponent": {
+      cves: components["schemas"]["dtos.CVE"][];
       ecosystem: string;
       id: number;
       purl: string;
@@ -15413,7 +15315,7 @@ export interface components {
       versionEnd: string;
       versionStart: string;
     };
-    "dtos.ArtifactDTO": {
+    "dtos.Artifact": {
       artifactName: string;
       assetId: string;
       assetVersionName: string;
@@ -15431,6 +15333,41 @@ export interface components {
       mediumCvss: number;
       name: string;
       projectSlug: string;
+    };
+    "dtos.Asset": {
+      availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
+      avatar: string;
+      centralDependencyVulnManagement: boolean;
+      confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
+      cvssAutomaticTicketThreshold: number;
+      description: string;
+      enableTicketRange: boolean;
+      externalBotUserLink: string;
+      externalEntityId: string;
+      externalEntityProviderId: string;
+      id: string;
+      integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
+      isPublic: boolean;
+      modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
+      modifiedAttackVector: components["schemas"]["dtos.ModifiedAttackVector"];
+      modifiedAvailability: components["schemas"]["dtos.ModifiedRequirementLevel"];
+      modifiedConfidentiality: components["schemas"]["dtos.ModifiedRequirementLevel"];
+      modifiedIntegrity: components["schemas"]["dtos.ModifiedRequirementLevel"];
+      modifiedPrivilegesRequired: components["schemas"]["dtos.ModifiedPrivilegesRequired"];
+      modifiedScope: components["schemas"]["dtos.ModifiedScope"];
+      modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
+      name: string;
+      paranoidMode: boolean;
+      projectId: string;
+      refs: components["schemas"]["dtos.AssetVersion"][];
+      repositoryId: string;
+      repositoryName: string;
+      repositoryProvider: string;
+      riskAutomaticTicketThreshold: number;
+      sharesInformation: boolean;
+      signingPubKey: string;
+      slug: string;
+      state: string;
     };
     "dtos.AssetChangeRoleRequest": {
       /** @enum {string} */
@@ -15461,7 +15398,7 @@ export interface components {
       repositoryProvider: "github" | "gitlab";
       riskAutomaticTicketThreshold: number;
     };
-    "dtos.AssetDTO": {
+    "dtos.AssetDetails": {
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -15475,6 +15412,7 @@ export interface components {
       id: string;
       integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
       isPublic: boolean;
+      members: components["schemas"]["dtos.User"][];
       modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
       modifiedAttackVector: components["schemas"]["dtos.ModifiedAttackVector"];
       modifiedAvailability: components["schemas"]["dtos.ModifiedRequirementLevel"];
@@ -15485,9 +15423,8 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       projectId: string;
-      refs: components["schemas"]["dtos.AssetVersionDTO"][];
+      refs: components["schemas"]["dtos.AssetVersion"][];
       repositoryId: string;
       repositoryName: string;
       repositoryProvider: string;
@@ -15496,9 +15433,8 @@ export interface components {
       signingPubKey: string;
       slug: string;
       state: string;
-      vulnAutoReopenAfterDays: number;
     };
-    "dtos.AssetDetailsDTO": {
+    "dtos.AssetDetailsWithSecrets": {
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -15512,7 +15448,7 @@ export interface components {
       id: string;
       integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
       isPublic: boolean;
-      members: components["schemas"]["dtos.UserDTO"][];
+      members: components["schemas"]["dtos.User"][];
       modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
       modifiedAttackVector: components["schemas"]["dtos.ModifiedAttackVector"];
       modifiedAvailability: components["schemas"]["dtos.ModifiedRequirementLevel"];
@@ -15523,9 +15459,8 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       projectId: string;
-      refs: components["schemas"]["dtos.AssetVersionDTO"][];
+      refs: components["schemas"]["dtos.AssetVersion"][];
       repositoryId: string;
       repositoryName: string;
       repositoryProvider: string;
@@ -15534,51 +15469,12 @@ export interface components {
       signingPubKey: string;
       slug: string;
       state: string;
-      vulnAutoReopenAfterDays: number;
-    };
-    "dtos.AssetDetailsWithSecretsDTO": {
-      availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      avatar: string;
-      centralDependencyVulnManagement: boolean;
-      confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      cvssAutomaticTicketThreshold: number;
-      description: string;
-      enableTicketRange: boolean;
-      externalBotUserLink: string;
-      externalEntityId: string;
-      externalEntityProviderId: string;
-      id: string;
-      integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      isPublic: boolean;
-      members: components["schemas"]["dtos.UserDTO"][];
-      modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
-      modifiedAttackVector: components["schemas"]["dtos.ModifiedAttackVector"];
-      modifiedAvailability: components["schemas"]["dtos.ModifiedRequirementLevel"];
-      modifiedConfidentiality: components["schemas"]["dtos.ModifiedRequirementLevel"];
-      modifiedIntegrity: components["schemas"]["dtos.ModifiedRequirementLevel"];
-      modifiedPrivilegesRequired: components["schemas"]["dtos.ModifiedPrivilegesRequired"];
-      modifiedScope: components["schemas"]["dtos.ModifiedScope"];
-      modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
-      name: string;
-      paranoidMode: boolean;
-      pipelineLastRun: string;
-      projectId: string;
-      refs: components["schemas"]["dtos.AssetVersionDTO"][];
-      repositoryId: string;
-      repositoryName: string;
-      repositoryProvider: string;
-      riskAutomaticTicketThreshold: number;
-      sharesInformation: boolean;
-      signingPubKey: string;
-      slug: string;
-      state: string;
-      vulnAutoReopenAfterDays: number;
       webhookSecret: string;
     };
-    "dtos.AssetEntryDTO": {
+    "dtos.AssetEntry": {
       assetExternalEntityId: string;
       assetName: string;
-      assetVersions: components["schemas"]["dtos.AssetVersionEntryDTO"][];
+      assetVersions: components["schemas"]["dtos.AssetVersionEntry"][];
     };
     "dtos.AssetInviteToAssetRequest": {
       ids: string[];
@@ -15614,10 +15510,9 @@ export interface components {
       repositoryProvider: "github" | "gitlab";
       riskAutomaticTicketThreshold: number;
       sharesInformation: boolean;
-      vulnAutoReopenAfterDays: number;
       webhookSecret: string;
     };
-    "dtos.AssetVersionDTO": {
+    "dtos.AssetVersion": {
       assetId: string;
       createdAt: string;
       defaultBranch: boolean;
@@ -15631,7 +15526,7 @@ export interface components {
       type: string;
       updatedAt: string;
     };
-    "dtos.AssetVersionEntryDTO": {
+    "dtos.AssetVersionEntry": {
       artifacts: string[];
       assetVersionName: string;
     };
@@ -15675,13 +15570,13 @@ export interface components {
       averageFixedEvents: number;
       averageReopenedEvents: number;
     };
-    "dtos.BatchDependencyVulnStatus": {
+    "dtos.BatchDependencyVulnStatusRequest": {
       justification: string;
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
       status: string;
       vulnIds: string[];
     };
-    "dtos.BatchFirstPartyVulnStatus": {
+    "dtos.BatchFirstPartyVulnStatusRequest": {
       justification: string;
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
       status: string;
@@ -15693,8 +15588,8 @@ export interface components {
       commit: string;
       version: string;
     };
-    "dtos.CVEDTO": {
-      affectedComponents: components["schemas"]["dtos.AffectedComponentDTO"][];
+    "dtos.CVE": {
+      affectedComponents: components["schemas"]["dtos.AffectedComponent"][];
       /** Format: date */
       cisaActionDue: string;
       /** Format: date */
@@ -15711,10 +15606,10 @@ export interface components {
       epss: number;
       /** Format: date */
       euvdExploitAdd: string;
-      exploits: components["schemas"]["dtos.ExploitDTO"][];
+      exploits: components["schemas"]["dtos.Exploit"][];
       percentile: number;
       references: string;
-      relationships: components["schemas"]["dtos.RelationshipDTO"][];
+      relationships: components["schemas"]["dtos.Relationship"][];
       risk: components["schemas"]["dtos.RiskMetrics"];
       updatedAt: string;
       vector: string;
@@ -15725,23 +15620,23 @@ export interface components {
       cvss: number;
       totalAmount: number;
     };
-    "dtos.CandidatesResponseDTO": {
-      artifacts: components["schemas"]["dtos.ArtifactDTO"][];
-      releases: components["schemas"]["dtos.ReleaseDTO"][];
+    "dtos.CandidatesResponse": {
+      artifacts: components["schemas"]["dtos.Artifact"][];
+      releases: components["schemas"]["dtos.Release"][];
     };
-    "dtos.ComplianceComponentDetailsDTO": {
+    "dtos.ComplianceComponentDetails": {
       description: string;
-      implementedControls: components["schemas"]["dtos.ComplianceComponentImplementsControlDTO"][];
+      implementedControls: components["schemas"]["dtos.ComplianceComponentImplementsControl"][];
       title: string;
       uuid: string;
     };
-    "dtos.ComplianceComponentImplementsControlDTO": {
+    "dtos.ComplianceComponentImplementsControl": {
       complianceComponentId: string;
       complianceComponentTitle: string;
       description: string;
       frameworkControlId: string;
     };
-    "dtos.ComplianceComponentImplementsControlStatementDTO": {
+    "dtos.ComplianceComponentImplementsControlStatement": {
       complianceComponentDescription: string;
       complianceComponentId: string;
       complianceComponentTitle: string;
@@ -15751,12 +15646,12 @@ export interface components {
       id: string;
       implementationStatus: string;
     };
-    "dtos.CompliancePostureStatsDTO": {
+    "dtos.CompliancePostureStats": {
       implemented: number;
       notApplicable: number;
       open: number;
     };
-    "dtos.CompliancePostureWithControlDTO": {
+    "dtos.CompliancePostureWithControl": {
       additional: Record<string, never>;
       assetId: string;
       assetVersionName: string;
@@ -15767,7 +15662,7 @@ export interface components {
       framework: string;
       frameworkControlId: string;
       importance: string;
-      mappedControls: components["schemas"]["dtos.MappedControlDTO"][];
+      mappedControls: components["schemas"]["dtos.MappedControl"][];
       orgId: string;
       parentFrameworkControlId: string;
       projectId: string;
@@ -15777,20 +15672,20 @@ export interface components {
       ticketUrl: string;
       title: string;
     };
-    "dtos.CompliancePostureWithDetailsDTO": {
+    "dtos.CompliancePostureWithDetails": {
       additional: Record<string, never>;
       assetId: string;
       assetVersionName: string;
-      byComponents: components["schemas"]["dtos.ComplianceComponentImplementsControlStatementDTO"][];
+      byComponents: components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"][];
       class: string;
       compliancePostureId: string;
       controlId: string;
       description: string;
-      events: components["schemas"]["dtos.VulnEventDTO"][];
+      events: components["schemas"]["dtos.VulnEvent"][];
       framework: string;
       frameworkControlId: string;
       importance: string;
-      mappedControls: components["schemas"]["dtos.MappedControlDTO"][];
+      mappedControls: components["schemas"]["dtos.MappedControl"][];
       orgId: string;
       parentFrameworkControlId: string;
       projectId: string;
@@ -15800,23 +15695,23 @@ export interface components {
       ticketUrl: string;
       title: string;
     };
-    "dtos.ComponentDTO": {
+    "dtos.Component": {
       componentType: components["schemas"]["dtos.ComponentType"];
-      dependsOn: components["schemas"]["dtos.ComponentDependencyDTO"][];
+      dependsOn: components["schemas"]["dtos.ComponentDependency"][];
       isLicenseOverwritten: boolean;
       license: string;
-      project: components["schemas"]["dtos.ComponentProjectDTO"];
+      project: components["schemas"]["dtos.ComponentProject"];
       projectId: string;
       published: string;
       /** @description without qualifiers! */
       purl: string;
       version: string;
     };
-    "dtos.ComponentDependencyDTO": {
-      artifacts: components["schemas"]["dtos.ArtifactDTO"][];
-      component: components["schemas"]["dtos.ComponentDTO"];
+    "dtos.ComponentDependency": {
+      artifacts: components["schemas"]["dtos.Artifact"][];
+      component: components["schemas"]["dtos.Component"];
       componentPurl: string;
-      dependency: components["schemas"]["dtos.ComponentDTO"];
+      dependency: components["schemas"]["dtos.Component"];
       /**
        * @description the provided sbom from cyclondx only contains the transitive dependencies, which do really get used
        *     this means, that the dependency graph between people using the same library might differ, since they use it differently
@@ -15825,16 +15720,7 @@ export interface components {
       dependencyPurl: string;
       id: string;
     };
-    "dtos.ComponentOccurrenceAcrossInstance": {
-      purl: string;
-      relativeAmount: number;
-      totalAmount: number;
-    };
-    "dtos.ComponentOccurrenceAcrossOrg": {
-      purl: string;
-      totalAmount: number;
-    };
-    "dtos.ComponentOccurrenceDTO": {
+    "dtos.ComponentOccurrence": {
       artifactAssetVersion: string;
       artifactName: string;
       assetId: string;
@@ -15852,7 +15738,16 @@ export interface components {
       projectName: string;
       projectSlug: string;
     };
-    "dtos.ComponentProjectDTO": {
+    "dtos.ComponentOccurrenceAcrossInstance": {
+      purl: string;
+      relativeAmount: number;
+      totalAmount: number;
+    };
+    "dtos.ComponentOccurrenceAcrossOrg": {
+      purl: string;
+      totalAmount: number;
+    };
+    "dtos.ComponentProject": {
       description: string;
       forksCount: number;
       homepage: string;
@@ -15931,8 +15826,8 @@ export interface components {
       /** @description array of cwe ids associated with this vulnerability */
       cwe_ids: string[];
     };
-    "dtos.DependencyVulnDTO": {
-      artifacts: components["schemas"]["dtos.ArtifactDTO"][];
+    "dtos.DependencyVuln": {
+      artifacts: components["schemas"]["dtos.Artifact"][];
       assetId: string;
       /** @example 0 */
       assetSignature: string;
@@ -15940,10 +15835,10 @@ export interface components {
       componentFixedVersion: string;
       componentPurl: string;
       createdAt: string;
-      cve: components["schemas"]["dtos.CVEDTO"];
+      cve: components["schemas"]["dtos.CVE"];
       cveID: string;
       directDependencyFixedVersion: string;
-      exploits: components["schemas"]["dtos.ExploitDTO"][];
+      exploits: components["schemas"]["dtos.Exploit"][];
       id: string;
       lastStateChange: string;
       manualTicketCreation: boolean;
@@ -15956,8 +15851,8 @@ export interface components {
       ticketUrl: string;
       vulnerabilityPath: string[];
     };
-    "dtos.DetailedDependencyVulnDTO": {
-      artifacts: components["schemas"]["dtos.ArtifactDTO"][];
+    "dtos.DetailedDependencyVuln": {
+      artifacts: components["schemas"]["dtos.Artifact"][];
       assetId: string;
       /** @example 0 */
       assetSignature: string;
@@ -15965,11 +15860,11 @@ export interface components {
       componentFixedVersion: string;
       componentPurl: string;
       createdAt: string;
-      cve: components["schemas"]["dtos.CVEDTO"];
+      cve: components["schemas"]["dtos.CVE"];
       cveID: string;
       directDependencyFixedVersion: string;
-      events: components["schemas"]["dtos.VulnEventDTO"][];
-      exploits: components["schemas"]["dtos.ExploitDTO"][];
+      events: components["schemas"]["dtos.VulnEvent"][];
+      exploits: components["schemas"]["dtos.Exploit"][];
       id: string;
       lastStateChange: string;
       manualTicketCreation: boolean;
@@ -15982,8 +15877,8 @@ export interface components {
       ticketUrl: string;
       vulnerabilityPath: string[];
     };
-    "dtos.DetailedDependencyVulnWithRelationsDTO": {
-      artifacts: components["schemas"]["dtos.ArtifactDTO"][];
+    "dtos.DetailedDependencyVulnWithRelations": {
+      artifacts: components["schemas"]["dtos.Artifact"][];
       assetId: string;
       /** @example 0 */
       assetSignature: string;
@@ -15991,16 +15886,16 @@ export interface components {
       componentFixedVersion: string;
       componentPurl: string;
       createdAt: string;
-      cve: components["schemas"]["dtos.CVEDTO"];
+      cve: components["schemas"]["dtos.CVE"];
       cveID: string;
       directDependencyFixedVersion: string;
-      events: components["schemas"]["dtos.VulnEventDTO"][];
-      exploits: components["schemas"]["dtos.ExploitDTO"][];
+      events: components["schemas"]["dtos.VulnEvent"][];
+      exploits: components["schemas"]["dtos.Exploit"][];
       id: string;
       lastStateChange: string;
       manualTicketCreation: boolean;
       related: {
-        [key: string]: components["schemas"]["dtos.CVEDTO"][];
+        [key: string]: components["schemas"]["dtos.CVE"][];
       };
       riskAssessment: number;
       riskRecalculatedAt: string;
@@ -16011,7 +15906,7 @@ export interface components {
       ticketUrl: string;
       vulnerabilityPath: string[];
     };
-    "dtos.DetailedFirstPartyVulnDTO": {
+    "dtos.DetailedFirstPartyVuln": {
       assetId: string;
       assetVersionName: string;
       author: string;
@@ -16019,7 +15914,7 @@ export interface components {
       createdAt: string;
       date: string;
       email: string;
-      events: components["schemas"]["dtos.VulnEventDTO"][];
+      events: components["schemas"]["dtos.VulnEvent"][];
       id: string;
       manualTicketCreation: boolean;
       message: string;
@@ -16038,14 +15933,14 @@ export interface components {
       ticketUrl: string;
       uri: string;
     };
-    "dtos.DetailedLicenseRiskDTO": {
-      artifacts: components["schemas"]["dtos.LicenseRiskArtifactDTO"][];
+    "dtos.DetailedLicenseRisk": {
+      artifacts: components["schemas"]["dtos.LicenseRiskArtifact"][];
       assetId: string;
       assetVersionName: string;
-      component: components["schemas"]["dtos.ComponentDTO"];
+      component: components["schemas"]["dtos.Component"];
       componentPurl: string;
       createdAt: string;
-      events: components["schemas"]["dtos.VulnEventDTO"][];
+      events: components["schemas"]["dtos.VulnEvent"][];
       finalLicenseDecision: string;
       id: string;
       manualTicketCreation: boolean;
@@ -16061,7 +15956,7 @@ export interface components {
       ecosystem: string;
       relativeAmount: number;
     };
-    "dtos.ExploitDTO": {
+    "dtos.Exploit": {
       author: string;
       cveID: string;
       description: string;
@@ -16077,7 +15972,7 @@ export interface components {
       verified: boolean;
       watchers: number;
     };
-    "dtos.ExternalReferenceDTO": {
+    "dtos.ExternalReference": {
       assetId: string;
       /** @description optional error message if the reference could not be processed */
       error: string;
@@ -16091,7 +15986,7 @@ export interface components {
     };
     /** @enum {string} */
     "dtos.ExternalReferenceType": "cyclonedx" | "csaf" | "openvex" | "unknown";
-    "dtos.ExternalSubprojectRequestDTO": {
+    "dtos.ExternalSubprojectRequest": {
       artifact: string;
       assetDescription: string;
       assetExternalEntityId: string;
@@ -16110,9 +16005,9 @@ export interface components {
     "dtos.FirstPartyScanResponse": {
       amountClosed: number;
       amountOpened: number;
-      firstPartyVulns: components["schemas"]["dtos.FirstPartyVulnDTO"][];
+      firstPartyVulns: components["schemas"]["dtos.FirstPartyVuln"][];
     };
-    "dtos.FirstPartyVulnDTO": {
+    "dtos.FirstPartyVuln": {
       assetId: string;
       assetVersionName: string;
       author: string;
@@ -16138,7 +16033,7 @@ export interface components {
       ticketUrl: string;
       uri: string;
     };
-    "dtos.FirstPartyVulnStatus": {
+    "dtos.FirstPartyVulnStatusRequest": {
       justification: string;
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
       status: string;
@@ -16153,7 +16048,7 @@ export interface components {
       isOwner: boolean;
       label: string;
     };
-    "dtos.GithubAppInstallationDTO": {
+    "dtos.GithubAppInstallation": {
       installationCreatedWebhookReceivedTime: string;
       installationId: number;
       orgID?: string;
@@ -16162,13 +16057,13 @@ export interface components {
       targetLogin: string;
       targetType: string;
     };
-    "dtos.GitlabIntegrationDTO": {
+    "dtos.GitlabIntegration": {
       id: string;
       name: string;
       obfuscatedToken: string;
       url: string;
     };
-    "dtos.GitlabOauth2ConfigDTO": {
+    "dtos.GitlabOauth2Config": {
       gitlabBaseURL: string;
       providerID: string;
     };
@@ -16186,9 +16081,9 @@ export interface components {
       topComponents: components["schemas"]["dtos.ComponentOccurrenceAcrossInstance"][];
       topVulnerableProjects: components["schemas"]["dtos.ProjectVulnDistribution"][];
     };
-    "dtos.InstanceSettingsDTO": {
+    "dtos.InstanceSettings": {
       bearerTokenAuthDisabled: boolean;
-      gitlabOAuth2Config: components["schemas"]["dtos.GitlabOauth2ConfigDTO"][];
+      gitlabOAuth2Config: components["schemas"]["dtos.GitlabOauth2Config"][];
       singleOrganizationMode: boolean;
     };
     "dtos.InstanceUsageStatistics": Record<string, never>;
@@ -16197,25 +16092,25 @@ export interface components {
     "dtos.InviteRequest": {
       email: string;
     };
-    "dtos.InvitedUserDTO": {
+    "dtos.InvitedUser": {
       email: string;
       expiryDate: string;
       id: string;
       invitationStatus: components["schemas"]["dtos.InvitationStatus"];
     };
-    "dtos.JiraIntegrationDTO": {
+    "dtos.JiraIntegration": {
       id: string;
       name: string;
       obfuscatedToken: string;
       url: string;
       userEmail: string;
     };
-    "dtos.LicenseRiskArtifactDTO": {
+    "dtos.LicenseRiskArtifact": {
       artifactName: string;
       assetId: string;
       assetVersionName: string;
     };
-    "dtos.LogDTO": {
+    "dtos.Log": {
       assetID: string;
       assetName: string;
       createdAt: string;
@@ -16253,7 +16148,7 @@ export interface components {
       maliciousPackageID: string;
       projectName: string;
     };
-    "dtos.MappedControlDTO": {
+    "dtos.MappedControl": {
       frameworkControlId: string;
       relatedControlId: string;
       relatedFramework: string;
@@ -16303,6 +16198,33 @@ export interface components {
       upstream: string[];
       withdrawn: string;
     };
+    "dtos.Org": {
+      configFiles: {
+        [key: string]: unknown;
+      };
+      contactPhoneNumber: string;
+      country: string;
+      createdAt: string;
+      criticalInfrastructure: boolean;
+      description: string;
+      externalEntityProviderId: string;
+      gitLabIntegrations: components["schemas"]["dtos.GitlabIntegration"][];
+      githubAppInstallations: components["schemas"]["dtos.GithubAppInstallation"][];
+      grundschutz: boolean;
+      id: string;
+      industry: string;
+      isPublic: boolean;
+      iso27001: boolean;
+      jiraIntegrations: components["schemas"]["dtos.JiraIntegration"][];
+      language: string;
+      name: string;
+      nist: boolean;
+      numberOfEmployees: number;
+      projects: components["schemas"]["dtos.Project"][];
+      sharesVulnInformation: boolean;
+      slug: string;
+      updatedAt: string;
+    };
     "dtos.OrgChangeRoleRequest": {
       /** @enum {string} */
       role: "member" | "admin";
@@ -16320,7 +16242,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
     };
-    "dtos.OrgDTO": {
+    "dtos.OrgDetails": {
       configFiles: {
         [key: string]: unknown;
       };
@@ -16330,48 +16252,21 @@ export interface components {
       criticalInfrastructure: boolean;
       description: string;
       externalEntityProviderId: string;
-      gitLabIntegrations: components["schemas"]["dtos.GitlabIntegrationDTO"][];
-      githubAppInstallations: components["schemas"]["dtos.GithubAppInstallationDTO"][];
+      gitLabIntegrations: components["schemas"]["dtos.GitlabIntegration"][];
+      githubAppInstallations: components["schemas"]["dtos.GithubAppInstallation"][];
       grundschutz: boolean;
       id: string;
       industry: string;
+      invitedMembers: components["schemas"]["dtos.InvitedUser"][];
       isPublic: boolean;
       iso27001: boolean;
-      jiraIntegrations: components["schemas"]["dtos.JiraIntegrationDTO"][];
+      jiraIntegrations: components["schemas"]["dtos.JiraIntegration"][];
       language: string;
+      members: components["schemas"]["dtos.User"][];
       name: string;
       nist: boolean;
       numberOfEmployees: number;
-      projects: components["schemas"]["dtos.ProjectDTO"][];
-      sharesVulnInformation: boolean;
-      slug: string;
-      updatedAt: string;
-    };
-    "dtos.OrgDetailsDTO": {
-      configFiles: {
-        [key: string]: unknown;
-      };
-      contactPhoneNumber: string;
-      country: string;
-      createdAt: string;
-      criticalInfrastructure: boolean;
-      description: string;
-      externalEntityProviderId: string;
-      gitLabIntegrations: components["schemas"]["dtos.GitlabIntegrationDTO"][];
-      githubAppInstallations: components["schemas"]["dtos.GithubAppInstallationDTO"][];
-      grundschutz: boolean;
-      id: string;
-      industry: string;
-      invitedMembers: components["schemas"]["dtos.InvitedUserDTO"][];
-      isPublic: boolean;
-      iso27001: boolean;
-      jiraIntegrations: components["schemas"]["dtos.JiraIntegrationDTO"][];
-      language: string;
-      members: components["schemas"]["dtos.UserDTO"][];
-      name: string;
-      nist: boolean;
-      numberOfEmployees: number;
-      projects: components["schemas"]["dtos.ProjectDTO"][];
+      projects: components["schemas"]["dtos.Project"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -16449,7 +16344,7 @@ export interface components {
       medium: number;
       mediumCvss: number;
     };
-    "dtos.OrgSettingsDTO": {
+    "dtos.OrgSettings": {
       configFiles: {
         [key: string]: unknown;
       };
@@ -16459,25 +16354,25 @@ export interface components {
       criticalInfrastructure: boolean;
       description: string;
       externalEntityProviderId: string;
-      gitLabIntegrations: components["schemas"]["dtos.GitlabIntegrationDTO"][];
-      githubAppInstallations: components["schemas"]["dtos.GithubAppInstallationDTO"][];
+      gitLabIntegrations: components["schemas"]["dtos.GitlabIntegration"][];
+      githubAppInstallations: components["schemas"]["dtos.GithubAppInstallation"][];
       grundschutz: boolean;
       id: string;
       industry: string;
-      invitedMembers: components["schemas"]["dtos.InvitedUserDTO"][];
+      invitedMembers: components["schemas"]["dtos.InvitedUser"][];
       isPublic: boolean;
       iso27001: boolean;
-      jiraIntegrations: components["schemas"]["dtos.JiraIntegrationDTO"][];
+      jiraIntegrations: components["schemas"]["dtos.JiraIntegration"][];
       language: string;
-      members: components["schemas"]["dtos.UserDTO"][];
+      members: components["schemas"]["dtos.User"][];
       name: string;
       nist: boolean;
       numberOfEmployees: number;
-      projects: components["schemas"]["dtos.ProjectDTO"][];
+      projects: components["schemas"]["dtos.Project"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
-      webhooks: components["schemas"]["dtos.WebhookIntegrationDTO"][];
+      webhooks: components["schemas"]["dtos.WebhookIntegration"][];
     };
     "dtos.OrgStructureDistribution": {
       numArtifacts: number;
@@ -16494,8 +16389,7 @@ export interface components {
       riskAvgLow: number;
       riskAvgMedium: number;
     };
-    "dtos.PATCreateResponseDTO": {
-      bearerToken: string;
+    "dtos.PAT": {
       createdAt: string;
       description: string;
       expiryDateUnix: number;
@@ -16504,7 +16398,8 @@ export interface components {
       lastUsedAt: string;
       scopes: string;
     };
-    "dtos.PATDTO": {
+    "dtos.PATCreateResponse": {
+      bearerToken: string;
       createdAt: string;
       description: string;
       expiryDateUnix: number;
@@ -16529,7 +16424,7 @@ export interface components {
       organizationSlug: string;
       projectSlug: string;
     };
-    "dtos.PolicyDTO": {
+    "dtos.Policy": {
       description: string;
       predicateType: string;
       priority: number;
@@ -16551,7 +16446,30 @@ export interface components {
       pid: number;
       uptimeSeconds: number;
     };
-    "dtos.ProjectAssetDTO": {
+    "dtos.Project": {
+      assets: components["schemas"]["dtos.Asset"][];
+      /** @description URL to the project's avatar */
+      avatar: string;
+      configFiles: {
+        [key: string]: unknown;
+      };
+      description: string;
+      /** @description only set if this is an external entity */
+      externalEntityId: string;
+      externalEntityProviderId: string;
+      id: string;
+      isPublic: boolean;
+      name: string;
+      /** @description recursive structure */
+      parent: components["schemas"]["dtos.Project"];
+      parentId: string;
+      repositoryId: string;
+      repositoryName: string;
+      slug: string;
+      subGroupsAndAsset: components["schemas"]["dtos.ProjectAsset"][];
+      type: string;
+    };
+    "dtos.ProjectAsset": {
       /** @description URL to the asset's avatar */
       avatar: string;
       createdAt: string;
@@ -16566,7 +16484,7 @@ export interface components {
       resourceType: string;
       slug: string;
       state: string;
-      subGroupsAndAsset: components["schemas"]["dtos.ProjectAssetDTO"][];
+      subGroupsAndAsset: components["schemas"]["dtos.ProjectAsset"][];
       updatedAt: string;
     };
     "dtos.ProjectChangeRoleRequest": {
@@ -16580,8 +16498,8 @@ export interface components {
       parentId: string;
       type: string;
     };
-    "dtos.ProjectDTO": {
-      assets: components["schemas"]["dtos.AssetDTO"][];
+    "dtos.ProjectDetails": {
+      assets: components["schemas"]["dtos.Asset"][];
       /** @description URL to the project's avatar */
       avatar: string;
       configFiles: {
@@ -16593,46 +16511,23 @@ export interface components {
       externalEntityProviderId: string;
       id: string;
       isPublic: boolean;
+      members: components["schemas"]["dtos.User"][];
       name: string;
       /** @description recursive structure */
-      parent: components["schemas"]["dtos.ProjectDTO"];
+      parent: components["schemas"]["dtos.Project"];
       parentId: string;
       repositoryId: string;
       repositoryName: string;
       slug: string;
-      subGroupsAndAsset: components["schemas"]["dtos.ProjectAssetDTO"][];
+      subGroupsAndAsset: components["schemas"]["dtos.ProjectAsset"][];
       type: string;
-    };
-    "dtos.ProjectDetailsDTO": {
-      assets: components["schemas"]["dtos.AssetDTO"][];
-      /** @description URL to the project's avatar */
-      avatar: string;
-      configFiles: {
-        [key: string]: unknown;
-      };
-      description: string;
-      /** @description only set if this is an external entity */
-      externalEntityId: string;
-      externalEntityProviderId: string;
-      id: string;
-      isPublic: boolean;
-      members: components["schemas"]["dtos.UserDTO"][];
-      name: string;
-      /** @description recursive structure */
-      parent: components["schemas"]["dtos.ProjectDTO"];
-      parentId: string;
-      repositoryId: string;
-      repositoryName: string;
-      slug: string;
-      subGroupsAndAsset: components["schemas"]["dtos.ProjectAssetDTO"][];
-      type: string;
-      webhooks: components["schemas"]["dtos.WebhookIntegrationDTO"][];
+      webhooks: components["schemas"]["dtos.WebhookIntegration"][];
     };
     "dtos.ProjectExternalEntityTree": {
-      assets: components["schemas"]["dtos.AssetEntryDTO"][];
+      assets: components["schemas"]["dtos.AssetEntry"][];
       projectExternalEntityId: string;
       projectName: string;
-      subProjects: components["schemas"]["dtos.SubProjectEntryDTO"][];
+      subProjects: components["schemas"]["dtos.SubProjectEntry"][];
     };
     "dtos.ProjectInviteRequest": {
       ids: string[];
@@ -16668,26 +16563,26 @@ export interface components {
     "dtos.Recommendation": {
       recommendedVersion: string;
     };
-    "dtos.RelationshipDTO": {
+    "dtos.Relationship": {
       relationshipType: string;
       targetCve: string;
     };
     /** @enum {string} */
     "dtos.RelationshipType":
       "alias" | "upstream" | "related" | "euvd" | "advisory";
-    "dtos.ReleaseCreateRequest": {
-      items: components["schemas"]["dtos.ReleaseItemDTO"][];
-      name: string;
-    };
-    "dtos.ReleaseDTO": {
+    "dtos.Release": {
       createdAt: string;
       id: string;
-      items: components["schemas"]["dtos.ReleaseItemDTO"][];
+      items: components["schemas"]["dtos.ReleaseItem"][];
       name: string;
       projectId: string;
       updatedAt: string;
     };
-    "dtos.ReleaseItemDTO": {
+    "dtos.ReleaseCreateRequest": {
+      items: components["schemas"]["dtos.ReleaseItem"][];
+      name: string;
+    };
+    "dtos.ReleaseItem": {
       artifactName: string;
       assetId: string;
       assetVersionName: string;
@@ -16697,7 +16592,7 @@ export interface components {
       releaseId: string;
     };
     "dtos.ReleasePatchRequest": {
-      items: components["schemas"]["dtos.ReleaseItemDTO"][];
+      items: components["schemas"]["dtos.ReleaseItem"][];
     };
     "dtos.RemediationTimeAverages": {
       cvssAvgCritical: number;
@@ -16719,7 +16614,7 @@ export interface components {
     "dtos.RevokeByPrivateKeyRequest": {
       privkey: string;
     };
-    "dtos.RiskHistoryDTO": {
+    "dtos.RiskHistory": {
       artifactName: string;
       assetId: string;
       assetVersionName: string;
@@ -16768,7 +16663,7 @@ export interface components {
       sumClosedRisk: number;
       sumOpenRisk: number;
     };
-    "dtos.RiskHistoryWithVersionDTO": {
+    "dtos.RiskHistoryWithVersion": {
       artifactName: string;
       assetId: string;
       assetVersionName: string;
@@ -16834,7 +16729,7 @@ export interface components {
     "dtos.ScanResponse": {
       amountClosed: number;
       amountOpened: number;
-      dependencyVulns: components["schemas"]["dtos.DependencyVulnDTO"][];
+      dependencyVulns: components["schemas"]["dtos.DependencyVuln"][];
     };
     "dtos.SemverEvent": {
       fixed: string;
@@ -16848,8 +16743,8 @@ export interface components {
       startColumn: number;
       startLine: number;
     };
-    "dtos.SubProjectEntryDTO": {
-      assets: components["schemas"]["dtos.AssetEntryDTO"][];
+    "dtos.SubProjectEntry": {
+      assets: components["schemas"]["dtos.AssetEntry"][];
       subProjectDescription: string;
       subProjectExternalEntityId: string;
       subProjectName: string;
@@ -16866,13 +16761,13 @@ export interface components {
       /** @description pointer makes it nil-able so we can distinguish a missing/ incorrectly parsed value (rather than the default value = false) */
       disable_org_creation: boolean;
     };
-    "dtos.UserDTO": {
+    "dtos.User": {
       avatarUrl: string;
       id: string;
       name: string;
       role: string;
     };
-    "dtos.VEXRuleDTO": {
+    "dtos.VEXRule": {
       /** @description Metrics */
       appliesToAmountOfDependencyVulns: number;
       /** @description Composite key components */
@@ -16917,7 +16812,7 @@ export interface components {
     };
     /** @enum {string} */
     "dtos.VexRuleRecommendationType": "session" | "crowdsourced" | "upstream";
-    "dtos.VulnEventDTO": {
+    "dtos.VulnEvent": {
       createdAt: string;
       createdByVexRule: boolean;
       id: string;
@@ -16929,7 +16824,7 @@ export interface components {
       uri: string;
       userAgent: string;
       userId: string;
-      vexRule: components["schemas"]["dtos.VEXRuleDTO"];
+      vexRule: components["schemas"]["dtos.VEXRule"];
       vexRuleId: string;
       vulnId: string;
       vulnType: components["schemas"]["dtos.VulnType"];
@@ -16954,7 +16849,7 @@ export interface components {
       | "removedComplianceComponent"
       | "detected"
       | "rawRiskAssessmentUpdated";
-    "dtos.VulnInPackageDTO": {
+    "dtos.VulnInPackage": {
       cveId: string;
       fixedVersion: string;
     };
@@ -16987,7 +16882,7 @@ export interface components {
       | "licenseRisk"
       | "compliancePosture"
       | "securityAdvisory";
-    "dtos.WebhookCreateRequestDTO": {
+    "dtos.WebhookCreateRequest": {
       description: string;
       name: string;
       sbomEnabled: boolean;
@@ -16995,7 +16890,7 @@ export interface components {
       url: string;
       vulnEnabled: boolean;
     };
-    "dtos.WebhookIntegrationDTO": {
+    "dtos.WebhookIntegration": {
       description: string;
       id: string;
       name: string;
@@ -17003,12 +16898,12 @@ export interface components {
       url: string;
       vulnEnabled: boolean;
     };
-    "dtos.WebhookTestRequestDTO": {
+    "dtos.WebhookTestRequest": {
       payloadType: string;
       secret: string;
       url: string;
     };
-    "dtos.WebhookUpdateRequestDTO": {
+    "dtos.WebhookUpdateRequest": {
       description: string;
       id: string;
       name: string;
@@ -17148,7 +17043,6 @@ export interface components {
       modifiedUserInteraction: components["schemas"]["dtos.ModifiedUserInteraction"];
       name: string;
       paranoidMode: boolean;
-      pipelineLastRun: string;
       project: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"];
       projectId: string;
       refs: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"][];
@@ -17163,8 +17057,6 @@ export interface components {
       state: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetState"];
       type: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetType"];
       updatedAt: string;
-      /** @description Auto-reopen configuration - number of days after which closed/accepted vulnerabilities should be reopened */
-      vulnAutoReopenAfterDays: number;
       webhookSecret: string;
     };
     /** @enum {string} */
@@ -17560,50 +17452,50 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_types.JSONB": {
       [key: string]: unknown;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControlDTO": {
-      data: components["schemas"]["dtos.CompliancePostureWithControlDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_CompliancePostureWithControl": {
+      data: components["schemas"]["dtos.CompliancePostureWithControl"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentDependencyDTO": {
-      data: components["schemas"]["dtos.ComponentDependencyDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentDependency": {
+      data: components["schemas"]["dtos.ComponentDependency"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrenceDTO": {
-      data: components["schemas"]["dtos.ComponentOccurrenceDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ComponentOccurrence": {
+      data: components["schemas"]["dtos.ComponentOccurrence"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_LogDTO": {
-      data: components["schemas"]["dtos.LogDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_Log": {
+      data: components["schemas"]["dtos.Log"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAssetDTO": {
-      data: components["schemas"]["dtos.ProjectAssetDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_Project": {
+      data: components["schemas"]["dtos.Project"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectDTO": {
-      data: components["schemas"]["dtos.ProjectDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAsset": {
+      data: components["schemas"]["dtos.ProjectAsset"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_ReleaseDTO": {
-      data: components["schemas"]["dtos.ReleaseDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_Release": {
+      data: components["schemas"]["dtos.Release"][];
       page: number;
       pageSize: number;
       total: number;
     };
-    "github_com_l3montree-dev_devguard_shared.Paged-dtos_VulnEventDTO": {
-      data: components["schemas"]["dtos.VulnEventDTO"][];
+    "github_com_l3montree-dev_devguard_shared.Paged-dtos_VulnEvent": {
+      data: components["schemas"]["dtos.VulnEvent"][];
       page: number;
       pageSize: number;
       total: number;
@@ -17678,24 +17570,6 @@ export interface components {
       | 3600000000000
       | -9223372036854776000
       | 9223372036854776000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
-      | 1
-      | 1000
-      | 1000000
-      | 1000000000
-      | 60000000000
-      | 3600000000000
       | 1
       | 1000
       | 1000000
