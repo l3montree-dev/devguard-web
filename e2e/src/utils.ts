@@ -48,7 +48,11 @@ export async function goto(
     try {
       return await page.goto(url, options);
     } catch (error) {
-      if (attempt >= 2 || !String(error).includes("NS_BINDING_ABORTED")) {
+      const retryable =
+        /NS_BINDING_ABORTED|interrupted by another navigation/.test(
+          String(error),
+        );
+      if (attempt >= 2 || !retryable) {
         throw error;
       }
       await sleep(500);

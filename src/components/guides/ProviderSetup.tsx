@@ -5,7 +5,10 @@ import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { innerCardClassName, type Surface } from "@/lib/surface";
-import { deleteGitlabIntegration } from "@/services/organizationService";
+import {
+  deleteGitlabIntegration,
+  deleteJiraIntegration,
+} from "@/services/organizationService";
 import type { OrganizationDetailsDTO } from "@/types/dto";
 import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
@@ -78,9 +81,36 @@ export default function ProviderSetup({
     }
   };
 
+  const handleDeleteJira = async (id: string) => {
+    let deleted = true;
+    try {
+      await deleteJiraIntegration(activeOrg.slug, id);
+    } catch {
+      deleted = false;
+    }
+
+    if (deleted) {
+      updateOrganization((prev) => {
+        if (!prev.organization) {
+          return prev;
+        }
+        return {
+          ...prev,
+          organization: {
+            ...prev.organization,
+            jiraIntegrations: prev.organization.jiraIntegrations.filter(
+              (i) => i.id !== id,
+            ),
+          },
+        };
+      });
+    }
+  };
+
   const providerIntegrationPresent =
     activeOrg.githubAppInstallations?.length > 0 ||
-    activeOrg.gitLabIntegrations?.length > 0;
+    activeOrg.gitLabIntegrations?.length > 0 ||
+    activeOrg.jiraIntegrations?.length > 0;
 
   return (
     <div>
@@ -152,6 +182,35 @@ export default function ProviderSetup({
           }
         />
       ))}
+      {activeOrg.jiraIntegrations?.map((integration) => (
+        <ListItem
+          className={cn("mb-4", innerCardClassName(variant))}
+          key={integration.id}
+          Title={
+            <div className="flex flex-row items-center">
+              <Image
+                src="/assets/jira-svgrepo-com.svg"
+                alt="Jira"
+                width={20}
+                height={20}
+                className="mr-2 inline-block"
+              />
+              {integration.name}
+            </div>
+          }
+          Description={
+            "DevGuard uses an Access-Token to access your Jira projects and interact with your issues."
+          }
+          Button={
+            <AsyncButton
+              variant={"destructiveOutline"}
+              onClick={() => handleDeleteJira(integration.id)}
+            >
+              Delete
+            </AsyncButton>
+          }
+        />
+      ))}
       {providerIntegrationPresent && (
         <div className="mb-4 flex flex-col items-end">
           <Button
@@ -165,7 +224,9 @@ export default function ProviderSetup({
             Add another{" "}
             {selectedProvider === "github"
               ? "GitHub App"
-              : "GitLab Integration"}
+              : selectedProvider === "jira"
+                ? "Jira Integration"
+                : "GitLab Integration"}
           </Button>
         </div>
       )}

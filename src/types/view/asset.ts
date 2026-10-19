@@ -13,7 +13,6 @@ export type AssetFormValues = Modify<
     enableTicketRange: boolean;
     enableExposureMetrics: boolean;
     keepOriginalSbomRootComponent: boolean;
-    vulnAutoReopenAfterDays: number | null;
   }
 >;
 

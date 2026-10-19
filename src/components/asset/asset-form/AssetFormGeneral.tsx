@@ -51,6 +51,8 @@ export const AssetFormGeneral: FunctionComponent<Props> = ({
                 variant={inputVariant}
                 autoFocus
                 {...field}
+                maxLength={256}
+                type="text"
               />
             </FormControl>
             <FormDescription>The name of the repository.</FormDescription>

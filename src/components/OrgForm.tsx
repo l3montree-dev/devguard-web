@@ -51,6 +51,8 @@ export const OrgForm: FunctionComponent<OrgFormProps> = ({
                 variant={variant}
                 autoFocus={autoFocus}
                 data-testid="org-name-label"
+                maxLength={256}
+                type="text"
                 {...field}
               />
             </FormControl>
