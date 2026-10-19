@@ -20,7 +20,8 @@ export type ZodConvert<T> = {
             : never;
 };
 
-export type ExternalTicketProvider = "github" | "gitlab" | "jira" | "opencode";
+export type ExternalTicketProvider =
+  "github" | "gitlab" | "jira" | "opencode" | "redmine";
 
 export type GitInstances = "GitHub" | "Gitlab";
 

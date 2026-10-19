@@ -42,7 +42,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
   const hasIntegration =
     activeOrg.gitLabIntegrations.length > 0 ||
     activeOrg.githubAppInstallations.length > 0 ||
-    activeOrg.jiraIntegrations.length > 0;
+    activeOrg.jiraIntegrations.length > 0 ||
+    activeOrg.redmineIntegrations.length > 0;
 
   const { repos, searchLoading, handleSearchRepos } =
     useRepositorySearch(repositories);
@@ -60,6 +61,8 @@ const ConnectToRepoSection: FunctionComponent<Props> = ({
     integration = "GitLab Repository";
   } else if (repositoryId?.startsWith("jira:")) {
     integration = "Jira Project";
+  } else if (repositoryId?.startsWith("redmine:")) {
+    integration = "Redmine Project";
   }
 
   return (
