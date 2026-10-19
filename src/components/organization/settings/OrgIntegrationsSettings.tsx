@@ -7,6 +7,8 @@ import GithubAppInstallationAlert from "@/components/common/GithubAppInstallatio
 import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
 import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
 import ListItem from "@/components/common/ListItem";
+import { RedmineIntegrationDialog } from "@/components/common/RedmineIntegrationDialog";
+import { RedmineIntegrationSettingsDialog } from "@/components/common/RedmineIntegrationSettingsDialog";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useConfig } from "@/context/ConfigContext";
 import { usePatchOrgContext } from "@/hooks/usePatchOrgContext";
@@ -15,8 +17,9 @@ import { encodeObjectBase64 } from "@/services/encodeService";
 import {
   deleteGitlabIntegration,
   deleteJiraIntegration,
+  deleteRedmineIntegration,
 } from "@/services/organizationService";
-import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/dto";
+import type { GitLabIntegrationDTO, JiraIntegrationDTO, RedmineIntegrationDTO } from "@/types/dto";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -69,6 +72,31 @@ const OrgIntegrationsSettings = () => {
 
   const handleNewJira = (integration: JiraIntegrationDTO) =>
     patchOrg({ jiraIntegrations: org.jiraIntegrations.concat(integration) });
+
+  const handleNewRedmineIntegration = (integration: RedmineIntegrationDTO) => {
+    patchOrg({
+        redmineIntegrations: org.redmineIntegrations.concat(integration),
+    });
+  };
+
+  const handleRedmineSettingsSaved = (integration: RedmineIntegrationDTO) => {
+    patchOrg({
+        redmineIntegrations: org.redmineIntegrations.map((i) => {
+          if (i.id === integration.id) {
+            return integration;
+          }
+          return i;
+        }),
+    });
+  };
+
+  const handleDeleteRedmineIntegration = async (id: string) => {
+    await deleteRedmineIntegration(org.slug, id);
+    patchOrg({
+        redmineIntegrations: org.redmineIntegrations.filter((i) => i.id !== id),
+    });
+  };
+
 
   return (
     <>
@@ -138,6 +166,37 @@ const OrgIntegrationsSettings = () => {
           }
         />
       ))}
+      {org.redmineIntegrations.map((integration) => (
+        <ListItem
+          key={integration.id}
+          Title={
+            <ProviderTitle src="/assets/provider-icons/redmine.svg">
+              {integration.name}
+            </ProviderTitle>
+          }
+          Description={
+            "DevGuard uses an Access-Token to access your repositories and create issues."
+          }
+          Button={
+            <>
+              <RedmineIntegrationSettingsDialog
+                integration={integration}
+                onSave={handleRedmineSettingsSaved}
+                Button={
+                  <Button variant={"secondary"}>Settings</Button>
+                }
+              ></RedmineIntegrationSettingsDialog>
+              <AsyncButton
+                variant={"destructiveOutline"}
+                onClick={() => handleDeleteRedmineIntegration(integration.id)}
+              >
+                Delete
+              </AsyncButton>
+            </>
+          }
+        />
+      ))}
+
       <ListItem
         Title={
           <ProviderTitle src="/assets/github.svg" invert>
@@ -196,6 +255,22 @@ const OrgIntegrationsSettings = () => {
             onNewIntegration={handleNewJira}
             Button={<Button variant="secondary">Integrate with Jira</Button>}
           />
+        }
+      />
+      <ListItem
+        Title={
+          <ProviderTitle src="/assets/provider-icons/redmine.svg">
+            Integrate with Redmine
+          </ProviderTitle>
+        }
+        Description="DevGuard uses a Redmine API Token to access your Redmine projects and interact with your issues. This allows DevGuard to create and manage issues in your Redmine projects."
+        Button={
+          <RedmineIntegrationDialog
+            onNewIntegration={handleNewRedmineIntegration}
+            Button={
+              <Button variant={"secondary"}>Integrate with Redmine</Button>
+            }
+          ></RedmineIntegrationDialog>
         }
       />
     </>

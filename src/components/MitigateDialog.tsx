@@ -34,7 +34,7 @@ interface MitigateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (justification: string) => Promise<boolean>;
-  integrationType: "github" | "gitlab" | "jira" | undefined;
+  integrationType: "github" | "gitlab" | "jira" | "redmine" | undefined;
   gitlabIntegration?: string;
 }
 
