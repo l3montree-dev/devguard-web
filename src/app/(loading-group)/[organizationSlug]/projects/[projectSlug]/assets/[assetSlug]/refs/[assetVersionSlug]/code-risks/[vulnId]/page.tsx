@@ -467,6 +467,35 @@ const Index = () => {
                               </AsyncButton>
                             )}
 
+                          {vuln.ticketId === null &&
+                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                              asset,
+                              project,
+                            ) === "redmine" && (
+                              <AsyncButton
+                                variant={"secondary"}
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "mitigate",
+                                    justification,
+                                  })
+                                }
+                              >
+                                <div className="flex flex-col">
+                                  <div className="flex">
+                                    <Image
+                                      alt="Redmine Logo"
+                                      width={15}
+                                      height={15}
+                                      className="mr-2"
+                                      src={"/assets/provider-icons/redmine.svg"}
+                                    />
+                                    Create Redmine Ticket
+                                  </div>
+                                </div>
+                              </AsyncButton>
+                            )}
+
                           <AsyncButton
                             onClick={() =>
                               handleSubmit({
