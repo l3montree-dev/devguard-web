@@ -53,9 +53,10 @@ export function BranchTagSelector({
   );
   const items = view === "branches" ? branches : tags;
 
-  const [selected, setSelected] = useState(
-    initAssetVersion ? initAssetVersion.name : undefined,
-  );
+  const [selectedState, setSelected] = useState(initAssetVersion?.name);
+  const selected = disableNavigateToRefInsteadCall
+    ? selectedState
+    : initAssetVersion?.name;
   const [filter, setFilter] = useState("");
 
   const filteredItems = useMemo(() => {
