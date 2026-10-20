@@ -31,7 +31,7 @@ const SHOWN_PAIR_KEY = "devguard-update-dialog-shown";
 export default function UpdateAvailableDialog() {
   const currentUser = useCurrentUser();
   const { data: info } = useApiQuery(currentUser ? "/info" : null);
-  const instanceVersion = info ? "v1.15.0" : undefined; //test
+  const instanceVersion = info?.build.version;
 
   const [check, setCheck] = useState<VersionCheckResult | null>(null);
   const [shownPair, storeShownPair] = useLocalStorage(SHOWN_PAIR_KEY);

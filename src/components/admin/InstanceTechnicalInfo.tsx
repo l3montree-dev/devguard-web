@@ -76,7 +76,7 @@ export default forwardRef<InstanceTechnicalInfoHandle>(
       null,
     );
 
-    const version = "1.16.0";
+    const version = info?.build.version;
 
     useEffect(() => {
       if (!version) return;

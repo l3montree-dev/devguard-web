@@ -15,7 +15,6 @@ const DEVGUARD_API_INFO = "https://api.devguard.org/api/v1/info";
  * */
 export async function fetchLatestDevguardVersion(): Promise<string | null> {
   try {
-    console.log("fetching latest version");
     const res = await fetch(DEVGUARD_API_INFO, {
       signal: AbortSignal.timeout(10000),
     });
