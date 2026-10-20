@@ -169,7 +169,7 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
         <Card className="pt-6">
           <form onSubmit={handleSubmit(handleCreatePat)}>
             <CardContent>
-              <FormSection step={1} title="Description">
+              <FormSection step={1} title="Token name">
                 <Input
                   variant="onCard"
                   placeholder="e.g. GitLab CI pipeline"
