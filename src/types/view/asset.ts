@@ -13,11 +13,8 @@ export type AssetFormValues = Modify<
     enableTicketRange: boolean;
     enableExposureMetrics: boolean;
     keepOriginalSbomRootComponent: boolean;
-    vulnAutoReopenAfterDays: number | null;
   }
 >;
-
-export type SecretType = "webhook";
 
 export type QuickfixVuln = Pick<
   DependencyVuln,

@@ -4,7 +4,11 @@
 import ListItem from "@/components/common/ListItem";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { deleteGitlabIntegration } from "@/services/organizationService";
+import { innerCardClassName, type Surface } from "@/lib/surface";
+import {
+  deleteGitlabIntegration,
+  deleteJiraIntegration,
+} from "@/services/organizationService";
 import type { OrganizationDetailsDTO } from "@/types/dto";
 import type { ExternalTicketProvider } from "@/types/common";
 import { InfoIcon } from "lucide-react";
@@ -23,6 +27,12 @@ interface ProviderSetupProps {
   selectRepoSlideIndex: number;
   prevIndex: number;
   providerIntegrationSlideIndex: number;
+  // renders back/ continue to navigate the carousel - disable when used outside of one
+  showNavigation?: boolean;
+  // replaces the carousel navigation of the "add another" button
+  onAddAnother?: () => void;
+  // the surface the list is rendered on
+  variant?: Surface;
 }
 
 export default function ProviderSetup({
@@ -33,6 +43,9 @@ export default function ProviderSetup({
   prevIndex,
   selectRepoSlideIndex,
   isLoadingRepositories,
+  showNavigation = true,
+  onAddAnother,
+  variant,
 }: ProviderSetupProps) {
   // Use hook to get reactive organization from context.
   const activeOrgFromContext = useActiveOrg();
@@ -68,9 +81,36 @@ export default function ProviderSetup({
     }
   };
 
+  const handleDeleteJira = async (id: string) => {
+    let deleted = true;
+    try {
+      await deleteJiraIntegration(activeOrg.slug, id);
+    } catch {
+      deleted = false;
+    }
+
+    if (deleted) {
+      updateOrganization((prev) => {
+        if (!prev.organization) {
+          return prev;
+        }
+        return {
+          ...prev,
+          organization: {
+            ...prev.organization,
+            jiraIntegrations: prev.organization.jiraIntegrations.filter(
+              (i) => i.id !== id,
+            ),
+          },
+        };
+      });
+    }
+  };
+
   const providerIntegrationPresent =
     activeOrg.githubAppInstallations?.length > 0 ||
-    activeOrg.gitLabIntegrations?.length > 0;
+    activeOrg.gitLabIntegrations?.length > 0 ||
+    activeOrg.jiraIntegrations?.length > 0;
 
   return (
     <div>
@@ -82,6 +122,7 @@ export default function ProviderSetup({
       </p>
       {activeOrg.githubAppInstallations?.map((installation) => (
         <ListItem
+          className={innerCardClassName(variant)}
           key={installation.installationId}
           Title={
             <>
@@ -112,7 +153,7 @@ export default function ProviderSetup({
       ))}
       {activeOrg.gitLabIntegrations.map((integration) => (
         <ListItem
-          className="mb-4"
+          className={cn("mb-4", innerCardClassName(variant))}
           key={integration.id}
           Title={
             <>
@@ -141,40 +182,77 @@ export default function ProviderSetup({
           }
         />
       ))}
+      {activeOrg.jiraIntegrations?.map((integration) => (
+        <ListItem
+          className={cn("mb-4", innerCardClassName(variant))}
+          key={integration.id}
+          Title={
+            <div className="flex flex-row items-center">
+              <Image
+                src="/assets/jira-svgrepo-com.svg"
+                alt="Jira"
+                width={20}
+                height={20}
+                className="mr-2 inline-block"
+              />
+              {integration.name}
+            </div>
+          }
+          Description={
+            "DevGuard uses an Access-Token to access your Jira projects and interact with your issues."
+          }
+          Button={
+            <AsyncButton
+              variant={"destructiveOutline"}
+              onClick={() => handleDeleteJira(integration.id)}
+            >
+              Delete
+            </AsyncButton>
+          }
+        />
+      ))}
       {providerIntegrationPresent && (
         <div className="mb-4 flex flex-col items-end">
           <Button
-            onClick={() => api?.scrollTo(providerIntegrationSlideIndex)}
+            onClick={() =>
+              onAddAnother
+                ? onAddAnother()
+                : api?.scrollTo(providerIntegrationSlideIndex)
+            }
             variant={"secondary"}
           >
             Add another{" "}
             {selectedProvider === "github"
               ? "GitHub App"
-              : "GitLab Integration"}
+              : selectedProvider === "jira"
+                ? "Jira Integration"
+                : "GitLab Integration"}
           </Button>
         </div>
       )}
-      <div className="mt-10 flex flex-row gap-2 justify-end">
-        <Button
-          variant={"secondary"}
-          onClick={() => {
-            api?.scrollTo(prevIndex);
-          }}
-        >
-          Back
-        </Button>
+      {showNavigation && (
+        <div className="mt-10 flex flex-row gap-2 justify-end">
+          <Button
+            variant={"secondary"}
+            onClick={() => {
+              api?.scrollTo(prevIndex);
+            }}
+          >
+            Back
+          </Button>
 
-        <Button
-          disabled={selectedProvider === undefined || isLoadingRepositories}
-          onClick={() => {
-            providerIntegrationPresent
-              ? api?.scrollTo(selectRepoSlideIndex)
-              : api?.scrollTo(providerIntegrationSlideIndex);
-          }}
-        >
-          {isLoadingRepositories ? "Loading Repositories..." : "Continue"}
-        </Button>
-      </div>
+          <Button
+            disabled={selectedProvider === undefined || isLoadingRepositories}
+            onClick={() => {
+              providerIntegrationPresent
+                ? api?.scrollTo(selectRepoSlideIndex)
+                : api?.scrollTo(providerIntegrationSlideIndex);
+            }}
+          >
+            {isLoadingRepositories ? "Loading Repositories..." : "Continue"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

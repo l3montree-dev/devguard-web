@@ -3,19 +3,6 @@
 
 import type { AssetDTO, ProjectDTO } from "@/types/dto";
 
-import type { Building2 } from "lucide-react";
-import type { ReactNode } from "react";
-
-export type StepState = "existing" | "pending" | "next";
-
-export interface Step {
-  Icon: typeof Building2;
-  label: string;
-  value: ReactNode;
-  description: ReactNode;
-  state: StepState;
-}
-
 export type SubGroupProject = Omit<ProjectDTO, "subGroupsAndAsset"> & {
   resourceType: "project";
   state?: string;

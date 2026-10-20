@@ -4,6 +4,7 @@
 import { test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
 import { goto } from "../../utils";
+import { openSettingsSection } from "./settings-nav";
 
 export class RepoFlow {
   constructor(private page: Page) {}
@@ -54,6 +55,7 @@ export class RepoFlow {
       .locator(".level-repo")
       .getByTestId("repository-settings")
       .click({ timeout: 30_000 });
+    await openSettingsSection(this.page, "danger-zone");
     await this.page.getByTestId("delete-repository-button").click();
     await this.page.getByTestId("alert-confirm-button").click();
   }
@@ -64,10 +66,10 @@ export class RepoFlow {
     await this.page.getByTestId("integrity-requirement-high").click();
     await this.page.getByTestId("availability-requirement-low").click();
     await this.page.getByTestId("save-security-requirements-button").click();
+    await openSettingsSection(this.page, "vulnerability-management");
     await this.page.getByTestId("enable-public-access-switch").click();
     await this.page.mouse.wheel(0, 300);
     await docShot(this.page, test.info(), "public-access");
-    await this.page.getByTestId("vuln-auto-reopen-switch").click();
     await this.page
       .getByTestId("save-vulnerability-management-settings-button")
       .click();
@@ -75,6 +77,7 @@ export class RepoFlow {
 
   async openSecurityRequirements() {
     await this.page.getByTestId("repository-settings").click();
+    await openSettingsSection(this.page, "security-requirements");
     await this.page
       .getByTestId("configure-security-requirements-button")
       .click();
@@ -93,11 +96,13 @@ export class RepoFlow {
 
   async publishRepo() {
     await this.page.getByTestId("repository-settings").click();
+    await openSettingsSection(this.page, "danger-zone");
     await this.page.getByTestId("publish-repo-switch").click();
   }
 
   async publishRepoURLs() {
     await this.page.getByTestId("repository-settings").click();
+    await openSettingsSection(this.page, "vulnerability-management");
     await this.page.getByTestId("enable-public-access-switch").click();
     await this.page
       .getByTestId("save-vulnerability-management-settings-button")

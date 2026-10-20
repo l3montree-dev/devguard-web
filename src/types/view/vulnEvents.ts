@@ -112,24 +112,24 @@ export type VulnEventDTO =
   | CreatedEventDTO;
 
 export type DetailedDependencyVulnDTO = Omit<
-  S["dtos.DetailedDependencyVulnWithRelationsDTO"],
+  S["dtos.DetailedDependencyVulnWithRelations"],
   "events"
 > & { events: VulnEventDTO[] };
 
 export type DetailedLicenseRiskDTO = Omit<
-  S["dtos.DetailedLicenseRiskDTO"],
+  S["dtos.DetailedLicenseRisk"],
   "events"
 > & { events: VulnEventDTO[] };
 
 export type DetailedFirstPartyVulnDTO = Omit<
-  S["dtos.DetailedFirstPartyVulnDTO"],
+  S["dtos.DetailedFirstPartyVuln"],
   "events"
 > & { events: VulnEventDTO[] };
 
 // `additional` is free-form control metadata in Go, so the spec types it as an
 // empty object; the UI probes well-known keys on it.
 export type DetailedComplianceRiskDTO = Omit<
-  S["dtos.CompliancePostureWithDetailsDTO"],
+  S["dtos.CompliancePostureWithDetails"],
   "events" | "additional"
 > & {
   events: VulnEventDTO[];

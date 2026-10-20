@@ -17,6 +17,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "@/lib/toast";
 
 import { Input } from "../ui/input";
+import type { Surface } from "@/lib/surface";
 import { Button } from "../ui/button";
 
 export function urlToBaseURL(url: string): string {
@@ -31,6 +32,8 @@ export interface GitLabIntegrationFormProps {
   setOpen?: (open: boolean) => void;
   additionalOnClick?: () => void;
   backButtonClick?: () => void;
+  // the surface the form is rendered on
+  variant?: Surface;
 }
 
 export default function GitLabIntegrationForm({
@@ -38,6 +41,7 @@ export default function GitLabIntegrationForm({
   setOpen,
   additionalOnClick,
   backButtonClick,
+  variant,
 }: GitLabIntegrationFormProps) {
   const form = useForm<{ url: string; token: string; name: string }>();
   const activeOrg = useActiveOrg();
@@ -90,6 +94,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   data-testid="gitlab-pat-name"
                   placeholder="My GitLab Access Token"
                   autoComplete="url"
@@ -110,6 +115,7 @@ export default function GitLabIntegrationForm({
               <FormLabel>GitLab Base URL</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   data-testid="gitlab-base-url-input"
                   placeholder={
                     "https://gitlab.com/ or https://gitlab.opencode.de/"
@@ -138,6 +144,7 @@ export default function GitLabIntegrationForm({
               </FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   data-testid="gitlab-pat-input"
                   placeholder="glpat-xxxxxxxxxxx-xxxx"
                   {...field}

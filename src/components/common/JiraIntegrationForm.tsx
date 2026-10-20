@@ -16,6 +16,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "@/lib/toast";
 import type { JiraIntegrationDTO } from "@/types/dto";
 import { Input } from "../ui/input";
+import type { Surface } from "@/lib/surface";
 import { Button } from "../ui/button";
 import React from "react";
 import { urlToBaseURL } from "@/utils/url";
@@ -24,12 +25,15 @@ export interface JiraIntegrationFormProps {
   onNewIntegration: (integration: JiraIntegrationDTO) => void;
   additionalOnClick?: () => void;
   backButtonClick?: () => void;
+  // the surface the form is rendered on
+  variant?: Surface;
 }
 
 export default function JiraIntegrationForm({
   onNewIntegration,
   additionalOnClick,
   backButtonClick,
+  variant,
 }: JiraIntegrationFormProps) {
   const form = useForm<{
     url: string;
@@ -84,6 +88,7 @@ export default function JiraIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   placeholder="My Jira Personal Access Token"
                   autoComplete="url"
                   {...field}
@@ -103,6 +108,7 @@ export default function JiraIntegrationForm({
               <FormLabel>Jira User Email</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   placeholder={"email@example.com"}
                   autoComplete="email"
                   type="email"
@@ -125,6 +131,7 @@ export default function JiraIntegrationForm({
               <FormLabel>Jira URL</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   placeholder={"https://your-domain.atlassian.net"}
                   autoComplete="url"
                   type="url"
@@ -149,6 +156,7 @@ export default function JiraIntegrationForm({
               <FormLabel>Jira Access-Token</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   required
                   autoComplete="off"
                   placeholder="xxxxxxxxxxxxxxx..."

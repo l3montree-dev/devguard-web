@@ -3,46 +3,16 @@
 
 "use client";
 
-import ConfigFileEditor from "@/components/common/ConfigFileEditor";
-import Page from "@/components/Page";
-import ProjectTitle from "@/components/common/ProjectTitle";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { useProjectMenu } from "@/hooks/useProjectMenu";
+import ConfigFilesSection from "@/components/common/settings/ConfigFilesSection";
+import { useProjectScope } from "@/hooks/useProjectScope";
 
-const Config = () => {
-  const org = useActiveOrg();
-  const project = useActiveProject();
-  const projectMenu = useProjectMenu();
-
-  const scope =
-    org && project
-      ? ({
-          level: "project",
-          organization: org.slug,
-          projectSlug: project.slug,
-        } as const)
-      : null;
+export default function ProjectConfigPage() {
+  const scope = useProjectScope();
 
   return (
-    <Page
-      breadcrumbs={[
-        {
-          title: "Settings",
-          href: "./",
-        },
-        {
-          title: "Config",
-          href: "",
-        },
-      ]}
-      title={"Configuration Files (" + project.name + ")"}
-      Menu={projectMenu}
-      Title={<ProjectTitle />}
-    >
-      <ConfigFileEditor scope={scope} />
-    </Page>
+    <ConfigFilesSection
+      scope={{ level: "project", ...scope }}
+      description="View and edit configuration files for this group, including scanner tool settings. These configurations override organization-level settings and are inherited by all repositories in this group."
+    />
   );
-};
-
-export default Config;
+}

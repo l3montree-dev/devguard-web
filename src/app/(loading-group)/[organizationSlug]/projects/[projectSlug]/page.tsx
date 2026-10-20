@@ -5,6 +5,7 @@
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
+import GettingStartedSteps from "@/components/onboarding/GettingStartedSteps";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRouterQuery from "@/hooks/useRouterQuery";
@@ -43,6 +44,7 @@ import SubgroupsAndAssetsList, {
   checkType,
 } from "@/components/SubgroupsAndAssetsList";
 import { useAutoTour } from "@/hooks/useAutoTour";
+import { truncateEnd } from "@/utils/common";
 
 export default function RepositoriesPage() {
   const [viewedProject, setViewedProject] = useState<"active" | "inactive">(
@@ -90,6 +92,7 @@ export default function RepositoriesPage() {
   const [showProjectModal, setShowProjectModal] = useState(false);
 
   const projectMenu = useProjectMenu();
+  const truncatedProjectName = truncateEnd(project.name, 65);
 
   // a filtered list that comes back empty means "no matches", not "nothing created yet",
   // so the inline create form is only offered on the unfiltered, genuinely empty group
@@ -144,6 +147,8 @@ export default function RepositoriesPage() {
   const handleCreateAsset = async (data: AssetFormValues) => {
     const modifiedData = {
       ...data,
+      // "None" is stored as "", but the API only accepts github/gitlab or no value
+      repositoryProvider: data.repositoryProvider || undefined,
       cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
         ? data.cvssAutomaticTicketThreshold[0]
         : 2,
@@ -263,10 +268,10 @@ export default function RepositoriesPage() {
           }
           primaryHeadline
           description={
-            "Repositories managed by the " + project.name + " group."
+            "Repositories managed by the " + truncatedProjectName + " group."
           }
           forceVertical
-          title={project.name}
+          title={truncatedProjectName}
         >
           {!showInlineCreateForm && (
             <>
@@ -319,10 +324,12 @@ export default function RepositoriesPage() {
               onFetchData={handleLazyDataFetching}
               Empty={
                 showInlineCreateForm ? (
-                  <CreateSubgroupOrRepoForm
-                    onCreateRepository={handleCreateAsset}
-                    onCreateSubgroup={handleCreateProject}
-                  />
+                  <GettingStartedSteps current="repository">
+                    <CreateSubgroupOrRepoForm
+                      onCreateRepository={handleCreateAsset}
+                      onCreateSubgroup={handleCreateProject}
+                    />
+                  </GettingStartedSteps>
                 ) : (
                   <EmptyParty title="No repositories found" description="" />
                 )

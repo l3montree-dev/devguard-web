@@ -3,19 +3,14 @@
 
 import { Button } from "@/components/ui/button";
 import { CarouselItem } from "@/components/ui/carousel";
-import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InputWithCustomButton } from "@/components/ui/input-with-custom-button";
-
+import {
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useActiveProject } from "@/hooks/useActiveProject";
-import { patchAsset } from "@/services/assetService";
 import { externalProviderIdToIntegrationName } from "@/utils/externalProvider";
-import Image from "next/image";
-import { useState } from "react";
-import { toast } from "@/lib/toast";
-import { useUpdateAsset } from "../../../context/AssetContext";
-import { useConfig } from "../../../context/ConfigContext";
+import WebhookSecretSetup, { webhookInstructions } from "./WebhookSecretSetup";
 
 interface WebhookSetupSlideProps {
   api?: {
@@ -30,13 +25,6 @@ export default function WebhookSetupSlide({
   onOpenChange,
   prevIndex,
 }: WebhookSetupSlideProps) {
-  const generateNewSecret = (): string => {
-    return crypto.randomUUID();
-  };
-  const [webhookSecret, setWebhookSecret] = useState<string | null>(null);
-  const updateAsset = useUpdateAsset();
-  const activeOrg = useActiveOrg();
-  const project = useActiveProject();
   const asset = useActiveAsset();
 
   const isExternalEntityProvider =
@@ -45,78 +33,16 @@ export default function WebhookSetupSlide({
     externalProviderIdToIntegrationName(asset.externalEntityProviderId) ===
       "gitlab";
 
-  const handleGenerateNewSecret = async () => {
-    let r;
-    try {
-      r = (await patchAsset(
-        {
-          organization: activeOrg.slug,
-          projectSlug: project!.slug,
-          assetSlug: asset.slug,
-        },
-        { webhookSecret: generateNewSecret() } as never,
-      )) as { webhookSecret: string };
-    } catch {
-      r = null;
-    }
-
-    if (r) {
-      setWebhookSecret(r.webhookSecret);
-      updateAsset({ ...asset, webhookSecret: r.webhookSecret });
-      navigator.clipboard.writeText(r.webhookSecret);
-      toast.success("New webhook secret generated and copied to clipboard");
-    } else {
-      toast.error("Could not generate new secret");
-    }
-  };
-
-  const config = useConfig();
-
   return (
     <CarouselItem>
       <DialogHeader>
         <DialogTitle>
           Set Webhook to allow DevGuard to recieve ticket updates
         </DialogTitle>
+        <DialogDescription>{webhookInstructions}</DialogDescription>
       </DialogHeader>
-      <p className="mb-4 mt-4 text-sm">
-        Go to your GitLab/ openCode project settings and add a webhook with the
-        following URL and secret (“Settings” → “Webhooks”). Ensure that you
-        select the Issue and comment event trigger checkboxes like shown in the
-        screenshot below. You must set a secret token.
-      </p>
-
-      <Image
-        src="/assets/gitlab-webhooks-combined.png"
-        alt="GitLab Webhooks"
-        className="rounded-md w-full h-auto"
-        width={1280}
-        height={720}
-      />
-
-      <div className="p-1">
-        <InputWithCustomButton
-          label="Webhook URL"
-          value={config.devguardApiUrlPublicInternet + "/api/v1/webhook/"}
-          onClick={() => {
-            navigator.clipboard.writeText(
-              config.devguardApiUrlPublicInternet + "/api/v1/webhook/",
-            );
-            toast.success("Webhook URL copied to clipboard");
-          }}
-          buttonChildren={"Copy"}
-        />
-        <div className="mt-4">
-          <InputWithCustomButton
-            buttonVariant={!!webhookSecret ? "secondary" : "default"}
-            label="Webhook Secret"
-            value={webhookSecret ?? "No webhook secret set"}
-            onClick={() => {
-              handleGenerateNewSecret();
-            }}
-            buttonChildren={"Create & Copy"}
-          />
-        </div>
+      <div className="mt-10">
+        <WebhookSecretSetup />
       </div>
       <div className="flex mt-10 flex-row gap-2 justify-end">
         <Button
@@ -131,9 +57,7 @@ export default function WebhookSetupSlide({
         </Button>
         <Button
           onClick={() => onOpenChange(false)}
-          disabled={
-            webhookSecret !== null && webhookSecret.length > 0 ? false : true
-          }
+          disabled={!asset?.webhookSecret}
         >
           Finish!
         </Button>

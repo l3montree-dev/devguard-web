@@ -15,10 +15,10 @@ test.describe("DevGuard repo flows", () => {
     await devguardPOM.createTestOrganizationGroupAndRepo();
   });
 
-  test("test devguard cli for screenshot", async ({ page }, testInfo) => {
-    await page.getByTestId("devguard-cli-card").click();
+  test("test repo onboarding for screenshot", async ({ page }, testInfo) => {
+    await page.getByTestId("onboarding-continue").waitFor();
     await page.setViewportSize({ width: 1440, height: 1200 });
-    await docShot(page, testInfo, "devguard-cli-screen");
+    await docShot(page, testInfo, "repo-onboarding-screen");
   });
 
   test("test create, settings and delete (through settings) of repo", async () => {

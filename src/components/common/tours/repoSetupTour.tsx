@@ -8,51 +8,40 @@ const DOCS = "https://docs.devguard.org";
 
 export const repoSetupTourSteps: ConditionalStep[] = [
   {
-    selector: '[data-tour="setup-risk-scan"]',
+    selector: '[data-tour="onboarding-steps"]',
     content: (
       <>
-        The recommended way to get started: pick the scans and scanners you need
-        from our curated list and let DevGuard generate a ready-to-use{" "}
+        The recommended way to get started: follow these steps to add the
+        DevGuard{" "}
         <TourLink href={`${DOCS}/how-to-guides/scanning/scan-with-gitlab-ci/`}>
           CI/CD integration
-        </TourLink>
-        . Every push is scanned automatically.
+        </TourLink>{" "}
+        to your pipeline. Every push is scanned automatically.
       </>
     ),
   },
   {
-    selector: '[data-tour="setup-devguard-cli"]',
+    selector: '[data-tour="onboarding-upload"]',
     content: (
       <>
-        Prefer running things yourself? The{" "}
+        Already have a SARIF, VEX or{" "}
+        <TourLink href={`${DOCS}/getting-started/`}>SBOM</TourLink> file? Drop
+        it here to scan for known vulnerabilities and manage the findings — no
+        pipeline required.
+      </>
+    ),
+  },
+  {
+    selector: '[data-tour="onboarding-alternatives"]',
+    content: (
+      <>
+        Using another CI system or want to bundle the SBOMs of several
+        components into a <strong>release asset</strong>? These guides show
+        alternative setups, like the{" "}
         <TourLink href={`${DOCS}/how-to-guides/scanning/scan-your-project/`}>
           DevGuard CLI
         </TourLink>{" "}
-        runs the same scans locally or in any pipeline and uploads the results
-        to this repository.
-      </>
-    ),
-  },
-  {
-    selector: '[data-tour="setup-manual-upload"]',
-    content: (
-      <>
-        Already have a SARIF or{" "}
-        <TourLink href={`${DOCS}/getting-started/`}>SBOM</TourLink> file? Upload
-        it manually to scan for known vulnerabilities and manage the findings —
-        no pipeline required.
-      </>
-    ),
-  },
-  {
-    selector: '[data-tour="setup-external-url"]',
-    content: (
-      <>
-        Instead of uploading an SBOM, an artifact can simply reference the
-        public SBOM URLs of other components. That turns this repository into a{" "}
-        <strong>release asset</strong>: a product-level view that bundles the
-        SBOMs of e.g. an API, a frontend, a database and an identity provider.
-        Learn more at<br></br>{" "}
+        or{" "}
         <TourLink href={`${DOCS}/how-to-guides/vex/multi-level-vexing/`}>
           multi-level VEXing
         </TourLink>

@@ -16,8 +16,17 @@ import AcceptInvitationDialog from "./AcceptInvitationDialog";
 import { toast } from "@/lib/toast";
 import { useUpdateSession } from "@/context/SessionContext";
 import { writeLocalStorage } from "@/hooks/useLocalStorage";
+import type { Surface } from "@/lib/surface";
 
-export default function OrgRegisterForm() {
+export default function OrgRegisterForm({
+  variant,
+  withSection,
+}: {
+  // the surface the form is rendered on
+  variant?: Surface;
+  // false hides the "General Information" section header
+  withSection?: boolean;
+}) {
   const updateSession = useUpdateSession();
   const form = useForm<OrganizationDTO>();
   const [acceptInvitationOpen, setAcceptInvitationOpen] = useState(false);
@@ -60,7 +69,7 @@ export default function OrgRegisterForm() {
         className="text-black dark:text-white"
         onSubmit={form.handleSubmit(handleOrgCreation)}
       >
-        <OrgForm autoFocus />
+        <OrgForm autoFocus variant={variant} withSection={withSection} />
 
         <div className="mt-6 flex items-center justify-end gap-x-3">
           <Button

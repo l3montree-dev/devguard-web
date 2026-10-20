@@ -39,19 +39,16 @@ export interface ScoreCard {
   scorecard: Scorecard;
 }
 
-export type ComponentProject = Omit<
-  S["dtos.ComponentProjectDTO"],
-  "scoreCard"
-> & {
+export type ComponentProject = Omit<S["dtos.ComponentProject"], "scoreCard"> & {
   scoreCard: ScoreCard;
 };
 
-export type Component = Omit<S["dtos.ComponentDTO"], "project"> & {
+export type Component = Omit<S["dtos.Component"], "project"> & {
   project?: ComponentProject;
 };
 
 export type ComponentPaged = Omit<
-  S["dtos.ComponentDependencyDTO"],
+  S["dtos.ComponentDependency"],
   "component" | "dependency"
 > & {
   component: Component;
@@ -61,7 +58,7 @@ export type ComponentPaged = Omit<
 // dependencyPurl, componentPurl, componentVersion, artifactName and
 // artifactAssetVersion are pointers in Go, so they may be absent.
 export type ProjectDependency = Omit<
-  S["dtos.ComponentOccurrenceDTO"],
+  S["dtos.ComponentOccurrence"],
   | "dependencyPurl"
   | "componentPurl"
   | "componentVersion"
