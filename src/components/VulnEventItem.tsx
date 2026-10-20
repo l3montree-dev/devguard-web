@@ -43,7 +43,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
   const assetVersion = useActiveAssetVersion();
   const routeId =
     event.vulnType === "compliancePosture"
-      ? (event.vulnerabilityName ?? event.vulnId)
+      ? (event.resourceIdentifier ?? event.vulnId)
       : event.vulnId;
 
   return (
@@ -93,7 +93,7 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
                       }{" "}
                       <FoundIn
                         event={event}
-                        flawName={event.vulnerabilityName || "a vulnerability"}
+                        flawName={event.resourceIdentifier || "a vulnerability"}
                       />
                     </p>
                   </div>

@@ -14,7 +14,7 @@ interface BaseVulnEventDTO {
   vulnType: S["dtos.VulnType"];
   justification: string;
   mechanicalJustification: string;
-  vulnerabilityName: string | null;
+  resourceIdentifier: string | null;
   originalAssetVersionName: string;
   packageName: string | null;
   uri: string | null;
