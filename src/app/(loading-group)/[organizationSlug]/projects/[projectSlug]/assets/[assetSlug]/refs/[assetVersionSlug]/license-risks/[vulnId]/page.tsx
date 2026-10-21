@@ -147,7 +147,7 @@ const Index: FunctionComponent = () => {
             userId: session?.identity.id ?? "",
             vulnId: vuln.id,
             vulnType: "dependencyVuln",
-            vulnerabilityName: null,
+            resourceIdentifier: null,
             packageName: vuln.componentPurl,
             uri: null,
             createdByVexRule: false,

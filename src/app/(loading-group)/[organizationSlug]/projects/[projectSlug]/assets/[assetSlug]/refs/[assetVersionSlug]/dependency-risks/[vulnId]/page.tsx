@@ -283,7 +283,7 @@ const Index: FunctionComponent = () => {
             userId: currentUser?.id ?? "",
             vulnId: vuln.id,
             vulnType: "dependencyVuln",
-            vulnerabilityName: vuln.cveID,
+            resourceIdentifier: vuln.cveID,
             createdByVexRule: false,
           } as VulnEventDTO)
         : undefined;
