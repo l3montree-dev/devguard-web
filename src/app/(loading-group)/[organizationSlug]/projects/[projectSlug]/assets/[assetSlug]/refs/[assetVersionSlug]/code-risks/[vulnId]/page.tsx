@@ -171,7 +171,7 @@ const Index = () => {
             userId: session?.identity.id ?? "",
             vulnId: vuln.id,
             vulnType: "firstPartyVuln",
-            vulnerabilityName: vuln.ruleId,
+            resourceIdentifier: vuln.ruleId,
             originalAssetVersionName: assetVersion?.name ?? "",
             packageName: null,
             uri: vuln.uri,
