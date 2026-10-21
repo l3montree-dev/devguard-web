@@ -33,16 +33,16 @@ export default function useAccessToken(
   const scopedUrl = useScopedAccessToken();
   const baseUrl = url ?? scopedUrl;
   const scopedAT = `pat:${baseUrl}`;
-  const [accessTokens, setAccessTokens] = useState<Array<Token>>(() => {
-    let accessTokens = existingAccessTokens ?? [];
-    // merge existing ATs with newly created ones (privKey)
-    const newlyCreated = accessTokens.filter((p) => "privKey" in p);
-    return uniqBy([...accessTokens, ...newlyCreated], "fingerprint");
-  });
+  const [createdTokens, setCreatedTokens] = useState<Array<Token>>([]);
+  const [deletedIds, setDeletedIds] = useState<Array<string>>([]);
+  const accessTokens = uniqBy(
+    [...createdTokens, ...(existingAccessTokens ?? [])],
+    "fingerprint",
+  ).filter((p) => !deletedIds.includes(p.id));
 
   useEffect(() => {
     const handleNewAccessToken = (accessToken: Token) => {
-      setAccessTokens((prev) => uniqBy([...prev, accessToken], "fingerprint"));
+      setCreatedTokens((prev) => uniqBy([...prev, accessToken], "fingerprint"));
     };
 
     const stored = readSessionStorage(scopedAT);
@@ -62,7 +62,7 @@ export default function useAccessToken(
     await apiFetch(`${baseUrl}${accessToken.id}/`, {
       method: "DELETE",
     });
-    setAccessTokens((prev) => prev.filter((p) => p.id !== accessToken.id));
+    setDeletedIds((prev) => [...prev, accessToken.id]);
     const storedAccessToken = readSessionStorage(scopedAT);
     if (
       storedAccessToken &&
@@ -98,7 +98,7 @@ export default function useAccessToken(
   }): Promise<SeeOnceATWithPrivKey | SeeOnceATWithBearerToken> {
     const accessToken = await createAccessToken(data, baseUrl);
 
-    setAccessTokens((prev) => [...prev, accessToken]);
+    setCreatedTokens((prev) => [...prev, accessToken]);
     writeSessionStorage(scopedAT, JSON.stringify(accessToken));
     newATEventEmitter.emit(scopedAT, accessToken);
     return accessToken;
