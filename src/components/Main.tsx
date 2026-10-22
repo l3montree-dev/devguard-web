@@ -6,6 +6,7 @@ import useDimensions from "@/hooks/useDimensions";
 import { classNames } from "@/utils/common";
 import React, { type FunctionComponent } from "react";
 import EntityProviderBanner from "./common/EntityProviderBanner";
+import EnterpriseTeaser from "./enterprise/EnterpriseTeaser";
 import Footer from "./misc/Footer";
 import {
   Breadcrumb,
@@ -80,6 +81,7 @@ const Main: FunctionComponent<Props> = ({
       <div className="bg-footer">
         <Footer variant="app" />
       </div>
+      <EnterpriseTeaser />
     </main>
   );
 };
