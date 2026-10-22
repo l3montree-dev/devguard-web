@@ -3,7 +3,7 @@
   # linked against glibc). Include these in the OCI image contents alongside the
   # nodejs derivation so the binary can resolve them at runtime.
   linuxLibs = targetPkgs: [ targetPkgs.glibc targetPkgs.stdenv.cc.cc.lib ];
-
+  nodeVersion = "26.12.1";
   common = {
     installPhase = ''
       mkdir -p $out
@@ -30,39 +30,39 @@
     '';
 
   aarch64-darwin = pkgs.stdenv.mkDerivation {
-      name = "nodejs-26.5.0-darwin-arm64";
+      name = "nodejs-${nodeVersion}-darwin-arm64";
       src = pkgs.fetchurl {
-        url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-darwin-arm64.tar.gz";
-        sha256 = "sha256-7pIFWaqiORVpz/TXN+O4OWNDDjoU3t2Rv+D/UxcbWvk=";
+        url = "https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-darwin-arm64.tar.gz";
+        sha256 = "sha256-GQHVOZEsAq+hDRzBJpQ6iFWn7t6+gwEZRjRw215sWeg=";
       };
       inherit (common) installPhase;
   };
 
   aarch64-linux = mkLinuxDerivation {
-      name = "nodejs-26.5.0-linux-arm64";
+      name = "nodejs-${nodeVersion}-linux-arm64";
       src = pkgs.fetchurl {
-        url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-linux-arm64.tar.gz";
-        sha256 = "sha256-MI5f6JqCRhulps8V/1Ihss29euh2AKpyuzw/vcZkEtE=";
+        url = "https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-arm64.tar.gz";
+        sha256 = "sha256-psAa9FndiXKrP7CO5dqBJE0muoxJRKYtW7uoxZeuFU8=";
       };
       targetPkgs = pkgsLinuxArm64;
       interpreter = "${pkgsLinuxArm64.glibc}/lib/ld-linux-aarch64.so.1";
   };
 
   x86_64-linux = mkLinuxDerivation {
-      name = "nodejs-26.5.0-linux-x64";
+      name = "nodejs-${nodeVersion}-linux-x64";
       src = pkgs.fetchurl {
-        url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-linux-x64.tar.gz";
-        sha256 = "sha256-IrX0etaueIN+TCuEYBmWXOGga6FD3hdhAilKG/RPxnc=";
+        url = "https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-x64.tar.gz";
+        sha256 = "sha256-D9Hrd3BZj1KiGZXt9u01/GkEAPpDfCOGrzKVGekUMTI=";
       };
       targetPkgs = pkgsLinuxAmd64;
       interpreter = "${pkgsLinuxAmd64.glibc}/lib/ld-linux-x86-64.so.2";
   };
 
   x86_64-darwin = pkgs.stdenv.mkDerivation {
-      name = "nodejs-26.5.0-darwin-x64";
+      name = "nodejs-${nodeVersion}-darwin-x64";
       src = pkgs.fetchurl {
-        url = "https://nodejs.org/dist/v26.5.0/node-v26.5.0-darwin-x64.tar.gz";
-        sha256 = "sha256-mCkzlMlFok5k4AtBd78HXslj6nCzTR0uJL1KcXFtM08=";
+        url = "https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-darwin-x64.tar.gz";
+        sha256 = "sha256-1CkzlMlFok5k4AtBd78HXslj6nCzTR0uJL1KcXFtM08=";
       };
       inherit (common) installPhase;
   };

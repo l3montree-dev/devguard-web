@@ -49,10 +49,8 @@ async function OrganizationShell({
 
   return (
     <ClientContextWrapper
-      Provider={OrganizationProvider}
-      value={{
-        organization: org,
-      }}
+      Context={OrganizationProvider}
+      value={{ organization: org }}
     >
       <OrgHeader />
       <UpdateAvailableDialog />

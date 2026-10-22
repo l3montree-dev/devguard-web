@@ -29,7 +29,7 @@ export const OrganizationProvider = (
     }
   }, [props.value.v.organization]);
 
-  return <OrganizationContext.Provider {...props} />;
+  return <OrganizationContext {...props} />;
 };
 export const useOrganization = () => useContext(OrganizationContext).v;
 

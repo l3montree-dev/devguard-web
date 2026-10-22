@@ -3,7 +3,7 @@
 
 import { fetchAssetVersion } from "@/data-fetcher/fetchAssetVersion";
 import React, { Suspense } from "react";
-import { AssetVersionProvider } from "../../../../../../../../../context/AssetVersionContext";
+import { AssetVersionContext } from "../../../../../../../../../context/AssetVersionContext";
 import { ClientContextWrapper } from "../../../../../../../../../context/ClientContextWrapper";
 import { fetchArtifacts } from "../../../../../../../../../data-fetcher/fetchArtifacts";
 import { handleHttpError } from "../../../../../../../../../data-fetcher/handleHttpError";
@@ -67,7 +67,7 @@ async function AssetVersionShell({
 
   return (
     <ClientContextWrapper
-      Provider={AssetVersionProvider}
+      Context={AssetVersionContext}
       value={{
         artifacts,
         assetVersion,
