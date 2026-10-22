@@ -5,38 +5,24 @@
 
 import { useConfig } from "@/context/ConfigContext";
 import { useIsSelfHosted } from "@/hooks/useIsSelfHosted";
-import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ShieldCheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useState, useSyncExternalStore } from "react";
+import { Portal } from "@radix-ui/react-portal";
 import { Button } from "../ui/button";
-
-const STORAGE_KEY = "devguard:enterpriseTeaserDismissed";
-
-const subscribe = () => () => {};
-const getStoredDismissed = () => readLocalStorage(STORAGE_KEY) === "true";
-const getServerDismissed = () => true;
 
 export default function EnterpriseTeaser() {
   const { enterpriseUrl } = useConfig();
   const isSelfHosted = useIsSelfHosted();
-  const storedDismissed = useSyncExternalStore(
-    subscribe,
-    getStoredDismissed,
-    getServerDismissed,
+  const [dismissed, setDismissed] = useLocalStorage(
+    "devguard:enterpriseTeaserDismissed",
   );
-  const [dismissed, setDismissed] = useState(false);
 
-  const dismiss = () => {
-    writeLocalStorage(STORAGE_KEY, "true");
-    setDismissed(true);
-  };
-
-  if (!isSelfHosted || storedDismissed || dismissed) {
+  if (!isSelfHosted || dismissed === "true") {
     return null;
   }
 
   return (
-    <div className="fixed bottom-4 left-4 z-40 w-72 rounded-lg border border-border bg-card p-4 text-card-foreground">
+    <Portal className="fixed bottom-4 left-4 z-40 w-72 rounded-lg border border-border bg-card p-4 text-card-foreground">
       <div className="mb-2 flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <ShieldCheckIcon className="h-4 w-4" />
@@ -44,7 +30,7 @@ export default function EnterpriseTeaser() {
         </span>
         <button
           type="button"
-          onClick={dismiss}
+          onClick={() => setDismissed("true")}
           aria-label="Dismiss enterprise teaser"
           className="cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
         >
@@ -65,6 +51,6 @@ export default function EnterpriseTeaser() {
           Learn more
         </a>
       </Button>
-    </div>
+    </Portal>
   );
 }
