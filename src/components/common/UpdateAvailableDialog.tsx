@@ -3,11 +3,8 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { useApiQuery } from "@/hooks/useApiQuery";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { checkForUpdate, toMinorVersion } from "@/services/versionCheck";
-import type { VersionCheckResult } from "@/types/view/admin";
 import {
   Dialog,
   DialogContent,
@@ -25,43 +22,40 @@ import {
   ArrowRightIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
+import { useApiQueryWithTransformer } from "../../hooks/useApiQuery";
 
 const SHOWN_PAIR_KEY = "devguard-update-dialog-shown";
 
 export default function UpdateAvailableDialog() {
   const currentUser = useCurrentUser();
-  const { data: info } = useApiQuery(currentUser ? "/info" : null);
-  const instanceVersion = info?.build.version;
+  const { data: check } = useApiQueryWithTransformer(
+    currentUser ? "/info" : null,
+    async (info) => {
+      const instanceVersion = info.build.version;
+      const result = await checkForUpdate(instanceVersion, "minor");
 
-  const [check, setCheck] = useState<VersionCheckResult | null>(null);
+      return {
+        result,
+        instanceVersion,
+        currentPair:
+          toMinorVersion(instanceVersion) +
+          "->" +
+          toMinorVersion(result.latestVersion),
+      };
+    },
+  );
+
   const [shownPair, storeShownPair] = useLocalStorage(SHOWN_PAIR_KEY);
 
-  useEffect(() => {
-    if (!instanceVersion) return;
-    let ignore = false;
-    checkForUpdate(instanceVersion, "minor")
-      .then((result) => {
-        if (!ignore) setCheck(result);
-      })
-      .catch(() => {});
-    return () => {
-      ignore = true;
-    };
-  }, [instanceVersion]);
+  if (!check) return null;
 
-  if (!check || !instanceVersion) return null;
-
-  const currentPair =
-    toMinorVersion(instanceVersion) +
-    "->" +
-    toMinorVersion(check.latestVersion);
-  const open = check.updateAvailable && shownPair !== currentPair;
+  const open = check.result.updateAvailable && shownPair !== check.currentPair;
 
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
-        if (!next) storeShownPair(currentPair);
+        if (!next) storeShownPair(check.currentPair);
       }}
     >
       <DialogContent className="max-w-md">
@@ -82,7 +76,7 @@ export default function UpdateAvailableDialog() {
               Your version
             </span>
             <Badge variant="yellow" className="font-mono text-sm">
-              {instanceVersion}
+              {check.instanceVersion}
             </Badge>
           </div>
           <ArrowRightIcon className="mt-6 h-4 w-5 shrink-0 text-muted-foreground" />
@@ -91,14 +85,18 @@ export default function UpdateAvailableDialog() {
               Latest version
             </span>
             <Badge variant="success" className="font-mono text-sm">
-              {check.latestVersion}
+              {check.result.latestVersion}
             </Badge>
           </div>
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="secondary" className="flex-1" asChild>
-            <a href={check.latestUrl} target="_blank" rel="noopener noreferrer">
+            <a
+              href={check.result.latestUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               View release notes
               <ArrowTopRightOnSquareIcon className="ml-2 h-4 w-4 -translate-y-0.25" />
             </a>
