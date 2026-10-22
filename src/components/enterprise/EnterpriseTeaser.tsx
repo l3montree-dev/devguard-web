@@ -7,7 +7,6 @@ import { useConfig } from "@/context/ConfigContext";
 import { useIsSelfHosted } from "@/hooks/useIsSelfHosted";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { ShieldCheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Portal } from "@radix-ui/react-portal";
 import { Button } from "../ui/button";
 
 export default function EnterpriseTeaser() {
@@ -17,12 +16,12 @@ export default function EnterpriseTeaser() {
     "devguard:enterpriseTeaserDismissed",
   );
 
-  if (!isSelfHosted || dismissed === "true") {
+  if (!isSelfHosted || dismissed !== null) {
     return null;
   }
 
   return (
-    <Portal className="fixed bottom-4 left-4 z-40 w-72 rounded-lg border border-border bg-card p-4 text-card-foreground">
+    <div className="fixed bottom-4 left-4 z-40 w-72 rounded-lg border border-border bg-card p-4 text-card-foreground">
       <div className="mb-2 flex items-center justify-between">
         <span className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <ShieldCheckIcon className="h-4 w-4" />
@@ -51,6 +50,6 @@ export default function EnterpriseTeaser() {
           Learn more
         </a>
       </Button>
-    </Portal>
+    </div>
   );
 }
