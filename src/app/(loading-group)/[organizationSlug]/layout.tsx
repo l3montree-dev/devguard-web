@@ -4,6 +4,7 @@
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import React, { Suspense } from "react";
 import OrgHeader from "@/components/common/OrgHeader";
+import UpdateAvailableDialog from "@/components/common/UpdateAvailableDialog";
 import { ClientContextWrapper } from "../../../context/ClientContextWrapper";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
 import { fetchOrganization } from "../../../data-fetcher/fetchOrganization";
@@ -54,6 +55,7 @@ async function OrganizationShell({
       }}
     >
       <OrgHeader />
+      <UpdateAvailableDialog />
       {children}
     </ClientContextWrapper>
   );
