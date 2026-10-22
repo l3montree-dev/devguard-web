@@ -31,6 +31,9 @@ if (!config.errorTrackingDsn) {
       return event;
     },
 
-    sendDefaultPii: false,
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+    },
   });
 }
