@@ -5,10 +5,9 @@
 
 import CodeEditor from "@/components/common/CodeEditor";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ProxyScope } from "@/hooks/useDependencyProxy";
 import { useDependencyProxy } from "@/hooks/useDependencyProxy";
 import { toast } from "@/lib/toast";
@@ -19,110 +18,14 @@ import CopyCode, { CopyCodeFragment } from "./CopyCode";
 import Callout from "./Callout";
 import { DocDrawer } from "./DocDrawer";
 
-function matchPattern(pattern: string, packagePurl: string): boolean {
-  const parts = pattern.split("*");
-  if (parts.length === 1) {
-    return packagePurl === pattern;
-  }
-  if (parts[0] !== "" && !packagePurl.startsWith(parts[0])) {
-    return false;
-  }
-  if (
-    parts[parts.length - 1] !== "" &&
-    !packagePurl.endsWith(parts[parts.length - 1])
-  ) {
-    return false;
-  }
-  let rest = packagePurl;
-  for (const part of parts) {
-    if (part === "") continue;
-    const idx = rest.indexOf(part);
-    if (idx === -1) return false;
-    rest = rest.slice(idx + part.length);
-  }
-  return true;
-}
-
-import type {
-  CheckResult,
-  DependencyProxyConfig,
-} from "@/types/view/dependencyProxy";
-
-function checkRulesAgainstPackages(
-  rulesText: string,
-  checkerRulesText: string,
-): CheckResult[] {
-  const rules = rulesText
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l !== "" && !l.startsWith("#"));
-
-  const packages = checkerRulesText
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l !== "" && !l.startsWith("#"));
-
-  return packages.map((packagePurl) => {
-    let blocked = false;
-    let matchedRule = "";
-
-    for (const rule of rules) {
-      const negate = rule.startsWith("!");
-      const pattern = negate ? rule.slice(1) : rule;
-      const matched = matchPattern(pattern, packagePurl);
-      if (matched) {
-        blocked = !negate;
-        matchedRule = rule;
-      }
-    }
-
-    return { packagePurl, blocked, matchedRule };
-  });
-}
-
-const defaultConfig: DependencyProxyConfig = {
-  rules: "",
-  minReleaseAge: 60,
-};
-
-const upstreamRegistries: Record<string, { key: string; defaultUrl: string }> =
-  {
-    npm: {
-      key: "npm",
-      defaultUrl: "https://registry.npmjs.org",
-    },
-    go: {
-      key: "go",
-      defaultUrl: "https://proxy.golang.org",
-    },
-    pypi: {
-      key: "pypi",
-      defaultUrl: "https://pypi.org",
-    },
-    maven: {
-      key: "maven",
-      defaultUrl: "https://repo1.maven.org/maven2",
-    },
-    composer: {
-      key: "composer",
-      defaultUrl: "https://repo.packagist.org",
-    },
-    debian: {
-      key: "deb",
-      defaultUrl: "http://deb.debian.org",
-    },
-  };
-
-const cleanRegistries = (registries: Record<string, string>) =>
-  Object.fromEntries(
-    Object.entries(registries)
-      .map(([key, value]) => [key, value.trim()] as const)
-      .filter(([, value]) => value !== ""),
-  );
-
-const sameRegistries = (a: Record<string, string>, b: Record<string, string>) =>
-  Object.keys(a).length === Object.keys(b).length &&
-  Object.keys(a).every((key) => a[key] === b[key]);
+const defaultConfig = `rules:
+  - name: min-release-age
+    action: deny
+    # OCI images have no release time to check here
+    expr: pkg.ecosystem != "oci" && now() - timestamp(pkg.releasedAt) < duration("120h")
+# registries:
+#   npm: https://nexus.example.com/repository/npm/
+`;
 
 const ecosystemIcons: Record<string, string> = {
   npm: "/logos/npm-svgrepo-com.svg",
@@ -262,8 +165,10 @@ default = true`}
             declared in your <code className="font-mono text-sm">pom.xml</code>{" "}
             bypass the proxy. To route them through the proxy as well, add them
             to <code className="font-mono text-sm">mirrorOf</code> and set an
-            upstream registry below that serves all of them, for example a Nexus
-            or Artifactory group repository.
+            upstream registry under{" "}
+            <code className="font-mono text-sm">registries</code> in the proxy
+            configuration that serves all of them, for example a Nexus or
+            Artifactory group repository.
           </Callout>
         </div>
       );
@@ -399,44 +304,18 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
   const { config: data, proxyUrls, saveConfig } = useDependencyProxy(scope);
 
   const [rulesText, setRulesText] = useState("");
-  const [minReleaseAge, setMinReleaseAge] = useState(
-    defaultConfig.minReleaseAge,
-  );
-  const [registries, setRegistries] = useState<Record<string, string>>({});
   const [codeError, setCodeError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [rulesHelpOpen, setRulesHelpOpen] = useState(false);
-  const [rulesCheckerOpen, setRulesCheckerOpen] = useState(false);
   const scopeKey = scope ? JSON.stringify(scope) : null;
   const initializedForScope = useRef<string | null | undefined>(undefined);
 
   const [proxyTab, setSelectedProxyTab] = useState("");
   const selectedProxyTab = proxyTab || Object.keys(proxyUrls ?? {})[0] || "";
 
-  const [checkerRulesText, setCheckerRulesText] = useState(
-    "# Example package URLs to test against the rules: \n" +
-      "# You can add new ones or modify these to test your rules.\n" +
-      "\n" +
-      "pkg:pypi/requests@2.25.1" +
-      "\n" +
-      "pkg:npm/lodash@4.17.21" +
-      "\n" +
-      "pkg:go/github.com/lodash/lodash@v1.0.0",
-  );
-  const checkResults: CheckResult[] = useMemo(
-    () =>
-      checkerRulesText.trim()
-        ? checkRulesAgainstPackages(rulesText, checkerRulesText)
-        : [],
-    [rulesText, checkerRulesText],
-  );
-
   useEffect(() => {
     if (data !== undefined && initializedForScope.current !== scopeKey) {
-      const config = data ?? defaultConfig;
-      setRulesText(config.rules);
-      setMinReleaseAge(config.minReleaseAge);
-      setRegistries(config.registries ?? {});
+      setRulesText(data ?? defaultConfig);
       initializedForScope.current = scopeKey;
     }
   }, [data, scopeKey]);
@@ -456,28 +335,17 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
     }
   };
 
-  const savedConfig = data ?? defaultConfig;
-  const cleanedRegistries = cleanRegistries(registries);
-  const isUnchanged =
-    rulesText === savedConfig.rules &&
-    minReleaseAge === savedConfig.minReleaseAge &&
-    sameRegistries(cleanedRegistries, savedConfig.registries ?? {});
-  const hasInvalidRegistry = Object.values(cleanedRegistries).some(
-    (value) => !/^https?:\/\/\S+$/.test(value),
-  );
-  const upstream = upstreamRegistries[selectedProxyTab];
-
   const handleSave = async () => {
     if (!scope) return;
     setIsSaving(true);
     try {
-      await saveConfig({
-        rules: rulesText,
-        minReleaseAge,
-        registries: cleanedRegistries,
-      });
-    } catch {
-      setCodeError("Failed to save dependency proxy settings");
+      await saveConfig(rulesText);
+    } catch (e) {
+      const message =
+        e instanceof Error
+          ? e.message
+          : "Failed to save dependency proxy settings";
+      setCodeError(message);
       toast.error("Failed to save dependency proxy settings");
       return;
     } finally {
@@ -538,8 +406,8 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
         </Section>
         <Section
           forceVertical={forceVertical}
-          description="Define rules for blocking packages using gitignore-style patterns. Each line is one rule, applied top to bottom."
-          title="Blocked Packages Rules"
+          description="Define allow and deny rules as CEL expressions in YAML. Rules are evaluated top to bottom and the last matching rule wins. Packages that match no rule are allowed."
+          title="Package Rules"
         >
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between">
@@ -552,68 +420,71 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
                 >
                   {rulesHelpOpen ? "Hide examples" : "Show examples"}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setRulesCheckerOpen((v) => !v)}
+                <a
+                  href="https://docs.devguard.org/how-to-guides/dependency-proxy/package-rules/"
+                  target="_blank"
                   className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
                 >
-                  {rulesCheckerOpen ? "Hide tester" : "Test your rules"}
-                </button>
+                  Learn more about CEL rules
+                </a>
               </div>
             </div>
             {rulesHelpOpen && (
               <div className="mt-2 flex flex-col gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
+                <p>
+                  Available fields: <code className="font-mono">pkg.name</code>,{" "}
+                  <code className="font-mono">pkg.version</code>,{" "}
+                  <code className="font-mono">pkg.ecosystem</code> (npm, go,
+                  pypi, maven, composer, deb, oci),{" "}
+                  <code className="font-mono">pkg.purl</code>,{" "}
+                  <code className="font-mono">pkg.registry</code>,{" "}
+                  <code className="font-mono">pkg.releasedAt</code> and, for npm
+                  only, <code className="font-mono">pkg.publisher.name</code>{" "}
+                  and{" "}
+                  <code className="font-mono">
+                    pkg.publisher.changedSinceLastVersion
+                  </code>
+                  .
+                </p>
                 {[
                   {
-                    pattern: "npm/lodash@1.17.21",
-                    desc: "Blocks exactly one specific version.",
+                    pattern:
+                      'now() - timestamp(pkg.releasedAt) < duration("120h")',
+                    desc: "Matches packages released less than 5 days ago.",
+                    example: "action: deny → blocks fresh releases",
+                  },
+                  {
+                    pattern: 'pkg.name == "lodash"',
+                    desc: "Matches one package by name, in every version.",
                     example:
-                      "npm/lodash@4.17.21 → only that version is blocked",
+                      "action: allow after a deny rule → exception for lodash",
                   },
                   {
-                    pattern: "npm/lodash*",
-                    desc: "Blocks all versions matching a prefix.",
+                    pattern: 'pkg.name.startsWith("@evil-scope/")',
+                    desc: "Matches every package of an npm scope.",
                     example:
-                      "npm/lodash* → blocks npm/lodash@4.17.21, npm/lodash@5.0.0, …",
+                      "action: deny → blocks @evil-scope/foo, @evil-scope/bar, …",
                   },
                   {
-                    pattern: "npm/lodash@4.*",
-                    desc: "Blocks all versions matching a version prefix.",
-                    example:
-                      "npm/lodash@4.* → blocks npm/lodash@4.0.0, npm/lodash@4.17.21, …",
+                    pattern: 'pkg.purl == "pkg:npm/lodash@4.17.21"',
+                    desc: "Matches exactly one version.",
+                    example: "action: deny → only lodash 4.17.21 is blocked",
                   },
                   {
-                    pattern: "*lodash*",
-                    desc: "Blocks any package with lodash in its name, regardless of ecosystem or version.",
-                    example:
-                      "*lodash* → matches npm/lodash@4.17.21, go/lodash@v1.0.0, …",
+                    pattern: 'pkg.ecosystem == "pypi"',
+                    desc: "Matches every package of one ecosystem.",
+                    example: "action: deny → blocks all PyPI packages",
                   },
                   {
-                    pattern: "npm*lodash@1.17.21",
-                    desc: "Wildcards can be combined to match specific patterns.",
-                    example:
-                      "npm*lodash → matches npm/frontend/lodash@4.17.21 but not go/lodash@v1.17.21",
+                    pattern:
+                      "has(pkg.publisher) && pkg.publisher.changedSinceLastVersion",
+                    desc: "Matches npm versions published by a different user than the previous version.",
+                    example: "action: deny → blocks possible account takeovers",
                   },
                   {
-                    pattern: "*",
-                    desc: "Blocks every package in every ecosystem.",
-                    example: "* → all packages are blocked",
-                  },
-                  {
-                    pattern: "!*lodash*",
-                    desc: "Negation with ! allows a package even if a previous rule blocked it.",
-                    example:
-                      "* then !*lodash* → everything blocked except lodash",
-                  },
-                  {
-                    pattern: "!*",
-                    desc: "Allows every package — overrides all previous block rules.",
-                    example: "* then !* → nothing is blocked in the end",
-                  },
-                  {
-                    pattern: "# comment",
-                    desc: "Lines starting with # are ignored.",
-                    example: "# block dangerous packages",
+                    pattern: "'!has(pkg.releasedAt) || …'",
+                    desc: "has() checks whether a field exists. Without it, a rule on a missing field fails and the package is blocked. Quote expressions that start with !.",
+                    example: "OCI images have no release time",
                   },
                 ].map(({ pattern, desc, example }) => (
                   <div key={pattern} className="flex flex-col gap-0.5">
@@ -630,43 +501,6 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
                 ))}
               </div>
             )}
-            {rulesCheckerOpen && (
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <p className="mb-1 text-sm text-muted-foreground">
-                  Test your rules by entering package URLs (one per line) in the
-                  box below.
-                </p>
-                <CodeEditor
-                  value={checkerRulesText}
-                  language="purl"
-                  onChange={setCheckerRulesText}
-                />
-
-                {checkResults.length > 0 && (
-                  <div className="rounded-md border bg-muted/40 p-2 font-mono text-xs">
-                    {checkResults.map(
-                      ({ packagePurl, blocked, matchedRule }) => (
-                        <div
-                          key={packagePurl}
-                          className={
-                            blocked ? "text-destructive" : "text-success"
-                          }
-                        >
-                          {packagePurl}
-                          {matchedRule && (
-                            <span className="opacity-60">
-                              {" # "}
-                              {blocked ? "blocked" : "allowed"} by &quot;
-                              {matchedRule}&quot;
-                            </span>
-                          )}
-                        </div>
-                      ),
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
           <div className="flex flex-col gap-4 md:flex-row pb-6">
             <div className="min-w-0 flex-1">
@@ -677,14 +511,13 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
               </div>
               <CodeEditor
                 value={rulesText}
-                language="dependencyProxyRule"
+                language="yaml"
                 onChange={setRulesText}
                 onValidation={handleEditorValidation}
                 onSave={
                   codeError ||
                   isSaving ||
-                  isUnchanged ||
-                  hasInvalidRegistry ||
+                  rulesText === (data ?? defaultConfig) ||
                   data === undefined
                     ? undefined
                     : handleSave
@@ -694,83 +527,6 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
           </div>
           {codeError && <p className="text-sm text-destructive">{codeError}</p>}
         </Section>
-        <Section
-          forceVertical={forceVertical}
-          title="Cooldown Period"
-          description="Set a cooldown period in hours that enforces a minimum time between when a new package version is released and when it can be downloaded through the proxy. "
-        >
-          <div>
-            <span className="text-sm mb-2 block font-medium">
-              Minimum release age
-            </span>
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min={0}
-                variant="onCard"
-                className="w-24"
-                value={minReleaseAge}
-                onChange={(e) =>
-                  setMinReleaseAge(Math.max(0, Number(e.target.value) || 0))
-                }
-              />
-              <span className="whitespace-nowrap text-sm text-muted-foreground">
-                hours
-              </span>
-            </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              In major supply chain incidents—such as the 2026 axios
-              compromise—malicious versions were identified and marked as
-              deprecated within a few hours. Deprecation is a common
-              registry-level mitigation used to discourage further installs.
-            </p>
-          </div>
-        </Section>
-        <Section
-          title="Upstream Registry"
-          description="Replace the public registry the proxy fetches packages from, for example with a private Nexus or Artifactory repository. Leave the field empty to use the public default."
-        >
-          <div className="flex flex-1 flex-col gap-4">
-            {upstream ? (
-              <div>
-                <span className="text-sm mb-2 flex items-center font-medium capitalize">
-                  {ecosystemIcons[selectedProxyTab] && (
-                    <Image
-                      src={ecosystemIcons[selectedProxyTab]}
-                      alt=""
-                      width={16}
-                      height={16}
-                      className="mr-1 inline-block h-4 w-4"
-                    />
-                  )}
-                  {selectedProxyTab} Registry URL
-                </span>
-                <Input
-                  type="url"
-                  variant="onCard"
-                  placeholder={upstream.defaultUrl}
-                  value={registries[upstream.key] ?? ""}
-                  onChange={(e) =>
-                    setRegistries((current) => ({
-                      ...current,
-                      [upstream.key]: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                OCI images are pulled from the registry named in the image
-                reference, so no upstream registry can be configured.
-              </p>
-            )}
-            {hasInvalidRegistry && (
-              <p className="text-sm text-destructive">
-                Registry URLs must start with http:// or https://.
-              </p>
-            )}
-          </div>
-        </Section>
         <div className="sticky bottom-0 flex justify-end pt-2">
           <Button
             onClick={handleSave}
@@ -778,8 +534,7 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
               isSaving ||
               data === undefined ||
               !!codeError ||
-              isUnchanged ||
-              hasInvalidRegistry
+              rulesText === (data ?? defaultConfig)
             }
           >
             {isSaving ? "Saving..." : "Save"}
