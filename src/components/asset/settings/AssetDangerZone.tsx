@@ -43,7 +43,7 @@ const AssetDangerZone = () => {
         <div className={classNames(!project.isPublic && "opacity-50")}>
           <ListItem
             Title="Public Repository"
-            Description="Setting this to true will make the repository visible to the public."
+            Description={`Setting this to true will make the ${asset.name} repository visible to the public.`}
             Button={
               <Switch
                 data-testid="publish-repo-switch"

@@ -45,7 +45,7 @@ const OrgDangerZone = () => {
       <div className="flex flex-col gap-4">
         <ListItem
           Title="Public Organization"
-          Description="Setting this to true will make the organization visible to the public. Only projects that are public become visible, private projects stay visible to members of the organization only."
+          Description={`Setting this to true will make the ${org.name} organization visible to the public. Only projects that are public become visible, private projects stay visible to members of the organization only.`}
           Button={
             <Switch
               data-testid="public-org-switch"

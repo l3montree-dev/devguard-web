@@ -53,7 +53,8 @@ const ProjectDangerZone = () => {
         <div className={classNames(!org.isPublic && "opacity-50")}>
           <ListItem
             Title="Public Group"
-            Description="Setting this to true will make the group visible to the public. It allows creating public and private assets."
+            Description={`Setting this to true will make the ${project.name} group visible to the public. This enables you to make public repositories inside this group that can be accessed by users that are not members of the ${org.name} organization. Turning this on does not make all repositories inside this group public, you can enable this in each repository individually in their respective settings.`}
+            //Callout oder InfoIcon
             Button={
               <Switch
                 data-testid="public-group-switch"
