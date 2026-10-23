@@ -11,7 +11,7 @@ import type { ReactNode } from "react";
 import useDecodedParams from "../../hooks/useDecodedParams";
 import UserNav from "../navigation/UserNav";
 import EntityProviderImage from "./EntityProviderImage";
-import dynamic from "next/dynamic";
+import OrganizationDropDown from "../OrganizationDropDown";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,10 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-
-const OrganizationDropDown = dynamic(() => import("../OrganizationDropDown"), {
-  ssr: false,
-});
 
 const levelMapping: { [idx: number]: string } = {
   1: "root",

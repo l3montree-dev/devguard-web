@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const readLocalStorage = (key: string) => {
   if (typeof window === "undefined") return null;
@@ -32,7 +32,12 @@ export const removeLocalStorage = (key: string) => {
 };
 
 export const useLocalStorage = (key: string) => {
-  const [value, setValue] = useState(() => readLocalStorage(key));
+  const [value, setValue] = useState<string | null>();
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setValue(readLocalStorage(key));
+  }, [key]);
 
   const store = useCallback(
     (next: string) => {
