@@ -11,19 +11,19 @@ import type { WithUpdater } from "@/types/view/context";
 export const NoopUpdater = () => {};
 interface ClientContextWrapperProps<T = any> {
   children: ReactNode;
-  Provider: ComponentType<{ value: WithUpdater<T>; children: ReactNode }>;
+  Context: ComponentType<{ value: WithUpdater<T>; children: ReactNode }>;
   value: Omit<T, "update">;
 }
 
 export function ClientContextWrapper<T>({
   children,
-  Provider,
+  Context,
   value,
 }: ClientContextWrapperProps<T>) {
   const [state, update] = useState(value);
 
   return (
-    <Provider
+    <Context
       value={
         {
           v: state as T,
@@ -32,6 +32,6 @@ export function ClientContextWrapper<T>({
       }
     >
       {children}
-    </Provider>
+    </Context>
   );
 }
