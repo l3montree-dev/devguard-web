@@ -155,7 +155,7 @@ const OrgIntegrationsSettings = () => {
                   "!text-primary-foreground hover:no-underline",
                 )}
                 href={
-                  `https://github.com/apps/${config.devguardGithubAppUrl}/installations/new?state=` +
+                  `https://github.com/apps/${config.devguardGithubAppName}/installations/new?state=` +
                   encodeObjectBase64({
                     orgSlug: org.slug,
                     redirectTo: pathname || "/",

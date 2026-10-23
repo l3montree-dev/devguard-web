@@ -11,13 +11,13 @@ import { autocompletion } from "@codemirror/autocomplete";
 import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { vscodeDarkInit, vscodeLight } from "@uiw/codemirror-theme-vscode";
-import jsYaml from "js-yaml";
 import tomlParser from "@iarna/toml";
 import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { StreamLanguage } from "@codemirror/language";
 import { toml } from "@codemirror/legacy-modes/mode/toml";
 import { javascript } from "@codemirror/legacy-modes/mode/javascript";
+import { load, YAMLException } from "js-yaml";
 import { keymap, placeholder as placeholderExtension } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { cn } from "@/lib/utils";
@@ -48,10 +48,10 @@ function tomlParseLinter() {
 function yamlParseLinter() {
   return (view: EditorView): Diagnostic[] => {
     try {
-      jsYaml.load(view.state.doc.toString());
+      load(view.state.doc.toString());
       return [];
     } catch (e) {
-      if (e instanceof jsYaml.YAMLException) {
+      if (e instanceof YAMLException) {
         const pos = e.mark?.position ?? 0;
         return [{ from: pos, to: pos, severity: "error", message: e.reason }];
       }

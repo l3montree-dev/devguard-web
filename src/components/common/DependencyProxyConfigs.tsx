@@ -23,6 +23,8 @@ const defaultConfig = `rules:
     action: deny
     # OCI images have no release time to check here
     expr: pkg.ecosystem != "oci" && now() - timestamp(pkg.releasedAt) < duration("120h")
+# registries:
+#   npm: https://nexus.example.com/repository/npm/
 `;
 
 const ecosystemIcons: Record<string, string> = {
@@ -161,7 +163,12 @@ default = true`}
             <code className="font-mono text-sm">mirrorOf</code> only redirects
             Maven Central. Dependencies resolved from other repositories
             declared in your <code className="font-mono text-sm">pom.xml</code>{" "}
-            bypass the proxy unless you list them as well.
+            bypass the proxy. To route them through the proxy as well, add them
+            to <code className="font-mono text-sm">mirrorOf</code> and set an
+            upstream registry under{" "}
+            <code className="font-mono text-sm">registries</code> in the proxy
+            configuration that serves all of them, for example a Nexus or
+            Artifactory group repository.
           </Callout>
         </div>
       );

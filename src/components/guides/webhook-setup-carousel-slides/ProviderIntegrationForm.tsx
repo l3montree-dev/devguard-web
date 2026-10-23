@@ -4,6 +4,7 @@
 import GitLabIntegrationForm from "@/components/common/GitLabIntegrationForm";
 import JiraIntegrationForm from "@/components/common/JiraIntegrationForm";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { useConfig } from "@/context/ConfigContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
@@ -35,6 +36,7 @@ export default function ProviderIntegrationForm({
 }: ProviderIntegrationFormProps) {
   const activeOrg = useActiveOrg();
   const updateOrganization = useUpdateOrganization();
+  const config = useConfig();
 
   const handleNewGitLabIntegration = (integration: GitLabIntegrationDTO) => {
     updateOrganization((prev) => ({
@@ -82,7 +84,7 @@ export default function ProviderIntegrationForm({
               "hover:no-underline mt-6",
             )}
             href={
-              "https://github.com/apps/devguard-bot/installations/new?state=" +
+              `https://github.com/apps/${config.devguardGithubAppName}/installations/new?state=` +
               encodeObjectBase64({
                 orgSlug: activeOrg.slug,
                 redirectTo: pathname,

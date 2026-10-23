@@ -41,9 +41,11 @@ export default function useAccessToken(
   });
 
   useEffect(() => {
-    const handleNewAccessToken = (accessToken: Token) => {
-      setAccessTokens((prev) => uniqBy([...prev, accessToken], "fingerprint"));
+    const handleNewAccessToken = (...tokens: Token[]) => {
+      setAccessTokens((prev) => uniqBy([...prev, ...tokens], "fingerprint"));
     };
+
+    handleNewAccessToken(...(existingAccessTokens ?? []));
 
     const stored = readSessionStorage(scopedAT);
     if (stored) {
@@ -56,7 +58,7 @@ export default function useAccessToken(
     return () => {
       newATEventEmitter.off(scopedAT, handleNewAccessToken);
     };
-  }, [scopedAT]);
+  }, [scopedAT, existingAccessTokens]);
 
   const handleDeleteAccessToken = async (accessToken: AccessTokenDTO) => {
     await apiFetch(`${baseUrl}${accessToken.id}/`, {
