@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const readLocalStorage = (key: string) => {
   if (typeof window === "undefined") return null;
@@ -31,28 +31,18 @@ export const removeLocalStorage = (key: string) => {
   }
 };
 
-// re-render callbacks of all mounted useLocalStorage hooks
-const listeners = new Set<() => void>();
-const subscribe = (listener: () => void) => {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-};
-
 export const useLocalStorage = (key: string) => {
-  // undefined on server and during hydration, the stored value afterwards
-  const value = useSyncExternalStore(
-    subscribe,
-    () => readLocalStorage(key),
-    () => undefined,
-  );
+  const [value, setValue] = useState<string | null>();
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setValue(readLocalStorage(key));
+  }, [key]);
 
   const store = useCallback(
     (next: string) => {
       writeLocalStorage(key, next);
-      // localStorage has no change event in the same tab, so notify manually
-      listeners.forEach((listener) => listener());
+      setValue(next);
     },
     [key],
   );
