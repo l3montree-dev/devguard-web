@@ -4,6 +4,18 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.17.1] — 2026-10-27
+
+### Changed
+
+- **Release workflow** — the GitHub release action was updated to `softprops/action-gh-release` v3.0.3
+
+### Fixed
+
+- **Affected branches/tags links** — links in the affected branches and tags overview now use the ref slug instead of the ref name, so refs with special characters (e.g. `feature/foo`) open the correct page
+
+---
+
 ## [v1.17.0] — 2026-10-26
 
 ### Added
