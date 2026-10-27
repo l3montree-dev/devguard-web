@@ -236,6 +236,8 @@ jobs:
       contents: read
       packages: write
       security-events: write
+      # the provenance and manifest jobs request an OIDC token to let devguard sign the SLSA build provenance
+      id-token: write
     with:
       nix-target-amd64: devguard-web-amd64
       nix-target-arm64: devguard-web-arm64
