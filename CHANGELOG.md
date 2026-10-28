@@ -4,6 +4,14 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.17.2] — 2026-10-28
+
+### Changed
+
+- **Release workflow** — the build workflow now requests the `id-token: write` permission so the provenance and manifest jobs can obtain an OIDC token for signing the SLSA build provenance
+
+---
+
 ## [v1.17.1] — 2026-10-27
 
 ### Changed
