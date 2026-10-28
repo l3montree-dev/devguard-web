@@ -32,19 +32,20 @@ export function AffectedBranchesTags({
   const project = useActiveProject();
   const asset = useActiveAsset();
 
-  const typeByRefName = useMemo(
-    () =>
-      Object.fromEntries(
-        (asset?.refs ?? []).map((ref) => [ref.name, ref.type]),
-      ),
+  const refByName = useMemo(
+    () => Object.fromEntries((asset?.refs ?? []).map((ref) => [ref.name, ref])),
     [asset?.refs],
   );
 
   const d = useMemo(
     () =>
       Object.entries(data)
-        .map(([refName, dist]) => ({ refName, dist }))
-        .filter(({ refName }) => typeByRefName[refName] === type)
+        .map(([refName, dist]) => ({
+          refName,
+          refSlug: refByName[refName]?.slug,
+          dist,
+        }))
+        .filter(({ refName }) => refByName[refName]?.type === type)
         .toSorted(
           (a, b) =>
             b.dist.critical - a.dist.critical ||
@@ -52,7 +53,7 @@ export function AffectedBranchesTags({
             b.dist.medium - a.dist.medium ||
             b.dist.low - a.dist.low,
         ),
-    [data, type, typeByRefName],
+    [data, type, refByName],
   );
 
   return (
@@ -98,7 +99,7 @@ export function AffectedBranchesTags({
             </div>
           ) : (
             d.slice(0, 5).map((item, i, arr) => {
-              const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${item.refName}`;
+              const href = `/${org?.slug}/projects/${project?.slug}/assets/${asset?.slug}/refs/${item.refSlug}`;
 
               return (
                 <Link

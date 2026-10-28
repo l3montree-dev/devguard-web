@@ -4,6 +4,56 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.17.2] — 2026-10-28
+
+### Changed
+
+- **Release workflow** — the build workflow now requests the `id-token: write` permission so the provenance and manifest jobs can obtain an OIDC token for signing the SLSA build provenance
+
+---
+
+## [v1.17.1] — 2026-10-27
+
+### Changed
+
+- **Release workflow** — the GitHub release action was updated to `softprops/action-gh-release` v3.0.3
+
+### Fixed
+
+- **Affected branches/tags links** — links in the affected branches and tags overview now use the ref slug instead of the ref name, so refs with special characters (e.g. `feature/foo`) open the correct page
+
+---
+
+## [v1.17.0] — 2026-10-26
+
+### Added
+
+- **Self-hosted GitHub integration** — GitHub Enterprise / self-hosted GitHub instances can now be connected as an integration
+- **Own registries for the dependency proxy** — the dependency proxy settings allow configuring your own registry URLs
+- **Update dialog** — a "please update" dialog informs you when a newer DevGuard version is available. The latest version is fetched from the DevGuard API only and cached server-side
+- **Assets with SBOM on the instance dashboard** — the instance dashboard shows the number of assets that have an SBOM
+- **Jira integrations in provider setup** — Jira integrations can be viewed and deleted in the provider setup
+- **Links to integrations and parent settings** — the connect-to-repository section links to the integrations page, and restricted visibility links to the parent settings
+
+### Changed
+
+- **Vulnerability auto-reopen and license refresh removed** — the automatic reopening of vulnerabilities and the license refresh were removed, along with the related e2e tests (those are now handled by vexrules)
+- **React context cleanup**
+- **Sentry v11** — migrated Sentry to v11
+- **Generated API client** — re-synced the generated API types, and the generated types are now used for vulnerability types
+- **Dependency updates** — all dependencies, Node.js and the Playwright image were updated; `react-hook-form` is pinned
+
+### Fixed
+
+- **Broken event links** — event links now point to the correct pages (advisory, dependency risks, code risks and compliance postures)
+- **Silent 404 loading state** — code risks check for errors before loading instead of showing a skeleton forever
+- **GitHub pipeline snippets** — working GitHub pipeline snippets are generated for all scan options
+- **Branch/tag selector** — the selected state is now derived from the ref
+- **Existing personal access tokens** — existing PATs are visible again
+- **Name length** — input names are limited to 256 characters
+
+---
+
 ## [v1.16.2] — 2026-10-12
 
 ### Added
