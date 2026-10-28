@@ -17,6 +17,8 @@ import Section from "./Section";
 import CopyCode, { CopyCodeFragment } from "./CopyCode";
 import Callout from "./Callout";
 import { DocDrawer } from "./DocDrawer";
+import { DelayedDownloadButton } from "./DelayedDownloadButton";
+import { DownloadIcon } from "lucide-react";
 
 const defaultConfig = `rules:
   - name: min-release-age
@@ -245,11 +247,28 @@ default = true`}
         <div>
           <InputWithButton
             label="Debian Repository URL"
-            message="Replace the URIs in /etc/apt/sources.list.d/debian.sources with this URL to route apt downloads through the dependency proxy."
+            message="Replace the URIs in /etc/apt/sources.list.d/debian.sources with this URL to route apt downloads through the dependency proxy. Supported are trixie and bookworm including their -updates and -security suites, component main, architectures amd64 and arm64."
             value={url}
             nameKey="deb-proxy-url"
             copyable
           />
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">Signing key</span>
+            <p className="mb-2 text-muted-foreground">
+              The proxy rewrites the package index and signs it with its own
+              key. apt only trusts the proxy if this key is installed.
+            </p>
+            <CopyCodeFragment
+              codeString={`curl -fsSL ${url}/devguard-deb-keyring.asc -o /etc/apt/keyrings/devguard.asc`}
+            />
+            <DelayedDownloadButton
+              className="mt-2"
+              href={`${url}/devguard-deb-keyring.asc`}
+              downloadFileName="devguard.asc"
+              icon={<DownloadIcon className="h-4 w-4" />}
+              label="Download signing key"
+            />
+          </div>
           <div className="my-4 text-sm">
             <span className="font-medium mb-1 block">
               Example /etc/apt/sources.list.d/debian.sources
@@ -260,24 +279,35 @@ default = true`}
 URIs: ${url}
 Suites: trixie trixie-updates
 Components: main
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+Signed-By: /etc/apt/keyrings/devguard.asc
 
 Types: deb
 URIs: ${url}-security
 Suites: trixie-security
 Components: main
-Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg`}
+Signed-By: /etc/apt/keyrings/devguard.asc`}
             />
           </div>
-          <Callout intent="warning">
-            apt verifies the signed repository metadata, so the proxy cannot
-            hide blocked or too new versions. apt fails with a 403 when it tries
-            to download them. Pin an allowed version explicitly, for example{" "}
-            <code className="font-mono text-sm">
-              apt-get install curl=&lt;version&gt;
-            </code>
-            .
+          <Callout intent="info">
+            Versions blocked by your rules are replaced in the package index
+            with the newest allowed version, so{" "}
+            <code className="font-mono text-sm">apt-get install</code> picks an
+            allowed version automatically. Rule changes can take up to 30
+            minutes to show up in the index.
           </Callout>
+          <div className="mt-4">
+            <Callout intent="warning">
+              If you set your own registry under{" "}
+              <code className="font-mono text-sm">registries.deb</code>, release
+              times are only known for packages that also exist in the official
+              Debian repository. All other packages get{" "}
+              <code className="font-mono text-sm">pkg.releasedAt</code> set to
+              now, so rules on the release time block them. Adjust your CEL
+              rules for these packages, for example with an allow rule on{" "}
+              <code className="font-mono text-sm">pkg.name</code> or{" "}
+              <code className="font-mono text-sm">pkg.registry</code>.
+            </Callout>
+          </div>
         </div>
       );
     }
