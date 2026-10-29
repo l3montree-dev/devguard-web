@@ -127,24 +127,24 @@ export function VulnerableComponents({
                         <div className="flex flex-row flex-wrap gap-2">
                           <CVERainbowBadge
                             low={
-                              mode === "risk"
-                                ? item.risk.low
-                                : item.risk.lowCvss
+                              (mode === "risk"
+                                ? item.risk?.low?.length
+                                : item.risk?.lowCvss?.length) ?? 0
                             }
                             medium={
-                              mode === "risk"
-                                ? item.risk.medium
-                                : item.risk.mediumCvss
+                              (mode === "risk"
+                                ? item.risk?.medium?.length
+                                : item.risk?.mediumCvss?.length) ?? 0
                             }
                             high={
-                              mode === "risk"
-                                ? item.risk.high
-                                : item.risk.highCvss
+                              (mode === "risk"
+                                ? item.risk?.high?.length
+                                : item.risk?.highCvss?.length) ?? 0
                             }
                             critical={
-                              mode === "risk"
-                                ? item.risk.critical
-                                : item.risk.criticalCvss
+                              (mode === "risk"
+                                ? item.risk?.critical?.length
+                                : item.risk?.criticalCvss?.length) ?? 0
                             }
                           />
                         </div>
