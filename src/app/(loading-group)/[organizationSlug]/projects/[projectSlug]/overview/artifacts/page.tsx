@@ -60,17 +60,17 @@ const columnsDef: TableColumnDef<
           <div className="w-fit">
             {mode === "risk" ? (
               <CVERainbowBadge
-                low={row.row.original.risk.cvePurlLow}
-                medium={row.row.original.risk.cvePurlMedium}
-                high={row.row.original.risk.cvePurlHigh}
-                critical={row.row.original.risk.cvePurlCritical}
+                low={row.row.original.risk.cvePurlLow.length}
+                medium={row.row.original.risk.cvePurlMedium.length}
+                high={row.row.original.risk.cvePurlHigh.length}
+                critical={row.row.original.risk.cvePurlCritical.length}
               />
             ) : (
               <CVERainbowBadge
-                low={row.row.original.risk.cvePurlLowCvss}
-                medium={row.row.original.risk.cvePurlMediumCvss}
-                high={row.row.original.risk.cvePurlHighCvss}
-                critical={row.row.original.risk.cvePurlCriticalCvss}
+                low={row.row.original.risk.cvePurlLowCvss.length}
+                medium={row.row.original.risk.cvePurlMediumCvss.length}
+                high={row.row.original.risk.cvePurlHighCvss.length}
+                critical={row.row.original.risk.cvePurlCriticalCvss.length}
               />
             )}
           </div>

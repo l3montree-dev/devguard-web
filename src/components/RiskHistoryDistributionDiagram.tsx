@@ -155,19 +155,27 @@ export function RiskHistoryDistributionDiagram({
                 { dataKey: "cvePurlMedium", severity: "medium" },
                 { dataKey: "cvePurlHigh", severity: "high" },
                 { dataKey: "cvePurlCritical", severity: "critical" },
-              ].map(({ dataKey, severity }) => (
-                <Area
-                  key={dataKey}
-                  dataKey={mode === "risk" ? dataKey : dataKey + "Cvss"}
-                  type="monotone"
-                  stackId="1"
-                  stroke={severityToColor(severity.toUpperCase())}
-                  strokeWidth={2}
-                  fill={`url(#fill-${severity})`}
-                  fillOpacity={0.8}
-                  dot={false}
-                />
-              ))}
+              ].map(({ dataKey, severity }) => {
+                const key = (
+                  mode === "risk" ? dataKey : dataKey + "Cvss"
+                ) as keyof RiskHistoryPoint;
+                return (
+                  <Area
+                    key={dataKey}
+                    name={key} // keeps the tooltip and legend config lookup working
+                    dataKey={(d: RiskHistoryPoint) =>
+                      (d[key] as string[] | null)?.length ?? 0
+                    }
+                    type="monotone"
+                    stackId="1"
+                    stroke={severityToColor(severity.toUpperCase())}
+                    strokeWidth={2}
+                    fill={`url(#fill-${severity})`}
+                    fillOpacity={0.8}
+                    dot={false}
+                  />
+                );
+              })}
             </AreaChart>
           </ChartContainer>
         )}

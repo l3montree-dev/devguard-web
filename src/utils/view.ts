@@ -11,6 +11,26 @@ import { type Identity } from "@ory/client-fetch";
 import { externalProviderIdToIntegrationName } from "./externalProvider";
 import type { User } from "@/types/auth";
 import { getUserFullName } from "@/utils/auth";
+
+export const BUCKETS = [
+  "cvePurlLow",
+  "cvePurlMedium",
+  "cvePurlHigh",
+  "cvePurlCritical",
+  "cvePurlFixableLow",
+  "cvePurlFixableMedium",
+  "cvePurlFixableHigh",
+  "cvePurlFixableCritical",
+  "cvePurlLowCvss",
+  "cvePurlMediumCvss",
+  "cvePurlHighCvss",
+  "cvePurlCriticalCvss",
+  "cvePurlFixableLowCvss",
+  "cvePurlFixableMediumCvss",
+  "cvePurlFixableHighCvss",
+  "cvePurlFixableCriticalCvss",
+] as const;
+
 export const removeUnderscores = (input: string): string => {
   return input.replace(/_/g, " ");
 };
@@ -26,29 +46,29 @@ export const sortRisk =
   (viewMode: "risk" | "cvss") =>
   (a: ComponentRisk[string], b: ComponentRisk[string]) => {
     if (viewMode === "cvss") {
-      if (a.criticalCvss !== b.criticalCvss) {
-        return b.criticalCvss - a.criticalCvss;
+      if ((a.criticalCvss?.length ?? 0) !== (b.criticalCvss?.length ?? 0)) {
+        return (b.criticalCvss?.length ?? 0) - (a.criticalCvss?.length ?? 0);
       }
-      if (a.highCvss !== b.highCvss) {
-        return b.highCvss - a.highCvss;
+      if ((a.highCvss?.length ?? 0) !== (b.highCvss?.length ?? 0)) {
+        return (b.highCvss?.length ?? 0) - (a.highCvss?.length ?? 0);
       }
-      if (a.mediumCvss !== b.mediumCvss) {
-        return b.mediumCvss - a.mediumCvss;
+      if ((a.mediumCvss?.length ?? 0) !== (b.mediumCvss?.length ?? 0)) {
+        return (b.mediumCvss?.length ?? 0) - (a.mediumCvss?.length ?? 0);
       }
-      return b.lowCvss - a.lowCvss;
+      return (b.lowCvss?.length ?? 0) - (a.lowCvss?.length ?? 0);
     }
 
     // critical > high > medium > low
-    if (a.critical !== b.critical) {
-      return b.critical - a.critical;
+    if ((a.critical?.length ?? 0) !== (b.critical?.length ?? 0)) {
+      return (b.critical?.length ?? 0) - (a.critical?.length ?? 0);
     }
-    if (a.high !== b.high) {
-      return b.high - a.high;
+    if ((a.high?.length ?? 0) !== (b.high?.length ?? 0)) {
+      return (b.high?.length ?? 0) - (a.high?.length ?? 0);
     }
-    if (a.medium !== b.medium) {
-      return b.medium - a.medium;
+    if ((a.medium?.length ?? 0) !== (b.medium?.length ?? 0)) {
+      return (b.medium?.length ?? 0) - (a.medium?.length ?? 0);
     }
-    return b.low - a.low;
+    return (b.low?.length ?? 0) - (a.low?.length ?? 0);
   };
 
 export const vexOptionMessages: Record<string, string> = {
@@ -284,46 +304,11 @@ export const reduceRiskHistories = (
   }
 
   return validHistories.map((dayHistories) => {
-    return dayHistories.reduce(
-      (acc, curr) => {
-        acc.cvePurlLow += curr.cvePurlLow;
-        acc.cvePurlMedium += curr.cvePurlMedium;
-        acc.cvePurlHigh += curr.cvePurlHigh;
-        acc.cvePurlCritical += curr.cvePurlCritical;
-        acc.cvePurlFixableLow += curr.cvePurlFixableLow ?? 0;
-        acc.cvePurlFixableMedium += curr.cvePurlFixableMedium ?? 0;
-        acc.cvePurlFixableHigh += curr.cvePurlFixableHigh ?? 0;
-        acc.cvePurlFixableCritical += curr.cvePurlFixableCritical ?? 0;
-        acc.cvePurlLowCvss += curr.cvePurlLowCvss;
-        acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
-        acc.cvePurlHighCvss += curr.cvePurlHighCvss;
-        acc.cvePurlCriticalCvss += curr.cvePurlCriticalCvss;
-        acc.cvePurlFixableLowCvss += curr.cvePurlFixableLowCvss ?? 0;
-        acc.cvePurlFixableMediumCvss += curr.cvePurlFixableMediumCvss ?? 0;
-        acc.cvePurlFixableHighCvss += curr.cvePurlFixableHighCvss ?? 0;
-        acc.cvePurlFixableCriticalCvss += curr.cvePurlFixableCriticalCvss ?? 0;
-        return acc;
-      },
-      {
-        day: dayHistories[0]?.day ?? "",
-        cvePurlLow: 0,
-        cvePurlMedium: 0,
-        cvePurlHigh: 0,
-        cvePurlCritical: 0,
-        cvePurlFixableLow: 0,
-        cvePurlFixableMedium: 0,
-        cvePurlFixableHigh: 0,
-        cvePurlFixableCritical: 0,
-        cvePurlLowCvss: 0,
-        cvePurlMediumCvss: 0,
-        cvePurlHighCvss: 0,
-        cvePurlCriticalCvss: 0,
-        cvePurlFixableLowCvss: 0,
-        cvePurlFixableMediumCvss: 0,
-        cvePurlFixableHighCvss: 0,
-        cvePurlFixableCriticalCvss: 0,
-      } as RiskHistoryPoint,
-    );
+    const out = { day: dayHistories[0]?.day ?? "" } as RiskHistoryPoint;
+    for (const key of BUCKETS) {
+      out[key] = dayHistories.flatMap((h) => h[key] ?? []);
+    }
+    return out;
   });
 };
 

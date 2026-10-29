@@ -675,6 +675,42 @@ export interface paths {
     };
     trace?: never;
   };
+  "/admin/statistics/dependency-proxy-cache/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get instance-wide dependency proxy cache statistics */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/statistics/usage/": {
     parameters: {
       query?: never;
@@ -1077,531 +1113,6 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["dtos.ComplianceComponentDetails"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/composer/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Composer repository request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/deb/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Debian repository request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/go": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Go module requests */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/go/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Go module requests */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/maven/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Maven repository request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/-/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm registry API request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    /** Proxy npm registry API request */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{package}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm package metadata */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{package}/-/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm tarball download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{scope}/{name}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm package metadata */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{scope}/{name}/-/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm tarball download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/pypi/packages/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy PyPI package download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/pypi/simple/{package}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy PyPI simple index metadata */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description PyPI package name */
-          package: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description HTML simple index */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": string;
           };
         };
       };
@@ -3175,6 +2686,45 @@ export interface paths {
             "application/json": {
               [key: string]: string;
             };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/dependency-proxy/cache-stats/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get dependency proxy cache statistics for an organization, project or asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
           };
         };
       };
@@ -5156,6 +4706,45 @@ export interface paths {
             "application/json": {
               [key: string]: string;
             };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/dependency-proxy/cache-stats/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get dependency proxy cache statistics for an organization, project or asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
           };
         };
       };
@@ -9077,13 +8666,7 @@ export interface paths {
       /** @description SBOM file */
       requestBody: {
         content: {
-          "multipart/form-data": {
-            /**
-             * Format: binary
-             * @description SBOM file
-             */
-            file: string;
-          };
+          "application/x-www-form-urlencoded": Record<string, never>;
         };
       };
       responses: {
@@ -10074,6 +9657,45 @@ export interface paths {
             "application/json": {
               [key: string]: string;
             };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/dependency-proxy/cache-stats/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get dependency proxy cache statistics for an organization, project or asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
           };
         };
       };
@@ -12313,6 +11935,110 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/slsa/build-provenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Sign SLSA build provenance with the verified identity of the CI job
+     * @description Verifies the OIDC workload identity token of the CI job with its issuer, writes the verified
+     *     identity into the provenance and signs it. Returns a DSSE envelope, or a sigstore bundle if a
+     *     transparency log is configured.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header: {
+          /** @description OIDC workload identity token of the CI job */
+          "X-Workload-Identity-Token": string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      /** @description in-toto v1 statement with a SLSA v1 provenance predicate */
+      requestBody: {
+        content: {
+          "application/json": Record<string, never>;
+          "text/plain": Record<string, never>;
+        };
+      };
+      responses: {
+        /** @description signed build provenance */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+        /** @description invalid build provenance */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+        /** @description missing or invalid workload identity token */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/slsa/public-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the public key devguard signs SLSA build provenance with */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description PEM encoded public key */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/x-pem-file": string;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/trigger-sync": {
     parameters: {
       query?: never;
@@ -12412,518 +12138,6 @@ export interface paths {
           content: {
             "application/json": {
               [key: string]: string;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/blobs/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image blob download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image blob download */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/manifests/{reference}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image manifest fetch */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image manifest fetch */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/referrers/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image referrers list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description subject digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/tags/list": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image tags list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/blobs/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image blob download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image blob download */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/manifests/{reference}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image manifest fetch */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image manifest fetch */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/referrers/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image referrers list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description subject digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/tags/list": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image tags list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
             };
           };
         };
@@ -13943,6 +13157,14 @@ export interface components {
       description: string;
       implementationStatus: string;
     };
+    "controllers_dependencyfirewall.CacheStats": {
+      entries: number;
+      evictions: number;
+      hits: number;
+      maxBytes: number;
+      misses: number;
+      sizeBytes: number;
+    };
     "cyclonedx.Advisory": {
       title: string;
       url: string;
@@ -14065,7 +13287,6 @@ export interface components {
       deactivationDate: string;
       /** @description New in 1.7 */
       destructionDate: string;
-      /** @description New in 1.7 */
       fingerprint: components["schemas"]["cyclonedx.Hash"];
       issuerName: string;
       notValidAfter: string;
@@ -14527,6 +13748,7 @@ export interface components {
       services: components["schemas"]["cyclonedx.Service"][];
       workflows: components["schemas"]["cyclonedx.Workflow"][];
     };
+    /** @description New in 1.7 */
     "cyclonedx.Hash": {
       alg: components["schemas"]["cyclonedx.HashAlgorithm"];
       content: string;
@@ -14846,7 +14068,6 @@ export interface components {
       distributionConstraints: components["schemas"]["cyclonedx.DistributionConstraints"];
       licenses: components["schemas"]["cyclonedx.LicenseChoice"][];
       lifecycles: components["schemas"]["cyclonedx.Lifecycle"][];
-      /** @description Deprecated: Use Component Manufacturer instead. */
       manufacture: components["schemas"]["cyclonedx.OrganizationalEntity"];
       manufacturer: components["schemas"]["cyclonedx.OrganizationalEntity"];
       properties: components["schemas"]["cyclonedx.Property"][];
@@ -14864,6 +14085,7 @@ export interface components {
       name: string;
       phone: string;
     };
+    /** @description Deprecated: Use Component Manufacturer instead. */
     "cyclonedx.OrganizationalEntity": {
       address: components["schemas"]["cyclonedx.PostalAddress"];
       "bom-ref": string;
@@ -14937,7 +14159,6 @@ export interface components {
       algorithmRef: string;
       creationDate: string;
       expirationDate: string;
-      /** @description New in 1.7 */
       fingerprint: components["schemas"]["cyclonedx.Hash"];
       format: string;
       id: string;
@@ -15784,7 +15005,6 @@ export interface components {
     "dtos.CreateExternalReferenceRequest": {
       /** @description only relevant for csaf references - NEEDS TO BE A VALID PURL */
       csafPackageScope: string;
-      /** @enum {unknown} */
       type: components["schemas"]["dtos.ExternalReferenceType"];
       url: string;
     };
@@ -15797,7 +15017,6 @@ export interface components {
     };
     "dtos.CreateVEXRuleRequest": {
       celExpression: string;
-      /** @enum {unknown} */
       eventType: components["schemas"]["dtos.VulnEventType"];
       justification: string;
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
@@ -15822,6 +15041,7 @@ export interface components {
       waitCount: number;
       waitDuration: components["schemas"]["time.Duration"];
     };
+    /** @description specific additional information, not standardized */
     "dtos.DatabaseSpecifics": {
       /** @description array of cwe ids associated with this vulnerability */
       cwe_ids: string[];
@@ -15985,7 +15205,14 @@ export interface components {
       url: string;
     };
     /** @enum {string} */
-    "dtos.ExternalReferenceType": "cyclonedx" | "csaf" | "openvex" | "unknown";
+    "dtos.ExternalReferenceType":
+      | "cyclonedx"
+      | "csaf"
+      | "openvex"
+      | "unknown"
+      | "cyclonedx"
+      | "csaf"
+      | "openvex";
     "dtos.ExternalSubprojectRequest": {
       artifact: string;
       assetDescription: string;
@@ -16168,22 +15395,94 @@ export interface components {
       totalAlloc: number;
     };
     /** @enum {string} */
-    "dtos.ModifiedAttackComplexity": "low" | "high" | "X";
+    "dtos.ModifiedAttackComplexity":
+      "low" | "high" | "X" | "X" | "low" | "high" | "X" | "low" | "high";
     /** @enum {string} */
     "dtos.ModifiedAttackVector":
-      "network" | "adjacent" | "local" | "physical" | "X";
+      | "network"
+      | "adjacent"
+      | "local"
+      | "physical"
+      | "X"
+      | "X"
+      | "network"
+      | "adjacent"
+      | "local"
+      | "physical"
+      | "X"
+      | "network"
+      | "adjacent"
+      | "local"
+      | "physical";
     /** @enum {string} */
-    "dtos.ModifiedPrivilegesRequired": "none" | "low" | "high" | "X";
+    "dtos.ModifiedPrivilegesRequired":
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high";
     /** @enum {string} */
-    "dtos.ModifiedRequirementLevel": "X" | "none" | "low" | "high";
+    "dtos.ModifiedRequirementLevel":
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high"
+      | "X"
+      | "none"
+      | "low"
+      | "high";
     /** @enum {string} */
-    "dtos.ModifiedScope": "unchanged" | "changed" | "X";
+    "dtos.ModifiedScope":
+      | "unchanged"
+      | "changed"
+      | "X"
+      | "X"
+      | "unchanged"
+      | "changed"
+      | "X"
+      | "unchanged"
+      | "changed";
     /** @enum {string} */
-    "dtos.ModifiedUserInteraction": "X" | "none" | "required";
+    "dtos.ModifiedUserInteraction":
+      | "X"
+      | "none"
+      | "required"
+      | "X"
+      | "none"
+      | "required"
+      | "X"
+      | "none"
+      | "required";
     "dtos.OSV": {
       affected: components["schemas"]["dtos.Affected"][];
       aliases: string[];
-      /** @description specific additional information, not standardized */
       database_specific: components["schemas"]["dtos.DatabaseSpecifics"];
       details: string;
       id: string;
@@ -16310,39 +15609,39 @@ export interface components {
       shareVulnInformation: boolean;
     };
     "dtos.OrgRiskHistory": {
-      critical: number;
-      criticalCvss: number;
-      cvePurlCritical: number;
-      cvePurlCriticalCvss: number;
-      cvePurlFixableCritical: number;
-      cvePurlFixableCriticalCvss: number;
-      cvePurlFixableHigh: number;
-      cvePurlFixableHighCvss: number;
-      cvePurlFixableLow: number;
-      cvePurlFixableLowCvss: number;
-      cvePurlFixableMedium: number;
-      cvePurlFixableMediumCvss: number;
-      cvePurlHigh: number;
-      cvePurlHighCvss: number;
-      cvePurlLow: number;
-      cvePurlLowCvss: number;
-      cvePurlMedium: number;
-      cvePurlMediumCvss: number;
+      critical: string[];
+      criticalCvss: string[];
+      cvePurlCritical: string[];
+      cvePurlCriticalCvss: string[];
+      cvePurlFixableCritical: string[];
+      cvePurlFixableCriticalCvss: string[];
+      cvePurlFixableHigh: string[];
+      cvePurlFixableHighCvss: string[];
+      cvePurlFixableLow: string[];
+      cvePurlFixableLowCvss: string[];
+      cvePurlFixableMedium: string[];
+      cvePurlFixableMediumCvss: string[];
+      cvePurlHigh: string[];
+      cvePurlHighCvss: string[];
+      cvePurlLow: string[];
+      cvePurlLowCvss: string[];
+      cvePurlMedium: string[];
+      cvePurlMediumCvss: string[];
       day: string;
-      fixableCritical: number;
-      fixableCriticalCvss: number;
-      fixableHigh: number;
-      fixableHighCvss: number;
-      fixableLow: number;
-      fixableLowCvss: number;
-      fixableMedium: number;
-      fixableMediumCvss: number;
-      high: number;
-      highCvss: number;
-      low: number;
-      lowCvss: number;
-      medium: number;
-      mediumCvss: number;
+      fixableCritical: string[];
+      fixableCriticalCvss: string[];
+      fixableHigh: string[];
+      fixableHighCvss: string[];
+      fixableLow: string[];
+      fixableLowCvss: string[];
+      fixableMedium: string[];
+      fixableMediumCvss: string[];
+      high: string[];
+      highCvss: string[];
+      low: string[];
+      lowCvss: string[];
+      medium: string[];
+      mediumCvss: string[];
     };
     "dtos.OrgSettings": {
       configFiles: {
@@ -16460,7 +15759,6 @@ export interface components {
       id: string;
       isPublic: boolean;
       name: string;
-      /** @description recursive structure */
       parent: components["schemas"]["dtos.Project"];
       parentId: string;
       repositoryId: string;
@@ -16513,7 +15811,6 @@ export interface components {
       isPublic: boolean;
       members: components["schemas"]["dtos.User"][];
       name: string;
-      /** @description recursive structure */
       parent: components["schemas"]["dtos.Project"];
       parentId: string;
       repositoryId: string;
@@ -16610,7 +15907,28 @@ export interface components {
       fixedPercentage: number;
     };
     /** @enum {string} */
-    "dtos.RequirementLevel": "low" | "medium" | "high";
+    "dtos.RequirementLevel":
+      | "low"
+      | "medium"
+      | "high"
+      | "low"
+      | "medium"
+      | "high"
+      | "low"
+      | "medium"
+      | "high"
+      | "low"
+      | "medium"
+      | "high"
+      | "low"
+      | "medium"
+      | "high"
+      | "low"
+      | "medium"
+      | "high"
+      | "low"
+      | "medium"
+      | "high";
     "dtos.RevokeByPrivateKeyRequest": {
       privkey: string;
     };
@@ -16620,43 +15938,43 @@ export interface components {
       assetVersionName: string;
       averageClosedRisk: number;
       averageOpenRisk: number;
-      critical: number;
-      criticalCvss: number;
-      cvePurlCritical: number;
-      cvePurlCriticalCvss: number;
-      cvePurlFixableCritical: number;
-      cvePurlFixableCriticalCvss: number;
-      cvePurlFixableHigh: number;
-      cvePurlFixableHighCvss: number;
-      cvePurlFixableLow: number;
-      cvePurlFixableLowCvss: number;
-      cvePurlFixableMedium: number;
-      cvePurlFixableMediumCvss: number;
-      cvePurlHigh: number;
-      cvePurlHighCvss: number;
-      cvePurlLow: number;
-      cvePurlLowCvss: number;
-      cvePurlMedium: number;
-      cvePurlMediumCvss: number;
+      critical: string[];
+      criticalCvss: string[];
+      cvePurlCritical: string[];
+      cvePurlCriticalCvss: string[];
+      cvePurlFixableCritical: string[];
+      cvePurlFixableCriticalCvss: string[];
+      cvePurlFixableHigh: string[];
+      cvePurlFixableHighCvss: string[];
+      cvePurlFixableLow: string[];
+      cvePurlFixableLowCvss: string[];
+      cvePurlFixableMedium: string[];
+      cvePurlFixableMediumCvss: string[];
+      cvePurlHigh: string[];
+      cvePurlHighCvss: string[];
+      cvePurlLow: string[];
+      cvePurlLowCvss: string[];
+      cvePurlMedium: string[];
+      cvePurlMediumCvss: string[];
       /** @description on the day 2024-08-12 the asset had a sumRisk of 25. */
       day: string;
-      fixableCritical: number;
-      fixableCriticalCvss: number;
-      fixableHigh: number;
-      fixableHighCvss: number;
-      fixableLow: number;
-      fixableLowCvss: number;
-      fixableMedium: number;
-      fixableMediumCvss: number;
+      fixableCritical: string[];
+      fixableCriticalCvss: string[];
+      fixableHigh: string[];
+      fixableHighCvss: string[];
+      fixableLow: string[];
+      fixableLowCvss: string[];
+      fixableMedium: string[];
+      fixableMediumCvss: string[];
       fixedDependencyVulns: number;
-      high: number;
-      highCvss: number;
-      low: number;
-      lowCvss: number;
+      high: string[];
+      highCvss: string[];
+      low: string[];
+      lowCvss: string[];
       maxClosedRisk: number;
       maxOpenRisk: number;
-      medium: number;
-      mediumCvss: number;
+      medium: string[];
+      mediumCvss: string[];
       minClosedRisk: number;
       minOpenRisk: number;
       openDependencyVulns: number;
@@ -16669,44 +15987,44 @@ export interface components {
       assetVersionName: string;
       averageClosedRisk: number;
       averageOpenRisk: number;
-      critical: number;
-      criticalCvss: number;
-      cvePurlCritical: number;
-      cvePurlCriticalCvss: number;
-      cvePurlFixableCritical: number;
-      cvePurlFixableCriticalCvss: number;
-      cvePurlFixableHigh: number;
-      cvePurlFixableHighCvss: number;
-      cvePurlFixableLow: number;
-      cvePurlFixableLowCvss: number;
-      cvePurlFixableMedium: number;
-      cvePurlFixableMediumCvss: number;
-      cvePurlHigh: number;
-      cvePurlHighCvss: number;
-      cvePurlLow: number;
-      cvePurlLowCvss: number;
-      cvePurlMedium: number;
-      cvePurlMediumCvss: number;
+      critical: string[];
+      criticalCvss: string[];
+      cvePurlCritical: string[];
+      cvePurlCriticalCvss: string[];
+      cvePurlFixableCritical: string[];
+      cvePurlFixableCriticalCvss: string[];
+      cvePurlFixableHigh: string[];
+      cvePurlFixableHighCvss: string[];
+      cvePurlFixableLow: string[];
+      cvePurlFixableLowCvss: string[];
+      cvePurlFixableMedium: string[];
+      cvePurlFixableMediumCvss: string[];
+      cvePurlHigh: string[];
+      cvePurlHighCvss: string[];
+      cvePurlLow: string[];
+      cvePurlLowCvss: string[];
+      cvePurlMedium: string[];
+      cvePurlMediumCvss: string[];
       /** @description on the day 2024-08-12 the asset had a sumRisk of 25. */
       day: string;
       defaultBranch: boolean;
-      fixableCritical: number;
-      fixableCriticalCvss: number;
-      fixableHigh: number;
-      fixableHighCvss: number;
-      fixableLow: number;
-      fixableLowCvss: number;
-      fixableMedium: number;
-      fixableMediumCvss: number;
+      fixableCritical: string[];
+      fixableCriticalCvss: string[];
+      fixableHigh: string[];
+      fixableHighCvss: string[];
+      fixableLow: string[];
+      fixableLowCvss: string[];
+      fixableMedium: string[];
+      fixableMediumCvss: string[];
       fixedDependencyVulns: number;
-      high: number;
-      highCvss: number;
-      low: number;
-      lowCvss: number;
+      high: string[];
+      highCvss: string[];
+      low: string[];
+      lowCvss: string[];
       maxClosedRisk: number;
       maxOpenRisk: number;
-      medium: number;
-      mediumCvss: number;
+      medium: string[];
+      mediumCvss: string[];
       minClosedRisk: number;
       minOpenRisk: number;
       openDependencyVulns: number;
@@ -16751,7 +16069,6 @@ export interface components {
     };
     "dtos.TestVEXRulesRequest": {
       celExpression: string[];
-      /** @enum {unknown} */
       eventType: components["schemas"]["dtos.VulnEventType"];
     };
     "dtos.UpdateAssetRequest": {
@@ -16848,7 +16165,13 @@ export interface components {
       | "attachedComplianceComponent"
       | "removedComplianceComponent"
       | "detected"
-      | "rawRiskAssessmentUpdated";
+      | "rawRiskAssessmentUpdated"
+      | "accepted"
+      | "falsePositive"
+      | "reopened"
+      | "accepted"
+      | "falsePositive"
+      | "reopened";
     "dtos.VulnInPackage": {
       cveId: string;
       fixedVersion: string;
@@ -16958,6 +16281,7 @@ export interface components {
       versionEnd: string;
       versionStart: string;
     };
+    /** @description Ensure foreign key field order matches Artifact primary key: ArtifactName, AssetVersionName, AssetID */
     "github_com_l3montree-dev_devguard_database_models.Artifact": {
       artifactName: string;
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
@@ -16975,43 +16299,45 @@ export interface components {
       assetVersionName: string;
       averageClosedRisk: number;
       averageOpenRisk: number;
-      critical: number;
-      criticalCvss: number;
-      cvePurlCritical: number;
-      cvePurlCriticalCvss: number;
-      cvePurlFixableCritical: number;
-      cvePurlFixableCriticalCvss: number;
-      cvePurlFixableHigh: number;
-      cvePurlFixableHighCvss: number;
-      cvePurlFixableLow: number;
-      cvePurlFixableLowCvss: number;
-      cvePurlFixableMedium: number;
-      cvePurlFixableMediumCvss: number;
-      cvePurlHigh: number;
-      cvePurlHighCvss: number;
-      cvePurlLow: number;
-      cvePurlLowCvss: number;
-      cvePurlMedium: number;
-      cvePurlMediumCvss: number;
+      critical: string[];
+      criticalCvss: string[];
+      cvePurlCritical: string[];
+      cvePurlCriticalCvss: string[];
+      cvePurlFixableCritical: string[];
+      cvePurlFixableCriticalCvss: string[];
+      cvePurlFixableHigh: string[];
+      cvePurlFixableHighCvss: string[];
+      cvePurlFixableLow: string[];
+      cvePurlFixableLowCvss: string[];
+      cvePurlFixableMedium: string[];
+      cvePurlFixableMediumCvss: string[];
+      cvePurlHigh: string[];
+      cvePurlHighCvss: string[];
+      /** @description dependencyVuln.cve_id */
+      cvePurlLow: string[];
+      cvePurlLowCvss: string[];
+      cvePurlMedium: string[];
+      cvePurlMediumCvss: string[];
       /** @description on the day 2024-08-12 the asset had a sumRisk of 25. */
       day: string;
-      fixableCritical: number;
-      fixableCriticalCvss: number;
-      fixableHigh: number;
-      fixableHighCvss: number;
-      fixableLow: number;
-      fixableLowCvss: number;
-      fixableMedium: number;
-      fixableMediumCvss: number;
+      fixableCritical: string[];
+      fixableCriticalCvss: string[];
+      fixableHigh: string[];
+      fixableHighCvss: string[];
+      fixableLow: string[];
+      fixableLowCvss: string[];
+      fixableMedium: string[];
+      fixableMediumCvss: string[];
       fixedDependencyVulns: number;
-      high: number;
-      highCvss: number;
-      low: number;
-      lowCvss: number;
+      high: string[];
+      highCvss: string[];
+      low: string[];
+      /** @description dependencyVuln.id */
+      lowCvss: string[];
       maxClosedRisk: number;
       maxOpenRisk: number;
-      medium: number;
-      mediumCvss: number;
+      medium: string[];
+      mediumCvss: string[];
       minClosedRisk: number;
       minOpenRisk: number;
       openDependencyVulns: number;
@@ -17085,7 +16411,6 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_models.AssetVersionType":
       "branch" | "tag";
     "github_com_l3montree-dev_devguard_database_models.Attestation": {
-      /** @description Ensure foreign key field order matches Artifact primary key: ArtifactName, AssetVersionName, AssetID */
       artifact: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"];
       artifactName: string;
       assetId: string;
@@ -17129,10 +16454,6 @@ export interface components {
       source_cve: string;
       /** @description the official CVE-XXXX-...  the external CVE-ID relates to */
       target_cve: string;
-      /**
-       * @description TargetCVEData is populated by GORM nested preload. It is nil when the target
-       *     CVE does not exist in this database — no DB-level FK constraint is added.
-       */
       target_cve_data: components["schemas"]["github_com_l3montree-dev_devguard_database_models.CVE"];
     };
     "github_com_l3montree-dev_devguard_database_models.Component": {
@@ -17379,7 +16700,6 @@ export interface components {
       verified: boolean;
     };
     "github_com_l3montree-dev_devguard_database_models.VEXRule": {
-      /** @description Relationships */
       asset: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Asset"];
       /** @description Composite key components (for indexing and queries) */
       assetId: string;
@@ -17568,6 +16888,32 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000

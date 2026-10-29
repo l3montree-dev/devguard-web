@@ -128,12 +128,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.cvePurlCriticalCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlCriticalCvss.length ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlCritical ?? 0),
+      (sum, r) => sum + (r?.cvePurlCritical.length ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -142,12 +142,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.cvePurlHighCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlHighCvss.length ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlHigh ?? 0),
+      (sum, r) => sum + (r?.cvePurlHigh.length ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -156,12 +156,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.cvePurlMediumCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlMediumCvss.length ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlMedium ?? 0),
+      (sum, r) => sum + (r?.cvePurlMedium.length ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -170,12 +170,12 @@ const OverviewPage = () => {
     if (completeRiskHistory.length === 0) return 0;
     if (mode === "cvss") {
       return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-        (sum, r) => sum + (r?.cvePurlLowCvss ?? 0),
+        (sum, r) => sum + (r?.cvePurlLowCvss.length ?? 0),
         0,
       );
     }
     return completeRiskHistory[completeRiskHistory.length - 1].reduce(
-      (sum, r) => sum + (r?.cvePurlLow ?? 0),
+      (sum, r) => sum + (r?.cvePurlLow.length ?? 0),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -186,8 +186,8 @@ const OverviewPage = () => {
       (sum, r) =>
         sum +
         (mode === "cvss"
-          ? (r?.cvePurlFixableCriticalCvss ?? 0)
-          : (r?.cvePurlFixableCritical ?? 0)),
+          ? (r?.cvePurlFixableCriticalCvss.length ?? 0)
+          : (r?.cvePurlFixableCritical.length ?? 0)),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -198,8 +198,8 @@ const OverviewPage = () => {
       (sum, r) =>
         sum +
         (mode === "cvss"
-          ? (r?.cvePurlFixableHighCvss ?? 0)
-          : (r?.cvePurlFixableHigh ?? 0)),
+          ? (r?.cvePurlFixableHighCvss.length ?? 0)
+          : (r?.cvePurlFixableHigh.length ?? 0)),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -210,8 +210,8 @@ const OverviewPage = () => {
       (sum, r) =>
         sum +
         (mode === "cvss"
-          ? (r?.cvePurlFixableMediumCvss ?? 0)
-          : (r?.cvePurlFixableMedium ?? 0)),
+          ? (r?.cvePurlFixableMediumCvss.length ?? 0)
+          : (r?.cvePurlFixableMedium.length ?? 0)),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -222,8 +222,8 @@ const OverviewPage = () => {
       (sum, r) =>
         sum +
         (mode === "cvss"
-          ? (r?.cvePurlFixableLowCvss ?? 0)
-          : (r?.cvePurlFixableLow ?? 0)),
+          ? (r?.cvePurlFixableLowCvss.length ?? 0)
+          : (r?.cvePurlFixableLow.length ?? 0)),
       0,
     );
   }, [completeRiskHistory, mode]);
@@ -483,23 +483,23 @@ const OverviewPage = () => {
                                 <CVERainbowBadge
                                   low={
                                     mode === "risk"
-                                      ? (r?.cvePurlLow ?? 0)
-                                      : (r?.cvePurlLowCvss ?? 0)
+                                      ? (r?.cvePurlLow.length ?? 0)
+                                      : (r?.cvePurlLowCvss.length ?? 0)
                                   }
                                   medium={
                                     mode === "risk"
-                                      ? (r?.cvePurlMedium ?? 0)
-                                      : (r?.cvePurlMediumCvss ?? 0)
+                                      ? (r?.cvePurlMedium.length ?? 0)
+                                      : (r?.cvePurlMediumCvss.length ?? 0)
                                   }
                                   high={
                                     mode === "risk"
-                                      ? (r?.cvePurlHigh ?? 0)
-                                      : (r?.cvePurlHighCvss ?? 0)
+                                      ? (r?.cvePurlHigh.length ?? 0)
+                                      : (r?.cvePurlHighCvss.length ?? 0)
                                   }
                                   critical={
                                     mode === "risk"
-                                      ? (r?.cvePurlCritical ?? 0)
-                                      : (r?.cvePurlCriticalCvss ?? 0)
+                                      ? (r?.cvePurlCritical.length ?? 0)
+                                      : (r?.cvePurlCriticalCvss.length ?? 0)
                                   }
                                 />
                               </div>

@@ -48,14 +48,13 @@ export function AffectedBranchesTags({
         .filter(({ refName }) => refByName[refName]?.type === type)
         .toSorted(
           (a, b) =>
-            b.dist.critical - a.dist.critical ||
-            b.dist.high - a.dist.high ||
-            b.dist.medium - a.dist.medium ||
-            b.dist.low - a.dist.low,
+            b.dist.critical.length - a.dist.critical.length ||
+            b.dist.high.length - a.dist.high.length ||
+            b.dist.medium.length - a.dist.medium.length ||
+            b.dist.low.length - a.dist.low.length,
         ),
     [data, type, refByName],
   );
-
   return (
     <Card className="flex flex-1 flex-col">
       <CardHeader>
@@ -125,19 +124,19 @@ export function AffectedBranchesTags({
                         <span className="">{item.refName}</span>
                         <div className="flex flex-row flex-wrap gap-2">
                           <CVERainbowBadge
-                            low={item.dist.low}
-                            medium={item.dist.medium}
-                            high={item.dist.high}
-                            critical={item.dist.critical}
+                            low={item.dist.low.length}
+                            medium={item.dist.medium.length}
+                            high={item.dist.high.length}
+                            critical={item.dist.critical.length}
                           />
                         </div>
                       </div>
 
                       <p className="text-sm text-muted-foreground">
-                        {item.dist.low +
-                          item.dist.medium +
-                          item.dist.high +
-                          item.dist.critical}{" "}
+                        {item.dist.low.length +
+                          item.dist.medium.length +
+                          item.dist.high.length +
+                          item.dist.critical.length}{" "}
                         vulnerabilities
                       </p>
                     </div>

@@ -198,7 +198,14 @@ const RefsPage = () => {
                       <td className="px-4 py-2">
                         {distributionByRef[tag.name] && (
                           <span>
-                            <CVERainbowBadge {...distributionByRef[tag.name]} />
+                            <CVERainbowBadge
+                              low={distributionByRef[tag.name].low.length}
+                              medium={distributionByRef[tag.name].medium.length}
+                              high={distributionByRef[tag.name].high.length}
+                              critical={
+                                distributionByRef[tag.name].critical.length
+                              }
+                            />
                           </span>
                         )}
                       </td>
@@ -292,7 +299,14 @@ const RefsPage = () => {
                         {distributionByRef[branch.name] && (
                           <span>
                             <CVERainbowBadge
-                              {...distributionByRef[branch.name]}
+                              low={distributionByRef[branch.name].low.length}
+                              medium={
+                                distributionByRef[branch.name].medium.length
+                              }
+                              high={distributionByRef[branch.name].high.length}
+                              critical={
+                                distributionByRef[branch.name].critical.length
+                              }
                             />
                           </span>
                         )}

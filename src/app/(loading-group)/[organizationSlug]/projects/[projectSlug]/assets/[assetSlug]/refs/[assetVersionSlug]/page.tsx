@@ -18,7 +18,7 @@ import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoHomeTourSteps } from "@/components/common/tours/repoHomeTour";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -38,7 +38,7 @@ import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 import { VulnerableComponents } from "@/components/VulnerableComponents";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { groupBy } from "lodash";
-import { OctagonAlertIcon } from "lucide-react";
+import { CircleHelp, OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { RiskHistoryDistributionDiagram } from "../../../../../../../../../components/RiskHistoryDistributionDiagram";
 import { AffectedBranchesTags } from "@/components/AffectedBranchesTags";
@@ -57,13 +57,24 @@ import {
 } from "@/hooks/useAssetVersionStats";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 
-import { reduceRiskHistories } from "../../../../../../../../../utils/view";
+import {
+  BUCKETS,
+  reduceRiskHistories,
+} from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 import type { RiskHistory } from "@/types/dto";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
+  const [uniqueVulns, setUniqueVulns] = useState(true);
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;
   const activeAsset = useActiveAsset()!;
@@ -119,8 +130,17 @@ const Index: FunctionComponent = () => {
     const completeRiskHistory: RiskHistory[][] = days.map((day) => {
       return groups[day];
     });
-    return reduceRiskHistories(completeRiskHistory);
-  }, [riskHistoryResp]);
+    const reduced = reduceRiskHistories(completeRiskHistory);
+    if (!uniqueVulns) return reduced;
+
+    return reduced.map((point) => {
+      const out = { ...point };
+      for (const key of BUCKETS) {
+        out[key] = [...new Set(point[key])];
+      }
+      return out;
+    });
+  }, [riskHistoryResp, uniqueVulns]);
 
   const { distributionByRef, isLoading: distributionByRefLoading } =
     useRefDistributions();
@@ -184,18 +204,34 @@ const Index: FunctionComponent = () => {
           onValueChange={(value) => setMode(value as "risk" | "cvss")}
           className="w-full"
         >
-          <div className="relative flex flex-row gap-4">
+          <div className="relative flex gap-4 mb-4 justify-start">
             <div data-tour="artifact-switcher">
               <QueryArtifactSelector
                 unassignPossible
                 artifacts={(artifacts ?? []).map((a) => a.artifactName)}
               />
             </div>
-            <div data-tour="risk-cvss-values" className="mb-4 flex">
+            <div data-tour="risk-cvss-values" className="flex">
               <TabsList>
                 <TabsTrigger value="risk">Risk values</TabsTrigger>
                 <TabsTrigger value="cvss">CVSS values</TabsTrigger>
               </TabsList>
+            </div>
+            <div className="flex items-center justify-self-end gap-2">
+              <Switch checked={uniqueVulns} onCheckedChange={setUniqueVulns} />
+              <Label>Unique across artifacts</Label>
+              <Tooltip>
+                <TooltipTrigger>
+                  <CircleHelp className="w-4 h-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="relative font-normal">
+                    Artifacts attached to an asset can report the same
+                    vulnerability multiple times. Enable this to count each
+                    vulnerability only once for the overview.
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 
@@ -208,13 +244,13 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={10}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableCritical ?? 0)
-                    : (latest?.cvePurlFixableCriticalCvss ?? 0)
+                    ? (latest?.cvePurlFixableCritical.length ?? 0)
+                    : (latest?.cvePurlFixableCriticalCvss.length ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlCritical ?? 0)
-                    : (latest?.cvePurlCriticalCvss ?? 0)
+                    ? (latest?.cvePurlCritical.length ?? 0)
+                    : (latest?.cvePurlCriticalCvss.length ?? 0)
                 }
                 mode={mode}
               />
@@ -225,13 +261,13 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={9}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableHigh ?? 0)
-                    : (latest?.cvePurlFixableHighCvss ?? 0)
+                    ? (latest?.cvePurlFixableHigh.length ?? 0)
+                    : (latest?.cvePurlFixableHighCvss.length ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlHigh ?? 0)
-                    : (latest?.cvePurlHighCvss ?? 0)
+                    ? (latest?.cvePurlHigh.length ?? 0)
+                    : (latest?.cvePurlHighCvss.length ?? 0)
                 }
                 mode={mode}
               />
@@ -242,13 +278,13 @@ const Index: FunctionComponent = () => {
                 isLoading={riskHistoryLoading}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableMedium ?? 0)
-                    : (latest?.cvePurlFixableMediumCvss ?? 0)
+                    ? (latest?.cvePurlFixableMedium.length ?? 0)
+                    : (latest?.cvePurlFixableMediumCvss.length ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlMedium ?? 0)
-                    : (latest?.cvePurlMediumCvss ?? 0)
+                    ? (latest?.cvePurlMedium.length ?? 0)
+                    : (latest?.cvePurlMediumCvss.length ?? 0)
                 }
                 mode={mode}
               />
@@ -259,13 +295,13 @@ const Index: FunctionComponent = () => {
                 isLoading={riskHistoryLoading}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableLow ?? 0)
-                    : (latest?.cvePurlFixableLowCvss ?? 0)
+                    ? (latest?.cvePurlFixableLow.length ?? 0)
+                    : (latest?.cvePurlFixableLowCvss.length ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlLow ?? 0)
-                    : (latest?.cvePurlLowCvss ?? 0)
+                    ? (latest?.cvePurlLow.length ?? 0)
+                    : (latest?.cvePurlLowCvss.length ?? 0)
                 }
                 mode={mode}
               />

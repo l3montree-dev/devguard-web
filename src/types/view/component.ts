@@ -74,14 +74,14 @@ export type ProjectDependency = Omit<
 
 export interface ComponentRisk {
   [component: string]: {
-    low: number;
-    medium: number;
-    high: number;
-    critical: number;
+    low: string[];
+    medium: string[];
+    high: string[];
+    critical: string[];
 
-    lowCvss: number;
-    mediumCvss: number;
-    highCvss: number;
-    criticalCvss: number;
+    lowCvss: string[];
+    mediumCvss: string[];
+    highCvss: string[];
+    criticalCvss: string[];
   };
 }
