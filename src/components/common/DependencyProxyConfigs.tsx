@@ -27,6 +27,14 @@ const defaultConfig = `rules:
     expr: pkg.ecosystem != "oci" && now() - timestamp(pkg.releasedAt) < duration("120h")
 # registries:
 #   npm: https://nexus.example.com/repository/npm/
+#   deb:
+#     url: https://deb.example.com
+#     # optional - the key(s) the upstream Release is signed with.
+#     # Paste several armored key blocks one after another.
+#     keyring: |
+#       -----BEGIN PGP PUBLIC KEY BLOCK-----
+#       ...
+#       -----END PGP PUBLIC KEY BLOCK-----
 `;
 
 const ecosystemIcons: Record<string, string> = {
@@ -306,6 +314,34 @@ Signed-By: /etc/apt/keyrings/devguard.asc`}
               rules for these packages, for example with an allow rule on{" "}
               <code className="font-mono text-sm">pkg.name</code> or{" "}
               <code className="font-mono text-sm">pkg.registry</code>.
+            </Callout>
+          </div>
+          <div className="mt-4">
+            <Callout intent="info">
+              <p>
+                A custom registry is configured with a{" "}
+                <code className="font-mono text-sm">url</code> and an optional{" "}
+                <code className="font-mono text-sm">keyring</code>:
+              </p>
+              <CopyCode
+                language="yaml"
+                codeString={`registries:
+  deb:
+    url: https://deb.example.com
+    keyring: |
+      -----BEGIN PGP PUBLIC KEY BLOCK-----
+      ...
+      -----END PGP PUBLIC KEY BLOCK-----`}
+              />
+              <p className="mt-2">
+                With a keyring, the proxy only accepts a Release signed by one
+                of its keys and signs the rewritten index with the signing key
+                above. Several keys can be pasted as armored blocks one after
+                another. Without a keyring, the upstream index is not verified
+                and the proxy serves it unsigned, so apt needs{" "}
+                <code className="font-mono text-sm">Trusted: yes</code> instead
+                of <code className="font-mono text-sm">Signed-By</code>.
+              </p>
             </Callout>
           </div>
         </div>
