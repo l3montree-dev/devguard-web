@@ -79,7 +79,6 @@
         "ogl": "^1.0.11",
         "openapi-fetch": "0.17.0",
         "packageurl-js": "^2.0.1",
-        "purl": "2.3.0",
         "react": "19.3.1",
         "react-day-picker": "10.0.2",
         "react-dom": "19.3.1",
