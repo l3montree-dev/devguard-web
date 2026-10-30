@@ -123,7 +123,7 @@ const Index: FunctionComponent = () => {
   }, [riskHistoryResp]);
 
   const { distributionByRef, isLoading: distributionByRefLoading } =
-    useRefDistributions();
+    useRefDistributions(mode);
 
   const project = activeProject;
   const asset = activeAsset;
