@@ -49,4 +49,5 @@ export const config = {
   billingUrl: process.env.BILLING_URL || "https://devguard.org/trial-expired",
   devguardWebsiteUrl:
     process.env.DEVGUARD_WEBSITE_URL || "https://devguard.org",
+  enterpriseUrl: "https://devguard.org/enterprise",
 };
