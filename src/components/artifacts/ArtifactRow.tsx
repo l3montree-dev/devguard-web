@@ -44,6 +44,9 @@ interface Props {
   onDelete: () => void;
 }
 
+export const sourceKey = (artifactName: string, url: string) =>
+  JSON.stringify([artifactName, url]);
+
 const trimOriginUrl = (url: string): string => {
   // Remove "sbom:" prefix if it exists
   let trimmedUrl = url.startsWith("sbom:") ? url.substring(5) : url;
@@ -71,7 +74,7 @@ const ArtifactRow: FunctionComponent<Props> = ({
 
   // Track selection state for this artifact's sources
   const sourceUrls = hasUpstreamUrls
-    ? rootNodes.map((node) => node.url)
+    ? rootNodes.map((node) => sourceKey(artifact.artifactName, node.url))
     : [`artifact:${artifact.artifactName}`];
   const allSelected = sourceUrls.every((url) => selectedSourceUrls.has(url));
   const someSelected = sourceUrls.some((url) => selectedSourceUrls.has(url));
@@ -206,8 +209,14 @@ const ArtifactRow: FunctionComponent<Props> = ({
                 {isAdmin(role) && (
                   <div className="pt-0.5" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
-                      checked={selectedSourceUrls.has(node.url)}
-                      onCheckedChange={() => onToggleSource(node.url)}
+                      checked={selectedSourceUrls.has(
+                        sourceKey(artifact.artifactName, node.url),
+                      )}
+                      onCheckedChange={() =>
+                        onToggleSource(
+                          sourceKey(artifact.artifactName, node.url),
+                        )
+                      }
                       disabled={!isAdmin(role)}
                     />
                   </div>
