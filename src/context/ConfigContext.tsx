@@ -8,11 +8,10 @@ import { NoopUpdater } from "./ClientContextWrapper";
 import type { InstanceSettings } from "@/types/dto";
 import type { WithUpdater } from "../types/view/context";
 
-const ConfigContext = React.createContext<
+export const ConfigContext = React.createContext<
   WithUpdater<typeof config & Partial<InstanceSettings>>
 >({
   v: config,
   update: NoopUpdater,
 });
-export const ConfigProvider = ConfigContext.Provider;
 export const useConfig = () => React.useContext(ConfigContext).v;

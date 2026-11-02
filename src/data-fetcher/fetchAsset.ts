@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { AssetDTO } from "@/types/dto";
+import type { AssetDetailsDTO } from "@/types/dto";
 import { getServerClient } from "@/services/serverApiClient";
 
 import { HttpError } from "./httpError";
@@ -35,6 +35,6 @@ export async function fetchAsset(
     });
   }
   // parse the organization
-  const asset = data as AssetDTO;
+  const asset = data as AssetDetailsDTO;
   return asset;
 }

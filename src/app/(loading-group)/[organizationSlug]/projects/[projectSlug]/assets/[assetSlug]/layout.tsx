@@ -3,7 +3,7 @@
 
 import AssetHeader from "@/components/common/AssetHeader";
 import React, { Suspense } from "react";
-import { AssetProvider } from "../../../../../../../context/AssetContext";
+import { AssetContext } from "../../../../../../../context/AssetContext";
 import { ClientContextWrapper } from "../../../../../../../context/ClientContextWrapper";
 import { fetchAsset } from "../../../../../../../data-fetcher/fetchAsset";
 import { handleHttpError } from "../../../../../../../data-fetcher/handleHttpError";
@@ -53,7 +53,7 @@ async function AssetShell({
   }
 
   return (
-    <ClientContextWrapper Provider={AssetProvider} value={asset}>
+    <ClientContextWrapper Context={AssetContext} value={asset}>
       <AssetHeader />
       {children}
     </ClientContextWrapper>

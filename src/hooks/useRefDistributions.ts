@@ -20,7 +20,7 @@ const dateOnly = (ms: number) => new Date(ms).toISOString().split("T")[0];
 const start = dateOnly(Date.now() - 30 * 864e5);
 const end = dateOnly(Date.now());
 
-export function useRefDistributions() {
+export function useRefDistributions(mode: "risk" | "cvss" = "cvss") {
   const params = useDecodedParams() as {
     organizationSlug: string;
     projectSlug: string;
@@ -39,16 +39,17 @@ export function useRefDistributions() {
     for (const history of riskHistories ?? []) {
       latest[history.assetVersionName + "|" + history.artifactName] = history;
     }
+    const suffix = mode === "risk" ? "" : "Cvss";
     return mapValues(
       groupBy(Object.values(latest), "assetVersionName"),
       (rows): RefDistribution => ({
-        low: sumBy(rows, "cvePurlLowCvss"),
-        medium: sumBy(rows, "cvePurlMediumCvss"),
-        high: sumBy(rows, "cvePurlHighCvss"),
-        critical: sumBy(rows, "cvePurlCriticalCvss"),
+        low: sumBy(rows, `cvePurlLow${suffix}`),
+        medium: sumBy(rows, `cvePurlMedium${suffix}`),
+        high: sumBy(rows, `cvePurlHigh${suffix}`),
+        critical: sumBy(rows, `cvePurlCritical${suffix}`),
       }),
     );
-  }, [riskHistories]);
+  }, [riskHistories, mode]);
 
   return { distributionByRef, isLoading };
 }

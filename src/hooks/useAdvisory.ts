@@ -209,7 +209,7 @@ export const useAdvisory = () => {
       userId: session?.identity.id ?? "",
       vulnId: advisory.id,
       vulnType: "securityAdvisory",
-      vulnerabilityName: advisory.title ?? advisory.id,
+      resourceIdentifier: advisory.title ?? advisory.id,
       createdByVexRule: false,
     } as VulnEventDTO;
 

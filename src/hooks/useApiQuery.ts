@@ -29,3 +29,30 @@ export function useApiQuery<
     swrConfig,
   );
 }
+
+export function useApiQueryWithTransformer<
+  Path extends GetPath,
+  Init extends MaybeOptionalInit<paths[Path], "get">,
+  T = MethodResponse<typeof browserClient, "get", Path>,
+>(
+  path: Path | null,
+  callback?: (
+    data: MethodResponse<typeof browserClient, "get", Path>,
+  ) => T | Promise<T>,
+  init?: Init,
+  swrConfig?: SWRConfiguration<T>,
+) {
+  return useSWR(
+    path === null ? null : ([path, init] as const),
+    async ([requestPath, requestInit]) => {
+      const response = unwrap(
+        await browserClient.GET(requestPath, requestInit as never),
+      ) as MethodResponse<typeof browserClient, "get", Path>;
+      if (callback) {
+        return await callback(response);
+      }
+      return response as unknown as T;
+    },
+    swrConfig,
+  );
+}

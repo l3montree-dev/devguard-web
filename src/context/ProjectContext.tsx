@@ -6,9 +6,8 @@ import { createContext, useContext } from "react";
 import type { AssetDTO, ProjectDetailsDTO } from "@/types/dto";
 import type { WithUpdater } from "@/types/view/context";
 
-const ProjectContext = createContext<
+export const ProjectContext = createContext<
   WithUpdater<(ProjectDetailsDTO & { assets: AssetDTO[] }) | null>
 >({ v: null, update: () => {} });
-export const ProjectProvider = ProjectContext.Provider;
 export const useProject = () => useContext(ProjectContext).v;
 export const useUpdateProject = () => useContext(ProjectContext).update;

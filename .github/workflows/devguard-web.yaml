@@ -196,7 +196,7 @@ jobs:
           echo "minor=${MINOR}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           name: "DevGuard Web ${{ steps.tag.outputs.tag }}"
@@ -236,6 +236,8 @@ jobs:
       contents: read
       packages: write
       security-events: write
+      # the provenance and manifest jobs request an OIDC token to let devguard sign the SLSA build provenance
+      id-token: write
     with:
       nix-target-amd64: devguard-web-amd64
       nix-target-arm64: devguard-web-arm64

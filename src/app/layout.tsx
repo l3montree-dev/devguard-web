@@ -14,8 +14,8 @@ import { config } from "../config";
 import MobileGate from "@/components/MobileGate";
 import { CSSVariableEditor } from "@/components/themes/CSSVariableEditor";
 import { ClientContextWrapper } from "../context/ClientContextWrapper";
-import { ConfigProvider } from "../context/ConfigContext";
-import { SessionProvider } from "../context/SessionContext";
+import { ConfigContext } from "../context/ConfigContext";
+import { SessionContext } from "../context/SessionContext";
 import { fetchInstanceSettings } from "../data-fetcher/fetchInstanceSettings";
 import { fetchOrgs } from "../data-fetcher/fetchOrgs";
 import { fetchSession } from "../data-fetcher/fetchSession";
@@ -145,11 +145,11 @@ async function SessionShell({ children }: { children: React.ReactNode }) {
 
   return (
     <ClientContextWrapper
-      Provider={ConfigProvider}
+      Context={ConfigContext}
       value={{ ...config, ...instanceSettings }}
     >
       <ClientContextWrapper
-        Provider={SessionProvider}
+        Context={SessionContext}
         value={{
           session,
           organizations: orgs,

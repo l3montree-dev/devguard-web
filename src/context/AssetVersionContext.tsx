@@ -11,7 +11,7 @@ import { fetcher } from "@/data-fetcher/fetcher";
 import useSWR from "swr";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
-const AssetVersionContext = createContext<
+export const AssetVersionContext = createContext<
   WithUpdater<{
     assetVersion: AssetVersionDTO;
     artifacts: ArtifactDTO[];
@@ -20,7 +20,6 @@ const AssetVersionContext = createContext<
   v: null,
   update: NoopUpdater,
 });
-export const AssetVersionProvider = AssetVersionContext.Provider;
 export const useAssetVersion = () =>
   useContext(AssetVersionContext).v?.assetVersion;
 export const useUpdateAssetVersionState = () =>

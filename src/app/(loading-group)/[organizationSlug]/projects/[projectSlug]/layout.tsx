@@ -4,7 +4,7 @@
 import ProjectHeader from "@/components/common/ProjectHeader";
 import React, { Suspense } from "react";
 import { ClientContextWrapper } from "../../../../../context/ClientContextWrapper";
-import { ProjectProvider } from "../../../../../context/ProjectContext";
+import { ProjectContext } from "../../../../../context/ProjectContext";
 import { fetchProject } from "../../../../../data-fetcher/fetchProject";
 import { handleHttpError } from "../../../../../data-fetcher/handleHttpError";
 
@@ -43,7 +43,7 @@ async function ProjectShell({
   }
 
   return (
-    <ClientContextWrapper Provider={ProjectProvider} value={project}>
+    <ClientContextWrapper Context={ProjectContext} value={project}>
       <ProjectHeader />
       {children}
     </ClientContextWrapper>

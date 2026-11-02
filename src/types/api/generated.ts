@@ -16820,6 +16820,7 @@ export interface components {
       mechanicalJustification: components["schemas"]["dtos.MechanicalJustificationType"];
       originalAssetVersionName: string;
       packageName: string;
+      resourceIdentifier: string;
       type: components["schemas"]["dtos.VulnEventType"];
       uri: string;
       userAgent: string;
@@ -16828,7 +16829,6 @@ export interface components {
       vexRuleId: string;
       vulnId: string;
       vulnType: components["schemas"]["dtos.VulnType"];
-      vulnerabilityName: string;
     };
     /** @enum {string} */
     "dtos.VulnEventType":
@@ -17568,8 +17568,6 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000

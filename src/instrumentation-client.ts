@@ -32,8 +32,10 @@ Sentry.init({
     }
     return event;
   },
-
-  sendDefaultPii: false,
+  dataCollection: {
+    userInfo: false,
+    cookies: false,
+  },
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

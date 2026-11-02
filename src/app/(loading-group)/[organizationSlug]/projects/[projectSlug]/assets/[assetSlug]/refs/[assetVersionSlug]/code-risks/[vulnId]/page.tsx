@@ -100,6 +100,15 @@ const Index = () => {
   );
   const deleteEvent = useDeleteEvent();
 
+  // Show error state, catch invalid vulnId before loading check to get 404 instead of infinitely loading skeleton
+  if (error) {
+    return (
+      <Page title="Error Loading Vulnerability">
+        <Err />
+      </Page>
+    );
+  }
+
   // Show loading skeleton if data is loading
   if (isLoading || !vuln) {
     return (
@@ -123,15 +132,6 @@ const Index = () => {
             <Skeleton className="w-full h-[200px]" />
           </div>
         </div>
-      </Page>
-    );
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <Page title="Error Loading Vulnerability">
-        <Err />
       </Page>
     );
   }
@@ -171,7 +171,7 @@ const Index = () => {
             userId: session?.identity.id ?? "",
             vulnId: vuln.id,
             vulnType: "firstPartyVuln",
-            vulnerabilityName: vuln.ruleId,
+            resourceIdentifier: vuln.ruleId,
             originalAssetVersionName: assetVersion?.name ?? "",
             packageName: null,
             uri: vuln.uri,
