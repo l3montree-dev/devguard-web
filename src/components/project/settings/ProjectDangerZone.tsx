@@ -8,6 +8,12 @@ import DangerZone from "@/components/common/DangerZone";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useProjectScope } from "@/hooks/useProjectScope";
@@ -15,6 +21,8 @@ import { useProjectUpdate } from "@/hooks/useProjectUpdate";
 import { toast } from "@/lib/toast";
 import { deleteProject } from "@/services/projectService";
 import { classNames } from "@/utils/common";
+
+import { InfoIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -52,9 +60,28 @@ const ProjectDangerZone = () => {
       <div className="flex flex-col gap-4">
         <div className={classNames(!org.isPublic && "opacity-50")}>
           <ListItem
-            Title="Public Group"
-            Description={`Setting this to true will make the ${project.name} group visible to the public. This enables you to make public repositories inside this group that can be accessed by users that are not members of the ${org.name} organization. Turning this on does not make all repositories inside this group public, you can enable this in each repository individually in their respective settings.`}
-            //Callout oder InfoIcon
+            Title={
+              <span className="flex items-center">
+                Public Group
+                <Tooltip>
+                  <TooltipTrigger aria-label="More information about public groups">
+                    <InfoIcon className="ml-1.5 block h-4 w-4 text-primary" />
+                  </TooltipTrigger>
+                  <TooltipPortal>
+                    <TooltipContent>
+                      <p>
+                        Only sub-groups and projects that are set to public
+                        become visible, private projects stay visible to members
+                        of the organization only. All sub-groups and projects
+                        are still private by default.
+                      </p>
+                    </TooltipContent>
+                  </TooltipPortal>
+                </Tooltip>
+              </span>
+            }
+            Description={`Makes the ${project.name} group visible to non-members of the ${org.name} organization. Has to be enabled so individual sub-groups and projects can be
+                      set to public.`}
             Button={
               <Switch
                 data-testid="public-group-switch"

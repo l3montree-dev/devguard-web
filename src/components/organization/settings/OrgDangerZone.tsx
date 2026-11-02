@@ -8,10 +8,17 @@ import DangerZone from "@/components/common/DangerZone";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrgUpdate } from "@/hooks/useOrgUpdate";
 import { toast } from "@/lib/toast";
 import { deleteOrganization } from "@/services/organizationService";
+import { InfoIcon } from "lucide-react";
 import { useState } from "react";
 
 const OrgDangerZone = () => {
@@ -44,8 +51,28 @@ const OrgDangerZone = () => {
     <DangerZone>
       <div className="flex flex-col gap-4">
         <ListItem
-          Title="Public Organization"
-          Description={`Setting this to true will make the ${org.name} organization visible to the public. Only projects that are public become visible, private projects stay visible to members of the organization only.`}
+          Title={
+            <span className="flex items-center">
+              Public Organization
+              <Tooltip>
+                <TooltipTrigger aria-label="More information about public organizations">
+                  <InfoIcon className="ml-1.5 block h-4 w-4 text-primary" />
+                </TooltipTrigger>
+                <TooltipPortal>
+                  <TooltipContent>
+                    <p>
+                      Only groups and projects that are set to public become
+                      visible, private projects stay visible to members of the
+                      organization only. All groups and projects are still
+                      private by default.
+                    </p>
+                  </TooltipContent>
+                </TooltipPortal>
+              </Tooltip>
+            </span>
+          }
+          Description={`Makes the ${org.name} organization visible to non-members. Has to be enabled so individual groups and projects can be
+                      set to public.`}
           Button={
             <Switch
               data-testid="public-org-switch"

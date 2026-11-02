@@ -8,19 +8,28 @@ import DangerZone from "@/components/common/DangerZone";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { useAssetScope } from "@/hooks/useAssetScope";
 import { useAssetUpdate } from "@/hooks/useAssetUpdate";
 import { toast } from "@/lib/toast";
 import { deleteAsset } from "@/services/assetService";
 import { classNames } from "@/utils/common";
+import { InfoIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const AssetDangerZone = () => {
   const asset = useActiveAsset()!;
   const project = useActiveProject()!;
+  const org = useActiveOrg();
   const scope = useAssetScope();
   const handleUpdate = useAssetUpdate();
   const router = useRouter();
@@ -42,8 +51,25 @@ const AssetDangerZone = () => {
       <div className="flex flex-col gap-4">
         <div className={classNames(!project.isPublic && "opacity-50")}>
           <ListItem
-            Title="Public Repository"
-            Description={`Setting this to true will make the ${asset.name} repository visible to the public.`}
+            Title={
+              <span className="flex items-center">
+                Public Project
+                <Tooltip>
+                  <TooltipTrigger aria-label="More information about public projects">
+                    <InfoIcon className="ml-1.5 block h-4 w-4 text-primary" />
+                  </TooltipTrigger>
+                  <TooltipPortal>
+                    <TooltipContent>
+                      <p>
+                        Non-members will be able to see the project pages but do
+                        not have any write access to anything.
+                      </p>
+                    </TooltipContent>
+                  </TooltipPortal>
+                </Tooltip>
+              </span>
+            }
+            Description={`Makes the ${asset.name} project visible to non-members of the ${org.name} organization.`}
             Button={
               <Switch
                 data-testid="publish-repo-switch"
