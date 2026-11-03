@@ -6,7 +6,6 @@
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
 import AuthGuard from "@/components/AuthGuard";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
@@ -35,7 +34,6 @@ import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useInstanceInfo } from "@/hooks/useInstanceSettings";
 import useTable from "@/hooks/useTable";
 import { createAppColumnHelper } from "@/hooks/useTable";
@@ -144,7 +142,6 @@ const Index: FunctionComponent = () => {
   const config = useConfig();
   const latestScannerImage = useScannerImage();
 
-  const assetMenu = useAssetMenu();
   const instanceInfo = useInstanceInfo();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
@@ -455,11 +452,7 @@ const Index: FunctionComponent = () => {
   }, [vulnData, selectedVulnIds]);
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Dependency Risks (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"Dependency Risks (" + asset.name + ")"}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex flex-row gap-2">

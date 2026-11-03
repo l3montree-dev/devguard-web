@@ -4,7 +4,6 @@
 "use client";
 
 import AuthGuard from "@/components/AuthGuard";
-import AssetTitle from "@/components/common/AssetTitle";
 import { DocDrawer } from "@/components/common/DocDrawer";
 import EmptyParty from "@/components/common/EmptyParty";
 import Err from "@/components/common/Err";
@@ -23,7 +22,6 @@ import VexRulesTable from "@/components/vex-rules/VexRulesTable";
 import VexSourcesTable from "@/components/vex-rules/VexSourcesSection";
 import { isVexSourceType, type VexSource } from "@/types/view/vexRules";
 import VexUploadModal from "@/components/vex-rules/VexUploadModal";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import useFilter from "@/hooks/useFilter";
@@ -137,7 +135,6 @@ const VexRulesPage: FunctionComponent = () => {
   const pushQuery = useRouterQuery();
 
   const activeTab = searchParams?.get("tab") ?? "rules";
-  const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
@@ -237,11 +234,7 @@ const VexRulesPage: FunctionComponent = () => {
 
   if (isLoading && !vexRulesResponse) {
     return (
-      <Page
-        Menu={assetMenu}
-        title="Loading VEX rules..."
-        Title={<AssetTitle />}
-      >
+      <Page title="Loading VEX rules...">
         <div className="space-y-4">
           <Skeleton className="h-40 w-full" />
           <Skeleton className="h-10 w-full" />
@@ -253,22 +246,14 @@ const VexRulesPage: FunctionComponent = () => {
 
   if (error) {
     return (
-      <Page
-        Menu={assetMenu}
-        title={"VEX Rules (" + asset.name + ")"}
-        Title={<AssetTitle />}
-      >
+      <Page title={"VEX Rules (" + asset.name + ")"}>
         <Err />
       </Page>
     );
   }
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"VEX Rules (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"VEX Rules (" + asset.name + ")"}>
       <Section
         primaryHeadline
         forceVertical

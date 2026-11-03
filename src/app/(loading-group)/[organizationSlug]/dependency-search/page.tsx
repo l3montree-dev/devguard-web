@@ -26,7 +26,6 @@ import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import { Badge } from "@/components/ui/badge";
 import { buildFilterSearchParams } from "@/utils/url";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { useOrganizationComponentList } from "@/hooks/useComponents";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
@@ -78,7 +77,6 @@ const columnsDef: TableColumnDef<ProjectDependency, any>[] = [
 ];
 
 const OrgDependencySearch: FunctionComponent = () => {
-  const menu = useOrganizationMenu();
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
@@ -105,7 +103,7 @@ const OrgDependencySearch: FunctionComponent = () => {
   });
 
   return (
-    <Page Menu={menu} title={"Package Search (" + activeOrg.name + ")"}>
+    <Page title={"Package Search (" + activeOrg.name + ")"}>
       <Section
         primaryHeadline
         forceVertical

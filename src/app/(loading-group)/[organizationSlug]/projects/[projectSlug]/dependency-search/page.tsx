@@ -24,7 +24,6 @@ import type { FunctionComponent } from "react";
 import { useProjectComponentList } from "@/hooks/useComponents";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
-import { useOrganizationMenu } from "../../../../../../hooks/useOrganizationMenu";
 
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -33,7 +32,6 @@ import { buildFilterSearchParams } from "@/utils/url";
 import { useActiveProject } from "../../../../../../hooks/useActiveProject";
 
 const OrgDependencySearch: FunctionComponent = () => {
-  const menu = useOrganizationMenu();
   const { organizationSlug } = useDecodedParams() as {
     organizationSlug: string;
   };
@@ -109,7 +107,7 @@ const OrgDependencySearch: FunctionComponent = () => {
   });
 
   return (
-    <Page Menu={menu} title={"Package Search (" + project.name + ")"}>
+    <Page title={"Package Search (" + project.name + ")"}>
       <Section
         primaryHeadline
         forceVertical

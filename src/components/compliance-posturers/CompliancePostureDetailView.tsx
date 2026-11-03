@@ -271,7 +271,7 @@ const InheritedHandlingWarning = (
     );
 };
 
-const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
+const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
   const {
     data: vuln,
     error,
@@ -493,7 +493,7 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
     mutate();
   };
   return (
-    <Page Menu={Menu} Title={Title} title={vuln.title}>
+    <Page title={vuln.title}>
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">

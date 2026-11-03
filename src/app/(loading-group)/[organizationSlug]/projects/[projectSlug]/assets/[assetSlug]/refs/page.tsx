@@ -11,7 +11,6 @@ import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { GitBranchIcon, TriangleAlert } from "lucide-react";
 import React from "react";
 import Page from "../../../../../../../../components/Page";
-import AssetTitle from "../../../../../../../../components/common/AssetTitle";
 import DateString, {
   parseDateOnly,
 } from "../../../../../../../../components/common/DateString";
@@ -35,7 +34,6 @@ import {
 } from "../../../../../../../../components/ui/dropdown-menu";
 import { useUpdateAsset } from "../../../../../../../../context/AssetContext";
 import { useAssetBranchesAndTags } from "../../../../../../../../hooks/useActiveAssetVersion";
-import { useAssetMenu } from "../../../../../../../../hooks/useAssetMenu";
 import useDecodedParams from "../../../../../../../../hooks/useDecodedParams";
 import {
   deleteAssetVersion,
@@ -50,7 +48,6 @@ import AuthGuard from "../../../../../../../../components/AuthGuard";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const RefsPage = () => {
-  const assetMenu = useAssetMenu();
   const assetVersions = useAssetBranchesAndTags();
   const updateAsset = useUpdateAsset();
   const params = useDecodedParams() as {
@@ -132,12 +129,7 @@ const RefsPage = () => {
   const { distributionByRef } = useRefDistributions();
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Branches + Tags (" + asset.name + ")"}
-      description="Overview of the repository"
-      Title={<AssetTitle />}
-    >
+    <Page title={"Branches + Tags (" + asset.name + ")"}>
       <Section
         forceVertical
         primaryHeadline

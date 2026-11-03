@@ -22,7 +22,6 @@ import { AsyncButton, Button } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import Link from "next/link";
@@ -31,7 +30,6 @@ import Markdown from "@/components/common/Markdown";
 
 import { Badge } from "@/components/ui/badge";
 
-import AssetTitle from "@/components/common/AssetTitle";
 import {
   emptyThenNull,
   getIntegrationNameFromRepositoryIdOrExternalProviderId,
@@ -90,7 +88,6 @@ const Index = () => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject();
 
-  const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
 
   const assetVersion = useActiveAssetVersion();
@@ -239,11 +236,7 @@ const Index = () => {
   };
 
   return (
-    <Page
-      Menu={assetMenu}
-      Title={<AssetTitle />}
-      title={vuln.ruleId ?? "Vuln Details"}
-    >
+    <Page title={vuln.ruleId ?? "Vuln Details"}>
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">

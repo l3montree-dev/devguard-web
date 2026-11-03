@@ -5,23 +5,15 @@
 
 import Page from "@/components/Page";
 import AssetSettingsNav from "@/components/asset/settings/AssetSettingsNav";
-import AssetTitle from "@/components/common/AssetTitle";
 import SettingsShell from "@/components/common/settings/SettingsShell";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import type { PropsWithChildren } from "react";
 
 export default function AssetSettingsLayout({ children }: PropsWithChildren) {
-  const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Settings (" + asset.name + ")"}
-      description="Update the settings of this repository"
-      Title={<AssetTitle />}
-    >
+    <Page title={"Settings (" + asset.name + ")"}>
       <SettingsShell nav={<AssetSettingsNav />}>{children}</SettingsShell>
     </Page>
   );

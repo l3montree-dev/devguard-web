@@ -5,7 +5,6 @@
 
 import Page from "@/components/Page";
 import RiskSeverityRadialChart from "@/components/RiskSeverityRadialChart";
-import AssetTitle from "@/components/common/AssetTitle";
 import MitigateDialog from "@/components/MitigateDialog";
 import VulnState from "@/components/common/VulnState";
 import { dependencyRiskTourSteps } from "@/components/common/tours/dependencyRiskTour";
@@ -32,7 +31,6 @@ import {
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { usePageTour } from "@/hooks/usePageTour";
@@ -119,7 +117,6 @@ const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
 
-  const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
   const assetVersion = useActiveAssetVersion();
 
@@ -351,22 +348,14 @@ const Index: FunctionComponent = () => {
   // Show error state
   if (error) {
     return (
-      <Page
-        Menu={assetMenu}
-        Title={<AssetTitle />}
-        title="Error Loading Vulnerability"
-      >
+      <Page title="Error Loading Vulnerability">
         <Err />
       </Page>
     );
   }
 
   return (
-    <Page
-      Menu={assetMenu}
-      Title={<AssetTitle />}
-      title={vuln?.cve?.cve ?? "Vulnerability Details"}
-    >
+    <Page title={vuln?.cve?.cve ?? "Vulnerability Details"}>
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">

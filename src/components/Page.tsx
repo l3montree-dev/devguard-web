@@ -5,7 +5,6 @@
 import { useGlobalNotice } from "@/hooks/useGlobalNotice";
 import useDocumentTitle from "@/hooks/useDocumentTitle";
 import React, { type PropsWithChildren, useEffect } from "react";
-import { classNames } from "../utils/common";
 import Main from "./Main";
 import { toast } from "@/lib/toast";
 import Markdown from "./common/Markdown";
@@ -14,17 +13,6 @@ import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
 
 type PageProps = {
   title: string;
-  description?: string;
-  Title?: React.ReactNode;
-  // searchActive: boolean;
-  Sidebar?: React.ReactNode;
-  Button?: React.ReactNode;
-  Menu?: Array<{
-    title: string;
-    href: string;
-    Icon: any;
-  }>;
-  fullscreen?: boolean;
   breadcrumbs?: Array<{
     title: string;
     href: string;
@@ -55,23 +43,9 @@ const Page = (props: PropsWithChildren<PageProps>) => {
 
   return (
     <div>
-      <div className={classNames(props.Sidebar ? "lg:pr-80" : "")}>
-        <Main
-          breadcrumbs={props.breadcrumbs}
-          fullscreen={props.fullscreen}
-          Menu={props.Menu}
-          Button={props.Button}
-          Title={props.Title}
-          title={props.title}
-        >
-          {props.children}
-        </Main>
-      </div>
-      {!!props.Sidebar && (
-        <aside className="bottom-0 right-0 top-0 hidden w-80 flex-1 overflow-y-auto border-l bg-card dark:text-white md:fixed lg:block">
-          {props.Sidebar}
-        </aside>
-      )}
+      <Main breadcrumbs={props.breadcrumbs} title={props.title}>
+        {props.children}
+      </Main>
     </div>
   );
 };

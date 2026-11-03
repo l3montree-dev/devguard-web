@@ -15,7 +15,6 @@ import type { SubGroupProject, SubGroupsAndAsset } from "@/types/view/project";
 import type { ProjectCreateRequest } from "@/services/projectService";
 
 import Section from "@/components/common/Section";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { toast } from "@/lib/toast";
 
 import CustomPagination from "@/components/common/CustomPagination";
@@ -155,8 +154,6 @@ const OrganizationHomePage: FunctionComponent = () => {
 
   const importingIntoEmptyList = syncRunning && projects?.data.length === 0;
 
-  const orgMenu = useOrganizationMenu();
-
   const tourSteps = useMemo(
     () => orgHomeTourSteps(isAdmin(currentUserRole)),
     [currentUserRole],
@@ -186,7 +183,7 @@ const OrganizationHomePage: FunctionComponent = () => {
         onStartTour={() => handleStartTour(startTour)}
         onSkip={handleSkip}
       />
-      <Page title={"Groups (" + activeOrg.name + ")"} Menu={orgMenu}>
+      <Page title={"Groups (" + activeOrg.name + ")"}>
         <CreateGroupForm
           variant="dialog"
           open={open}
