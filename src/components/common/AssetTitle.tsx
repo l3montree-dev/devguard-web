@@ -8,25 +8,12 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import Link from "next/link";
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import ProjectTitle from "./ProjectTitle";
 import { eventBus } from "@/events";
 import { truncateMiddle } from "@/utils/common";
 import { readLocalStorage, writeLocalStorage } from "@/hooks/useLocalStorage";
-
-const subscribe = (onStoreChange: () => void) => {
-  eventBus.subscribe(
-    "assetTitleListener",
-    "assetVersionDeleted",
-    onStoreChange,
-  );
-  return () => {
-    eventBus.unsubscribe("assetTitleListener");
-  };
-};
-
-const getServerSnapshot = () => "";
 
 const AssetTitle = () => {
   const activeOrg = useActiveOrg();
@@ -37,16 +24,19 @@ const AssetTitle = () => {
   const currentSlug = params?.assetVersionSlug;
   const storageKey = "lastViewedAssetVersionSlug" + asset?.slug;
 
-  const getSnapshot = useCallback(() => {
-    const stored = readLocalStorage(storageKey);
-    return stored && stored !== "undefined" ? stored : "";
-  }, [storageKey]);
+  const [storedSlug, setStoredSlug] = useState("");
 
-  const storedSlug = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
+  useEffect(() => {
+    const read = () => {
+      const stored = readLocalStorage(storageKey);
+      setStoredSlug(stored && stored !== "undefined" ? stored : "");
+    };
+    read();
+    eventBus.subscribe("assetTitleListener", "assetVersionDeleted", read);
+    return () => {
+      eventBus.unsubscribe("assetTitleListener");
+    };
+  }, [storageKey]);
 
   const assetVersionSlug = currentSlug ?? storedSlug;
 

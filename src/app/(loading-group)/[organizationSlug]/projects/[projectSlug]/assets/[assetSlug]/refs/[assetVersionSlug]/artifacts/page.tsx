@@ -27,7 +27,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
-import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
+import ArtifactRow, { sourceKey } from "@/components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 import {
@@ -288,7 +288,8 @@ const Artifacts = () => {
     for (const artifact of artifacts) {
       const artifactSources = rootNodes?.[artifact.artifactName] || [];
       const remainingSources = artifactSources.filter(
-        (source) => !urlsToDelete.includes(source.url),
+        (source) =>
+          !urlsToDelete.includes(sourceKey(artifact.artifactName, source.url)),
       );
 
       // Only include artifacts that have sources being deleted

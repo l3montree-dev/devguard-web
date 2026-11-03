@@ -6,6 +6,7 @@
 import { documentationLinks } from "@/const/documentationLinks";
 import { useConfig } from "@/context/ConfigContext";
 import { useInstanceInfo } from "@/hooks/useInstanceSettings";
+import { useIsSelfHosted } from "@/hooks/useIsSelfHosted";
 import { classNames } from "@/utils/common";
 import Link from "next/link";
 
@@ -19,6 +20,7 @@ interface Props {
 export default function Footer({ variant = "auth" }: Props) {
   const config = useConfig();
   const instanceInfo = useInstanceInfo();
+  const isSelfHosted = useIsSelfHosted();
   const isApp = variant === "app";
 
   return (
@@ -55,6 +57,16 @@ export default function Footer({ variant = "auth" }: Props) {
         >
           GitHub
         </Link>
+        {isSelfHosted && (
+          <Link
+            className={linkClassName}
+            target="_blank"
+            rel="noopener noreferrer"
+            href={config.enterpriseUrl}
+          >
+            Enterprise
+          </Link>
+        )}
         <Link
           className={linkClassName}
           target="_blank"

@@ -1,13 +1,15 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
-const subscribe = () => () => {};
+export const useIsHydrated = () => {
+  const [isHydrated, setIsHydrated] = useState(false);
 
-const getSnapshot = () => true;
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsHydrated(true);
+  }, []);
 
-const getServerSnapshot = () => false;
-
-export const useIsHydrated = () =>
-  useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return isHydrated;
+};
