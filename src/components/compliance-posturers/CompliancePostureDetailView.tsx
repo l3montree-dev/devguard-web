@@ -34,7 +34,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -212,8 +211,6 @@ function MappedControlsGroup({
 interface Props {
   scope: PostureScope;
   vulnId: string;
-  Menu?: any[];
-  Title?: ReactNode;
   showTicketCreation?: boolean;
 }
 

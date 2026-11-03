@@ -10,7 +10,7 @@ import { flexRender } from "@tanstack/react-table";
 
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import type { FunctionComponent, ReactNode } from "react";
+import type { FunctionComponent } from "react";
 import { classNames } from "@/utils/common";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -59,8 +59,6 @@ const columnHelper = createAppColumnHelper<CompliancePostureWithControlDTO>();
 interface Props {
   scope: PostureScope;
   contextName: string;
-  Menu?: any[];
-  Title?: ReactNode;
 }
 
 const CompliancePosturesListView: FunctionComponent<Props> = ({

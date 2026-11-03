@@ -4,7 +4,6 @@
 "use client";
 
 import CompliancePostureDetailView from "@/components/compliance-posturers/CompliancePostureDetailView";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
 const Index = () => {
@@ -13,16 +12,12 @@ const Index = () => {
     vulnId: string;
   };
 
-  const orgMenu = useOrganizationMenu();
-
   const scope = {
     level: "organization",
     organization: organizationSlug,
   } as const;
 
-  return (
-    <CompliancePostureDetailView scope={scope} vulnId={vulnId} Menu={orgMenu} />
-  );
+  return <CompliancePostureDetailView scope={scope} vulnId={vulnId} />;
 };
 
 export default Index;
