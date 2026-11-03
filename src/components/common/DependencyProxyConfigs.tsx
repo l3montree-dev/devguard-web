@@ -45,6 +45,7 @@ const ecosystemIcons: Record<string, string> = {
   composer: "/logos/composer-svgrepo-com.svg",
   oci: "/assets/oci-icon-pantone.svg",
   debian: "/logos/deb-svgrepo-com.svg",
+  alpine: "/logos/apk-svgrepo-com.svg",
 };
 
 const getEcosystemContent = (key: string, url: string) => {
@@ -348,6 +349,37 @@ Signed-By: /etc/apt/keyrings/devguard.asc`}
       );
     }
 
+    case "alpine": {
+      return (
+        <div>
+          <InputWithButton
+            label="Alpine Repository URL"
+            message="Replace the entries in /etc/apk/repositories with this URL to route apk downloads through the dependency proxy."
+            value={url}
+            nameKey="apk-proxy-url"
+            copyable
+          />
+          <div className="my-4 text-sm">
+            <span className="font-medium mb-1 block">
+              Example /etc/apk/repositories
+            </span>
+            <CopyCode
+              language="shell"
+              codeString={`${url}/v3.20/main
+${url}/v3.20/community`}
+            />
+          </div>
+          <Callout intent="warning">
+            Versions blocked by your rules are not replaced with an older
+            allowed version, so{" "}
+            <code className="font-mono text-sm">apk add</code> fails for them.
+            Wait until the package satisfies your rules or add an allow rule for
+            it.
+          </Callout>
+        </div>
+      );
+    }
+
     default:
       return (
         <InputWithButton
@@ -501,7 +533,7 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
                   Available fields: <code className="font-mono">pkg.name</code>,{" "}
                   <code className="font-mono">pkg.version</code>,{" "}
                   <code className="font-mono">pkg.ecosystem</code> (npm, go,
-                  pypi, maven, composer, deb, oci),{" "}
+                  pypi, maven, composer, deb, apk, oci),{" "}
                   <code className="font-mono">pkg.purl</code>,{" "}
                   <code className="font-mono">pkg.registry</code>,{" "}
                   <code className="font-mono">pkg.releasedAt</code> and, for npm
