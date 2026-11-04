@@ -12,7 +12,6 @@ import Callout from "../../../../../../components/common/Callout";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
 import ListItem from "../../../../../../components/common/ListItem";
 import ListRenderer from "../../../../../../components/common/ListRenderer";
-import ProjectTitle from "../../../../../../components/common/ProjectTitle";
 import Section from "../../../../../../components/common/Section";
 import Page from "../../../../../../components/Page";
 import ReleaseDialog from "../../../../../../components/ReleaseDialog";
@@ -24,7 +23,6 @@ import {
   TooltipTrigger,
 } from "../../../../../../components/ui/tooltip";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
-import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import AuthGuard from "../../../../../../components/AuthGuard";
 import {
   createRelease,
@@ -37,7 +35,6 @@ import type { ReleaseDTO } from "@/types/dto";
 
 import { type Modify } from "../../../../../../types/common";
 const Releases = () => {
-  const menu = useProjectMenu();
   const [open, setOpen] = React.useState(false);
   const { organizationSlug, projectSlug } = useDecodedParams() as {
     organizationSlug: string;
@@ -86,11 +83,7 @@ const Releases = () => {
   };
 
   return (
-    <Page
-      Menu={menu}
-      Title={<ProjectTitle />}
-      title={"Releases (" + project.name + ")"}
-    >
+    <Page title={"Releases (" + project.name + ")"}>
       <div className="flex flex-row">
         <div className="flex-1">
           <Section

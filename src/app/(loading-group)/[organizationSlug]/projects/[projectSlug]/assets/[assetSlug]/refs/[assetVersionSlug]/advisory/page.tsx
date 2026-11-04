@@ -6,14 +6,12 @@
 import AdvisoryDialog from "@/components/AdvisoryDialog";
 import AdvisoryTable from "@/components/advisory/AdvisoryTable";
 import AuthGuard from "@/components/AuthGuard";
-import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useConfig } from "@/context/ConfigContext";
 import { useAdvisoryList } from "@/hooks/useAdvisory";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import useRouterQuery from "@/hooks/useRouterQuery";
 import { Loader2 } from "lucide-react";
@@ -32,7 +30,6 @@ const Index: FunctionComponent = () => {
   const router = useRouter();
   const pathname = usePathname();
   const config = useConfig();
-  const assetMenu = useAssetMenu();
   const push = useRouterQuery();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams();
   const asset = useActiveAsset();
@@ -44,11 +41,7 @@ const Index: FunctionComponent = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Security Advisories (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"Security Advisories (" + asset.name + ")"}>
       {dialogOpen && (
         <AdvisoryDialog
           open={dialogOpen}

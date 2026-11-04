@@ -10,7 +10,7 @@ import { flexRender } from "@tanstack/react-table";
 
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
-import type { FunctionComponent, ReactNode } from "react";
+import type { FunctionComponent } from "react";
 import { classNames } from "@/utils/common";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import CustomPagination from "@/components/common/CustomPagination";
@@ -59,14 +59,10 @@ const columnHelper = createAppColumnHelper<CompliancePostureWithControlDTO>();
 interface Props {
   scope: PostureScope;
   contextName: string;
-  Menu?: any[];
-  Title?: ReactNode;
 }
 
 const CompliancePosturesListView: FunctionComponent<Props> = ({
   scope,
-  Menu,
-  Title,
   contextName,
 }) => {
   const router = useRouter();
@@ -367,11 +363,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   }, [isClosed, frameworks]);
 
   return (
-    <Page
-      Menu={Menu}
-      title={"Compliance Postures (" + contextName + ")"}
-      Title={Title}
-    >
+    <Page title={"Compliance Postures (" + contextName + ")"}>
       <div className="flex flex-row items-center justify-between">
         {asset && <BranchTagSelector branches={branches} tags={tags} />}
         <div className="ml-auto flex flex-row gap-2">

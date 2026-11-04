@@ -4,7 +4,6 @@
 "use client";
 
 import CompliancePosturesListView from "@/components/compliance-posturers/CompliancePosturesListView";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 
@@ -13,7 +12,6 @@ const Index = () => {
     organizationSlug: string;
   };
 
-  const orgMenu = useOrganizationMenu();
   const activeOrg = useActiveOrg();
   const orgName = activeOrg.name;
 
@@ -22,13 +20,7 @@ const Index = () => {
     organization: organizationSlug,
   } as const;
 
-  return (
-    <CompliancePosturesListView
-      scope={scope}
-      Menu={orgMenu}
-      contextName={orgName}
-    />
-  );
+  return <CompliancePosturesListView scope={scope} contextName={orgName} />;
 };
 
 export default Index;

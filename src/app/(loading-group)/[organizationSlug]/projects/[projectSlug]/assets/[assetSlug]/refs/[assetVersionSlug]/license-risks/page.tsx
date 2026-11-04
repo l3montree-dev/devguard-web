@@ -5,7 +5,6 @@
 import type { LicenseRiskDTO } from "@/types/dto";
 import SortingCaret from "@/components/common/SortingCaret";
 import { DocDrawer } from "@/components/common/DocDrawer";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import Page from "@/components/Page";
 
@@ -15,7 +14,6 @@ import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { beautifyPurl, classNames, extractVersion } from "@/utils/common";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
 import EmptyParty from "@/components/common/EmptyParty";
@@ -257,18 +255,13 @@ const Index: FunctionComponent = () => {
     data: vulns?.data || [],
   });
 
-  const assetMenu = useAssetMenu();
   const asset = useActiveAsset();
 
   const { branches, tags } = useAssetBranchesAndTags();
   const push = useRouterQuery();
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"License Risks (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"License Risks (" + asset.name + ")"}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
       </div>

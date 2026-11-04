@@ -13,7 +13,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ApiError } from "@/services/apiClient";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { useViewMode } from "@/hooks/useViewMode";
 
@@ -26,7 +25,6 @@ const OrganizationOverview: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const orgSlug = activeOrg.slug;
 
-  const orgMenu = useOrganizationMenu();
   const [mode, setMode] = useViewMode("devguard-org-view-mode");
   useAutoTour("org-overview", orgOverviewTourSteps);
 
@@ -62,11 +60,7 @@ const OrganizationOverview: FunctionComponent = () => {
     !isStatisticsLoading && (is404 || !orgStatistics || isEmptyResponse);
 
   return (
-    <Page
-      Menu={orgMenu}
-      title={"Overview (" + activeOrg.name + ")"}
-      description="Displays an overview about the stats of the org"
-    >
+    <Page title={"Overview (" + activeOrg.name + ")"}>
       <div className="mb-6 flex flex-row items-center justify-between">
         <div data-tour="overview-header">
           <h1 className="text-2xl font-bold">Organization Overview</h1>

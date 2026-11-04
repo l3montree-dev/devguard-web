@@ -18,7 +18,6 @@ import { useCallback, useMemo, useState } from "react";
 import type { AssetFormValues } from "@/types/view/asset";
 import { CreateRepositoryForm } from "../../../../../components/asset/CreateRepositoryForm";
 import AuthGuard from "../../../../../components/AuthGuard";
-import ProjectTitle from "../../../../../components/common/ProjectTitle";
 import Section from "../../../../../components/common/Section";
 import Page from "../../../../../components/Page";
 import { CreateGroupForm } from "../../../../../components/project/CreateGroupForm";
@@ -27,7 +26,6 @@ import { Button } from "../../../../../components/ui/button";
 import { useOrganization } from "../../../../../context/OrganizationContext";
 import { useProject } from "../../../../../context/ProjectContext";
 import { useActiveOrg } from "../../../../../hooks/useActiveOrg";
-import { useProjectMenu } from "../../../../../hooks/useProjectMenu";
 import { isAdmin, useCurrentUserRole } from "../../../../../hooks/useUserRole";
 import {
   createAsset,
@@ -91,7 +89,6 @@ export default function RepositoriesPage() {
   const currentUserRole = useCurrentUserRole();
   const [showProjectModal, setShowProjectModal] = useState(false);
 
-  const projectMenu = useProjectMenu();
   const truncatedProjectName = truncateEnd(project.name, 65);
 
   // a filtered list that comes back empty means "no matches", not "nothing created yet",
@@ -231,16 +228,7 @@ export default function RepositoriesPage() {
 
   return (
     <>
-      <Page
-        Button={
-          !showInlineCreateForm && (
-            <Button onClick={() => setShowModal(true)}>New Asset</Button>
-          )
-        }
-        title={"Repositories (" + project.name + ")"}
-        Menu={projectMenu}
-        Title={<ProjectTitle />}
-      >
+      <Page title={"Repositories (" + project.name + ")"}>
         <Section
           Button={
             !project.externalEntityProviderId &&

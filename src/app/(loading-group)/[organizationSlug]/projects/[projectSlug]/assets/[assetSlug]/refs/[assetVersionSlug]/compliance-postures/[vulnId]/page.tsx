@@ -3,9 +3,7 @@
 
 "use client";
 
-import AssetTitle from "@/components/common/AssetTitle";
 import CompliancePostureDetailView from "@/components/compliance-posturers/CompliancePostureDetailView";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 
 const Index = () => {
@@ -17,8 +15,6 @@ const Index = () => {
       assetVersionSlug: string;
       vulnId: string;
     };
-
-  const assetMenu = useAssetMenu();
 
   const scope = {
     level: "assetVersion",
@@ -32,8 +28,6 @@ const Index = () => {
     <CompliancePostureDetailView
       scope={scope}
       vulnId={vulnId}
-      Menu={assetMenu}
-      Title={<AssetTitle />}
       showTicketCreation={true}
     />
   );

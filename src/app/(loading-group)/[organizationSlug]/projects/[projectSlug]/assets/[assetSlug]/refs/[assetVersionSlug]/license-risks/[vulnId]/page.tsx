@@ -14,7 +14,6 @@ import { AsyncButton, Button } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import Image from "next/image";
@@ -22,7 +21,6 @@ import Link from "next/link";
 import { useState } from "react";
 import type { FunctionComponent } from "react";
 
-import AssetTitle from "@/components/common/AssetTitle";
 import { Combobox } from "@/components/common/Combobox";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -87,7 +85,6 @@ const Index: FunctionComponent = () => {
 
   const activeOrg = useActiveOrg();
   const project = useActiveProject()!;
-  const assetMenu = useAssetMenu();
   const asset = useActiveAsset()!;
   const { session } = useSession();
 
@@ -261,7 +258,7 @@ const Index: FunctionComponent = () => {
   };
 
   return (
-    <Page Menu={assetMenu} Title={<AssetTitle />} title="License Details">
+    <Page title="License Details">
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">

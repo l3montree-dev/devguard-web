@@ -26,7 +26,6 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useConfig } from "@/context/ConfigContext";
 import { useAdvisory } from "@/hooks/useAdvisory";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDecodedParams from "@/hooks/useDecodedParams";
 import { withVPrefix } from "@/services/versionCheck";
 import { Eye, TriangleAlert } from "lucide-react";
@@ -41,7 +40,6 @@ const stateBadges = {
 
 const Index = () => {
   const config = useConfig();
-  const assetMenu = useAssetMenu();
   const { organizationSlug, projectSlug, assetSlug } = useDecodedParams();
   const { sharesInformation } = useCsafAccess();
 
@@ -118,8 +116,6 @@ const Index = () => {
   const activeConfirm = confirm ? confirmConfig[confirm] : null;
   return (
     <Page
-      Menu={assetMenu}
-      Title={"Security Advisory"}
       title={advisory.title ?? advisory.id}
       breadcrumbs={[
         { title: "Security Advisories", href: "./" },

@@ -5,7 +5,6 @@
 
 import type { FirstPartyVuln } from "@/types/dto";
 import SortingCaret from "@/components/common/SortingCaret";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import AuthGuard from "@/components/AuthGuard";
 
 import AcceptRiskDialog from "@/components/AcceptRiskDialog";
@@ -23,7 +22,6 @@ import type { FunctionComponent } from "react";
 import { classNames } from "@/utils/common";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
@@ -289,7 +287,6 @@ const Index: FunctionComponent = () => {
 
   const handleSearch = useDebouncedQuerySearch();
 
-  const assetMenu = useAssetMenu();
   const config = useConfig();
   const latestScannerImage = useScannerImage();
   const asset = useActiveAsset();
@@ -312,11 +309,7 @@ const Index: FunctionComponent = () => {
   );
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Code Risks (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"Code Risks (" + asset.name + ")"}>
       <div className="flex flex-row items-center justify-between">
         <BranchTagSelector branches={branches} tags={tags} />
         <div className="flex gap-2">

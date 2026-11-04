@@ -7,7 +7,6 @@ import { useRelease } from "@/hooks/useReleases";
 import { useReleaseRiskHistory } from "@/hooks/useReleaseStats";
 import CVERainbowBadge from "@/components/CVERainbowBadge";
 import Page from "@/components/Page";
-import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import useTable from "@/hooks/useTable";
 import { createAppColumnHelper } from "@/hooks/useTable";
@@ -155,11 +154,7 @@ const Index: FunctionComponent = () => {
   });
 
   return (
-    <Page
-      title={"Artifacts (" + project.name + ")"}
-      description="Artifacts of the Release"
-      Title={<AssetTitle />}
-    >
+    <Page title={"Artifacts (" + project.name + ")"}>
       <Section
         primaryHeadline
         forceVertical

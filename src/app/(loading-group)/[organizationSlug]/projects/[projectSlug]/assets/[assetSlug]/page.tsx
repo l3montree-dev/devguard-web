@@ -2,11 +2,9 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 "use client";
-import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import PageSkeleton from "@/components/PageSkeleton";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import "@xyflow/react/dist/style.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -98,7 +96,6 @@ const alternatives = [
 ];
 
 const Index: FunctionComponent = () => {
-  const assetMenu = useAssetMenu();
   const role = useCurrentUserRole();
   const config = useConfig();
   const latestScannerImage = useScannerImage();
@@ -396,12 +393,7 @@ const Index: FunctionComponent = () => {
   );
 
   return (
-    <Page
-      Menu={assetMenu}
-      title="Welcome to DevGuard!"
-      description="Overview of the asset"
-      Title={<AssetTitle />}
-    >
+    <Page title="Welcome to DevGuard!">
       {isLoggedIn(role) ? (
         <Section primaryHeadline forceVertical title="Welcome to DevGuard 🚀">
           {isGitLab ? (
