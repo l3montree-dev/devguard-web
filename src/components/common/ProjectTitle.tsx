@@ -14,9 +14,11 @@ import { cn } from "@/lib/utils";
 export const ProjectBadge = ({
   type,
   inHeader = false,
+  isSubGroup = false,
 }: {
   type: ProjectDTO["type"];
   inHeader?: boolean;
+  isSubGroup?: boolean;
 }) => {
   if (type === "kubernetesNamespace") {
     return (
@@ -56,7 +58,7 @@ export const ProjectBadge = ({
         className={cn(inHeader ? "!text-header-foreground" : "text-foreground")}
         variant="outline"
       >
-        {type === "default" ? "Group" : "Subgroup"}
+        {type === "default" && !isSubGroup ? "Group" : "Sub-Group"}
       </Badge>
     );
   }
@@ -107,7 +109,11 @@ export const ProjectElement = ({
         title={displayName}
       >
         <span className="truncate">{truncateMiddle(displayName)}</span>
-        <ProjectBadge type={project.type} inHeader={true} />
+        <ProjectBadge
+          type={project.type}
+          inHeader={true}
+          isSubGroup={!!project.parentId}
+        />
       </Link>
       {!isLast && <span className="opacity-75 flex-shrink-0">/</span>}
     </>

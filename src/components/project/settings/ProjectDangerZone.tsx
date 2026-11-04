@@ -35,6 +35,8 @@ const ProjectDangerZone = () => {
   const router = useRouter();
   const [isPublic, setIsPublic] = useState(project.isPublic);
   const [isSaving, setIsSaving] = useState(false);
+  const isSubGroup = !!project.parentId;
+  const canBePublic = isSubGroup ? !!project.parent?.isPublic : org.isPublic;
 
   const handlePublicChange = async (checked: boolean) => {
     setIsPublic(checked);
@@ -58,11 +60,11 @@ const ProjectDangerZone = () => {
   return (
     <DangerZone>
       <div className="flex flex-col gap-4">
-        <div className={classNames(!org.isPublic && "opacity-50")}>
+        <div className={classNames(!canBePublic && "opacity-50")}>
           <ListItem
             Title={
               <span className="flex items-center">
-                Public Group
+                {isSubGroup ? "Public Sub-Group" : "Public Group"}
                 <Tooltip>
                   <TooltipTrigger aria-label="More information about public groups">
                     <InfoIcon className="ml-1.5 block h-4 w-4 text-primary" />
@@ -80,29 +82,35 @@ const ProjectDangerZone = () => {
                 </Tooltip>
               </span>
             }
-            Description={`Makes the ${project.name} group visible to non-members of the ${org.name} organization. Has to be enabled so individual sub-groups and projects can be
-                      set to public.`}
+            Description={`Makes the ${project.name} ${isSubGroup ? "sub-group" : "group"} visible to non-members of the ${org.name} organization. Has to be enabled so individual sub-groups and projects can be set to public.`}
             Button={
               <Switch
                 data-testid="public-group-switch"
-                disabled={!org.isPublic || isSaving}
+                disabled={!canBePublic || isSaving}
                 checked={isPublic}
                 onCheckedChange={handlePublicChange}
               />
             }
           />
         </div>
-        {org.isPublic ? null : (
+        {canBePublic ? null : (
           <div className="flex items-center justify-between mb-2">
             <small>
-              The organization is not public. You can not make the group public.
+              {isSubGroup
+                ? `The parent group ${project.parent?.name} is not public. You can not make the sub-group public.`
+                : "The organization is not public. You can not make the group public."}
             </small>
             <Link
-              href={`/${scope.organization}/settings/danger-zone`}
-
+              href={
+                isSubGroup
+                  ? `/${scope.organization}/projects/${project.parent?.slug}/settings/danger-zone`
+                  : `/${scope.organization}/settings/danger-zone`
+              }
               className="text-sm text-muted-foreground hover:text-foreground underline"
             >
-              Go to Organization Settings
+              {isSubGroup
+                ? "Go to Parent Group Settings"
+                : "Go to Organization Settings"}
             </Link>
           </div>
         )}
