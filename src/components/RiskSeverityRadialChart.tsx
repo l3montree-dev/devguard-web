@@ -52,14 +52,14 @@ const RiskSeverityRadialChart: FunctionComponent<
     {
       metric: "cvss",
       label: "CVSS",
-      score: cvss,
+      score: Math.max(cvss, 0),
       fill: cvssColor,
       stroke: cvssColor,
     },
     {
       metric: "risk",
       label: "Risk",
-      score: risk,
+      score: Math.max(risk, 0),
       fill: riskColor,
       stroke: riskColor,
     },
@@ -132,7 +132,7 @@ const RiskSeverityRadialChart: FunctionComponent<
                       y={(viewBox.cy || 0) - 10}
                       className="fill-foreground text-xl font-bold"
                     >
-                      {risk.toFixed(1)}
+                      {risk > 0 ? risk.toFixed(1) : "N/A"}
                     </tspan>
                     <tspan
                       x={viewBox.cx}
