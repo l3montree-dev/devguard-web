@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { useProjectResources } from "@/hooks/useProjectResources";
 import { useProjectScope } from "@/hooks/useProjectScope";
 import { useProjectUpdate } from "@/hooks/useProjectUpdate";
 import { toast } from "@/lib/toast";
@@ -27,6 +28,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+const publicFilter = new URLSearchParams({
+  "filterQuery[is_public][is]": "true",
+  pageSize: "1",
+});
+
 const ProjectDangerZone = () => {
   const org = useActiveOrg();
   const project = useActiveProject()!;
@@ -37,6 +43,14 @@ const ProjectDangerZone = () => {
   const [isSaving, setIsSaving] = useState(false);
   const isSubGroup = !!project.parentId;
   const canBePublic = isSubGroup ? !!project.parent?.isPublic : org.isPublic;
+  const { data: publicChildren } = useProjectResources(
+    scope.organization,
+    scope.projectSlug,
+    project.id,
+    publicFilter,
+    false,
+  );
+  const publicChild = isPublic ? publicChildren?.data[0] : undefined;
 
   const handlePublicChange = async (checked: boolean) => {
     setIsPublic(checked);
@@ -60,7 +74,9 @@ const ProjectDangerZone = () => {
   return (
     <DangerZone>
       <div className="flex flex-col gap-4">
-        <div className={classNames(!canBePublic && "opacity-50")}>
+        <div
+          className={classNames((!canBePublic || publicChild) && "opacity-50")}
+        >
           <ListItem
             Title={
               <span className="flex items-center">
@@ -86,7 +102,7 @@ const ProjectDangerZone = () => {
             Button={
               <Switch
                 data-testid="public-group-switch"
-                disabled={!canBePublic || isSaving}
+                disabled={!canBePublic || !!publicChild || isSaving}
                 checked={isPublic}
                 onCheckedChange={handlePublicChange}
               />
@@ -111,6 +127,30 @@ const ProjectDangerZone = () => {
               {isSubGroup
                 ? "Go to Parent Group Settings"
                 : "Go to Organization Settings"}
+            </Link>
+          </div>
+        )}
+        {publicChild && (
+          <div className="flex items-center justify-between mb-2">
+            <small>
+              The{" "}
+              {publicChild.resourceType === "asset"
+                ? "repository"
+                : "sub-group"}{" "}
+              {publicChild.name} is still public. Make it private before making
+              this {isSubGroup ? "sub-group" : "group"} private.
+            </small>
+            <Link
+              href={
+                publicChild.resourceType === "asset"
+                  ? `/${scope.organization}/projects/${scope.projectSlug}/assets/${publicChild.slug}/settings/danger-zone`
+                  : `/${scope.organization}/projects/${publicChild.slug}/settings/danger-zone`
+              }
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              {publicChild.resourceType === "asset"
+                ? "Go to Repository Settings"
+                : "Go to Sub-Group Settings"}
             </Link>
           </div>
         )}
