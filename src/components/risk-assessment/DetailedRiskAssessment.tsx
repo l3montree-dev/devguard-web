@@ -349,7 +349,9 @@ const DetailedRiskAssessment: FunctionComponent<
               </span>
               <div className="whitespace-nowrap">
                 <Badge variant="outline">
-                  {(vuln.cve?.risk.withEnvironment ?? 0).toFixed(1)}
+                  {vuln.cve?.risk.withEnvironment > 0
+                    ? (vuln.cve?.risk.withEnvironment ?? 0).toFixed(1)
+                    : "N/A"}
                 </Badge>
               </div>
             </div>
@@ -379,7 +381,9 @@ const DetailedRiskAssessment: FunctionComponent<
               </span>
               <div className="whitespace-nowrap">
                 <Badge variant="outline">
-                  {(vuln.cve?.risk.baseScore ?? 0).toFixed(1)}
+                  {vuln.cve?.risk.baseScore > 0
+                    ? (vuln.cve?.risk.baseScore ?? 0).toFixed(1)
+                    : "N/A"}
                 </Badge>
               </div>
             </div>

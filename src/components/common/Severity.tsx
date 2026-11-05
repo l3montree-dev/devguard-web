@@ -58,6 +58,8 @@ export const riskToSeverity = (risk: number) => {
 
 const Severity = ({ risk, gray }: { risk: number; gray?: boolean }) => {
   const rounded = Math.floor(risk * 10) / 10;
+  if (rounded < 0) return <>N/A</>;
+
   const cls = getSeverityClassNames(riskToSeverity(rounded), Boolean(gray));
 
   return (
