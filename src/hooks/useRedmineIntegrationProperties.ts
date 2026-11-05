@@ -8,7 +8,7 @@ export const useRedmineIntegrationProperties = (
   integrationId: string,
 ) =>
   useApiQuery(
-    "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/properties",
+    "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/properties/",
     {
       params: {
         path: {

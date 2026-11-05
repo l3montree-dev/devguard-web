@@ -54,9 +54,9 @@ export default function RedmineIntegrationForm({
     const closeStatusId = selectedCloseStatus === "none" ? null : parseInt(selectedCloseStatus, 10);
 
     const body = {
-      tracker: trackerId,
-      defaultStatus: defaultStatusId,
-      closeStatus: closeStatusId,
+      trackerID: trackerId,
+      defaultStatusID: defaultStatusId,
+      closeStatusID: closeStatusId,
       mermaidIntegration: selectedMermaidIntegration as "none" | "macro" | "commonmark",
     };
 
@@ -184,7 +184,7 @@ export default function RedmineIntegrationForm({
           name="mermaidIntegration"
           render={() => (
             <FormItem>
-              <FormLabel>Closed Status</FormLabel>
+              <FormLabel>Markdown Rendering</FormLabel>
               <FormControl>
                 <Select value={selectedMermaidIntegration} onValueChange={setSelectedMermaidIntegration} required>
                   <SelectTrigger data-testid="filter-field-select">
