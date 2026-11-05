@@ -135,16 +135,21 @@ export const saveRedmineIntegrationSettings = async (
   organization: string,
   redmineIntegrationID: string,
   body: {
-    tracker: number;
-    defaultStatus: number | null;
-    closeStatus: number | null;
+    trackerID: number;
+    defaultStatusID: number | null;
+    closeStatusID: number | null;
     mermaidIntegration: "none" | "macro" | "commonmark";
   },
 ) =>
   unwrap(
-    await browserClient.POST(
-      "/organizations/{organization}/integrations/redmine/{redmineIntegrationID}/settings",
-      { params: { path: { organization, redmineIntegrationID } }, body },
+    await browserClient.PUT(
+      "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/settings/",
+      {
+        params: {
+          path: { organization, redmine_integration_id: redmineIntegrationID },
+        },
+        body,
+      },
     ),
   );
 
