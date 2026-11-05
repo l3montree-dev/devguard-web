@@ -27,6 +27,7 @@ import { Badge } from "../ui/badge";
 import { Collapsible, CollapsibleContent } from "../ui/collapsible";
 import EmptyGroupState from "./EmptyGroupState";
 import NestedList from "./NestedList";
+import VisibilityIcon from "./VisibilityIcon";
 
 interface Props {
   project: SubGroupProject;
@@ -146,6 +147,7 @@ const ProjectRow: FunctionComponent<Props> = ({
             >
               {project.name}
             </Link>
+            <VisibilityIcon isPublic={project.isPublic} type="project" />
             {project.type !== "default" && <ProjectBadge type={project.type} />}
             {project.state === "deleted" && (
               <Badge variant="destructive">Pending deletion</Badge>
