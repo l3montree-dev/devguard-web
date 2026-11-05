@@ -29,7 +29,7 @@ export const RedmineIntegrationSettingsDialog: FunctionComponent<Props> = ({
   const org = useActiveOrg();
   const { data: integrationProperties } = useRedmineIntegrationProperties(org.slug, integration.id);
 
-  const handleSave = (updatedIntegration: RedmineIntegrationSettingsDTO) => {
+  const handleSave = (updatedIntegration: RedmineIntegrationDTO) => {
     onSave(updatedIntegration);
     setOpen(false);
   };

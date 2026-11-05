@@ -3109,7 +3109,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Test and save Rdemine integration credentials */
+    /** Test and save Redmine integration credentials */
     post: {
       parameters: {
         query?: never;
@@ -3188,7 +3188,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/properties": {
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/properties/": {
     parameters: {
       query?: never;
       header?: never;
@@ -3229,7 +3229,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/settings": {
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/settings/": {
     parameters: {
       query?: never;
       header?: never;
@@ -3237,9 +3237,8 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    put?: never;
     /** Update Redmine integration settings */
-    post: {
+    put: {
       parameters: {
         query?: never;
         header?: never;
@@ -3278,6 +3277,7 @@ export interface paths {
         };
       };
     };
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -16991,12 +16991,16 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000

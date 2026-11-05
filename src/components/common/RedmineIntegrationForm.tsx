@@ -45,7 +45,7 @@ export default function RedmineIntegrationForm({
     url: string;
     token: string;
     name: string;
-    userEmail: string;
+    tracker: string;
   }) => {
     let integration;
     try {
