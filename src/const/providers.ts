@@ -10,4 +10,5 @@ export const ExternalTicketProviderNames: {
   gitlab: "GitLab",
   jira: "Jira",
   opencode: "openCode",
+  redmine: "Redmine",
 };

@@ -73,6 +73,21 @@ export const deleteJiraIntegration = async (
     ),
   );
 
+export const deleteRedmineIntegration = async (
+  organization: string,
+  redmineIntegrationID: string,
+) =>
+  unwrap(
+    await browserClient.DELETE(
+      "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/",
+      {
+        params: {
+          path: { organization, redmine_integration_id: redmineIntegrationID },
+        },
+      },
+    ),
+  );
+
 export const revokeInvitation = async (organization: string, ID: string) =>
   unwrap(
     await browserClient.DELETE(
@@ -102,6 +117,39 @@ export const saveJiraIntegration = async (
     await browserClient.POST(
       "/organizations/{organization}/integrations/jira/test-and-save/",
       { params: { path: { organization } }, body },
+    ),
+  );
+
+export const saveRedmineIntegration = async (
+  organization: string,
+  body: { url: string; token: string; name: string },
+) =>
+  unwrap(
+    await browserClient.POST(
+      "/organizations/{organization}/integrations/redmine/test-and-save/",
+      { params: { path: { organization } }, body },
+    ),
+  );
+
+export const saveRedmineIntegrationSettings = async (
+  organization: string,
+  redmineIntegrationID: string,
+  body: {
+    trackerID: number;
+    defaultStatusID: number | null;
+    closeStatusID: number | null;
+    mermaidIntegration: "none" | "macro" | "commonmark";
+  },
+) =>
+  unwrap(
+    await browserClient.PUT(
+      "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/settings/",
+      {
+        params: {
+          path: { organization, redmine_integration_id: redmineIntegrationID },
+        },
+        body,
+      },
     ),
   );
 
