@@ -199,12 +199,10 @@ const RefsPage = () => {
                         {distributionByRef[tag.name] && (
                           <span>
                             <CVERainbowBadge
-                              low={distributionByRef[tag.name].low.length}
-                              medium={distributionByRef[tag.name].medium.length}
-                              high={distributionByRef[tag.name].high.length}
-                              critical={
-                                distributionByRef[tag.name].critical.length
-                              }
+                              low={distributionByRef[tag.name].low}
+                              medium={distributionByRef[tag.name].medium}
+                              high={distributionByRef[tag.name].high}
+                              critical={distributionByRef[tag.name].critical}
                             />
                           </span>
                         )}
@@ -299,14 +297,10 @@ const RefsPage = () => {
                         {distributionByRef[branch.name] && (
                           <span>
                             <CVERainbowBadge
-                              low={distributionByRef[branch.name].low.length}
-                              medium={
-                                distributionByRef[branch.name].medium.length
-                              }
-                              high={distributionByRef[branch.name].high.length}
-                              critical={
-                                distributionByRef[branch.name].critical.length
-                              }
+                              low={distributionByRef[branch.name].low}
+                              medium={distributionByRef[branch.name].medium}
+                              high={distributionByRef[branch.name].high}
+                              critical={distributionByRef[branch.name].critical}
                             />
                           </span>
                         )}

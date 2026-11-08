@@ -25,10 +25,12 @@ export function RiskHistoryDistributionDiagram({
   data,
   mode = "risk",
   isLoading,
+  unique,
 }: {
   data: RiskHistoryPoint[];
   mode?: "risk" | "cvss";
   isLoading: boolean;
+  unique?: boolean;
 }) {
   return (
     <Card>
@@ -86,6 +88,38 @@ export function RiskHistoryDistributionDiagram({
                 color: severityToColor("LOW"),
               },
               cvePurlLowCvss: {
+                label: "Low",
+                color: severityToColor("LOW"),
+              },
+              uniqueCrossArtifactCvePurlCritical: {
+                label: "Critical",
+                color: severityToColor("CRITICAL"),
+              },
+              uniqueCrossArtifactCvePurlCriticalCvss: {
+                label: "Critical",
+                color: severityToColor("CRITICAL"),
+              },
+              uniqueCrossArtifactCvePurlHigh: {
+                label: "High",
+                color: severityToColor("HIGH"),
+              },
+              uniqueCrossArtifactCvePurlHighCvss: {
+                label: "High",
+                color: severityToColor("HIGH"),
+              },
+              uniqueCrossArtifactCvePurlMedium: {
+                label: "Medium",
+                color: severityToColor("MEDIUM"),
+              },
+              uniqueCrossArtifactCvePurlMediumCvss: {
+                label: "Medium",
+                color: severityToColor("MEDIUM"),
+              },
+              uniqueCrossArtifactCvePurlLow: {
+                label: "Low",
+                color: severityToColor("LOW"),
+              },
+              uniqueCrossArtifactCvePurlLowCvss: {
                 label: "Low",
                 color: severityToColor("LOW"),
               },
@@ -151,20 +185,42 @@ export function RiskHistoryDistributionDiagram({
                 })}
               </defs>
               {[
-                { dataKey: "cvePurlLow", severity: "low" },
-                { dataKey: "cvePurlMedium", severity: "medium" },
-                { dataKey: "cvePurlHigh", severity: "high" },
-                { dataKey: "cvePurlCritical", severity: "critical" },
-              ].map(({ dataKey, severity }) => {
+                {
+                  dataKey: "cvePurlLow",
+                  dataKeyUnique: "uniqueCrossArtifactCvePurlLow",
+                  severity: "low",
+                },
+                {
+                  dataKey: "cvePurlMedium",
+                  dataKeyUnique: "uniqueCrossArtifactCvePurlMedium",
+                  severity: "medium",
+                },
+                {
+                  dataKey: "cvePurlHigh",
+                  dataKeyUnique: "uniqueCrossArtifactCvePurlHigh",
+                  severity: "high",
+                },
+                {
+                  dataKey: "cvePurlCritical",
+                  dataKeyUnique: "uniqueCrossArtifactCvePurlCritical",
+                  severity: "critical",
+                },
+              ].map(({ dataKey, dataKeyUnique, severity }) => {
                 const key = (
-                  mode === "risk" ? dataKey : dataKey + "Cvss"
+                  mode === "risk"
+                    ? unique
+                      ? dataKeyUnique
+                      : dataKey
+                    : unique
+                      ? dataKeyUnique + "Cvss"
+                      : dataKey + "Cvss"
                 ) as keyof RiskHistoryPoint;
                 return (
                   <Area
                     key={dataKey}
                     name={key} // keeps the tooltip and legend config lookup working
                     dataKey={(d: RiskHistoryPoint) =>
-                      (d[key] as string[] | null)?.length ?? 0
+                      (d[key] as number | null) ?? 0
                     }
                     type="monotone"
                     stackId="1"

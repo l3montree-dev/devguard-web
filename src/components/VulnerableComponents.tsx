@@ -128,23 +128,23 @@ export function VulnerableComponents({
                           <CVERainbowBadge
                             low={
                               (mode === "risk"
-                                ? item.risk?.low?.length
-                                : item.risk?.lowCvss?.length) ?? 0
+                                ? item.risk?.low
+                                : item.risk?.lowCvss) ?? 0
                             }
                             medium={
                               (mode === "risk"
-                                ? item.risk?.medium?.length
-                                : item.risk?.mediumCvss?.length) ?? 0
+                                ? item.risk?.medium
+                                : item.risk?.mediumCvss) ?? 0
                             }
                             high={
                               (mode === "risk"
-                                ? item.risk?.high?.length
-                                : item.risk?.highCvss?.length) ?? 0
+                                ? item.risk?.high
+                                : item.risk?.highCvss) ?? 0
                             }
                             critical={
                               (mode === "risk"
-                                ? item.risk?.critical?.length
-                                : item.risk?.criticalCvss?.length) ?? 0
+                                ? item.risk?.critical
+                                : item.risk?.criticalCvss) ?? 0
                             }
                           />
                         </div>

@@ -30,18 +30,15 @@ export type ComplianceComponentImplementsControlStatementDTO =
   Schemas["dtos.ComplianceComponentImplementsControlStatement"];
 export type OrgOverview = Schemas["dtos.OrgOverview"];
 export type EcosystemUsageInOrg = Schemas["dtos.EcosystemUsage"];
-export type RiskHistory =
-  Schemas["github_com_l3montree-dev_devguard_database_models.ArtifactRiskHistory"];
+export type RiskHistory = Schemas["dtos.RiskHistory"];
 export type DependencyVuln = Schemas["dtos.DependencyVuln"];
 export type License = Schemas["licenses.License"];
-export type Exploit =
-  Schemas["github_com_l3montree-dev_devguard_database_models.Exploit"];
+export type Exploit = Schemas["dtos.Exploit"];
 export type ComplianceComponentImplementsControlDTO =
   Schemas["dtos.ComplianceComponentImplementsControl"];
 export type InstanceOverview = Schemas["dtos.InstanceOverview"];
 export type GitLabIntegrationDTO = Schemas["dtos.GitlabIntegration"];
-export type LicenseRiskDTO =
-  Schemas["github_com_l3montree-dev_devguard_database_models.LicenseRisk"];
+export type LicenseRiskDTO = Schemas["dtos.DetailedLicenseRisk"];
 export type FirstPartyVuln = Schemas["dtos.FirstPartyVuln"];
 export type CVEOccurrenceInOrg = Schemas["dtos.CVEOccurrence"];
 export type CandidatesDTO = Schemas["dtos.CandidatesResponse"];

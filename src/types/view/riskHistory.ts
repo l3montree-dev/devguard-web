@@ -26,6 +26,22 @@ export type RiskHistoryPoint = Pick<
   | "cvePurlFixableMediumCvss"
   | "cvePurlFixableHighCvss"
   | "cvePurlFixableCriticalCvss"
+  | "uniqueCrossArtifactCvePurlLow"
+  | "uniqueCrossArtifactCvePurlMedium"
+  | "uniqueCrossArtifactCvePurlHigh"
+  | "uniqueCrossArtifactCvePurlCritical"
+  | "uniqueCrossArtifactCvePurlLowCvss"
+  | "uniqueCrossArtifactCvePurlMediumCvss"
+  | "uniqueCrossArtifactCvePurlHighCvss"
+  | "uniqueCrossArtifactCvePurlCriticalCvss"
+  | "uniqueCrossArtifactCvePurlFixableLow"
+  | "uniqueCrossArtifactCvePurlFixableMedium"
+  | "uniqueCrossArtifactCvePurlFixableHigh"
+  | "uniqueCrossArtifactCvePurlFixableCritical"
+  | "uniqueCrossArtifactCvePurlFixableLowCvss"
+  | "uniqueCrossArtifactCvePurlFixableMediumCvss"
+  | "uniqueCrossArtifactCvePurlFixableHighCvss"
+  | "uniqueCrossArtifactCvePurlFixableCriticalCvss"
 >;
 
 // The three top-* lists address their target differently: projects carry a

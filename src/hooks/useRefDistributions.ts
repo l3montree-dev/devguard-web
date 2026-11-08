@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { groupBy, mapValues } from "lodash";
+import { groupBy, mapValues, sumBy } from "lodash";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import useSWR from "swr";
@@ -10,10 +10,10 @@ import type { RiskHistory } from "@/types/dto";
 import useDecodedParams from "./useDecodedParams";
 
 export interface RefDistribution {
-  low: string[];
-  medium: string[];
-  high: string[];
-  critical: string[];
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
 }
 
 const dateOnly = (ms: number) => new Date(ms).toISOString().split("T")[0];
@@ -42,14 +42,10 @@ export function useRefDistributions() {
     const val = mapValues(
       groupBy(Object.values(latest), "assetVersionName"),
       (rows): RefDistribution => ({
-        low: rows.flatMap((x) => x.cvePurlLowCvss).filter((x) => x != null),
-        medium: rows
-          .flatMap((x) => x.cvePurlMediumCvss)
-          .filter((x) => x != null),
-        high: rows.flatMap((x) => x.cvePurlHighCvss).filter((x) => x != null),
-        critical: rows
-          .flatMap((x) => x.cvePurlCriticalCvss)
-          .filter((x) => x != null),
+        low: sumBy(rows, "cvePurlLowCvss"),
+        medium: sumBy(rows, "cvePurlMediumCvss"),
+        high: sumBy(rows, "cvePurlHighCvss"),
+        critical: sumBy(rows, "cvePurlCriticalCvss"),
       }),
     );
     return val;

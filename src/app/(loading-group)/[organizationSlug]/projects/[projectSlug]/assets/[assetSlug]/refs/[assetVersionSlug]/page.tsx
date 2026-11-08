@@ -57,10 +57,7 @@ import {
 } from "@/hooks/useAssetVersionStats";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 
-import {
-  BUCKETS,
-  reduceRiskHistories,
-} from "../../../../../../../../../utils/view";
+import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
 import type { RiskHistory } from "@/types/dto";
@@ -74,7 +71,7 @@ import {
 
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
-  const [uniqueVulns, setUniqueVulns] = useState(true);
+  const [uniqueAcrossArtifacts, setUniqueAcrossArtifacts] = useState(true);
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;
   const activeAsset = useActiveAsset()!;
@@ -130,17 +127,9 @@ const Index: FunctionComponent = () => {
     const completeRiskHistory: RiskHistory[][] = days.map((day) => {
       return groups[day];
     });
-    const reduced = reduceRiskHistories(completeRiskHistory);
-    if (!uniqueVulns) return reduced;
 
-    return reduced.map((point) => {
-      const out = { ...point };
-      for (const key of BUCKETS) {
-        out[key] = [...new Set(point[key])];
-      }
-      return out;
-    });
-  }, [riskHistoryResp, uniqueVulns]);
+    return reduceRiskHistories(completeRiskHistory);
+  }, [riskHistoryResp]);
 
   const { distributionByRef, isLoading: distributionByRefLoading } =
     useRefDistributions();
@@ -218,7 +207,10 @@ const Index: FunctionComponent = () => {
               </TabsList>
             </div>
             <div className="flex items-center justify-self-end gap-2">
-              <Switch checked={uniqueVulns} onCheckedChange={setUniqueVulns} />
+              <Switch
+                checked={uniqueAcrossArtifacts}
+                onCheckedChange={setUniqueAcrossArtifacts}
+              />
               <Label>Unique across artifacts</Label>
               <Tooltip>
                 <TooltipTrigger>
@@ -244,13 +236,22 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={10}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableCritical.length ?? 0)
-                    : (latest?.cvePurlFixableCriticalCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableCritical ?? 0)
+                      : (latest?.cvePurlFixableCritical ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableCriticalCvss ??
+                        0)
+                      : (latest?.cvePurlFixableCriticalCvss ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlCritical.length ?? 0)
-                    : (latest?.cvePurlCriticalCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlCritical ?? 0)
+                      : (latest?.cvePurlCritical ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlCriticalCvss ?? 0)
+                      : (latest?.cvePurlCriticalCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -261,13 +262,21 @@ const Index: FunctionComponent = () => {
                 queryIntervalEnd={9}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableHigh.length ?? 0)
-                    : (latest?.cvePurlFixableHighCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableHigh ?? 0)
+                      : (latest?.cvePurlFixableHigh ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableHighCvss ?? 0)
+                      : (latest?.cvePurlFixableHighCvss ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlHigh.length ?? 0)
-                    : (latest?.cvePurlHighCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlHigh ?? 0)
+                      : (latest?.cvePurlHigh ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlHighCvss ?? 0)
+                      : (latest?.cvePurlHighCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -278,13 +287,22 @@ const Index: FunctionComponent = () => {
                 isLoading={riskHistoryLoading}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableMedium.length ?? 0)
-                    : (latest?.cvePurlFixableMediumCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableMedium ?? 0)
+                      : (latest?.cvePurlFixableMedium ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableMediumCvss ??
+                        0)
+                      : (latest?.cvePurlFixableMediumCvss ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlMedium.length ?? 0)
-                    : (latest?.cvePurlMediumCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlMedium ?? 0)
+                      : (latest?.cvePurlMedium ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlMediumCvss ?? 0)
+                      : (latest?.cvePurlMediumCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -295,13 +313,21 @@ const Index: FunctionComponent = () => {
                 isLoading={riskHistoryLoading}
                 fixableAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlFixableLow.length ?? 0)
-                    : (latest?.cvePurlFixableLowCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableLow ?? 0)
+                      : (latest?.cvePurlFixableLow ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlFixableLowCvss ?? 0)
+                      : (latest?.cvePurlFixableLowCvss ?? 0)
                 }
                 currentAmount={
                   mode === "risk"
-                    ? (latest?.cvePurlLow.length ?? 0)
-                    : (latest?.cvePurlLowCvss.length ?? 0)
+                    ? uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlLow ?? 0)
+                      : (latest?.cvePurlLow ?? 0)
+                    : uniqueAcrossArtifacts
+                      ? (latest?.uniqueCrossArtifactCvePurlLowCvss ?? 0)
+                      : (latest?.cvePurlLowCvss ?? 0)
                 }
                 mode={mode}
               />
@@ -412,6 +438,7 @@ const Index: FunctionComponent = () => {
               isLoading={riskHistoryLoading}
               data={riskHistory}
               mode={mode}
+              unique={uniqueAcrossArtifacts}
             />
             <div className="grid grid-cols-8 gap-4">
               <div className="col-span-4 grid grid-cols-2 gap-4">
