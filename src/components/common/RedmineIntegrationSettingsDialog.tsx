@@ -12,8 +12,6 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import RedmineIntegrationSettingsForm from "./RedmineIntegrationSettingsForm";
-import { useRedmineIntegrationProperties } from "@/hooks/useRedmineIntegrationProperties";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 interface Props {
   integration: RedmineIntegrationDTO;
@@ -26,8 +24,6 @@ export const RedmineIntegrationSettingsDialog: FunctionComponent<Props> = ({
   Button: Trigger,
 }) => {
   const [open, setOpen] = React.useState(false);
-  const org = useActiveOrg();
-  const { data: integrationProperties } = useRedmineIntegrationProperties(org.slug, integration.id);
 
   const handleSave = (updatedIntegration: RedmineIntegrationDTO) => {
     onSave(updatedIntegration);
@@ -44,8 +40,8 @@ export const RedmineIntegrationSettingsDialog: FunctionComponent<Props> = ({
             Configure how the Redmine integration behaves.
           </DialogDescription>
         </DialogHeader>
-        {integrationProperties &&
-        <RedmineIntegrationSettingsForm integration={integration} integrationProperties={integrationProperties} onSave={handleSave} />}
+        {open &&
+        <RedmineIntegrationSettingsForm integration={integration} onSave={handleSave} />}
       </DialogContent>
     </Dialog>
   );
