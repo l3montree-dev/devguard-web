@@ -41,8 +41,7 @@ export const RedmineIntegrationSettingsDialog: FunctionComponent<Props> = ({
         <DialogHeader>
           <DialogTitle>Integrate with Redmine</DialogTitle>
           <DialogDescription>
-            To integrate with Redmine, you need to provide your Personal Access
-            Token
+            Configure how the Redmine integration behaves.
           </DialogDescription>
         </DialogHeader>
         {integrationProperties &&

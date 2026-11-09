@@ -122,7 +122,7 @@ export const saveJiraIntegration = async (
 
 export const saveRedmineIntegration = async (
   organization: string,
-  body: { url: string; token: string; name: string },
+  body: { url: string; token: string; name: string; tracker: string },
 ) =>
   unwrap(
     await browserClient.POST(
