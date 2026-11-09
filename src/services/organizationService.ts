@@ -135,10 +135,14 @@ export const saveRedmineIntegrationSettings = async (
   organization: string,
   redmineIntegrationID: string,
   body: {
-    trackerID: number;
-    defaultStatusID: number | null;
-    closeStatusID: number | null;
+    trackerId: number;
+    defaultStatusId: number | null;
+    closeStatusId: number | null;
     mermaidIntegration: "none" | "macro" | "commonmark";
+    lowPriorityId: number | null;
+    mediumPriorityId: number | null;
+    highPriorityId: number | null;
+    criticalPriorityId: number | null;
   },
 ) =>
   unwrap(

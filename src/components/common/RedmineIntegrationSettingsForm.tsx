@@ -14,14 +14,16 @@ import { useLoader } from "@/hooks/useLoader";
 import { saveRedmineIntegrationSettings } from "@/services/organizationService";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "@/lib/toast";
-import type { RedmineIntegrationDTO, RedmineIntegrationPropertiesDTO, RedmineStatusDTO, RedmineTrackerDTO } from "@/types/dto";
+import type { RedmineIntegrationDTO, RedmineIntegrationPropertiesDTO, RedminePriorityDTO, RedmineStatusDTO, RedmineTrackerDTO } from "@/types/dto";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { useRedmineIntegrationProperties } from "@/hooks/useRedmineIntegrationProperties";
+import Loading from "@/app/(loading-group)/user-settings/loading";
+import Callout from "./Callout";
 
 export interface RedmineIntegrationSettingsFormProps {
   integration: RedmineIntegrationDTO;
-  integrationProperties: RedmineIntegrationPropertiesDTO;
   onSave: (integration: RedmineIntegrationDTO) => void;
   additionalOnClick?: () => void;
   backButtonClick?: () => void;
@@ -29,7 +31,6 @@ export interface RedmineIntegrationSettingsFormProps {
 
 export default function RedmineIntegrationForm({
   integration,
-  integrationProperties,
   onSave,
   additionalOnClick,
   backButtonClick,
@@ -39,9 +40,14 @@ export default function RedmineIntegrationForm({
     tracker: string;
     closedStatusId: string;
     mermaidIntegration: string;
+    lowPriorityId: string;
+    mediumPriorityId: string;
+    highPriorityId: string;
+    criticalPriorityId: string;
   }>();
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
+  const { data: integrationProperties, error: propertyError } = useRedmineIntegrationProperties(activeOrg.slug, integration.id);
 
   const handleSubmit = async (params: {
     defaultStatusId: string;
@@ -51,12 +57,20 @@ export default function RedmineIntegrationForm({
     const trackerId = parseInt(selectedTracker, 10);
     const defaultStatusId = selectedDefaultStatus === "none" ? null : parseInt(selectedDefaultStatus, 10);
     const closeStatusId = selectedCloseStatus === "none" ? null : parseInt(selectedCloseStatus, 10);
+    const lowPriorityId = selectedLowPriority === "none" ? null : parseInt(selectedLowPriority, 10);
+    const mediumPriorityId = selectedMediumPriority === "none" ? null : parseInt(selectedMediumPriority, 10);
+    const highPriorityId = selectedHighPriority === "none" ? null : parseInt(selectedHighPriority, 10);
+    const criticalPriorityId = selectedCriticalPriority === "none" ? null : parseInt(selectedCriticalPriority, 10);
 
     const body = {
-      trackerID: trackerId,
-      defaultStatusID: defaultStatusId,
-      closeStatusID: closeStatusId,
+      trackerId,
+      defaultStatusId: defaultStatusId,
+      closeStatusId: closeStatusId,
       mermaidIntegration: selectedMermaidIntegration as "none" | "macro" | "commonmark",
+      lowPriorityId,
+      mediumPriorityId,
+      highPriorityId,
+      criticalPriorityId,
     };
 
     try {
@@ -68,9 +82,28 @@ export default function RedmineIntegrationForm({
   };
 
   const [selectedTracker, setSelectedTracker] = useState(integration.trackerId.toString());
-  const [selectedDefaultStatus, setSelectedDefaultStatus] = useState(integration.defaultStatusId?.toString() || "");
-  const [selectedCloseStatus, setSelectedClosedStatus] = useState(integration.closeStatusId?.toString() || "");
+  const [selectedDefaultStatus, setSelectedDefaultStatus] = useState(integration.defaultStatusId?.toString() || "none");
+  const [selectedCloseStatus, setSelectedClosedStatus] = useState(integration.closeStatusId?.toString() || "none");
   const [selectedMermaidIntegration, setSelectedMermaidIntegration] = useState(integration.mermaidIntegration || "none");
+  const [selectedLowPriority, setSelectedLowPriority] = useState(integration.lowPriorityId?.toString() || "none");
+  const [selectedMediumPriority, setSelectedMediumPriority] = useState(integration.mediumPriorityId?.toString() || "none");
+  const [selectedHighPriority, setSelectedHighPriority] = useState(integration.highPriorityId?.toString() || "none");
+  const [selectedCriticalPriority, setSelectedCriticalPriority] = useState(integration.criticalPriorityId?.toString() || "none");
+
+  if (propertyError) {
+    return (
+      <Callout
+        intent="warning"
+        children="Failed to load Redmine integration properties. Please make sure the Redmine integration is properly configured and try again."
+      />
+    );
+  }
+
+  if (!integrationProperties) {
+    return (
+      <Loading />
+    );
+  }
 
   return (
     <Form {...form}>
@@ -178,6 +211,18 @@ export default function RedmineIntegrationForm({
             </FormItem>
           )}
         />
+
+        <div className="grid grid-cols-2 gap-4">
+          {priorityDropdown(integrationProperties.priorities, selectedCriticalPriority, setSelectedCriticalPriority, "Critical Priority Status")}
+          {priorityDropdown(integrationProperties.priorities, selectedHighPriority, setSelectedHighPriority, "High Priority Status")}
+          {priorityDropdown(integrationProperties.priorities, selectedMediumPriority, setSelectedMediumPriority, "Medium Priority Status")}
+          {priorityDropdown(integrationProperties.priorities, selectedLowPriority, setSelectedLowPriority, "Low Priority Status")}
+        </div>
+        <FormDescription>
+          Select the priority of issues based on the risk level of the finding.
+          If not set, the default priority of the selected tracker will be used.
+        </FormDescription>
+
         <FormField
           control={form.control}
           name="mermaidIntegration"
@@ -210,6 +255,7 @@ export default function RedmineIntegrationForm({
             </FormItem>
           )}
         />
+
         <div className="flex flex-row justify-end">
           <div className="flex flex-col items-end justify-end gap-2">
             <div className="flex flex-row gap-4">
@@ -227,5 +273,34 @@ export default function RedmineIntegrationForm({
         </div>
       </form>
     </Form>
+  );
+}
+
+function priorityDropdown(
+  statuses: RedminePriorityDTO[],
+  selectedPriority: string,
+  setSelectedPriority: (status: string) => void, label: string
+) {
+  return (
+    <FormItem className="mt-4">
+      <FormLabel>{label}</FormLabel>
+      <FormControl>
+        <Select value={selectedPriority} onValueChange={setSelectedPriority} required>
+          <SelectTrigger data-testid="filter-field-select">
+            <SelectValue placeholder={`Select ${label}`} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem key="none" value="none" className="border-b pb-3 mb-1">
+              None (use tracker default)
+            </SelectItem>
+            {statuses.map((status: RedmineStatusDTO) => (
+              <SelectItem key={status.id} value={status.id.toString()}>
+                {status.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormControl>
+    </FormItem>
   );
 }
