@@ -50,12 +50,12 @@ const AffectedComponentDetails: FunctionComponent<{
                 <p className="text-sm">
                   <span className="flex flex-row gap-2">
                     <EcosystemImage packageName={purl} />{" "}
-                    <span className="flex-1 text-left mt-0.75 text-xs">
+                    <span className="flex-1 text-left mt-0.75 text-xs text-primary">
                       {beautifyPurl(purl)}
                     </span>
                   </span>
                 </p>
-                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground text-primary transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </CollapsibleTrigger>
               <div className="mt-4 text-sm">
                 {" "}
