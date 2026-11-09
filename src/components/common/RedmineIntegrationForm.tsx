@@ -149,15 +149,13 @@ export default function RedmineIntegrationForm({
             <FormItem>
               <FormLabel>Redmine Issue Tracker</FormLabel>
               <FormControl>
-                <Input
-                  required
-                  placeholder="Bug"
-                  {...field}
-                />
+                <Input required placeholder="Bug" {...field} />
               </FormControl>
               <FormDescription>
-                Issue tracker to use for creating issues in Redmine. Either the name or the ID of the tracker can be used.
-                Tracker names are localized, so make sure to use the correct name for your Redmine instance.
+                Issue tracker to use for creating issues in Redmine. Either the
+                name or the ID of the tracker can be used. Tracker names are
+                localized, so make sure to use the correct name for your Redmine
+                instance.
               </FormDescription>
             </FormItem>
           )}

@@ -377,19 +377,21 @@ const Index = () => {
                             )}
                           {vuln.ticketId === null && (
                             <CreateTicketButton
-                                integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                  asset,
-                                  project,
-                                )}
-                                hasTicket={vuln.ticketId != null}
-                                externalEntityProviderId={
-                                  asset.externalEntityProviderId
-                                }
-                                onClick={() => handleSubmit({
+                              integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                asset,
+                                project,
+                              )}
+                              hasTicket={vuln.ticketId != null}
+                              externalEntityProviderId={
+                                asset.externalEntityProviderId
+                              }
+                              onClick={() =>
+                                handleSubmit({
                                   status: "mitigate",
                                   justification,
-                                })}
-                              />
+                                })
+                              }
+                            />
                           )}
                           <AsyncButton
                             onClick={() =>

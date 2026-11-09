@@ -20,7 +20,11 @@ import {
   deleteJiraIntegration,
   deleteRedmineIntegration,
 } from "@/services/organizationService";
-import type { GitLabIntegrationDTO, JiraIntegrationDTO, RedmineIntegrationDTO } from "@/types/dto";
+import type {
+  GitLabIntegrationDTO,
+  JiraIntegrationDTO,
+  RedmineIntegrationDTO,
+} from "@/types/dto";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -76,28 +80,27 @@ const OrgIntegrationsSettings = () => {
 
   const handleNewRedmineIntegration = (integration: RedmineIntegrationDTO) => {
     patchOrg({
-        redmineIntegrations: org.redmineIntegrations.concat(integration),
+      redmineIntegrations: org.redmineIntegrations.concat(integration),
     });
   };
 
   const handleRedmineSettingsSaved = (integration: RedmineIntegrationDTO) => {
     patchOrg({
-        redmineIntegrations: org.redmineIntegrations.map((i) => {
-          if (i.id === integration.id) {
-            return integration;
-          }
-          return i;
-        }),
+      redmineIntegrations: org.redmineIntegrations.map((i) => {
+        if (i.id === integration.id) {
+          return integration;
+        }
+        return i;
+      }),
     });
   };
 
   const handleDeleteRedmineIntegration = async (id: string) => {
     await deleteRedmineIntegration(org.slug, id);
     patchOrg({
-        redmineIntegrations: org.redmineIntegrations.filter((i) => i.id !== id),
+      redmineIntegrations: org.redmineIntegrations.filter((i) => i.id !== id),
     });
   };
-
 
   return (
     <>
@@ -183,9 +186,7 @@ const OrgIntegrationsSettings = () => {
               <RedmineIntegrationSettingsDialog
                 integration={integration}
                 onSave={handleRedmineSettingsSaved}
-                Button={
-                  <Button variant={"secondary"}>Settings</Button>
-                }
+                Button={<Button variant={"secondary"}>Settings</Button>}
               ></RedmineIntegrationSettingsDialog>
               <AsyncButton
                 variant={"destructiveOutline"}
@@ -241,7 +242,12 @@ const OrgIntegrationsSettings = () => {
           <IntegrationDialog
             description="To integrate with GitLab a personal access token, a group access token or a repository access token is necessary."
             integration="gitlab"
-            Form={(setOpen) => <GitLabIntegrationForm onNewIntegration={handleNewGitLab} setOpen={setOpen} />}
+            Form={(setOpen) => (
+              <GitLabIntegrationForm
+                onNewIntegration={handleNewGitLab}
+                setOpen={setOpen}
+              />
+            )}
             Button={<Button variant="secondary">Integrate with GitLab</Button>}
           />
         }
@@ -257,7 +263,12 @@ const OrgIntegrationsSettings = () => {
           <IntegrationDialog
             description="To integrate with Jira, you need to provide your Personal Access Token"
             integration="jira"
-            Form={(setOpen) => <JiraIntegrationForm onNewIntegration={handleNewJira} setOpen={setOpen} />}
+            Form={(setOpen) => (
+              <JiraIntegrationForm
+                onNewIntegration={handleNewJira}
+                setOpen={setOpen}
+              />
+            )}
             Button={<Button variant="secondary">Integrate with Jira</Button>}
           />
         }
@@ -272,15 +283,26 @@ const OrgIntegrationsSettings = () => {
         Button={
           <IntegrationDialog
             description={
-            <>
-              To integrate with Redmine, you need to provide your API access key.
-              <br />
-              You can find your API access key under 'My account' → 'API access key'.
-              Make sure the REST API is enabled under "Administration" → "Settings" → "API".
-            </>}
+              <>
+                To integrate with Redmine, you need to provide your API access
+                key.
+                <br />
+                You can find your API access key under &ldquo;My account&rdquo;
+                → &ldquo;API access key&rdquo;. Make sure the REST API is
+                enabled under &ldquo;Administration&rdquo; →
+                &ldquo;Settings&rdquo; → &ldquo;API&rdquo;.
+              </>
+            }
             integration="redmine"
-            Form={(setOpen) => <RedmineIntegrationForm onNewIntegration={handleNewRedmineIntegration} setOpen={setOpen}/>}
-            Button={<Button variant={"secondary"}>Integrate with Redmine</Button>}
+            Form={(setOpen) => (
+              <RedmineIntegrationForm
+                onNewIntegration={handleNewRedmineIntegration}
+                setOpen={setOpen}
+              />
+            )}
+            Button={
+              <Button variant={"secondary"}>Integrate with Redmine</Button>
+            }
           />
         }
       />

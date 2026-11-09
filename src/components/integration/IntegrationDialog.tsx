@@ -1,4 +1,6 @@
-import type { RedmineIntegrationDTO } from "@/types/dto";
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 import React, { type FunctionComponent, type ReactNode } from "react";
 import {
   Dialog,
@@ -29,12 +31,12 @@ export const IntegrationDialog: FunctionComponent<Props> = ({
       <DialogTrigger asChild>{Trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Integrate with {integrationToName(integration)}</DialogTitle>
-          <DialogDescription>
-            {description}
-          </DialogDescription>
+          <DialogTitle>
+            Integrate with {integrationToName(integration)}
+          </DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        { IntegrationForm(setOpen) }
+        {IntegrationForm(setOpen)}
       </DialogContent>
     </Dialog>
   );
