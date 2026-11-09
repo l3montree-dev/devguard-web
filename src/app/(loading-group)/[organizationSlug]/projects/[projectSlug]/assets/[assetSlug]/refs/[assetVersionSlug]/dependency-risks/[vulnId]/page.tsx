@@ -14,7 +14,6 @@ import VulnAssessmentComposer from "@/components/risk-assessment/VulnAssessmentC
 import PathToComponent from "@/components/risk-handling/PathToComponent";
 import RelationCard from "@/components/risk-handling/RelationCard";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,

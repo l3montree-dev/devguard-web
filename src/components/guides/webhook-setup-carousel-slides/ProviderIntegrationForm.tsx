@@ -8,7 +8,11 @@ import { useConfig } from "@/context/ConfigContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
-import type { GitLabIntegrationDTO, JiraIntegrationDTO, RedmineIntegrationDTO } from "@/types/dto";
+import type {
+  GitLabIntegrationDTO,
+  JiraIntegrationDTO,
+  RedmineIntegrationDTO,
+} from "@/types/dto";
 
 import type { ExternalTicketProvider } from "@/types/common";
 import type { Surface } from "@/lib/surface";

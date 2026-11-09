@@ -1,3 +1,6 @@
+// Copyright 2026 L3montree GmbH and the DevGuard Contributors.
+// SPDX-License-Identifier: 	AGPL-3.0-or-later
+
 // Renders nothing unless a ticket can actually be created — that needs a linked
 
 import type { ExternalTicketProvider } from "@/types/common";
