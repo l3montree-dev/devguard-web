@@ -16,8 +16,7 @@ import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { toast } from "@/lib/toast";
 import type { RedmineIntegrationDTO, RedmineIntegrationPropertiesDTO, RedmineStatusDTO, RedmineTrackerDTO } from "@/types/dto";
 import { Button } from "../ui/button";
-import React, { useState } from "react";
-import { urlToBaseURL } from "@/utils/url";
+import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
 export interface RedmineIntegrationSettingsFormProps {
@@ -126,7 +125,7 @@ export default function RedmineIntegrationForm({
                     <SelectItem value="none" className="border-b pb-3 mb-1">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">
-                          None (use tarcker default)
+                          None (use tracker default)
                         </span>
                       </div>
                     </SelectItem>

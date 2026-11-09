@@ -17,19 +17,20 @@ import { toast } from "@/lib/toast";
 import type { RedmineIntegrationDTO } from "@/types/dto";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import React from "react";
 import { urlToBaseURL } from "@/utils/url";
 
 export interface RedmineIntegrationFormProps {
   onNewIntegration: (integration: RedmineIntegrationDTO) => void;
   additionalOnClick?: () => void;
   backButtonClick?: () => void;
+  setOpen?: (open: boolean) => void;
 }
 
 export default function RedmineIntegrationForm({
   onNewIntegration,
   additionalOnClick,
   backButtonClick,
+  setOpen,
 }: RedmineIntegrationFormProps) {
   const form = useForm<{
     url: string;
@@ -39,7 +40,6 @@ export default function RedmineIntegrationForm({
   }>();
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
-  const [_open, setOpen] = React.useState(false);
 
   const handleSubmit = async (params: {
     url: string;
@@ -58,7 +58,9 @@ export default function RedmineIntegrationForm({
     }
     if (integration) {
       onNewIntegration(integration);
-      setOpen(false);
+      if (setOpen) {
+        setOpen(false);
+      }
     } else {
       toast.error("Your Redmine token seems to be wrong");
     }

@@ -4,11 +4,12 @@
 "use client";
 
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
-import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
-import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
+import GitLabIntegrationForm from "@/components/common/GitLabIntegrationForm";
+import JiraIntegrationForm from "@/components/common/JiraIntegrationForm";
 import ListItem from "@/components/common/ListItem";
-import { RedmineIntegrationDialog } from "@/components/common/RedmineIntegrationDialog";
+import RedmineIntegrationForm from "@/components/common/RedmineIntegrationForm";
 import { RedmineIntegrationSettingsDialog } from "@/components/common/RedmineIntegrationSettingsDialog";
+import { IntegrationDialog } from "@/components/integration/IntegrationDialog";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useConfig } from "@/context/ConfigContext";
 import { usePatchOrgContext } from "@/hooks/usePatchOrgContext";
@@ -237,8 +238,10 @@ const OrgIntegrationsSettings = () => {
         }
         Description="DevGuard uses a personal, organization, group or repository access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
         Button={
-          <GitLabIntegrationDialog
-            onNewIntegration={handleNewGitLab}
+          <IntegrationDialog
+            description="To integrate with GitLab a personal access token, a group access token or a repository access token is necessary."
+            integration="gitlab"
+            Form={(setOpen) => <GitLabIntegrationForm onNewIntegration={handleNewGitLab} setOpen={setOpen} />}
             Button={<Button variant="secondary">Integrate with GitLab</Button>}
           />
         }
@@ -251,8 +254,10 @@ const OrgIntegrationsSettings = () => {
         }
         Description="DevGuard uses a Jira API Token to access your Jira projects and interact with your issues. This allows DevGuard to create and manage issues in your Jira projects."
         Button={
-          <JiraIntegrationDialog
-            onNewIntegration={handleNewJira}
+          <IntegrationDialog
+            description="To integrate with Jira, you need to provide your Personal Access Token"
+            integration="jira"
+            Form={(setOpen) => <JiraIntegrationForm onNewIntegration={handleNewJira} setOpen={setOpen} />}
             Button={<Button variant="secondary">Integrate with Jira</Button>}
           />
         }
@@ -265,12 +270,18 @@ const OrgIntegrationsSettings = () => {
         }
         Description="DevGuard uses a Redmine API Token to access your Redmine projects and interact with your issues. This allows DevGuard to create and manage issues in your Redmine projects."
         Button={
-          <RedmineIntegrationDialog
-            onNewIntegration={handleNewRedmineIntegration}
-            Button={
-              <Button variant={"secondary"}>Integrate with Redmine</Button>
-            }
-          ></RedmineIntegrationDialog>
+          <IntegrationDialog
+            description={
+            <>
+              To integrate with Redmine, you need to provide your API access key.
+              <br />
+              You can find your API access key under 'My account' → 'API access key'.
+              Make sure the REST API is enabled under "Administration" → "Settings" → "API".
+            </>}
+            integration="redmine"
+            Form={(setOpen) => <RedmineIntegrationForm onNewIntegration={handleNewRedmineIntegration} setOpen={setOpen}/>}
+            Button={<Button variant={"secondary"}>Integrate with Redmine</Button>}
+          />
         }
       />
     </>
