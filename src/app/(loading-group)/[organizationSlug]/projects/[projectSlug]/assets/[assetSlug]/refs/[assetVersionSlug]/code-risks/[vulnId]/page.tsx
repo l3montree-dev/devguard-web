@@ -55,6 +55,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CreateTicketButton } from "@/components/integration/CreateTicketButton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -374,121 +375,22 @@ const Index = () => {
                                 </TooltipContent>
                               </Tooltip>
                             )}
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "gitlab" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
+                          {vuln.ticketId === null && (
+                            <CreateTicketButton
+                                integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                  asset,
+                                  project,
+                                )}
+                                hasTicket={vuln.ticketId != null}
+                                externalEntityProviderId={
+                                  asset.externalEntityProviderId
                                 }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <GitProviderIcon
-                                      externalEntityProviderIdOrRepositoryId={
-                                        asset.externalEntityProviderId ??
-                                        "gitlab"
-                                      }
-                                    />
-                                    Create Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "github" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <Image
-                                      alt="GitLab Logo"
-                                      width={15}
-                                      height={15}
-                                      className="mr-2 dark:invert"
-                                      src={"/assets/github.svg"}
-                                    />
-                                    Create GitHub Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "jira" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <Image
-                                      alt="Jira Logo"
-                                      width={15}
-                                      height={15}
-                                      className="mr-2"
-                                      src={"/assets/jira-svgrepo-com.svg"}
-                                    />
-                                    Create Jira Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "redmine" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <Image
-                                      alt="Redmine Logo"
-                                      width={15}
-                                      height={15}
-                                      className="mr-2"
-                                      src={"/assets/provider-icons/redmine.svg"}
-                                    />
-                                    Create Redmine Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
+                                onClick={() => handleSubmit({
+                                  status: "mitigate",
+                                  justification,
+                                })}
+                              />
+                          )}
                           <AsyncButton
                             onClick={() =>
                               handleSubmit({

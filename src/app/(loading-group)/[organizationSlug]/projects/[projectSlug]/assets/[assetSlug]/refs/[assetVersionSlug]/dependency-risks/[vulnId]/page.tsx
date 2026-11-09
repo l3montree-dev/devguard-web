@@ -69,47 +69,7 @@ import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../compone
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
-
-// Renders nothing unless a ticket can actually be created — that needs a linked
-// issue tracker and a vulnerability that doesn't have a ticket yet.
-const CreateTicketButton: FunctionComponent<{
-  integrationName: "gitlab" | "github" | "jira" | undefined;
-  hasTicket: boolean;
-  externalEntityProviderId?: string;
-  onClick: () => void;
-}> = ({ integrationName, hasTicket, externalEntityProviderId, onClick }) => {
-  if (integrationName === undefined || hasTicket) return null;
-
-  return (
-    <Button variant="secondary" onClick={onClick}>
-      {integrationName === "gitlab" && (
-        <GitProviderIcon
-          externalEntityProviderIdOrRepositoryId={
-            externalEntityProviderId ?? "gitlab"
-          }
-        />
-      )}
-      {integrationName === "github" && (
-        <Image
-          alt="GitHub Logo"
-          width={15}
-          height={15}
-          className="dark:invert"
-          src={"/assets/github.svg"}
-        />
-      )}
-      {integrationName === "jira" && (
-        <Image
-          alt="Jira Logo"
-          width={15}
-          height={15}
-          src={"/assets/jira-svgrepo-com.svg"}
-        />
-      )}
-      <span className="ml-1">Create Ticket</span>
-    </Button>
-  );
-};
+import { CreateTicketButton } from "@/components/integration/CreateTicketButton";
 
 const Index: FunctionComponent = () => {
   const role = useCurrentUserRole();
