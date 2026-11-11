@@ -11,7 +11,7 @@ export default function MobileGate({
 }) {
   return (
     <>
-      <div className="contents max-md:hidden">{children}</div>
+      <div className="relative max-md:hidden">{children}</div>
       <div className="hidden max-md:block">
         <NotSupported />
       </div>

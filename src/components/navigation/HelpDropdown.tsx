@@ -2,8 +2,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 "use client";
 
+import { useConfig } from "@/context/ConfigContext";
 import { useTourContext } from "@/context/TourContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
+import { useIsSelfHosted } from "@/hooks/useIsSelfHosted";
 import { MessageCircleQuestionMark } from "lucide-react";
 import Link from "next/link";
 import {
@@ -17,6 +19,8 @@ import {
 export default function HelpDropdown() {
   const activeOrg = useActiveOrg();
   const { openTour, hasSteps } = useTourContext();
+  const { enterpriseUrl } = useConfig();
+  const isSelfHosted = useIsSelfHosted();
   const slug = activeOrg?.slug ?? "";
 
   return (
@@ -53,6 +57,20 @@ export default function HelpDropdown() {
               onClick={openTour}
             >
               Guided Tour
+            </DropdownMenuItem>
+          </>
+        )}
+        {isSelfHosted && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              asChild
+              data-umami-event="Enterprise"
+              className="flex items-center gap-2 cursor-pointer !text-foreground hover:no-underline"
+            >
+              <a href={enterpriseUrl} target="_blank" rel="noopener noreferrer">
+                Enterprise
+              </a>
             </DropdownMenuItem>
           </>
         )}

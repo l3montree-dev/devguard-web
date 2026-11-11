@@ -4,6 +4,33 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.18.0] — 2026-11-05
+
+### Added
+
+- **Alpine proxy settings** — the dependency proxy settings now include Alpine (apk) configuration
+- **CEL expressions for the dependency proxy** — the dependency proxy settings support the new CEL rule expressions. The previous custom code editor was removed
+- **Debian proxy keyring example** — the dependency proxy settings show an example for using a custom Debian registry keyring
+- **Enterprise teaser** — self-hosted instances see an enterprise teaser in the footer and the help dropdown
+- **N/A risk assessment** — the risk assessment and the severity chart now show a "not applicable" state
+
+### Changed
+
+- **Debian proxy settings reworked**
+- **Visibility settings** — the public/private setting in the organization, group and asset danger zones got a tooltip and clearer descriptions, and groups and assets show a visibility icon in the group list
+- **Access token wording** — adjusted the wording in the token settings
+- **Component cleanup** — removed the unused `Main` component (merged into `Page`), unused `Page` props and dead compliance page props; removed the unused `purl` dependency
+- **Dependency updates** — dependencies were updated (including Next.js 16.4.2) and `npm audit` fixes were applied; the Nix package hashes were refreshed
+
+### Fixed
+
+- **Danger zones** — fixed the danger zone settings for organizations, groups and subgroups
+- **Overview top 5** — the asset version overview now shows the correct top 5
+- **Artifact selector** — fixed the artifact selector on the artifacts page
+- **Hydration** — `useLocalStorage` is now hydration safe
+
+---
+
 ## [v1.17.2] — 2026-10-28
 
 ### Changed

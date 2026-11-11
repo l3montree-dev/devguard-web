@@ -15,7 +15,6 @@ import { BranchTagSelector } from "@/components/BranchTagSelector";
 import Filter from "@/components/Filter";
 import Page from "@/components/Page";
 import RootNodeSelector from "@/components/RootNodeSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import { Combobox } from "@/components/common/Combobox";
 import CustomPagination from "@/components/common/CustomPagination";
 import EcosystemImage from "@/components/common/EcosystemImage";
@@ -32,7 +31,6 @@ import {
   useActiveAssetVersion,
   useAssetBranchesAndTags,
 } from "@/hooks/useActiveAssetVersion";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import useDebouncedQuerySearch from "@/hooks/useDebouncedQuerySearch";
 import useTable from "@/hooks/useTable";
 import { createAppColumnHelper } from "@/hooks/useTable";
@@ -325,7 +323,6 @@ const columnsDef: TableColumnDef<ComponentPaged & { license: License }, any>[] =
   ];
 
 const Index: FunctionComponent = () => {
-  const assetMenu = useAssetMenu();
   useAutoTour("dependency-insights", dependencyInsightsTourSteps);
 
   const [showSBOMModal, setShowSBOMModal] = useState(false);
@@ -457,12 +454,7 @@ const Index: FunctionComponent = () => {
   const assetVersion = useActiveAssetVersion();
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Dependencies (" + asset.name + ")"}
-      description="Dependencies of the asset"
-      Title={<AssetTitle />}
-    >
+    <Page title={"Dependencies (" + asset.name + ")"}>
       <div
         data-tour="dependencies-header"
         className="flex flex-row items-start justify-between"

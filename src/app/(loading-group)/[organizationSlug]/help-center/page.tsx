@@ -9,7 +9,6 @@ import SupportSection from "@/components/help-center/SupportSection";
 import Page from "@/components/Page";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHelpCenter } from "@/hooks/useHelpCenter";
-import { useOrganizationMenu } from "@/hooks/useOrganizationMenu";
 import {
   BookOpenIcon,
   GitBranchIcon,
@@ -19,12 +18,11 @@ import {
 } from "lucide-react";
 
 export default function HelpCenterPage() {
-  const orgMenu = useOrganizationMenu();
   const { isLoading, welcomeTour, groupTour, repoTour, depRiskTour } =
     useHelpCenter();
 
   return (
-    <Page Title={null} title="Help Center" Menu={orgMenu}>
+    <Page title="Help Center">
       <Section
         primaryHeadline
         title="Help Center"

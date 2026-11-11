@@ -20,6 +20,7 @@ export async function suppressOverlays(page: Page) {
     tourKeys.forEach((key) =>
       localStorage.setItem(`devguard:tourSeen:${key}`, "true"),
     );
+    localStorage.setItem("devguard:enterpriseTeaserDismissed", "true");
     document.addEventListener("DOMContentLoaded", () => {
       const style = document.createElement("style");
       style.textContent = "[data-sonner-toaster]{display:none !important}";

@@ -34,7 +34,6 @@ import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -212,8 +211,6 @@ function MappedControlsGroup({
 interface Props {
   scope: PostureScope;
   vulnId: string;
-  Menu?: any[];
-  Title?: ReactNode;
   showTicketCreation?: boolean;
 }
 
@@ -271,7 +268,7 @@ const InheritedHandlingWarning = (
     );
 };
 
-const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
+const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
   const {
     data: vuln,
     error,
@@ -493,7 +490,7 @@ const CompliancePostureDetailView = ({ scope, vulnId, Menu, Title }: Props) => {
     mutate();
   };
   return (
-    <Page Menu={Menu} Title={Title} title={vuln.title}>
+    <Page title={vuln.title}>
       <div className="flex flex-row gap-4">
         <div className="flex-1">
           <div className="grid grid-cols-4 gap-4">

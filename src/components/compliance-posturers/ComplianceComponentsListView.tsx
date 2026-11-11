@@ -62,21 +62,17 @@ const ComponentControlBadges: FunctionComponent<{
 };
 
 interface Props {
-  Menu?: any[];
   contextName: string;
 }
 
 const ComplianceComponentsListView: FunctionComponent<Props> = ({
-  Menu,
   contextName,
 }) => {
   const { data: components, isLoading } = useComplianceComponents();
 
   return (
     <Page
-      Menu={Menu}
       title={"Compliance Components (" + contextName + ")"}
-      Title={null}
       breadcrumbs={[
         {
           title: "Compliance Postures",

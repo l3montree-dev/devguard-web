@@ -2,14 +2,12 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 "use client";
 
-import AssetTitle from "@/components/common/AssetTitle";
 import EmptyParty from "@/components/common/EmptyParty";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { Button } from "@/components/ui/button";
 import { documentationLinks } from "@/const/documentationLinks";
 import AuthGuard from "@/components/AuthGuard";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import {
   createArtifact as createArtifactRequest,
   deleteArtifact as deleteArtifactRequest,
@@ -27,7 +25,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "@/lib/toast";
-import ArtifactRow from "../../../../../../../../../../components/artifacts/ArtifactRow";
+import ArtifactRow, { sourceKey } from "@/components/artifacts/ArtifactRow";
 import { BranchTagSelector } from "../../../../../../../../../../components/BranchTagSelector";
 import ArtifactDialog from "../../../../../../../../../../components/common/ArtifactDialog";
 import {
@@ -50,8 +48,6 @@ import useDecodedParams from "../../../../../../../../../../hooks/useDecodedPara
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 
 const Artifacts = () => {
-  const assetMenu = useAssetMenu();
-
   const artifacts = useArtifacts();
 
   const updateAssetVersionState = useUpdateAssetVersionState();
@@ -288,7 +284,8 @@ const Artifacts = () => {
     for (const artifact of artifacts) {
       const artifactSources = rootNodes?.[artifact.artifactName] || [];
       const remainingSources = artifactSources.filter(
-        (source) => !urlsToDelete.includes(source.url),
+        (source) =>
+          !urlsToDelete.includes(sourceKey(artifact.artifactName, source.url)),
       );
 
       // Only include artifacts that have sources being deleted
@@ -363,11 +360,7 @@ const Artifacts = () => {
   };
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Artifacts (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"Artifacts (" + asset.name + ")"}>
       <div className="flex flex-row">
         <div className="flex-1">
           <div className="mb-4 flex items-center justify-between">

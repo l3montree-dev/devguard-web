@@ -9,6 +9,7 @@ import { cn } from "../../lib/utils";
 import type { AssetDTO } from "@/types/dto";
 import Markdown from "../common/Markdown";
 import { Badge } from "../ui/badge";
+import VisibilityIcon from "./VisibilityIcon";
 
 interface Props {
   asset: AssetDTO;
@@ -54,6 +55,7 @@ const AssetRow: FunctionComponent<Props> = ({
               <span className="font-medium text-foreground truncate">
                 {asset.name}
               </span>
+              <VisibilityIcon isPublic={asset.isPublic} type="asset" />
               {asset.state === "archived" && (
                 <Badge variant="outline">Archived</Badge>
               )}

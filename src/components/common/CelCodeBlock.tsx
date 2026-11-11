@@ -3,7 +3,7 @@
 
 "use client";
 
-import CodeEditor from "@/components/common/CodeEditor";
+import CodeEditor, { type Language } from "@/components/common/CodeEditor";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Diagnostic } from "@codemirror/lint";
@@ -17,6 +17,8 @@ interface CelCodeBlockProps {
   readOnly?: boolean;
   onChange?: (value: string) => void;
   onValidation?: (isValid: boolean, diagnostics: Diagnostic[]) => void;
+  onSave?: () => void;
+  language?: Language;
   placeholder?: string;
   /** Header label; defaults to "CEL". */
   label?: string;
@@ -35,6 +37,8 @@ const CelCodeBlock: FunctionComponent<CelCodeBlockProps> = ({
   readOnly = false,
   onChange,
   onValidation,
+  onSave,
+  language = "cel",
   placeholder,
   label = "CEL",
   height,
@@ -79,12 +83,13 @@ const CelCodeBlock: FunctionComponent<CelCodeBlockProps> = ({
       >
         <CodeEditor
           value={value}
-          language="cel"
+          language={language}
           readOnly={readOnly}
           lineWrapping
           transparent
           onChange={onChange ?? noop}
           onValidation={onValidation}
+          onSave={onSave}
           placeholder={placeholder}
           className="rounded-none border-0 [&_.cm-editor]:!bg-transparent [&_.cm-gutters]:!bg-transparent [&_.cm-scroller]:!bg-transparent [&_.cm-activeLineGutter]:!bg-transparent [&_.cm-activeLine]:!bg-transparent"
         />

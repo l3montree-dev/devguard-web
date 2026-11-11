@@ -4,10 +4,8 @@
 "use client";
 
 import Page from "@/components/Page";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import CustomPagination from "@/components/common/CustomPagination";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import VulnEventItem from "@/components/VulnEventItem";
@@ -38,7 +36,6 @@ const Index = () => {
     searchParams?.toString() || "",
   );
 
-  const assetMenu = useAssetMenu();
   const { branches, tags } = useAssetBranchesAndTags();
   const asset = useActiveAsset();
 
@@ -62,22 +59,14 @@ const Index = () => {
   // Show error state
   if (error) {
     return (
-      <Page
-        Menu={assetMenu}
-        title={"Events (" + asset.name + ")"}
-        Title={<AssetTitle />}
-      >
+      <Page title={"Events (" + asset.name + ")"}>
         <Err />
       </Page>
     );
   }
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Events (" + asset.name + ")"}
-      Title={<AssetTitle />}
-    >
+    <Page title={"Events (" + asset.name + ")"}>
       <BranchTagSelector branches={branches} tags={tags} />
 
       <Section

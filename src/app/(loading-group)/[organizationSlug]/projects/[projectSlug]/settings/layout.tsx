@@ -4,18 +4,15 @@
 "use client";
 
 import Page from "@/components/Page";
-import ProjectTitle from "@/components/common/ProjectTitle";
 import SettingsShell from "@/components/common/settings/SettingsShell";
 import ProjectSettingsNav from "@/components/project/settings/ProjectSettingsNav";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useProjectMenu } from "@/hooks/useProjectMenu";
 import { isAdmin, useCurrentUserRole } from "@/hooks/useUserRole";
 import { useRouter } from "next/navigation";
 import { type PropsWithChildren, useEffect } from "react";
 
 export default function ProjectSettingsLayout({ children }: PropsWithChildren) {
-  const projectMenu = useProjectMenu();
   const project = useActiveProject()!;
   const { slug } = useActiveOrg();
   const role = useCurrentUserRole();
@@ -29,11 +26,7 @@ export default function ProjectSettingsLayout({ children }: PropsWithChildren) {
   }, [allowed, router, slug]);
 
   return (
-    <Page
-      title={"Settings (" + project.name + ")"}
-      Menu={projectMenu}
-      Title={<ProjectTitle />}
-    >
+    <Page title={"Settings (" + project.name + ")"}>
       <SettingsShell nav={<ProjectSettingsNav />}>{children}</SettingsShell>
     </Page>
   );

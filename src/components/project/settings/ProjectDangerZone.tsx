@@ -8,16 +8,30 @@ import DangerZone from "@/components/common/DangerZone";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipPortal,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
+import { useProjectResources } from "@/hooks/useProjectResources";
 import { useProjectScope } from "@/hooks/useProjectScope";
 import { useProjectUpdate } from "@/hooks/useProjectUpdate";
 import { toast } from "@/lib/toast";
 import { deleteProject } from "@/services/projectService";
 import { classNames } from "@/utils/common";
+
+import { InfoIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+const publicFilter = new URLSearchParams({
+  "filterQuery[is_public][is]": "true",
+  pageSize: "1",
+});
 
 const ProjectDangerZone = () => {
   const org = useActiveOrg();
@@ -27,6 +41,16 @@ const ProjectDangerZone = () => {
   const router = useRouter();
   const [isPublic, setIsPublic] = useState(project.isPublic);
   const [isSaving, setIsSaving] = useState(false);
+  const isSubGroup = !!project.parentId;
+  const canBePublic = isSubGroup ? !!project.parent?.isPublic : org.isPublic;
+  const { data: publicChildren } = useProjectResources(
+    scope.organization,
+    scope.projectSlug,
+    project.id,
+    publicFilter,
+    false,
+  );
+  const publicChild = isPublic ? publicChildren?.data[0] : undefined;
 
   const handlePublicChange = async (checked: boolean) => {
     setIsPublic(checked);
@@ -50,31 +74,83 @@ const ProjectDangerZone = () => {
   return (
     <DangerZone>
       <div className="flex flex-col gap-4">
-        <div className={classNames(!org.isPublic && "opacity-50")}>
+        <div
+          className={classNames((!canBePublic || publicChild) && "opacity-50")}
+        >
           <ListItem
-            Title="Public Group"
-            Description="Setting this to true will make the group visible to the public. It allows creating public and private assets."
+            Title={
+              <span className="flex items-center">
+                {isSubGroup ? "Public Sub-Group" : "Public Group"}
+                <Tooltip>
+                  <TooltipTrigger aria-label="More information about public groups">
+                    <InfoIcon className="ml-1.5 block h-4 w-4 text-primary" />
+                  </TooltipTrigger>
+                  <TooltipPortal>
+                    <TooltipContent>
+                      <p>
+                        Only sub-groups and projects that are set to public
+                        become visible, private projects stay visible to members
+                        of the organization only. All sub-groups and projects
+                        are still private by default.
+                      </p>
+                    </TooltipContent>
+                  </TooltipPortal>
+                </Tooltip>
+              </span>
+            }
+            Description={`Makes the ${project.name} ${isSubGroup ? "sub-group" : "group"} visible to non-members of the ${org.name} organization. Has to be enabled so individual sub-groups and projects can be set to public.`}
             Button={
               <Switch
                 data-testid="public-group-switch"
-                disabled={!org.isPublic || isSaving}
+                disabled={!canBePublic || !!publicChild || isSaving}
                 checked={isPublic}
                 onCheckedChange={handlePublicChange}
               />
             }
           />
         </div>
-        {org.isPublic ? null : (
+        {canBePublic ? null : (
           <div className="flex items-center justify-between mb-2">
             <small>
-              The organization is not public. You can not make the group public.
+              {isSubGroup
+                ? `The parent group ${project.parent?.name} is not public. You can not make the sub-group public.`
+                : "The organization is not public. You can not make the group public."}
             </small>
             <Link
-              href={`/${scope.organization}/settings/danger-zone`}
-
+              href={
+                isSubGroup
+                  ? `/${scope.organization}/projects/${project.parent?.slug}/settings/danger-zone`
+                  : `/${scope.organization}/settings/danger-zone`
+              }
               className="text-sm text-muted-foreground hover:text-foreground underline"
             >
-              Go to Organization Settings
+              {isSubGroup
+                ? "Go to Parent Group Settings"
+                : "Go to Organization Settings"}
+            </Link>
+          </div>
+        )}
+        {publicChild && (
+          <div className="flex items-center justify-between mb-2">
+            <small>
+              The{" "}
+              {publicChild.resourceType === "asset"
+                ? "repository"
+                : "sub-group"}{" "}
+              {publicChild.name} is still public. Make it private before making
+              this {isSubGroup ? "sub-group" : "group"} private.
+            </small>
+            <Link
+              href={
+                publicChild.resourceType === "asset"
+                  ? `/${scope.organization}/projects/${scope.projectSlug}/assets/${publicChild.slug}/settings/danger-zone`
+                  : `/${scope.organization}/projects/${publicChild.slug}/settings/danger-zone`
+              }
+              className="text-sm text-muted-foreground hover:text-foreground underline"
+            >
+              {publicChild.resourceType === "asset"
+                ? "Go to Repository Settings"
+                : "Go to Sub-Group Settings"}
             </Link>
           </div>
         )}

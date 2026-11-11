@@ -3,10 +3,9 @@
 
 import useSWR from "swr";
 
-import { browserClient, unwrap } from "@/services/apiClient";
+import { ApiError, browserClient, unwrap } from "@/services/apiClient";
 import type { ConfigScope } from "@/services/configFileService";
 import { readConfigFile, writeConfigFile } from "@/services/configFileService";
-import type { DependencyProxyConfig } from "@/types/view/dependencyProxy";
 
 export type ProxyScope = ConfigScope;
 
@@ -54,7 +53,7 @@ export const useDependencyProxy = (scope: ProxyScope | null) => {
       const result = await readConfigFile(proxyScope, CONFIG_FILE);
       // an unset config answers 404
       if (result.response.status === 404) return null;
-      return JSON.parse(unwrap(result)) as DependencyProxyConfig;
+      return unwrap(result);
     },
   );
 
@@ -63,9 +62,14 @@ export const useDependencyProxy = (scope: ProxyScope | null) => {
     async ([, proxyScope]) => unwrap(await readProxyUrls(proxyScope)),
   );
 
-  const saveConfig = async (next: DependencyProxyConfig) => {
+  const saveConfig = async (next: string) => {
     if (!scope) return;
-    unwrap(await writeConfigFile(scope, CONFIG_FILE, JSON.stringify(next)));
+    const { error, response } = await writeConfigFile(scope, CONFIG_FILE, next);
+    if (!response.ok) {
+      const body = error as { message?: string } | string | undefined;
+      const message = typeof body === "string" ? body : body?.message;
+      throw new ApiError(message || response.statusText, response.status);
+    }
     await config.mutate();
   };
 

@@ -13,7 +13,6 @@ import { QueryArtifactSelector } from "../../../../../../components/ArtifactSele
 import Avatar from "../../../../../../components/Avatar";
 import AverageFixingTimeChart from "../../../../../../components/AverageFixingTimeChart";
 import EmptyParty from "../../../../../../components/common/EmptyParty";
-import ProjectTitle from "../../../../../../components/common/ProjectTitle";
 import Section from "../../../../../../components/common/Section";
 import CVERainbowBadge from "../../../../../../components/CVERainbowBadge";
 import Page from "../../../../../../components/Page";
@@ -41,7 +40,6 @@ import {
 import { useProject } from "../../../../../../context/ProjectContext";
 import { useActiveOrg } from "../../../../../../hooks/useActiveOrg";
 import useDecodedParams from "../../../../../../hooks/useDecodedParams";
-import { useProjectMenu } from "../../../../../../hooks/useProjectMenu";
 import useRouterQuery from "../../../../../../hooks/useRouterQuery";
 import { useViewMode } from "../../../../../../hooks/useViewMode";
 import { downloadFile } from "@/services/apiClient";
@@ -121,7 +119,6 @@ const OverviewPage = () => {
   const project = useProject()!;
   const [mode, setMode] = useViewMode("devguard-view-mode");
   const activeOrg = useActiveOrg();
-  const projectMenu = useProjectMenu();
   const router = useRouter();
 
   const criticalAmount = useMemo(() => {
@@ -253,11 +250,7 @@ const OverviewPage = () => {
 
   if (releases?.data.length === 0) {
     return (
-      <Page
-        title={"Group Overview (" + project.name + ")"}
-        Menu={projectMenu}
-        Title={<ProjectTitle />}
-      >
+      <Page title={"Group Overview (" + project.name + ")"}>
         <EmptyParty
           title={"No data available for this group yet..."}
           Button={
@@ -280,11 +273,7 @@ const OverviewPage = () => {
   }
 
   return (
-    <Page
-      title={"Group Overview (" + project.name + ")"}
-      Menu={projectMenu}
-      Title={<ProjectTitle />}
-    >
+    <Page title={"Group Overview (" + project.name + ")"}>
       <div className="mb-4 flex flex-row items-start justify-between">
         <div className="flex items-center gap-2">
           <QueryArtifactSelector

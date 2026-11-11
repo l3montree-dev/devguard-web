@@ -5,14 +5,12 @@
 import { useDownloadPdf } from "@/hooks/useDownloadPdf";
 import { QueryArtifactSelector } from "@/components/ArtifactSelector";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
-import AssetTitle from "@/components/common/AssetTitle";
 import Section from "@/components/common/Section";
 import Page from "@/components/Page";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
-import { useAssetMenu } from "@/hooks/useAssetMenu";
 import { useViewMode } from "@/hooks/useViewMode";
 import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoHomeTourSteps } from "@/components/common/tours/repoHomeTour";
@@ -75,7 +73,6 @@ const Index: FunctionComponent = () => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;
   const activeAsset = useActiveAsset()!;
-  const assetMenu = useAssetMenu();
   const artifacts = useArtifacts();
   const { branches, tags } = useAssetBranchesAndTags();
 
@@ -132,7 +129,7 @@ const Index: FunctionComponent = () => {
   }, [riskHistoryResp]);
 
   const { distributionByRef, isLoading: distributionByRefLoading } =
-    useRefDistributions();
+    useRefDistributions(mode);
 
   const project = activeProject;
   const asset = activeAsset;
@@ -155,12 +152,7 @@ const Index: FunctionComponent = () => {
     : null;
 
   return (
-    <Page
-      Menu={assetMenu}
-      title={"Overview (" + asset.name + ")"}
-      description="Overview of the repository"
-      Title={<AssetTitle />}
-    >
+    <Page title={"Overview (" + asset.name + ")"}>
       <div className="flex flex-row items-start justify-between">
         <div data-tour="branch-switcher" className="flex items-center gap-2">
           <BranchTagSelector branches={branches} tags={tags} />
