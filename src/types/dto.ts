@@ -8,8 +8,6 @@ type Schemas = components["schemas"];
 export type AssetDTO = Schemas["dtos.Asset"];
 export type JiraIntegrationDTO = Schemas["dtos.JiraIntegration"];
 export type RedmineIntegrationDTO = Schemas["dtos.RedmineIntegration"];
-export type RedmineIntegrationPropertiesDTO =
-  Schemas["dtos.RedmineIntegrationProperties"];
 export type RedmineTrackerDTO = Schemas["dtos.RedmineTracker"];
 export type RedmineStatusDTO = Schemas["dtos.RedmineStatus"];
 export type RedminePriorityDTO = Schemas["dtos.RedminePriority"];
