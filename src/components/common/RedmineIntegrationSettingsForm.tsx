@@ -9,7 +9,7 @@ import {
   FormItem,
   FormLabel,
 } from "../ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, type ControllerRenderProps } from "react-hook-form";
 import { useLoader } from "@/hooks/useLoader";
 import { saveRedmineIntegrationSettings } from "@/services/organizationService";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
@@ -21,7 +21,6 @@ import type {
   RedmineTrackerDTO,
 } from "@/types/dto";
 import { Button } from "../ui/button";
-import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -40,59 +39,72 @@ export interface RedmineIntegrationSettingsFormProps {
   backButtonClick?: () => void;
 }
 
+type RedmineIntegrationSettingsFormValues = {
+  defaultStatusId: string;
+  trackerId: string;
+  closedStatusId: string;
+  mermaidIntegration: string;
+  lowPriorityId: string;
+  mediumPriorityId: string;
+  highPriorityId: string;
+  criticalPriorityId: string;
+};
+
 export default function RedmineIntegrationForm({
   integration,
   onSave,
   additionalOnClick,
   backButtonClick,
 }: RedmineIntegrationSettingsFormProps) {
-  const form = useForm<{
-    defaultStatusId: string;
-    tracker: string;
-    closedStatusId: string;
-    mermaidIntegration: string;
-    lowPriorityId: string;
-    mediumPriorityId: string;
-    highPriorityId: string;
-    criticalPriorityId: string;
-  }>();
+  const form = useForm<RedmineIntegrationSettingsFormValues>({
+    defaultValues: {
+      defaultStatusId: integration.defaultStatusId?.toString() || "none",
+      trackerId: integration.trackerId.toString(),
+      closedStatusId: integration.closeStatusId?.toString() || "none",
+      mermaidIntegration: integration.mermaidIntegration || "none",
+      lowPriorityId: integration.lowPriorityId?.toString() || "none",
+      mediumPriorityId: integration.mediumPriorityId?.toString() || "none",
+      highPriorityId: integration.highPriorityId?.toString() || "none",
+      criticalPriorityId: integration.criticalPriorityId?.toString() || "none",
+    },
+  });
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
   const { data: integrationProperties, error: propertyError } =
     useRedmineIntegrationProperties(activeOrg.slug, integration.id);
 
-  const handleSubmit = async (_params: {
-    defaultStatusId: string;
-    tracker: string;
-    closedStatusId: string;
-  }) => {
-    const trackerId = parseInt(selectedTracker, 10);
+  const handleSubmit = async (params: RedmineIntegrationSettingsFormValues) => {
+    const trackerId = parseInt(params.trackerId, 10);
     const defaultStatusId =
-      selectedDefaultStatus === "none"
+      params.defaultStatusId === "none"
         ? null
-        : parseInt(selectedDefaultStatus, 10);
+        : parseInt(params.defaultStatusId, 10);
     const closeStatusId =
-      selectedCloseStatus === "none" ? null : parseInt(selectedCloseStatus, 10);
+      params.closedStatusId === "none"
+        ? null
+        : parseInt(params.closedStatusId, 10);
     const lowPriorityId =
-      selectedLowPriority === "none" ? null : parseInt(selectedLowPriority, 10);
+      params.lowPriorityId === "none"
+        ? null
+        : parseInt(params.lowPriorityId, 10);
     const mediumPriorityId =
-      selectedMediumPriority === "none"
+      params.mediumPriorityId === "none"
         ? null
-        : parseInt(selectedMediumPriority, 10);
+        : parseInt(params.mediumPriorityId, 10);
     const highPriorityId =
-      selectedHighPriority === "none"
+      params.highPriorityId === "none"
         ? null
-        : parseInt(selectedHighPriority, 10);
+        : parseInt(params.highPriorityId, 10);
     const criticalPriorityId =
-      selectedCriticalPriority === "none"
+      params.criticalPriorityId === "none"
         ? null
-        : parseInt(selectedCriticalPriority, 10);
+        : parseInt(params.criticalPriorityId, 10);
 
     const body = {
       trackerId,
       defaultStatusId: defaultStatusId,
       closeStatusId: closeStatusId,
-      mermaidIntegration: selectedMermaidIntegration as
+      mermaidIntegration: params.mermaidIntegration as
         "none" | "macro" | "commonmark",
       lowPriorityId,
       mediumPriorityId,
@@ -111,31 +123,6 @@ export default function RedmineIntegrationForm({
       toast.error("Failed to save Redmine integration settings.");
     }
   };
-
-  const [selectedTracker, setSelectedTracker] = useState(
-    integration.trackerId.toString(),
-  );
-  const [selectedDefaultStatus, setSelectedDefaultStatus] = useState(
-    integration.defaultStatusId?.toString() || "none",
-  );
-  const [selectedCloseStatus, setSelectedClosedStatus] = useState(
-    integration.closeStatusId?.toString() || "none",
-  );
-  const [selectedMermaidIntegration, setSelectedMermaidIntegration] = useState(
-    integration.mermaidIntegration || "none",
-  );
-  const [selectedLowPriority, setSelectedLowPriority] = useState(
-    integration.lowPriorityId?.toString() || "none",
-  );
-  const [selectedMediumPriority, setSelectedMediumPriority] = useState(
-    integration.mediumPriorityId?.toString() || "none",
-  );
-  const [selectedHighPriority, setSelectedHighPriority] = useState(
-    integration.highPriorityId?.toString() || "none",
-  );
-  const [selectedCriticalPriority, setSelectedCriticalPriority] = useState(
-    integration.criticalPriorityId?.toString() || "none",
-  );
 
   if (propertyError) {
     return (
@@ -164,16 +151,12 @@ export default function RedmineIntegrationForm({
       >
         <FormField
           control={form.control}
-          name="tracker"
-          render={() => (
+          name="trackerId"
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Issue Tracker</FormLabel>
               <FormControl>
-                <Select
-                  value={selectedTracker}
-                  onValueChange={setSelectedTracker}
-                  required
-                >
+                <Select {...field} onValueChange={field.onChange} required>
                   <SelectTrigger data-testid="filter-field-select">
                     <SelectValue placeholder="Select Issue Tracker" />
                   </SelectTrigger>
@@ -200,14 +183,11 @@ export default function RedmineIntegrationForm({
         <FormField
           control={form.control}
           name="defaultStatusId"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Default Status</FormLabel>
               <FormControl>
-                <Select
-                  value={selectedDefaultStatus}
-                  onValueChange={setSelectedDefaultStatus}
-                >
+                <Select {...field} onValueChange={field.onChange}>
                   <SelectTrigger data-testid="filter-field-select">
                     <SelectValue placeholder="Select default status" />
                   </SelectTrigger>
@@ -243,15 +223,11 @@ export default function RedmineIntegrationForm({
         <FormField
           control={form.control}
           name="closedStatusId"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Closed Status</FormLabel>
               <FormControl>
-                <Select
-                  value={selectedCloseStatus}
-                  onValueChange={setSelectedClosedStatus}
-                  required
-                >
+                <Select {...field} onValueChange={field.onChange} required>
                   <SelectTrigger data-testid="filter-field-select">
                     <SelectValue placeholder="Select field" />
                   </SelectTrigger>
@@ -285,30 +261,50 @@ export default function RedmineIntegrationForm({
         />
 
         <div className="grid grid-cols-2 gap-4">
-          {priorityDropdown(
-            integrationProperties.priorities,
-            selectedCriticalPriority,
-            setSelectedCriticalPriority,
-            "Critical Priority Status",
-          )}
-          {priorityDropdown(
-            integrationProperties.priorities,
-            selectedHighPriority,
-            setSelectedHighPriority,
-            "High Priority Status",
-          )}
-          {priorityDropdown(
-            integrationProperties.priorities,
-            selectedMediumPriority,
-            setSelectedMediumPriority,
-            "Medium Priority Status",
-          )}
-          {priorityDropdown(
-            integrationProperties.priorities,
-            selectedLowPriority,
-            setSelectedLowPriority,
-            "Low Priority Status",
-          )}
+          <FormField
+            control={form.control}
+            name="criticalPriorityId"
+            render={({ field }) =>
+              priorityDropdown(
+                integrationProperties.priorities,
+                "Critical Priority Status",
+                field,
+              )
+            }
+          />
+          <FormField
+            control={form.control}
+            name="highPriorityId"
+            render={({ field }) =>
+              priorityDropdown(
+                integrationProperties.priorities,
+                "High Priority Status",
+                field,
+              )
+            }
+          />
+          <FormField
+            control={form.control}
+            name="mediumPriorityId"
+            render={({ field }) =>
+              priorityDropdown(
+                integrationProperties.priorities,
+                "Medium Priority Status",
+                field,
+              )
+            }
+          />
+          <FormField
+            control={form.control}
+            name="lowPriorityId"
+            render={({ field }) =>
+              priorityDropdown(
+                integrationProperties.priorities,
+                "Low Priority Status",
+                field,
+              )
+            }
+          />
         </div>
         <FormDescription>
           Select the priority of issues based on the risk level of the finding.
@@ -318,15 +314,11 @@ export default function RedmineIntegrationForm({
         <FormField
           control={form.control}
           name="mermaidIntegration"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>Markdown Rendering</FormLabel>
               <FormControl>
-                <Select
-                  value={selectedMermaidIntegration}
-                  onValueChange={setSelectedMermaidIntegration}
-                  required
-                >
+                <Select {...field} onValueChange={field.onChange} required>
                   <SelectTrigger data-testid="filter-field-select">
                     <SelectValue placeholder="Select field" />
                   </SelectTrigger>
@@ -376,19 +368,20 @@ export default function RedmineIntegrationForm({
 
 function priorityDropdown(
   statuses: RedminePriorityDTO[],
-  selectedPriority: string,
-  setSelectedPriority: (status: string) => void,
   label: string,
+  field: ControllerRenderProps<
+    RedmineIntegrationSettingsFormValues,
+    | "lowPriorityId"
+    | "mediumPriorityId"
+    | "highPriorityId"
+    | "criticalPriorityId"
+  >,
 ) {
   return (
     <FormItem className="mt-4">
       <FormLabel>{label}</FormLabel>
       <FormControl>
-        <Select
-          value={selectedPriority}
-          onValueChange={setSelectedPriority}
-          required
-        >
+        <Select {...field} onValueChange={field.onChange} required>
           <SelectTrigger data-testid="filter-field-select">
             <SelectValue placeholder={`Select ${label}`} />
           </SelectTrigger>
