@@ -375,24 +375,25 @@ const Index = () => {
                                 </TooltipContent>
                               </Tooltip>
                             )}
-                          {vuln.ticketId === null && (
-                            <CreateTicketButton
-                              integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                                asset,
-                                project,
-                              )}
-                              hasTicket={vuln.ticketId != null}
-                              externalEntityProviderId={
-                                asset.externalEntityProviderId
-                              }
-                              onClick={() =>
-                                handleSubmit({
-                                  status: "mitigate",
-                                  justification,
-                                })
-                              }
-                            />
-                          )}
+                          <CreateTicketButton
+                            integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                              asset,
+                              project,
+                            )}
+                            hasTicket={vuln.ticketId != null}
+                            externalEntityProviderId={
+                              asset.externalEntityProviderId
+                            }
+                            orgSlug={activeOrg.slug}
+                            projectSlug={projectSlug}
+                            assetSlug={assetSlug}
+                            onClick={() =>
+                              handleSubmit({
+                                status: "mitigate",
+                                justification,
+                              })
+                            }
+                          />
                           <AsyncButton
                             onClick={() =>
                               handleSubmit({

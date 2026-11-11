@@ -3,6 +3,7 @@
 
 import type { ExternalTicketProvider } from "@/types/common";
 import Image from "next/image";
+import { Badge } from "../ui/badge";
 
 export default function ProviderTitleIcon({
   provider,
@@ -73,6 +74,7 @@ export default function ProviderTitleIcon({
             height={16}
           />{" "}
           Redmine
+          <Badge variant="outline">Community</Badge>
         </span>
       );
     default:

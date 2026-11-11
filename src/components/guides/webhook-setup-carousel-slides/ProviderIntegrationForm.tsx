@@ -138,6 +138,7 @@ export default function ProviderIntegrationForm({
         <RedmineIntegrationForm
           onNewIntegration={handleNewRedmineIntegration}
           additionalOnClick={onConnected}
+          variant={variant}
           backButtonClick={onBack}
         />
       )}

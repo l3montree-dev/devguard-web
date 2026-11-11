@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useRedmineIntegrationProperties } from "@/hooks/useRedmineIntegrationProperties";
-import Loading from "@/app/(loading-group)/user-settings/loading";
+import SkeletonListItems from "./SkeletonListItems";
 import Callout from "./Callout";
 
 export interface RedmineIntegrationSettingsFormProps {
@@ -147,7 +147,7 @@ export default function RedmineIntegrationForm({
   }
 
   if (!integrationProperties) {
-    return <Loading />;
+    return <SkeletonListItems />;
   }
 
   return (

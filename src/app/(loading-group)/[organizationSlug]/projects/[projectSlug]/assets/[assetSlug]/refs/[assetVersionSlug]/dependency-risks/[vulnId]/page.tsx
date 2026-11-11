@@ -542,7 +542,10 @@ const Index: FunctionComponent = () => {
                               externalEntityProviderId={
                                 asset.externalEntityProviderId
                               }
-                              onClick={() => setMitigateDialogOpen(true)}
+                              orgSlug={organizationSlug}
+                              projectSlug={projectSlug}
+                              assetSlug={assetSlug}
+                              onClick={async () => setMitigateDialogOpen(true)}
                             />
                           }
                         />

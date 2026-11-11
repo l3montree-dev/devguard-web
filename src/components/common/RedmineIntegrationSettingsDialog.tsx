@@ -40,12 +40,10 @@ export const RedmineIntegrationSettingsDialog: FunctionComponent<Props> = ({
             Configure how the Redmine integration behaves.
           </DialogDescription>
         </DialogHeader>
-        {open && (
-          <RedmineIntegrationSettingsForm
-            integration={integration}
-            onSave={handleSave}
-          />
-        )}
+        <RedmineIntegrationSettingsForm
+          integration={integration}
+          onSave={handleSave}
+        />
       </DialogContent>
     </Dialog>
   );

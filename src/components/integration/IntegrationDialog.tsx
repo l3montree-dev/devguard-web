@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import type { ExternalTicketProvider } from "@/types/common";
+import { ExternalTicketProviderNames } from "@/const/providers";
 
 interface Props {
   Button: ReactNode;
@@ -32,7 +33,7 @@ export const IntegrationDialog: FunctionComponent<Props> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            Integrate with {integrationToName(integration)}
+            Integrate with {ExternalTicketProviderNames[integration]}
           </DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
@@ -41,18 +42,3 @@ export const IntegrationDialog: FunctionComponent<Props> = ({
     </Dialog>
   );
 };
-
-function integrationToName(integration: ExternalTicketProvider): string {
-  switch (integration) {
-    case "gitlab":
-      return "GitLab";
-    case "github":
-      return "GitHub";
-    case "jira":
-      return "Jira";
-    case "opencode":
-      return "OpenCode";
-    case "redmine":
-      return "Redmine";
-  }
-}
