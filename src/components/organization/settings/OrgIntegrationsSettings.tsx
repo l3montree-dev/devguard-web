@@ -10,6 +10,7 @@ import ListItem from "@/components/common/ListItem";
 import RedmineIntegrationForm from "@/components/common/RedmineIntegrationForm";
 import { RedmineIntegrationSettingsDialog } from "@/components/common/RedmineIntegrationSettingsDialog";
 import { IntegrationDialog } from "@/components/integration/IntegrationDialog";
+import { Badge } from "@/components/ui/badge";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useConfig } from "@/context/ConfigContext";
 import { usePatchOrgContext } from "@/hooks/usePatchOrgContext";
@@ -276,7 +277,8 @@ const OrgIntegrationsSettings = () => {
       <ListItem
         Title={
           <ProviderTitle src="/assets/provider-icons/redmine.svg">
-            Integrate with Redmine
+            Integrate with Redmine&nbsp;
+            <Badge variant="outline">Community</Badge>
           </ProviderTitle>
         }
         Description="DevGuard uses a Redmine API Token to access your Redmine projects and interact with your issues. This allows DevGuard to create and manage issues in your Redmine projects."

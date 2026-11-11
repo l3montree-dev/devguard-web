@@ -18,12 +18,14 @@ import type { RedmineIntegrationDTO } from "@/types/dto";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { urlToBaseURL } from "@/utils/url";
+import type { Surface } from "@/lib/surface";
 
 export interface RedmineIntegrationFormProps {
   onNewIntegration: (integration: RedmineIntegrationDTO) => void;
   additionalOnClick?: () => void;
   backButtonClick?: () => void;
   setOpen?: (open: boolean) => void;
+  variant?: Surface;
 }
 
 export default function RedmineIntegrationForm({
@@ -31,6 +33,7 @@ export default function RedmineIntegrationForm({
   additionalOnClick,
   backButtonClick,
   setOpen,
+  variant,
 }: RedmineIntegrationFormProps) {
   const form = useForm<{
     url: string;
@@ -86,6 +89,7 @@ export default function RedmineIntegrationForm({
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   placeholder="My Redmine Personal Access Token"
                   autoComplete="url"
                   {...field}
@@ -105,6 +109,7 @@ export default function RedmineIntegrationForm({
               <FormLabel>Redmine URL</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   placeholder={"https://redmine.example.com"}
                   autoComplete="url"
                   type="url"
@@ -129,6 +134,7 @@ export default function RedmineIntegrationForm({
               <FormLabel>Redmine Access-Token</FormLabel>
               <FormControl>
                 <Input
+                  variant={variant}
                   required
                   autoComplete="off"
                   placeholder="xxxxxxxxxxxxxxx..."
@@ -149,7 +155,12 @@ export default function RedmineIntegrationForm({
             <FormItem>
               <FormLabel>Redmine Issue Tracker</FormLabel>
               <FormControl>
-                <Input required placeholder="Bug" {...field} />
+                <Input
+                  variant={variant}
+                  required
+                  placeholder="Bug"
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 Issue tracker to use for creating issues in Redmine. Either the

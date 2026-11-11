@@ -5,54 +5,62 @@
 
 import type { ExternalTicketProvider } from "@/types/common";
 import type { FunctionComponent } from "react";
-import GitProviderIcon from "../GitProviderIcon";
-import { Button } from "../ui/button";
-import Image from "next/image";
+import { AsyncButton, Button } from "../ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import Link from "next/link";
+import { ProviderIcon } from "./ProviderIcon";
 
 // issue tracker and a vulnerability that doesn't have a ticket yet.
 export const CreateTicketButton: FunctionComponent<{
   integrationName: ExternalTicketProvider | undefined;
   hasTicket: boolean;
   externalEntityProviderId?: string;
-  onClick: () => void;
-}> = ({ integrationName, hasTicket, externalEntityProviderId, onClick }) => {
-  if (integrationName === undefined || hasTicket) return null;
+  orgSlug: string;
+  projectSlug: string;
+  assetSlug: string;
+  onClick: () => Promise<any>;
+}> = ({
+  integrationName,
+  hasTicket,
+  externalEntityProviderId,
+  orgSlug,
+  projectSlug,
+  assetSlug,
+  onClick,
+}) => {
+  if (hasTicket) return null;
+
+  if (integrationName === undefined) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>
+            <Button variant={"ghost"} disabled className="">
+              <span className="ml-1 text-muted-foreground">Create Ticket</span>
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          No repository is linked. To create a ticket, please integrate your
+          issue tracker in the {` `}
+          <Link
+            href={`/${orgSlug}/projects/${projectSlug}/assets/${assetSlug}/settings/repository`}
+            className="underline"
+          >
+            settings
+          </Link>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
 
   return (
-    <Button variant="secondary" onClick={onClick}>
-      {integrationName === "gitlab" && (
-        <GitProviderIcon
-          externalEntityProviderIdOrRepositoryId={
-            externalEntityProviderId ?? "gitlab"
-          }
-        />
-      )}
-      {integrationName === "github" && (
-        <Image
-          alt="GitHub Logo"
-          width={15}
-          height={15}
-          className="dark:invert"
-          src={"/assets/github.svg"}
-        />
-      )}
-      {integrationName === "jira" && (
-        <Image
-          alt="Jira Logo"
-          width={15}
-          height={15}
-          src={"/assets/jira-svgrepo-com.svg"}
-        />
-      )}
-      {integrationName === "redmine" && (
-        <Image
-          alt="Redmine Logo"
-          width={15}
-          height={15}
-          src={"/assets/provider-icons/redmine.svg"}
-        />
-      )}
+    <AsyncButton variant="secondary" onClick={onClick}>
+      <ProviderIcon
+        integrationType={integrationName}
+        externalEntityProviderId={externalEntityProviderId}
+      />
       <span className="ml-1">Create Ticket</span>
-    </Button>
+    </AsyncButton>
   );
 };
