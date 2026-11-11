@@ -18,7 +18,7 @@ import type {
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { AsyncButton, Button } from "@/components/ui/button";
+import { AsyncButton } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -50,11 +50,7 @@ import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 import { CreateTicketButton } from "@/components/integration/CreateTicketButton";
 
 const MarkdownEditor = dynamic(
@@ -343,38 +339,6 @@ const Index = () => {
 
                       <div className="flex flex-row justify-end gap-1">
                         <div className="flex flex-row items-start gap-2">
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === undefined && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span>
-                                    <Button
-                                      variant={"ghost"}
-                                      disabled
-                                      className=""
-                                    >
-                                      <span className="ml-1 text-muted-foreground">
-                                        Create Ticket
-                                      </span>
-                                    </Button>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  No repository is linked. To create a ticket,
-                                  please integrate your issue tracker in the{" "}
-                                  {` `}
-                                  <Link
-                                    href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                    className="underline"
-                                  >
-                                    settings
-                                  </Link>
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
                           <CreateTicketButton
                             integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
                               asset,

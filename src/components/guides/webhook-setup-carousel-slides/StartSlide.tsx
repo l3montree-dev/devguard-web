@@ -103,7 +103,7 @@ export default function StartSlide({
                   setSelectedProvider(value as ExternalTicketProvider);
                 }}
               >
-                <SelectTrigger className="w-[220px]">
+                <SelectTrigger className="w-[320px]">
                   <SelectValue placeholder="Select Provider" />
                 </SelectTrigger>
                 <SelectContent>

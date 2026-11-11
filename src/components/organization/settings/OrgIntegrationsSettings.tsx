@@ -278,7 +278,9 @@ const OrgIntegrationsSettings = () => {
         Title={
           <ProviderTitle src="/assets/provider-icons/redmine.svg">
             Integrate with Redmine&nbsp;
-            <Badge variant="outline">Community</Badge>
+            <Badge className="text-xs" variant="secondary">
+              Community driven
+            </Badge>
           </ProviderTitle>
         }
         Description="DevGuard uses a Redmine API Token to access your Redmine projects and interact with your issues. This allows DevGuard to create and manage issues in your Redmine projects."

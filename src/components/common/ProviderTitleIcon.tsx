@@ -74,7 +74,9 @@ export default function ProviderTitleIcon({
             height={16}
           />{" "}
           Redmine
-          <Badge variant="outline">Community</Badge>
+          <Badge className="text-xs" variant="secondary">
+            Community driven
+          </Badge>
         </span>
       );
     default:
