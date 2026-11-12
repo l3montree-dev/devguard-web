@@ -100,7 +100,7 @@ const FixableBadge = ({ message }: { message: string }) => (
 );
 
 const QuickfixWrench = ({ vuln }: { vuln: VulnWithCVE }) => {
-  if (!isDirectDependencyUpdateAvailable(vuln)) {
+  if (vuln.state === "fixed" || !isDirectDependencyUpdateAvailable(vuln)) {
     return null;
   }
   return (
@@ -239,7 +239,10 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     [row.original.vulns],
   );
   const packageHasQuickfix = useMemo(
-    () => row.original.vulns.some(isDirectDependencyUpdateAvailable),
+    () =>
+      row.original.vulns.some(
+        (v) => v.state !== "fixed" && isDirectDependencyUpdateAvailable(v),
+      ),
     [row.original.vulns],
   );
 
@@ -373,7 +376,9 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const pathExplosionOrOnlySinglePath =
             isPathExplosion || !hasMultiplePaths;
 
-          const cveHasQuickfix = vulns.some(isDirectDependencyUpdateAvailable);
+          const cveHasQuickfix = vulns.some(
+            (v) => v.state !== "fixed" && isDirectDependencyUpdateAvailable(v),
+          );
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
