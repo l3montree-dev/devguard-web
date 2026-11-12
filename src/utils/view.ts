@@ -242,10 +242,7 @@ export const findUser = (
   const user = org?.members.find((u) => u.id === id);
 
   if (!user) {
-    return {
-      displayName: "Unknown",
-      realName: "Unknown",
-    };
+    return { displayName: id, realName: id };
   }
   if (id.startsWith("github:")) {
     // the id is assembled like:
