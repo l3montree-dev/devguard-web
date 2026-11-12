@@ -12,6 +12,7 @@ import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "@/lib/toast";
+import { readErrorMessage } from "@/services/apiClient";
 import {
   uploadSarif,
   uploadSbomFile,
@@ -164,7 +165,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
         if (!resp.ok) {
           toast.error(
             "SBOM has not been sent successfully. Reason: " +
-              (await resp.text()),
+              (await readErrorMessage(resp)),
           );
           return;
         }
