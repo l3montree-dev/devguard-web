@@ -144,8 +144,7 @@ export const useAssetMenu = () => {
               assetVersionSlug +
               "/code-risks",
             Icon: CodeIcon,
-            isActive:
-              pathname.includes("code-risks") || pathname.includes("/advisory"),
+            isActive: pathname.includes("code-risks"),
             testId: "nav-asset-code-risks",
           },
           {
@@ -199,11 +198,7 @@ export const useAssetMenu = () => {
               assetVersionSlug +
               "/dependency-risks",
             Icon: WrenchScrewdriverIcon,
-            isActive:
-              pathname.includes("dependency-risks") ||
-              pathname.includes("license-risks") ||
-              pathname.includes("dependencies") ||
-              pathname.includes("vex-rules"),
+            isActive: pathname.includes("dependency-risks"),
             testId: "nav-asset-dependency-risks",
           },
           {
