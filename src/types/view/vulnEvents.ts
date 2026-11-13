@@ -22,6 +22,7 @@ interface BaseVulnEventDTO {
   userAgent: string;
   vexRuleId?: string | null;
   vexRule?: VexRule | null;
+  artifactId: string | null;
 }
 
 export interface ImplementedEventDTO extends BaseVulnEventDTO {
@@ -92,6 +93,14 @@ export interface CreatedEventDTO extends BaseVulnEventDTO {
   type: "created";
 }
 
+export interface DetectedInArtifactEventDTO extends BaseVulnEventDTO {
+  type: "detectedInArtifact";
+}
+
+export interface FixedInArtifactEventDTO extends BaseVulnEventDTO {
+  type: "fixedInArtifact";
+}
+
 export type VulnEventDTO =
   | AcceptedEventDTO
   | FixedEventDTO
@@ -109,7 +118,9 @@ export type VulnEventDTO =
   | RemovedComplianceComponentEventDTO
   | PublishedEventDTO
   | WithdrawnEventDTO
-  | CreatedEventDTO;
+  | CreatedEventDTO
+  | DetectedInArtifactEventDTO
+  | FixedInArtifactEventDTO;
 
 export type DetailedDependencyVulnDTO = Omit<
   S["dtos.DetailedDependencyVulnWithRelations"],

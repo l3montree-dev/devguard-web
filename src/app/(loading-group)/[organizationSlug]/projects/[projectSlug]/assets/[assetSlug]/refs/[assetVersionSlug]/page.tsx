@@ -419,7 +419,7 @@ const Index: FunctionComponent = () => {
                   isLoading={averageFixingTimeLoading}
                 />
               </div>
-              <Card className="col-span-4 flex flex-col">
+              <Card className="col-span-4 bg-transparent! flex flex-col">
                 <CardHeader>
                   <CardTitle className="relative text-base w-full">
                     Activity Stream

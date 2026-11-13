@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import { useActiveAsset } from "@/hooks/useActiveAsset";
+import { useArtifacts } from "@/context/AssetVersionContext";
 import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -35,6 +36,8 @@ import {
   Eye,
   GitBranchIcon,
   GitPullRequestCreateArrowIcon,
+  PackageMinus,
+  PackagePlus,
   Scale,
   Sparkles,
   Unlink,
@@ -99,6 +102,10 @@ export function EventTypeIcon({
       return <ArrowDownToDot className="h-4 w-4" />;
     case "created":
       return <Sparkles className="h-4 w-4" />;
+    case "detectedInArtifact":
+      return <PackagePlus className="h-4 w-4" />;
+    case "fixedInArtifact":
+      return <PackageMinus className="h-4 w-4" />;
   }
 }
 
@@ -116,6 +123,7 @@ const RiskFeedGroupHeader = ({
   children: React.ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const artifacts = useArtifacts();
   const type = groupedEvents[0].type;
 
   return (
@@ -134,7 +142,11 @@ const RiskFeedGroupHeader = ({
             <button className="w-full bg-card px-2 py-2 font-medium flex flex-row items-center justify-between hover:bg-muted/50 transition-colors">
               <span className="flex flex-row items-center gap-2">
                 {(() => {
-                  const msg = eventTypeMessages(groupedEvents[0], "");
+                  const msg = eventTypeMessages(
+                    groupedEvents[0],
+                    "",
+                    artifacts,
+                  );
                   return msg.charAt(0).toUpperCase() + msg.slice(1);
                 })()}
                 <Badge variant="secondary" className="text-xs font-normal">
@@ -181,6 +193,7 @@ const RiskFeedItem = ({
   inGroup?: boolean;
 }) => {
   const user = findUser(event.userId, org, currentUser);
+  const artifacts = useArtifacts();
 
   const msg = event.justification;
 
@@ -256,7 +269,7 @@ const RiskFeedItem = ({
                   {event.createdByVexRule
                     ? "VEX Rule"
                     : findUser(event.userId, org, currentUser).displayName}{" "}
-                  {eventTypeMessages(event, vulnerabilityName)}
+                  {eventTypeMessages(event, vulnerabilityName, artifacts)}
                   {event.mechanicalJustification &&
                     "- " +
                       removeUnderscores(

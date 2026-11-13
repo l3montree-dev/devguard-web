@@ -18,6 +18,7 @@ import { useActiveAssetVersion } from "../hooks/useActiveAssetVersion";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import EcosystemImage from "./common/EcosystemImage";
+import { useArtifacts } from "../context/AssetVersionContext";
 
 interface Props {
   events: VulnEventDTO[];
@@ -93,7 +94,12 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
                       }{" "}
                       <FoundIn
                         event={event}
-                        flawName={event.resourceIdentifier || "a vulnerability"}
+                        flawName={
+                          event.resourceIdentifier ||
+                          (event.vulnType === "licenseRisk"
+                            ? "a license risk"
+                            : "a vulnerability")
+                        }
                       />
                     </p>
                   </div>
@@ -123,10 +129,28 @@ const FoundIn: FunctionComponent<{
   event: VulnEventDTO;
   flawName: string;
 }> = ({ event, flawName }) => {
-  const title = eventTypeMessages(event, flawName);
+  const artifacts = useArtifacts();
+  const title = eventTypeMessages(event, flawName, artifacts);
   let found = <></>;
 
-  if (event.type === "detected") {
+  const packageName = (
+    <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+      <span className="inline-flex flex-shrink-0">
+        <EcosystemImage packageName={event.packageName ?? ""} size={16} />
+      </span>
+      {beautifyPurl(event.packageName ?? "")}
+    </span>
+  );
+
+  if (event.vulnType === "licenseRisk") {
+    // a license risk is identified by its component, so every event names it
+    found = (
+      <>
+        {event.type === "licenseDecision" ? " for " : " in "}
+        {packageName}
+      </>
+    );
+  } else if (event.type === "detected") {
     if (event.vulnType === "firstPartyVuln") {
       found = (
         <span className="text-muted-foreground">
@@ -138,12 +162,7 @@ const FoundIn: FunctionComponent<{
       found = (
         <>
           {" in "}
-          <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-            <span className="inline-flex flex-shrink-0">
-              <EcosystemImage packageName={event.packageName ?? ""} size={16} />
-            </span>
-            {beautifyPurl(event.packageName ?? "")}
-          </span>
+          {packageName}
         </>
       );
     }

@@ -3,7 +3,12 @@
 
 import type { ComponentRisk } from "@/types/view/component";
 
-import type { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/dto";
+import type {
+  ArtifactDTO,
+  AssetDTO,
+  OrganizationDetailsDTO,
+  ProjectDTO,
+} from "@/types/dto";
 
 import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { type Identity } from "@ory/client-fetch";
@@ -62,7 +67,14 @@ export const vexOptionMessages: Record<string, string> = {
     "Built-in defenses prevent known exploitation paths.",
 };
 
-export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
+export const eventTypeMessages = (
+  event: VulnEventDTO,
+  flawName: string,
+  artifacts: ArtifactDTO[] = [],
+) => {
+  const artifactName =
+    artifacts.find((artifact) => artifact.id === event.artifactId)
+      ?.artifactName ?? "an unknown artifact";
   let message = "";
   switch (event.type) {
     case "licenseDecision":
@@ -116,6 +128,13 @@ export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
       message = "created " + flawName;
       break;
     }
+    case "detectedInArtifact":
+      message = "detected " + flawName + " in artifact " + artifactName;
+      break;
+    case "fixedInArtifact":
+      message =
+        "no longer detects " + flawName + " in artifact " + artifactName;
+      break;
   }
   if (event.userAgent === "devguard-mcp-server") {
     message += " (applied by AI agent)";
@@ -141,6 +160,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   published: "bg-info text-info-foreground!",
   withdrawn: "bg-destructive text-destructive-foreground!",
   created: "bg-success text-success-foreground!",
+  detectedInArtifact: "bg-secondary text-secondary-foreground!",
+  fixedInArtifact: "bg-secondary text-secondary-foreground!",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {
