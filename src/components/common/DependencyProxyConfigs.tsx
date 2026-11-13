@@ -625,7 +625,7 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
           </div>
           {codeError && <p className="text-sm text-destructive">{codeError}</p>}
         </Section>
-        <div className="sticky bottom-0 flex justify-end pt-2">
+        <div className="flex justify-end pt-2">
           <Button
             onClick={handleSave}
             disabled={

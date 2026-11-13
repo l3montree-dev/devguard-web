@@ -6,6 +6,7 @@ import { FolderSearch, ShieldCheck } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
 import useDecodedParams from "./useDecodedParams";
 import useDecodedPathname from "./useDecodedPathname";
+import { ThinBrickWallFireIcon } from "./useOrganizationMenu";
 import { isAdmin, useCurrentUserRole } from "./useUserRole";
 
 export const useProjectMenu = () => {
@@ -52,12 +53,27 @@ export const useProjectMenu = () => {
           testId: "nav-group-package-search",
         },
         {
+          title: "Dependency Proxy",
+          href:
+            "/" +
+            orgSlug +
+            "/projects/" +
+            projectSlug +
+            "/settings/dependency-proxy",
+          Icon: ThinBrickWallFireIcon,
+          isActive: pathname.startsWith(
+            `/${orgSlug}/projects/${projectSlug}/settings/dependency-proxy`,
+          ),
+          testId: "nav-group-dependency-proxy",
+        },
+        {
           title: "Settings",
           href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
           Icon: CogIcon,
-          isActive: pathname.startsWith(
-            `/${orgSlug}/projects/${projectSlug}/settings`,
-          ),
+          isActive:
+            pathname.startsWith(
+              `/${orgSlug}/projects/${projectSlug}/settings`,
+            ) && !pathname.endsWith("/settings/dependency-proxy"),
           testId: "nav-group-settings",
         },
       ],
