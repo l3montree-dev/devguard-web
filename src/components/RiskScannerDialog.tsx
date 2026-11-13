@@ -15,6 +15,7 @@ import React, {
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "@/lib/toast";
+import { readErrorMessage } from "@/services/apiClient";
 import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
@@ -261,7 +262,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
       toast.success("SBOM has successfully been sent!");
     } else {
       // check if there is an error message
-      const msg = await resp.text();
+      const msg = await readErrorMessage(resp);
       toast.error("SBOM has not been sent successfully. Reason: " + msg);
     }
   };

@@ -3,7 +3,7 @@
 
 "use client";
 
-import CodeEditor from "@/components/common/CodeEditor";
+import CelCodeBlock from "@/components/common/CelCodeBlock";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
@@ -20,11 +20,25 @@ import { DocDrawer } from "./DocDrawer";
 import { DelayedDownloadButton } from "./DelayedDownloadButton";
 import { DownloadIcon } from "lucide-react";
 
-const defaultConfig = `rules:
-  - name: min-release-age
-    action: deny
-    # OCI images have no release time to check here
-    expr: pkg.ecosystem != "oci" && now() - timestamp(pkg.releasedAt) < duration("120h")
+const rulesPlaceholder = `# Available fields: pkg.name, pkg.version, pkg.purl, pkg.registry, pkg.releasedAt,
+# pkg.ecosystem (npm, go, pypi, maven, composer, deb, apk, oci)
+# npm only: pkg.publisher.name, pkg.publisher.changedSinceLastVersion
+# has() checks whether a field exists. Without it, a rule on a missing field
+# fails and the package is blocked. Quote expressions that start with !.
+#
+# Examples:
+# rules:
+#   - name: min-release-age
+#     action: deny
+#     # OCI images have no release time to check here
+#     expr: pkg.ecosystem != "oci" && now() - timestamp(pkg.releasedAt) < duration("120h")
+#   - name: allow-lodash
+#     action: allow
+#     expr: pkg.name == "lodash"
+#   - name: block-scope
+#     action: deny
+#     expr: pkg.name.startsWith("@evil-scope/")
+#
 # registries:
 #   npm: https://nexus.example.com/repository/npm/
 #   deb:
@@ -34,8 +48,46 @@ const defaultConfig = `rules:
 #     keyring: |
 #       -----BEGIN PGP PUBLIC KEY BLOCK-----
 #       ...
-#       -----END PGP PUBLIC KEY BLOCK-----
-`;
+#       -----END PGP PUBLIC KEY BLOCK-----`;
+
+const exampleRules = [
+  {
+    label: "Block releases younger than 5 days",
+    rule: `- name: min-release-age
+  action: deny
+  expr: pkg.ecosystem != "oci" && now() - timestamp(pkg.releasedAt) < duration("120h")`,
+  },
+  {
+    label: "Allow one package (exception)",
+    rule: `- name: allow-lodash
+  action: allow
+  expr: pkg.name == "lodash"`,
+  },
+  {
+    label: "Block an npm scope",
+    rule: `- name: block-evil-scope
+  action: deny
+  expr: pkg.name.startsWith("@evil-scope/")`,
+  },
+  {
+    label: "Block one exact version",
+    rule: `- name: block-lodash-4.17.21
+  action: deny
+  expr: pkg.purl == "pkg:npm/lodash@4.17.21"`,
+  },
+  {
+    label: "Block a whole ecosystem",
+    rule: `- name: block-pypi
+  action: deny
+  expr: pkg.ecosystem == "pypi"`,
+  },
+  {
+    label: "Block npm publisher changes",
+    rule: `- name: publisher-changed
+  action: deny
+  expr: has(pkg.publisher) && pkg.publisher.changedSinceLastVersion`,
+  },
+];
 
 const ecosystemIcons: Record<string, string> = {
   npm: "/logos/npm-svgrepo-com.svg",
@@ -413,7 +465,7 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
 
   useEffect(() => {
     if (data !== undefined && initializedForScope.current !== scopeKey) {
-      setRulesText(data ?? defaultConfig);
+      setRulesText(data ?? "");
       initializedForScope.current = scopeKey;
     }
   }, [data, scopeKey]);
@@ -507,99 +559,35 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
           description="Define allow and deny rules as CEL expressions in YAML. Rules are evaluated top to bottom and the last matching rule wins. Packages that match no rule are allowed."
           title="Package Rules"
         >
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground"></p>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setRulesHelpOpen((v) => !v)}
-                  className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
-                >
-                  {rulesHelpOpen ? "Hide examples" : "Show examples"}
-                </button>
-                <a
-                  href="https://docs.devguard.org/how-to-guides/dependency-proxy/package-rules/"
-                  target="_blank"
-                  className="ml-4 shrink-0 text-xs text-muted-foreground underline hover:text-foreground"
-                >
-                  Learn more about CEL rules
-                </a>
-              </div>
-            </div>
-            {rulesHelpOpen && (
-              <div className="mt-2 flex flex-col gap-2 rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
-                <p>
-                  Available fields: <code className="font-mono">pkg.name</code>,{" "}
-                  <code className="font-mono">pkg.version</code>,{" "}
-                  <code className="font-mono">pkg.ecosystem</code> (npm, go,
-                  pypi, maven, composer, deb, apk, oci),{" "}
-                  <code className="font-mono">pkg.purl</code>,{" "}
-                  <code className="font-mono">pkg.registry</code>,{" "}
-                  <code className="font-mono">pkg.releasedAt</code> and, for npm
-                  only, <code className="font-mono">pkg.publisher.name</code>{" "}
-                  and{" "}
-                  <code className="font-mono">
-                    pkg.publisher.changedSinceLastVersion
-                  </code>
-                  .
-                </p>
-                {[
-                  {
-                    pattern:
-                      'now() - timestamp(pkg.releasedAt) < duration("120h")',
-                    desc: "Matches packages released less than 5 days ago.",
-                    example: "action: deny → blocks fresh releases",
-                  },
-                  {
-                    pattern: 'pkg.name == "lodash"',
-                    desc: "Matches one package by name, in every version.",
-                    example:
-                      "action: allow after a deny rule → exception for lodash",
-                  },
-                  {
-                    pattern: 'pkg.name.startsWith("@evil-scope/")',
-                    desc: "Matches every package of an npm scope.",
-                    example:
-                      "action: deny → blocks @evil-scope/foo, @evil-scope/bar, …",
-                  },
-                  {
-                    pattern: 'pkg.purl == "pkg:npm/lodash@4.17.21"',
-                    desc: "Matches exactly one version.",
-                    example: "action: deny → only lodash 4.17.21 is blocked",
-                  },
-                  {
-                    pattern: 'pkg.ecosystem == "pypi"',
-                    desc: "Matches every package of one ecosystem.",
-                    example: "action: deny → blocks all PyPI packages",
-                  },
-                  {
-                    pattern:
-                      "has(pkg.publisher) && pkg.publisher.changedSinceLastVersion",
-                    desc: "Matches npm versions published by a different user than the previous version.",
-                    example: "action: deny → blocks possible account takeovers",
-                  },
-                  {
-                    pattern: "'!has(pkg.releasedAt) || …'",
-                    desc: "has() checks whether a field exists. Without it, a rule on a missing field fails and the package is blocked. Quote expressions that start with !.",
-                    example: "OCI images have no release time",
-                  },
-                ].map(({ pattern, desc, example }) => (
-                  <div key={pattern} className="flex flex-col gap-0.5">
-                    <div className="flex items-baseline gap-2">
-                      <code className="rounded bg-muted px-1 py-0.5 font-mono text-foreground">
-                        {pattern}
-                      </code>
-                      <span>{desc}</span>
-                    </div>
-                    <span className="pl-1 text-muted-foreground/70">
-                      e.g. <code className="font-mono">{example}</code>
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => setRulesHelpOpen((v) => !v)}
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              {rulesHelpOpen ? "Hide example rules" : "Show example rules"}
+            </button>
+            <a
+              href="https://docs.devguard.org/how-to-guides/dependency-proxy/package-rules/"
+              target="_blank"
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Learn more about CEL rules
+            </a>
           </div>
+          {rulesHelpOpen && (
+            <div className="grid gap-3 md:grid-cols-2">
+              {exampleRules.map(({ label, rule }) => (
+                <CelCodeBlock
+                  key={label}
+                  value={rule}
+                  language="yaml"
+                  label={label}
+                  readOnly
+                />
+              ))}
+            </div>
+          )}
           <div className="flex flex-col gap-4 md:flex-row pb-6">
             <div className="min-w-0 flex-1">
               <div>
@@ -607,15 +595,17 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
                   Enter your dependency proxy rules below:
                 </p>
               </div>
-              <CodeEditor
+              <CelCodeBlock
                 value={rulesText}
                 language="yaml"
+                label="YAML"
+                placeholder={rulesPlaceholder}
                 onChange={setRulesText}
                 onValidation={handleEditorValidation}
                 onSave={
                   codeError ||
                   isSaving ||
-                  rulesText === (data ?? defaultConfig) ||
+                  rulesText === (data ?? "") ||
                   data === undefined
                     ? undefined
                     : handleSave
@@ -632,7 +622,7 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
               isSaving ||
               data === undefined ||
               !!codeError ||
-              rulesText === (data ?? defaultConfig)
+              rulesText === (data ?? "")
             }
           >
             {isSaving ? "Saving..." : "Save"}

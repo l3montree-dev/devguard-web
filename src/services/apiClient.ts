@@ -28,7 +28,12 @@ export const readErrorMessage = async (resp: Response): Promise<string> => {
     const json = JSON.parse(text);
     return (typeof json === "string" ? json : json?.message) || fallback;
   } catch {
-    return (text.length < 500 && text) || fallback;
+    // error pages from a proxy or from Next.js itself, e.g. when the API is
+    // down, are HTML and unreadable as a message
+    const isHtml =
+      resp.headers.get("content-type")?.includes("text/html") ||
+      text.trimStart().startsWith("<");
+    return (!isHtml && text.length < 500 && text) || fallback;
   }
 };
 
