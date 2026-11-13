@@ -418,6 +418,7 @@ const Index: FunctionComponent = () => {
     rulePrefill,
     recommendationsResponse,
     isRecommendationsLoading,
+    mutateRecommendations,
     setAddRuleDialogOpen,
     createRuleFromRecommendation,
   } = useVexRuleRecommendations(
@@ -568,7 +569,10 @@ const Index: FunctionComponent = () => {
                     projectSlug,
                     assetSlug,
                   }}
-                  onCreated={() => mutateVulns()}
+                  onCreated={() => {
+                    mutateVulns();
+                    mutateRecommendations();
+                  }}
                   prefill={rulePrefill}
                 />
               </div>

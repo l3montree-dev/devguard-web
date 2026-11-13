@@ -30,13 +30,16 @@ export default function useVexRuleRecommendations(
     projectSlug,
     assetSlug,
   });
-  const { data: recommendationsResponse, isLoading: isRecommendationsLoading } =
-    useSWR<Paged<VexRuleRecommendation>>(
-      canSeeRecommendations
-        ? `${recommendationsUrl}/?${recommendationsQuery?.toString()}`
-        : null,
-      fetcher,
-    );
+  const {
+    data: recommendationsResponse,
+    isLoading: isRecommendationsLoading,
+    mutate: mutateRecommendations,
+  } = useSWR<Paged<VexRuleRecommendation>>(
+    canSeeRecommendations
+      ? `${recommendationsUrl}/?${recommendationsQuery?.toString()}`
+      : null,
+    fetcher,
+  );
 
   const createRuleFromRecommendation = (
     recommendation: VexRuleRecommendation,
@@ -58,6 +61,7 @@ export default function useVexRuleRecommendations(
     setAddRuleDialogOpen,
     recommendationsResponse,
     isRecommendationsLoading,
+    mutateRecommendations,
     createRuleFromRecommendation,
     canSeeRecommendations,
   };
