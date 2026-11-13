@@ -84,14 +84,16 @@ export class RepoFlow {
   }
 
   async openDependencyInsights() {
-    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
+    await this.page.getByTestId("nav-asset-dependencies").hover();
     await this.page.getByTestId("nav-asset-dependency-insights").click();
     await docShot(this.page, test.info(), "dependency-insights-overview");
   }
 
   async openDependencyRiskTable() {
-    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
-    await this.page.getByRole("menuitem", { name: "Dependency Risks" }).click();
+    await this.page
+      .getByTestId("nav-asset-dependencies")
+      .getByRole("link")
+      .click();
   }
 
   async publishRepo() {

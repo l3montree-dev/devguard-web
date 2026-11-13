@@ -112,9 +112,8 @@ export class VulnFlow {
     ).trim();
 
     await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("button")
-      .click({ timeout: 20_000 });
+      .getByTestId("nav-asset-dependencies")
+      .hover({ timeout: 20_000 });
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });
@@ -165,9 +164,8 @@ export class VulnFlow {
 
   async verifyVEXRule() {
     await this.page
-      .getByTestId("nav-asset-dependency-risks")
-      .locator("button")
-      .click({ timeout: 20_000 });
+      .getByTestId("nav-asset-dependencies")
+      .hover({ timeout: 20_000 });
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });
@@ -202,7 +200,7 @@ export class VulnFlow {
   }
 
   async deleteFirstVexRule(testInfo: TestInfo) {
-    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
+    await this.page.getByTestId("nav-asset-dependencies").hover();
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });

@@ -49,7 +49,7 @@ export class SetupFlow {
   }
 
   async uploadVEX(inputFile: string) {
-    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
+    await this.page.getByTestId("nav-asset-dependencies").hover();
     await this.page
       .getByTestId("nav-asset-vex-rules")
       .click({ timeout: 20_000 });

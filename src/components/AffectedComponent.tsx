@@ -42,7 +42,7 @@ const AffectedComponentDetails: FunctionComponent<{
   return (
     <div>
       <div className="p-5">
-        <h3 className="mb-2 text-xs font-semibold">Affected component</h3>
+        <h3 className="pl-1 mb-2 text-xs font-semibold">Affected component</h3>
         <div className="flex flex-col gap-4">
           <Collapsible>
             <div className="rounded-lg border bg-card p-3">

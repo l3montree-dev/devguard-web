@@ -115,7 +115,7 @@ export const useAssetMenu = () => {
 
     menu = menu.concat([
       {
-        title: "Code Risks",
+        title: "Code",
         href:
           "/" +
           orgSlug +
@@ -129,8 +129,25 @@ export const useAssetMenu = () => {
         Icon: CodeIcon,
         isActive:
           pathname.includes("code-risks") || pathname.includes("/advisory"),
-        testId: "nav-asset-code-risks",
+        testId: "nav-asset-code",
         children: [
+          {
+            title: "Code Risks",
+            href:
+              "/" +
+              orgSlug +
+              "/projects/" +
+              projectSlug +
+              "/assets/" +
+              assetSlug +
+              "/refs/" +
+              assetVersionSlug +
+              "/code-risks",
+            Icon: CodeIcon,
+            isActive:
+              pathname.includes("code-risks") || pathname.includes("/advisory"),
+            testId: "nav-asset-code-risks",
+          },
           {
             title: "Security Advisories",
             href:
@@ -150,7 +167,7 @@ export const useAssetMenu = () => {
         ],
       },
       {
-        title: "Dependency Risks",
+        title: "Dependencies",
         href:
           "/" +
           orgSlug +
@@ -167,8 +184,28 @@ export const useAssetMenu = () => {
           pathname.includes("license-risks") ||
           pathname.includes("dependencies") ||
           pathname.includes("vex-rules"),
-        testId: "nav-asset-dependency-risks",
+        testId: "nav-asset-dependencies",
         children: [
+          {
+            title: "Dependency Risks",
+            href:
+              "/" +
+              orgSlug +
+              "/projects/" +
+              projectSlug +
+              "/assets/" +
+              assetSlug +
+              "/refs/" +
+              assetVersionSlug +
+              "/dependency-risks",
+            Icon: WrenchScrewdriverIcon,
+            isActive:
+              pathname.includes("dependency-risks") ||
+              pathname.includes("license-risks") ||
+              pathname.includes("dependencies") ||
+              pathname.includes("vex-rules"),
+            testId: "nav-asset-dependency-risks",
+          },
           {
             title: "License Risks",
             href:
