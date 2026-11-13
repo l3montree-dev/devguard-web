@@ -38,7 +38,11 @@ const VulnEventItem: FunctionComponent<Props> = ({ event }) => {
   const currentUser = useCurrentUser();
   const activeOrg = useActiveOrg();
   const user = findUser(event.userId, activeOrg, currentUser);
-  const msg = event.justification;
+  // the pipeline recalculates the risk with an empty or a fixed justification - only a user gives a reason
+  const msg =
+    event.type === "rawRiskAssessmentUpdated" && event.userId === "system"
+      ? null
+      : event.justification;
   const project = useActiveProject();
   const asset = useActiveAsset();
   const assetVersion = useActiveAssetVersion();
@@ -147,6 +151,16 @@ const FoundIn: FunctionComponent<{
     found = (
       <>
         {event.type === "licenseDecision" ? " for " : " in "}
+        {packageName}
+      </>
+    );
+  } else if (
+    event.type === "rawRiskAssessmentUpdated" &&
+    event.vulnType === "dependencyVuln"
+  ) {
+    found = (
+      <>
+        {" in "}
         {packageName}
       </>
     );

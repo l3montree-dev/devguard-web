@@ -114,7 +114,10 @@ export const eventTypeMessages = (
       message = "removed a component from " + flawName;
       break;
     case "rawRiskAssessmentUpdated":
-      message = "updated the risk assessment";
+      // grouped events are rendered without a flaw name
+      message = flawName
+        ? "recalculated the risk of " + flawName
+        : "recalculated the risk";
       break;
     case "published": {
       message = "published " + flawName;
