@@ -15,7 +15,7 @@ import useDecodedParams from "./useDecodedParams";
 import { isAdmin, useCurrentUserRole } from "./useUserRole";
 import useDecodedPathname from "./useDecodedPathname";
 
-const ThinBrickWallFireIcon = (props: LucideProps) =>
+export const ThinBrickWallFireIcon = (props: LucideProps) =>
   createElement(BrickWallFireIcon, { strokeWidth: 1.75, ...props });
 
 export const useOrganizationMenu = () => {
@@ -83,9 +83,9 @@ export const useOrganizationMenu = () => {
           title: "Settings",
           href: "/" + decodedOrgSlug + "/settings",
           Icon: CogIcon,
-          isActive: decodedPathName.startsWith(
-            "/" + decodedOrgSlug + "/settings",
-          ),
+          isActive:
+            decodedPathName.startsWith("/" + decodedOrgSlug + "/settings") &&
+            !decodedPathName.endsWith("/settings/dependency-proxy"),
           testId: "nav-org-settings",
         },
       ],

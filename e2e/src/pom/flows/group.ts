@@ -67,8 +67,6 @@ export class GroupFlow {
       .getByRole("link", { name: "Test Group" })
       .first()
       .click({ timeout: 10_000 });
-    await this.page.getByTestId("nav-group-overview").click();
-    await this.page.getByTestId("nav-group-releases").click();
     await this.page.getByTestId("nav-group-subgroups-repositories").click();
     await this.page.getByTestId("nav-group-package-search").click();
     await this.page.getByTestId("nav-group-settings").click();

@@ -15318,7 +15318,9 @@ export interface components {
     "dtos.Artifact": {
       artifactName: string;
       assetId: string;
+      assetVersionId: string;
       assetVersionName: string;
+      id: string;
     };
     "dtos.ArtifactVulnDistribution": {
       assetSlug: string;

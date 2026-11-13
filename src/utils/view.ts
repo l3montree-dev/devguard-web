@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import type { ComponentRisk } from "@/types/view/component";
-import type { RiskHistoryPoint } from "@/types/view/riskHistory";
 
-import type { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/dto";
+import type {
+  ArtifactDTO,
+  AssetDTO,
+  OrganizationDetailsDTO,
+  ProjectDTO,
+} from "@/types/dto";
 
 import type { VulnEventDTO } from "@/types/view/vulnEvents";
 import { type Identity } from "@ory/client-fetch";
@@ -63,7 +67,14 @@ export const vexOptionMessages: Record<string, string> = {
     "Built-in defenses prevent known exploitation paths.",
 };
 
-export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
+export const eventTypeMessages = (
+  event: VulnEventDTO,
+  flawName: string,
+  artifacts: ArtifactDTO[] = [],
+) => {
+  const artifactName =
+    artifacts.find((artifact) => artifact.id === event.artifactId)
+      ?.artifactName ?? "an unknown artifact";
   let message = "";
   switch (event.type) {
     case "licenseDecision":
@@ -103,7 +114,10 @@ export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
       message = "removed a component from " + flawName;
       break;
     case "rawRiskAssessmentUpdated":
-      message = "updated the risk assessment";
+      // grouped events are rendered without a flaw name
+      message = flawName
+        ? "recalculated the risk of " + flawName
+        : "recalculated the risk";
       break;
     case "published": {
       message = "published " + flawName;
@@ -117,6 +131,13 @@ export const eventTypeMessages = (event: VulnEventDTO, flawName: string) => {
       message = "created " + flawName;
       break;
     }
+    case "detectedInArtifact":
+      message = "detected " + flawName + " in artifact " + artifactName;
+      break;
+    case "fixedInArtifact":
+      message =
+        "no longer detects " + flawName + " in artifact " + artifactName;
+      break;
   }
   if (event.userAgent === "devguard-mcp-server") {
     message += " (applied by AI agent)";
@@ -142,6 +163,8 @@ export const evTypeBackground: { [key in VulnEventDTO["type"]]: string } = {
   published: "bg-info text-info-foreground!",
   withdrawn: "bg-destructive text-destructive-foreground!",
   created: "bg-success text-success-foreground!",
+  detectedInArtifact: "bg-secondary text-secondary-foreground!",
+  fixedInArtifact: "bg-secondary text-secondary-foreground!",
 };
 
 export const osiLicenseHexColors: Record<string, string> = {
@@ -260,68 +283,6 @@ export const findUser = (
     realName: user?.name,
     avatarUrl: user?.avatarUrl,
   };
-};
-
-// The diagram plots only the day and the cvePurl* buckets, so that is all this
-// sums up - the per-day rows come from different risk history DTOs.
-export const reduceRiskHistories = (
-  histories: RiskHistoryPoint[][],
-): RiskHistoryPoint[] => {
-  // Filter out any histories that are shorter than the previous one, as they are likely incomplete.
-  const validHistories: RiskHistoryPoint[][] = [];
-
-  for (let i = 0; i < histories.length; i++) {
-    const current = histories[i];
-
-    if (i > 0 && current.length < histories[i - 1].length) {
-      break;
-    }
-
-    validHistories.push(current);
-  }
-
-  return validHistories.map((dayHistories) => {
-    return dayHistories.reduce(
-      (acc, curr) => {
-        acc.cvePurlLow += curr.cvePurlLow;
-        acc.cvePurlMedium += curr.cvePurlMedium;
-        acc.cvePurlHigh += curr.cvePurlHigh;
-        acc.cvePurlCritical += curr.cvePurlCritical;
-        acc.cvePurlFixableLow += curr.cvePurlFixableLow ?? 0;
-        acc.cvePurlFixableMedium += curr.cvePurlFixableMedium ?? 0;
-        acc.cvePurlFixableHigh += curr.cvePurlFixableHigh ?? 0;
-        acc.cvePurlFixableCritical += curr.cvePurlFixableCritical ?? 0;
-        acc.cvePurlLowCvss += curr.cvePurlLowCvss;
-        acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
-        acc.cvePurlHighCvss += curr.cvePurlHighCvss;
-        acc.cvePurlCriticalCvss += curr.cvePurlCriticalCvss;
-        acc.cvePurlFixableLowCvss += curr.cvePurlFixableLowCvss ?? 0;
-        acc.cvePurlFixableMediumCvss += curr.cvePurlFixableMediumCvss ?? 0;
-        acc.cvePurlFixableHighCvss += curr.cvePurlFixableHighCvss ?? 0;
-        acc.cvePurlFixableCriticalCvss += curr.cvePurlFixableCriticalCvss ?? 0;
-        return acc;
-      },
-      {
-        day: dayHistories[0]?.day ?? "",
-        cvePurlLow: 0,
-        cvePurlMedium: 0,
-        cvePurlHigh: 0,
-        cvePurlCritical: 0,
-        cvePurlFixableLow: 0,
-        cvePurlFixableMedium: 0,
-        cvePurlFixableHigh: 0,
-        cvePurlFixableCritical: 0,
-        cvePurlLowCvss: 0,
-        cvePurlMediumCvss: 0,
-        cvePurlHighCvss: 0,
-        cvePurlCriticalCvss: 0,
-        cvePurlFixableLowCvss: 0,
-        cvePurlFixableMediumCvss: 0,
-        cvePurlFixableHighCvss: 0,
-        cvePurlFixableCriticalCvss: 0,
-      } as RiskHistoryPoint,
-    );
-  });
 };
 
 export const generateNewSecret = (): string => {

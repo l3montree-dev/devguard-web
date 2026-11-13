@@ -179,7 +179,7 @@ const CodeEditor = ({
           EditorView.theme({
             "&": {
               height: "100%",
-              fontSize: "13px",
+              fontSize: "14px",
               ...(transparent ? { backgroundColor: "transparent" } : {}),
             },
             ".cm-scroller": { overflow: "auto", fontFamily: "monospace" },

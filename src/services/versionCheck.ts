@@ -14,7 +14,7 @@ export function withVPrefix(version: string): string {
 }
 
 /** Parse a semver-style tag "v1.2.3" → [1, 2, 3]. Returns null on failure. */
-function parseSemver(tag: string): [number, number, number] | null {
+export function parseSemver(tag: string): [number, number, number] | null {
   const m = tag.match(/^v?(\d+)\.(\d+)\.(\d+)/);
   if (!m) return null;
   return [Number(m[1]), Number(m[2]), Number(m[3])];
