@@ -119,7 +119,7 @@ export function AffectedBranchesTags({
     <Card className="flex flex-1 flex-col">
       <CardHeader>
         <CardTitle className="relative text-base w-full">
-          {type == "branch" ? "Top 5 affected Branches" : "Latest Tags"}
+          {type == "branch" ? "Most affected Branches" : "Latest Tags"}
           {/* <Link
             href={`#`}
             className="absolute right-0 top-0 text-xs !text-muted-foreground"
