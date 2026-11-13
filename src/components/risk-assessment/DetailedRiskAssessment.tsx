@@ -230,13 +230,12 @@ const DetailedRiskAssessment: FunctionComponent<
   return (
     <div className="p-5">
       <Collapsible>
-        <CollapsibleTrigger className="group flex w-full cursor-pointer flex-row items-center justify-between text-xs font-semibold">
+        <CollapsibleTrigger className="p-2 group flex w-full cursor-pointer bg-card border rounded-lg flex-row items-center justify-between text-xs text-primary font-semibold">
           Show detailed risk assessment
-          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          <ChevronDown className="mr-1 h-4 w-4 shrink-0 text-muted-foreground text-primary transition-transform duration-200 group-data-[state=open]:rotate-180" />
         </CollapsibleTrigger>
-        <small className="text-muted-foreground">
-          Last calculated at:{" "}
-          <FormatDate dateString={vuln.riskRecalculatedAt} />
+        <small className="pl-1 text-muted-foreground">
+          Last calculated: <FormatDate dateString={vuln.riskRecalculatedAt} />
         </small>
         <CollapsibleContent className="mt-4 flex flex-col gap-5 text-sm">
           <div className="w-full border-b pb-4">

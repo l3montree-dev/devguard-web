@@ -3,7 +3,7 @@
 
 import { test, type Page } from "@playwright/test";
 import { docShot } from "../../doc-shot";
-import { goto } from "../../utils";
+import { clickNavDropdownItem, goto } from "../../utils";
 import { openSettingsSection } from "./settings-nav";
 
 export class RepoFlow {
@@ -84,14 +84,19 @@ export class RepoFlow {
   }
 
   async openDependencyInsights() {
-    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
-    await this.page.getByTestId("nav-asset-dependency-insights").click();
+    await clickNavDropdownItem(
+      this.page,
+      "nav-asset-dependencies",
+      "nav-asset-dependency-insights",
+    );
     await docShot(this.page, test.info(), "dependency-insights-overview");
   }
 
   async openDependencyRiskTable() {
-    await this.page.getByTestId("nav-asset-dependency-risks-chevron").click();
-    await this.page.getByRole("menuitem", { name: "Dependency Risks" }).click();
+    await this.page
+      .getByTestId("nav-asset-dependencies")
+      .getByRole("link")
+      .click();
   }
 
   async publishRepo() {

@@ -13,11 +13,13 @@ import UserNav from "../navigation/UserNav";
 import EntityProviderImage from "./EntityProviderImage";
 import OrganizationDropDown from "../OrganizationDropDown";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuContent,
+  NavigationMenuLink,
+} from "../ui/navigation-menu";
+import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 
 const levelMapping: { [idx: number]: string } = {
@@ -75,91 +77,75 @@ export default function DynamicHeader({ Title, menu, z }: Props) {
           </div>
         </div>
         {menu && (
-          <div
-            data-tour="menu"
-            className="flex flex-row items-end gap-6 text-sm"
-          >
-            {menu.map((item) =>
-              item.children && item.children.length > 0 ? (
-                <DropdownMenu key={item.title}>
-                  <div
-                    className="cursor-pointer relative hover:no-underline outline-none"
-                    data-testid={item.testId}
-                  >
-                    {(item.isActive ||
-                      item.children.some(
-                        (child) => child.isActive || pathname == child.href,
-                      )) && (
-                      <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
-                    )}
-                    <div className="mt-4 flex flex-row items-center gap-1">
-                      <Link
-                        href={item.href}
-                        className="flex flex-row items-center gap-1 hover:no-underline"
+          <NavigationMenu viewport={false} data-tour="menu">
+            <NavigationMenuList className="items-end gap-6 space-x-0 text-sm">
+              {menu.map((item) =>
+                item.children && item.children.length > 0 ? (
+                  <NavigationMenuItem key={item.title} className="relative">
+                    <NavigationMenuPrimitive.Trigger asChild>
+                      <div
+                        className="group/trigger cursor-pointer relative hover:no-underline outline-none"
+                        data-testid={item.testId}
                       >
+                        {(item.isActive ||
+                          item.children.some(
+                            (child) => child.isActive || pathname == child.href,
+                          )) && (
+                          <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
+                        )}
+                        <div className="mt-4 flex flex-row items-center gap-1">
+                          <Link
+                            href={item.href}
+                            className="flex flex-row items-center gap-1 hover:no-underline"
+                          >
+                            <item.Icon className="h-5 w-5 text-gray-400" />
+                            <span className="text-header-foreground">
+                              {item.title}
+                            </span>
+                          </Link>
+                          <ChevronDownIcon className="h-4 w-4 text-gray-400 transition duration-200 group-data-[state=open]/trigger:rotate-180" />
+                        </div>
+                      </div>
+                    </NavigationMenuPrimitive.Trigger>
+                    <NavigationMenuContent className="top-full mt-3 min-w-[12rem] rounded-md border bg-popover p-1 text-popover-foreground">
+                      {item.children.map((child) => (
+                        <NavigationMenuLink key={child.title} asChild>
+                          <Link
+                            href={child.href}
+                            data-testid={child.testId}
+                            className="flex flex-row items-center gap-2 rounded-sm px-2 py-1.5 !text-foreground hover:bg-accent hover:no-underline"
+                          >
+                            <child.Icon className="h-4 w-4 text-gray-400" />
+                            <span>{child.title}</span>
+                          </Link>
+                        </NavigationMenuLink>
+                      ))}
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ) : (
+                  <NavigationMenuItem key={item.title}>
+                    <Link
+                      className={classNames(
+                        "cursor-pointer relative hover:no-underline",
+                      )}
+                      href={item.href}
+                      data-testid={item.testId}
+                    >
+                      {(item.isActive || pathname == item.href) && (
+                        <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
+                      )}
+                      <div className="mt-4 flex flex-row items-center gap-1">
                         <item.Icon className="h-5 w-5 text-gray-400" />
                         <span className="text-header-foreground">
                           {item.title}
                         </span>
-                      </Link>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          type="button"
-                          className="outline-none"
-                          data-testid={
-                            item.testId ? `${item.testId}-chevron` : undefined
-                          }
-                        >
-                          <ChevronDownIcon className="h-4 w-4 text-gray-400" />
-                        </button>
-                      </DropdownMenuTrigger>
-                    </div>
-                  </div>
-                  <DropdownMenuContent align="center">
-                    <DropdownMenuItem key={item.title} asChild>
-                      <Link
-                        href={item.href}
-                        data-testid={item.testId}
-                        className="flex !text-foreground flex-row items-center gap-2"
-                      >
-                        <item.Icon className="h-4 w-4 text-gray-400" />
-                        <span>{item.title}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    {item.children.map((child) => (
-                      <DropdownMenuItem key={child.title} asChild>
-                        <Link
-                          href={child.href}
-                          data-testid={child.testId}
-                          className="flex !text-foreground flex-row items-center gap-2"
-                        >
-                          <child.Icon className="h-4 w-4 text-gray-400" />
-                          <span>{child.title}</span>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link
-                  className={classNames(
-                    "cursor-pointer relative hover:no-underline",
-                  )}
-                  key={item.title}
-                  href={item.href}
-                  data-testid={item.testId}
-                >
-                  {(item.isActive || pathname == item.href) && (
-                    <div className="absolute -bottom-3 -left-2 -right-2 h-0.5 bg-primary" />
-                  )}
-                  <div className="mt-4 flex flex-row items-center gap-1">
-                    <item.Icon className="h-5 w-5 text-gray-400" />
-                    <span className="text-header-foreground">{item.title}</span>
-                  </div>
-                </Link>
-              ),
-            )}
-          </div>
+                      </div>
+                    </Link>
+                  </NavigationMenuItem>
+                ),
+              )}
+            </NavigationMenuList>
+          </NavigationMenu>
         )}
       </div>
     </header>

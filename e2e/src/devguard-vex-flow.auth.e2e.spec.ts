@@ -4,6 +4,7 @@ import { test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import path from "path";
 import { docShot } from "./doc-shot";
+import { clickNavDropdownItem } from "./utils";
 
 test.use({ viewport: { width: 1440, height: 1200 } });
 
@@ -103,7 +104,11 @@ test.describe("DevGuard handle vuln flows", () => {
     await page.getByTestId("setup-information-sources-create").click();
     await page.reload();
     await devguardPOM.repo().openDependencyRiskTable();
-    await page.getByTestId("nav-asset-vex-rules").click({ timeout: 20_000 });
+    await clickNavDropdownItem(
+      page,
+      "nav-asset-dependencies",
+      "nav-asset-vex-rules",
+    );
     await page.getByTestId("upstream-vex-sources-trigger").click();
     await page.getByTestId("vex-sources-add-button").click();
     await page.getByTestId("supply-vex-source-url").click();
