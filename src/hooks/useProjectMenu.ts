@@ -30,7 +30,7 @@ export const useProjectMenu = () => {
   });
 
   menu.push({
-    title: "Compliance Postures",
+    title: "Compliance",
     href: "/" + orgSlug + "/projects/" + projectSlug + "/compliance-postures",
     Icon: ShieldCheck,
     isActive: pathname.startsWith(

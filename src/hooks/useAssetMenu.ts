@@ -250,7 +250,7 @@ export const useAssetMenu = () => {
         ],
       },
       {
-        title: "Compliance Postures",
+        title: "Compliance",
         href:
           "/" +
           orgSlug +

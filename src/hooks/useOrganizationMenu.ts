@@ -55,7 +55,7 @@ export const useOrganizationMenu = () => {
     menu.push(
       ...[
         {
-          title: "Compliance Postures",
+          title: "Compliance",
           href: "/" + decodedOrgSlug + "/compliance-postures",
           Icon: ShieldCheck,
           isActive: decodedPathName.startsWith(
