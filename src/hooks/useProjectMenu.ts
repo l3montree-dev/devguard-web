@@ -1,16 +1,12 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import {
-  ChartBarSquareIcon,
-  CogIcon,
-  ListBulletIcon,
-} from "@heroicons/react/24/outline";
-import { ContainerIcon, FolderSearch, ShieldCheck } from "lucide-react";
+import { CogIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import { FolderSearch, ShieldCheck } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
 import useDecodedParams from "./useDecodedParams";
 import useDecodedPathname from "./useDecodedPathname";
-import { isAdmin, isMember, useCurrentUserRole } from "./useUserRole";
+import { isAdmin, useCurrentUserRole } from "./useUserRole";
 
 export const useProjectMenu = () => {
   const params = useDecodedParams();
@@ -21,27 +17,6 @@ export const useProjectMenu = () => {
   const currentUserRole = useCurrentUserRole();
 
   const menu = [];
-
-  if (isMember(currentUserRole)) {
-    menu.push(
-      {
-        title: "Overview",
-        href: "/" + orgSlug + "/projects/" + projectSlug + "/overview",
-        Icon: ChartBarSquareIcon,
-        isActive: pathname.startsWith(
-          `/${orgSlug}/projects/${projectSlug}/overview`,
-        ),
-        testId: "nav-group-overview",
-      },
-      {
-        title: "Releases",
-        href: "/" + orgSlug + "/projects/" + projectSlug + "/releases",
-        Icon: ContainerIcon,
-        isActive: pathname === `/${orgSlug}/projects/${projectSlug}/releases`,
-        testId: "nav-group-releases",
-      },
-    );
-  }
 
   menu.push({
     title: project.externalEntityProviderId

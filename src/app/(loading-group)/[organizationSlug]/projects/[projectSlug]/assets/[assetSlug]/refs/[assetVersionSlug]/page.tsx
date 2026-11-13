@@ -16,7 +16,6 @@ import { useAutoTour } from "@/hooks/useAutoTour";
 import { repoHomeTourSteps } from "@/components/common/tours/repoHomeTour";
 import "@xyflow/react/dist/style.css";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import {
   Card,
@@ -35,7 +34,6 @@ import {
 import AverageFixingTimeChart from "@/components/AverageFixingTimeChart";
 import { VulnerableComponents } from "@/components/VulnerableComponents";
 import { CheckBadgeIcon } from "@heroicons/react/24/outline";
-import { groupBy } from "lodash";
 import { OctagonAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { RiskHistoryDistributionDiagram } from "../../../../../../../../../components/RiskHistoryDistributionDiagram";
@@ -55,10 +53,8 @@ import {
 } from "@/hooks/useAssetVersionStats";
 import useDecodedParams from "../../../../../../../../../hooks/useDecodedParams";
 
-import { reduceRiskHistories } from "../../../../../../../../../utils/view";
 import { classNames } from "../../../../../../../../../utils/common";
 import { Skeleton } from "../../../../../../../../../components/ui/skeleton";
-import type { RiskHistory } from "@/types/dto";
 
 const Index: FunctionComponent = () => {
   const [mode, setMode] = useViewMode("devguard-asset-view-mode");
@@ -92,13 +88,13 @@ const Index: FunctionComponent = () => {
   const { data: componentRisk, isLoading: componentRiskLoading } =
     useComponentRisk(versionScope, selectedArtifact);
 
-  const { data: riskHistoryResp, isLoading: riskHistoryLoading } =
-    useRiskHistory(
-      versionScope,
-      extractDateOnly(last3Month),
-      extractDateOnly(today),
-      selectedArtifact,
-    );
+  // a single row per day - for the selected artifact, otherwise for the whole asset version
+  const { data: riskHistory, isLoading: riskHistoryLoading } = useRiskHistory(
+    versionScope,
+    extractDateOnly(last3Month),
+    extractDateOnly(today),
+    selectedArtifact,
+  );
 
   const { data: averageFixingTime, isLoading: averageFixingTimeLoading } =
     useAverageFixingTime(versionScope, selectedArtifact);
@@ -109,15 +105,6 @@ const Index: FunctionComponent = () => {
   );
 
   const hasLicenses = (licenses?.length ?? 0) > 0;
-
-  const riskHistory = useMemo(() => {
-    const groups = groupBy(riskHistoryResp, "day");
-    const days = Object.keys(groups).sort();
-    const completeRiskHistory: RiskHistory[][] = days.map((day) => {
-      return groups[day];
-    });
-    return reduceRiskHistories(completeRiskHistory);
-  }, [riskHistoryResp]);
 
   const { distributionByRef, isLoading: distributionByRefLoading } =
     useRefDistributions(mode);
@@ -501,4 +488,4 @@ export default Index;
 const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 const today = new Date();
 const last3Month = new Date(today);
-last3Month.setMonth(last3Month.getMonth() - 3);
+last3Month.setMonth(last3Month.getMonth() - 10);

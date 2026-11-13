@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import type { ComponentRisk } from "@/types/view/component";
-import type { RiskHistoryPoint } from "@/types/view/riskHistory";
 
 import type { AssetDTO, OrganizationDetailsDTO, ProjectDTO } from "@/types/dto";
 
@@ -263,68 +262,6 @@ export const findUser = (
     realName: user?.name,
     avatarUrl: user?.avatarUrl,
   };
-};
-
-// The diagram plots only the day and the cvePurl* buckets, so that is all this
-// sums up - the per-day rows come from different risk history DTOs.
-export const reduceRiskHistories = (
-  histories: RiskHistoryPoint[][],
-): RiskHistoryPoint[] => {
-  // Filter out any histories that are shorter than the previous one, as they are likely incomplete.
-  const validHistories: RiskHistoryPoint[][] = [];
-
-  for (let i = 0; i < histories.length; i++) {
-    const current = histories[i];
-
-    if (i > 0 && current.length < histories[i - 1].length) {
-      break;
-    }
-
-    validHistories.push(current);
-  }
-
-  return validHistories.map((dayHistories) => {
-    return dayHistories.reduce(
-      (acc, curr) => {
-        acc.cvePurlLow += curr.cvePurlLow;
-        acc.cvePurlMedium += curr.cvePurlMedium;
-        acc.cvePurlHigh += curr.cvePurlHigh;
-        acc.cvePurlCritical += curr.cvePurlCritical;
-        acc.cvePurlFixableLow += curr.cvePurlFixableLow ?? 0;
-        acc.cvePurlFixableMedium += curr.cvePurlFixableMedium ?? 0;
-        acc.cvePurlFixableHigh += curr.cvePurlFixableHigh ?? 0;
-        acc.cvePurlFixableCritical += curr.cvePurlFixableCritical ?? 0;
-        acc.cvePurlLowCvss += curr.cvePurlLowCvss;
-        acc.cvePurlMediumCvss += curr.cvePurlMediumCvss;
-        acc.cvePurlHighCvss += curr.cvePurlHighCvss;
-        acc.cvePurlCriticalCvss += curr.cvePurlCriticalCvss;
-        acc.cvePurlFixableLowCvss += curr.cvePurlFixableLowCvss ?? 0;
-        acc.cvePurlFixableMediumCvss += curr.cvePurlFixableMediumCvss ?? 0;
-        acc.cvePurlFixableHighCvss += curr.cvePurlFixableHighCvss ?? 0;
-        acc.cvePurlFixableCriticalCvss += curr.cvePurlFixableCriticalCvss ?? 0;
-        return acc;
-      },
-      {
-        day: dayHistories[0]?.day ?? "",
-        cvePurlLow: 0,
-        cvePurlMedium: 0,
-        cvePurlHigh: 0,
-        cvePurlCritical: 0,
-        cvePurlFixableLow: 0,
-        cvePurlFixableMedium: 0,
-        cvePurlFixableHigh: 0,
-        cvePurlFixableCritical: 0,
-        cvePurlLowCvss: 0,
-        cvePurlMediumCvss: 0,
-        cvePurlHighCvss: 0,
-        cvePurlCriticalCvss: 0,
-        cvePurlFixableLowCvss: 0,
-        cvePurlFixableMediumCvss: 0,
-        cvePurlFixableHighCvss: 0,
-        cvePurlFixableCriticalCvss: 0,
-      } as RiskHistoryPoint,
-    );
-  });
 };
 
 export const generateNewSecret = (): string => {
