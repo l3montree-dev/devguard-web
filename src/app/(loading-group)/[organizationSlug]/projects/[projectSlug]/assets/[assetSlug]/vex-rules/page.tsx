@@ -191,6 +191,7 @@ const VexRulesPage: FunctionComponent = () => {
     rulePrefill,
     recommendationsResponse,
     isRecommendationsLoading,
+    mutateRecommendations,
     setAddRuleDialogOpen,
     createRuleFromRecommendation,
   } = useVexRuleRecommendations(recommendationsQuery);
@@ -477,7 +478,10 @@ const VexRulesPage: FunctionComponent = () => {
         open={addRuleDialogOpen}
         onOpenChange={setAddRuleDialogOpen}
         scope={scope}
-        onCreated={() => mutate()}
+        onCreated={() => {
+          mutate();
+          mutateRecommendations();
+        }}
         prefill={rulePrefill}
       />
       <VexExportDialog
