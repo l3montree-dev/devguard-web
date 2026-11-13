@@ -3,7 +3,7 @@
 
 import * as OTPAuth from "otpauth";
 import { DevGuardPOM } from "./pom/devguard";
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import { OpenCodePOM } from "./pom/opencode";
 import path from "path";
 import dotenv from "dotenv";
@@ -58,6 +58,18 @@ export async function goto(
       await sleep(500);
     }
   }
+}
+
+export async function clickNavDropdownItem(
+  page: Page,
+  triggerTestId: string,
+  itemTestId: string,
+) {
+  await expect(async () => {
+    await page.mouse.move(0, 0);
+    await page.getByTestId(triggerTestId).hover({ timeout: 5_000 });
+    await page.getByTestId(itemTestId).click({ timeout: 2_000 });
+  }).toPass({ timeout: 20_000 });
 }
 
 // TODO: Remove this workaround once https://github.com/l3montree-dev/devguard/issues/1193 is fixed

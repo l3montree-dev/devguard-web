@@ -3,6 +3,7 @@
 
 import type { Page } from "@playwright/test";
 import { RepoFlow } from "./repo";
+import { clickNavDropdownItem } from "../../utils";
 
 export class SetupFlow {
   constructor(private page: Page) {}
@@ -49,10 +50,11 @@ export class SetupFlow {
   }
 
   async uploadVEX(inputFile: string) {
-    await this.page.getByTestId("nav-asset-dependencies").hover();
-    await this.page
-      .getByTestId("nav-asset-vex-rules")
-      .click({ timeout: 20_000 });
+    await clickNavDropdownItem(
+      this.page,
+      "nav-asset-dependencies",
+      "nav-asset-vex-rules",
+    );
     await this.page.getByTestId("upload-vex-button").click();
     await this.page.getByTestId("upload-vex-file").click();
     await this.page

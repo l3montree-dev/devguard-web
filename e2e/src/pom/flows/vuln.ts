@@ -7,6 +7,7 @@ import { docShot } from "../../doc-shot";
 import type { TestInfo } from "@playwright/test";
 import { DevGuardNavigationLevel } from "../devguard";
 import { RepoFlow } from "./repo";
+import { clickNavDropdownItem } from "../../utils";
 
 export class VulnFlow {
   constructor(private page: Page) {}
@@ -110,13 +111,11 @@ export class VulnFlow {
     const cveId = (
       await this.page.locator('[data-tour="cve-detail"]').innerText()
     ).trim();
-
-    await this.page
-      .getByTestId("nav-asset-dependencies")
-      .hover({ timeout: 20_000 });
-    await this.page
-      .getByTestId("nav-asset-vex-rules")
-      .click({ timeout: 20_000 });
+    await clickNavDropdownItem(
+      this.page,
+      "nav-asset-dependencies",
+      "nav-asset-vex-rules",
+    );
 
     const celExpression = `vuln.cveId == "${cveId}" && vuln.componentFixedVersion != null`;
     const playgroundEditor = this.page.locator(".cm-content").first();
@@ -163,12 +162,11 @@ export class VulnFlow {
   }
 
   async verifyVEXRule() {
-    await this.page
-      .getByTestId("nav-asset-dependencies")
-      .hover({ timeout: 20_000 });
-    await this.page
-      .getByTestId("nav-asset-vex-rules")
-      .click({ timeout: 20_000 });
+    await clickNavDropdownItem(
+      this.page,
+      "nav-asset-dependencies",
+      "nav-asset-vex-rules",
+    );
     const firstRuleRow = this.page.getByTestId("vex-rule-row").first();
     await expect(firstRuleRow).toBeVisible({ timeout: 20_000 });
     await firstRuleRow.click();
@@ -200,10 +198,11 @@ export class VulnFlow {
   }
 
   async deleteFirstVexRule(testInfo: TestInfo) {
-    await this.page.getByTestId("nav-asset-dependencies").hover();
-    await this.page
-      .getByTestId("nav-asset-vex-rules")
-      .click({ timeout: 20_000 });
+    await clickNavDropdownItem(
+      this.page,
+      "nav-asset-dependencies",
+      "nav-asset-vex-rules",
+    );
 
     const firstRuleRow = this.page.getByTestId("vex-rule-row").first();
     await expect(firstRuleRow).toBeVisible({ timeout: 20_000 });
