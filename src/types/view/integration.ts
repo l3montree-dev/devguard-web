@@ -5,17 +5,6 @@ import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 
 export type ManualUploadKind = "sbom" | "sarif" | "vex";
 
-export interface ManualUploadTab {
-  value: ManualUploadKind;
-  title: string;
-  description: string;
-  originLabel: string;
-  originHint: string;
-  showArtifact: boolean;
-  docHref?: string;
-  docLabel?: string;
-}
-
 export interface ManualUploadOptions {
   branches: AssetVersionDTO[];
   tags: AssetVersionDTO[];
