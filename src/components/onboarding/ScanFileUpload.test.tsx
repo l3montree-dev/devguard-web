@@ -248,8 +248,11 @@ it("keeps upload disabled while pending and releases pending state after a failu
 it("does not navigate on an unsuccessful SBOM response", async () => {
   jest.mocked(uploadSbomFile).mockResolvedValueOnce({
     ok: false,
+    status: 400,
+    statusText: "Bad Request",
+    headers: { get: () => "text/plain" },
     text: async () => "Invalid SBOM",
-  } as Response);
+  } as unknown as Response);
   const onUploaded = jest.fn();
   render(<ScanFileUpload onUploaded={onUploaded} />);
   fireEvent.change(screen.getByTestId("file-upload-input-onboarding-upload"), {
