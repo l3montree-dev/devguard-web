@@ -18,7 +18,7 @@ import type {
 import Image from "next/image";
 
 import RiskAssessmentFeed from "@/components/risk-assessment/RiskAssessmentFeed";
-import { AsyncButton, Button } from "@/components/ui/button";
+import { AsyncButton } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
@@ -50,11 +50,8 @@ import Err from "@/components/common/Err";
 import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../components/risk-assessment/RiskAssessmentFeedSkeleton";
 import EditorSkeleton from "../../../../../../../../../../../components/risk-assessment/EditorSkeleton";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
+import { CreateTicketButton } from "@/components/integration/CreateTicketButton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -342,124 +339,25 @@ const Index = () => {
 
                       <div className="flex flex-row justify-end gap-1">
                         <div className="flex flex-row items-start gap-2">
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                          <CreateTicketButton
+                            integrationName={getIntegrationNameFromRepositoryIdOrExternalProviderId(
                               asset,
                               project,
-                            ) === undefined && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <span>
-                                    <Button
-                                      variant={"ghost"}
-                                      disabled
-                                      className=""
-                                    >
-                                      <span className="ml-1 text-muted-foreground">
-                                        Create Ticket
-                                      </span>
-                                    </Button>
-                                  </span>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  No repository is linked. To create a ticket,
-                                  please integrate your issue tracker in the{" "}
-                                  {` `}
-                                  <Link
-                                    href={`/${activeOrg.slug}/projects/${projectSlug}/assets/${assetSlug}/settings`}
-                                    className="underline"
-                                  >
-                                    settings
-                                  </Link>
-                                </TooltipContent>
-                              </Tooltip>
                             )}
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "gitlab" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <GitProviderIcon
-                                      externalEntityProviderIdOrRepositoryId={
-                                        asset.externalEntityProviderId ??
-                                        "gitlab"
-                                      }
-                                    />
-                                    Create Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "github" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <Image
-                                      alt="GitLab Logo"
-                                      width={15}
-                                      height={15}
-                                      className="mr-2 dark:invert"
-                                      src={"/assets/github.svg"}
-                                    />
-                                    Create GitHub Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
-                          {vuln.ticketId === null &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
-                              asset,
-                              project,
-                            ) === "jira" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <Image
-                                      alt="Jira Logo"
-                                      width={15}
-                                      height={15}
-                                      className="mr-2"
-                                      src={"/assets/jira-svgrepo-com.svg"}
-                                    />
-                                    Create Jira Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
-                            )}
-
+                            hasTicket={vuln.ticketId != null}
+                            externalEntityProviderId={
+                              asset.externalEntityProviderId
+                            }
+                            orgSlug={activeOrg.slug}
+                            projectSlug={projectSlug}
+                            assetSlug={assetSlug}
+                            onClick={() =>
+                              handleSubmit({
+                                status: "mitigate",
+                                justification,
+                              })
+                            }
+                          />
                           <AsyncButton
                             onClick={() =>
                               handleSubmit({

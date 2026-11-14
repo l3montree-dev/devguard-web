@@ -8,7 +8,11 @@ import { useConfig } from "@/context/ConfigContext";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { cn } from "@/lib/utils";
 import { encodeObjectBase64 } from "@/services/encodeService";
-import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/dto";
+import type {
+  GitLabIntegrationDTO,
+  JiraIntegrationDTO,
+  RedmineIntegrationDTO,
+} from "@/types/dto";
 
 import type { ExternalTicketProvider } from "@/types/common";
 import type { Surface } from "@/lib/surface";
@@ -16,6 +20,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useUpdateOrganization } from "../../../context/OrganizationContext";
 import useDecodedPathname from "../../../hooks/useDecodedPathname";
+import RedmineIntegrationForm from "@/components/common/RedmineIntegrationForm";
 
 interface ProviderIntegrationFormProps {
   provider: ExternalTicketProvider;
@@ -54,6 +59,16 @@ export default function ProviderIntegrationForm({
       organization: {
         ...activeOrg,
         jiraIntegrations: activeOrg.jiraIntegrations.concat(integration),
+      },
+    }));
+  };
+
+  const handleNewRedmineIntegration = (integration: RedmineIntegrationDTO) => {
+    updateOrganization((prev) => ({
+      ...prev,
+      organization: {
+        ...activeOrg,
+        redmineIntegrations: activeOrg.redmineIntegrations.concat(integration),
       },
     }));
   };
@@ -114,6 +129,14 @@ export default function ProviderIntegrationForm({
       {provider === "jira" && (
         <JiraIntegrationForm
           onNewIntegration={handleNewJiraIntegration}
+          additionalOnClick={onConnected}
+          variant={variant}
+          backButtonClick={onBack}
+        />
+      )}
+      {provider === "redmine" && (
+        <RedmineIntegrationForm
+          onNewIntegration={handleNewRedmineIntegration}
           additionalOnClick={onConnected}
           variant={variant}
           backButtonClick={onBack}

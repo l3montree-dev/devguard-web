@@ -18,7 +18,6 @@ import type { JiraIntegrationDTO } from "@/types/dto";
 import { Input } from "../ui/input";
 import type { Surface } from "@/lib/surface";
 import { Button } from "../ui/button";
-import React from "react";
 import { urlToBaseURL } from "@/utils/url";
 
 export interface JiraIntegrationFormProps {
@@ -27,6 +26,7 @@ export interface JiraIntegrationFormProps {
   backButtonClick?: () => void;
   // the surface the form is rendered on
   variant?: Surface;
+  setOpen?: (open: boolean) => void;
 }
 
 export default function JiraIntegrationForm({
@@ -34,6 +34,7 @@ export default function JiraIntegrationForm({
   additionalOnClick,
   backButtonClick,
   variant,
+  setOpen,
 }: JiraIntegrationFormProps) {
   const form = useForm<{
     url: string;
@@ -43,7 +44,6 @@ export default function JiraIntegrationForm({
   }>();
   const { Loader, waitFor, isLoading } = useLoader();
   const activeOrg = useActiveOrg();
-  const [_open, setOpen] = React.useState(false);
 
   const handleSubmit = async (params: {
     url: string;
@@ -62,7 +62,9 @@ export default function JiraIntegrationForm({
     }
     if (integration) {
       onNewIntegration(integration);
-      setOpen(false);
+      if (setOpen) {
+        setOpen(false);
+      }
     } else {
       toast.error("Your Jira token seems to be wrong");
     }

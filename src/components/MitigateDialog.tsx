@@ -5,7 +5,6 @@
 
 import { useState } from "react";
 import type { FunctionComponent } from "react";
-import Image from "next/image";
 
 import {
   Dialog,
@@ -16,12 +15,13 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 import { AsyncButton, Button } from "./ui/button";
-import GitProviderIcon from "./GitProviderIcon";
 import dynamic from "next/dynamic";
 import {
   MAX_JUSTIFICATION_LENGTH,
   validateJustification,
 } from "@/utils/justificationValidator";
+import type { ExternalTicketProvider } from "@/types/common";
+import { ProviderIcon } from "./integration/ProviderIcon";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -34,7 +34,7 @@ interface MitigateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (justification: string) => Promise<boolean>;
-  integrationType: "github" | "gitlab" | "jira" | undefined;
+  integrationType: ExternalTicketProvider | undefined;
   gitlabIntegration?: string;
 }
 
@@ -93,38 +93,25 @@ const MitigateDialog: FunctionComponent<MitigateDialogProps> = ({
               disabled={justification.length > MAX_JUSTIFICATION_LENGTH}
             >
               <div className="flex flex-row items-center">
-                {integrationType === "gitlab" && (
-                  <>
-                    <GitProviderIcon
-                      externalEntityProviderIdOrRepositoryId={gitlabIntegration}
-                    />
+                <>
+                  <ProviderIcon
+                    integrationType={integrationType}
+                    externalEntityProviderId={gitlabIntegration}
+                  />
+                  {integrationType === "gitlab" && (
                     <span className="ml-2">Create GitLab Issue</span>
-                  </>
-                )}
-                {integrationType === "github" && (
-                  <>
-                    <Image
-                      alt="GitHub Logo"
-                      width={15}
-                      height={15}
-                      className="dark:invert"
-                      src={"/assets/github.svg"}
-                    />
+                  )}
+                  {integrationType === "github" && (
                     <span className="ml-2">Create GitHub Ticket</span>
-                  </>
-                )}
-                {integrationType === "jira" && (
-                  <>
-                    <Image
-                      alt="Jira Logo"
-                      width={15}
-                      height={15}
-                      src={"/assets/jira-svgrepo-com.svg"}
-                    />
+                  )}
+                  {integrationType === "jira" && (
                     <span className="ml-2">Create Jira Ticket</span>
-                  </>
-                )}
-                {integrationType === undefined && "Create Ticket"}
+                  )}
+                  {integrationType === "redmine" && (
+                    <span className="ml-2">Create Redmine Ticket</span>
+                  )}
+                  {integrationType === undefined && "Create Ticket"}
+                </>
               </div>
             </AsyncButton>
           </DialogFooter>
