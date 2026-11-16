@@ -305,7 +305,7 @@ export const useAssetMenu = () => {
   if (isAdmin(currentUserRole)) {
     return menu.concat([
       {
-        title: "Settings",
+        title: "Repository Settings",
         href:
           "/" +
           orgSlug +
