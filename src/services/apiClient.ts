@@ -122,25 +122,3 @@ export const adminFetch = async (
     credentials: "omit",
   });
 };
-
-const DOWNLOAD_TIMEOUT_MS = 60 * 8 * 1000;
-
-// Saves an API response as a file (SBOM/VEX documents, PDF reports).
-export const downloadFile = async (path: string, fileName: string) => {
-  const response = await apiFetch(path, {
-    method: "GET",
-    signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
-  });
-  if (!response.ok) {
-    throw new ApiError(await readErrorMessage(response), response.status);
-  }
-
-  const url = window.URL.createObjectURL(await response.blob());
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
-};

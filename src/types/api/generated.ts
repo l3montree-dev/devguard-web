@@ -675,6 +675,42 @@ export interface paths {
     };
     trace?: never;
   };
+  "/admin/statistics/dependency-proxy-cache/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get instance-wide dependency proxy cache statistics */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/admin/statistics/usage/": {
     parameters: {
       query?: never;
@@ -1089,14 +1125,14 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/dependency-proxy/composer/{path}": {
+  "/dependency-proxy/{secret}/apk/{path}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Proxy Composer repository request */
+    /** Proxy Alpine repository request */
     get: {
       parameters: {
         query?: never;
@@ -1116,492 +1152,6 @@ export interface paths {
           };
           content: {
             "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/deb/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Debian repository request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/go": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Go module requests */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/go/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Go module requests */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/maven/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy Maven repository request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/-/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm registry API request */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    /** Proxy npm registry API request */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{package}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm package metadata */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{package}/-/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm tarball download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{scope}/{name}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm package metadata */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/npm/{scope}/{name}/-/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy npm tarball download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description npm package name */
-          package: string;
-          /** @description npm scope */
-          scope: string;
-          /** @description npm package name (scoped) */
-          name: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/pypi/packages/{path}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy PyPI package download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/dependency-proxy/pypi/simple/{package}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy PyPI simple index metadata */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description PyPI package name */
-          package: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description HTML simple index */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": string;
           };
         };
       };
@@ -1805,7 +1355,30 @@ export interface paths {
     post?: never;
     delete?: never;
     options?: never;
-    head?: never;
+    /** Proxy Maven repository request */
+    head: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description dependency proxy secret */
+          secret: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+      };
+    };
     patch?: never;
     trace?: never;
   };
@@ -3175,6 +2748,45 @@ export interface paths {
             "application/json": {
               [key: string]: string;
             };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/dependency-proxy/cache-stats/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get dependency proxy cache statistics for an organization, project or asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
           };
         };
       };
@@ -5156,6 +4768,45 @@ export interface paths {
             "application/json": {
               [key: string]: string;
             };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/dependency-proxy/cache-stats/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get dependency proxy cache statistics for an organization, project or asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
           };
         };
       };
@@ -10086,6 +9737,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/dependency-proxy/cache-stats/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get dependency proxy cache statistics for an organization, project or asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["controllers_dependencyfirewall.CacheStats"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/dependency-vulns": {
     parameters: {
       query?: never;
@@ -11293,97 +10983,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}/stats/average-fixing-time/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get average remediation times for a release */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Release ID */
-          releaseID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.RemediationTimeAverages"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}/stats/risk-history/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get risk history for a release */
-    get: {
-      parameters: {
-        query: {
-          /** @description Start date (YYYY-MM-DD) */
-          start: string;
-          /** @description End date (YYYY-MM-DD) */
-          end: string;
-        };
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Release ID */
-          releaseID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.RiskHistory"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}/vex.json": {
     parameters: {
       query?: never;
@@ -12313,6 +11912,110 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/slsa/build-provenance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Sign SLSA build provenance with the verified identity of the CI job
+     * @description Verifies the OIDC workload identity token of the CI job with its issuer, writes the verified
+     *     identity into the provenance and signs it. Returns a DSSE envelope, or a sigstore bundle if a
+     *     transparency log is configured.
+     */
+    post: {
+      parameters: {
+        query?: never;
+        header: {
+          /** @description OIDC workload identity token of the CI job */
+          "X-Workload-Identity-Token": string;
+        };
+        path?: never;
+        cookie?: never;
+      };
+      /** @description in-toto v1 statement with a SLSA v1 provenance predicate */
+      requestBody: {
+        content: {
+          "application/json": Record<string, never>;
+          "text/plain": Record<string, never>;
+        };
+      };
+      responses: {
+        /** @description signed build provenance */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+        /** @description invalid build provenance */
+        400: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+        /** @description missing or invalid workload identity token */
+        401: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": Record<string, never>;
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/slsa/public-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get the public key devguard signs SLSA build provenance with */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path?: never;
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description PEM encoded public key */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/x-pem-file": string;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/trigger-sync": {
     parameters: {
       query?: never;
@@ -12412,518 +12115,6 @@ export interface paths {
           content: {
             "application/json": {
               [key: string]: string;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/blobs/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image blob download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image blob download */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/manifests/{reference}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image manifest fetch */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image manifest fetch */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/referrers/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image referrers list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description subject digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{image}/tags/list": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image tags list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/blobs/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image blob download */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image blob download */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description blob digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": Record<string, never>;
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/manifests/{reference}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image manifest fetch */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    /** Proxy OCI image manifest fetch */
-    head: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description tag or digest */
-          reference: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/referrers/{digest}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image referrers list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-          /** @description subject digest */
-          digest: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/v2/{registry}/{namespace}/{image}/tags/list": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Proxy OCI image tags list */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description dependency proxy secret */
-          secret: string;
-          /** @description registry hostname */
-          registry: string;
-          /** @description image namespace */
-          namespace: string;
-          /** @description image name */
-          image: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              [key: string]: unknown;
             };
           };
         };
@@ -13942,6 +13133,14 @@ export interface components {
     "controllers.statementPayload": {
       description: string;
       implementationStatus: string;
+    };
+    "controllers_dependencyfirewall.CacheStats": {
+      entries: number;
+      evictions: number;
+      hits: number;
+      maxBytes: number;
+      misses: number;
+      sizeBytes: number;
     };
     "cyclonedx.Advisory": {
       title: string;
@@ -15910,6 +15109,7 @@ export interface components {
     };
     "dtos.DetailedFirstPartyVuln": {
       assetId: string;
+      assetVersionId: string;
       assetVersionName: string;
       author: string;
       commit: string;
@@ -15938,6 +15138,7 @@ export interface components {
     "dtos.DetailedLicenseRisk": {
       artifacts: components["schemas"]["dtos.LicenseRiskArtifact"][];
       assetId: string;
+      assetVersionId: string;
       assetVersionName: string;
       component: components["schemas"]["dtos.Component"];
       componentPurl: string;
@@ -16011,6 +15212,7 @@ export interface components {
     };
     "dtos.FirstPartyVuln": {
       assetId: string;
+      assetVersionId: string;
       assetVersionName: string;
       author: string;
       commit: string;
@@ -16111,6 +15313,7 @@ export interface components {
       artifactName: string;
       assetId: string;
       assetVersionName: string;
+      id: string;
     };
     "dtos.Log": {
       assetID: string;
@@ -16585,6 +15788,7 @@ export interface components {
       name: string;
     };
     "dtos.ReleaseItem": {
+      artifactId: string;
       artifactName: string;
       assetId: string;
       assetVersionName: string;
@@ -16815,6 +16019,7 @@ export interface components {
     /** @enum {string} */
     "dtos.VexRuleRecommendationType": "session" | "crowdsourced" | "upstream";
     "dtos.VulnEvent": {
+      artifactId: string;
       createdAt: string;
       createdByVexRule: boolean;
       id: string;
@@ -16850,6 +16055,8 @@ export interface components {
       | "attachedComplianceComponent"
       | "removedComplianceComponent"
       | "detected"
+      | "detectedInArtifact"
+      | "fixedInArtifact"
       | "rawRiskAssessmentUpdated";
     "dtos.VulnInPackage": {
       cveId: string;
@@ -16920,6 +16127,8 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_models.Advisory": {
       affectedPackages: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AffectedPackage"][];
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
+      assetVersionId: string;
+      /** @description not stored on advisories, filled by selecting withAssetVersionName */
       assetVersionName: string;
       createdAt: string;
       description: string;
@@ -16963,62 +16172,12 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_models.Artifact": {
       artifactName: string;
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
-      assetVersionName: string;
+      assetVersionId: string;
       createdAt: string;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
-      lastHistoryUpdate: string;
+      id: string;
       licenseRisks: components["schemas"]["github_com_l3montree-dev_devguard_database_models.LicenseRisk"][];
-      riskHistories: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ArtifactRiskHistory"][];
       vulnAssetId: string;
-    };
-    "github_com_l3montree-dev_devguard_database_models.ArtifactRiskHistory": {
-      artifactName: string;
-      assetId: string;
-      assetVersionName: string;
-      averageClosedRisk: number;
-      averageOpenRisk: number;
-      critical: number;
-      criticalCvss: number;
-      cvePurlCritical: number;
-      cvePurlCriticalCvss: number;
-      cvePurlFixableCritical: number;
-      cvePurlFixableCriticalCvss: number;
-      cvePurlFixableHigh: number;
-      cvePurlFixableHighCvss: number;
-      cvePurlFixableLow: number;
-      cvePurlFixableLowCvss: number;
-      cvePurlFixableMedium: number;
-      cvePurlFixableMediumCvss: number;
-      cvePurlHigh: number;
-      cvePurlHighCvss: number;
-      cvePurlLow: number;
-      cvePurlLowCvss: number;
-      cvePurlMedium: number;
-      cvePurlMediumCvss: number;
-      /** @description on the day 2024-08-12 the asset had a sumRisk of 25. */
-      day: string;
-      fixableCritical: number;
-      fixableCriticalCvss: number;
-      fixableHigh: number;
-      fixableHighCvss: number;
-      fixableLow: number;
-      fixableLowCvss: number;
-      fixableMedium: number;
-      fixableMediumCvss: number;
-      fixedDependencyVulns: number;
-      high: number;
-      highCvss: number;
-      low: number;
-      lowCvss: number;
-      maxClosedRisk: number;
-      maxOpenRisk: number;
-      medium: number;
-      mediumCvss: number;
-      minClosedRisk: number;
-      minOpenRisk: number;
-      openDependencyVulns: number;
-      sumClosedRisk: number;
-      sumOpenRisk: number;
     };
     "github_com_l3montree-dev_devguard_database_models.Asset": {
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
@@ -17074,6 +16233,7 @@ export interface components {
       createdAt: string;
       defaultBranch: boolean;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
+      id: string;
       lastAccessedAt: string;
       metadata: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       name: string;
@@ -17087,8 +16247,9 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_models.AssetVersionType":
       "branch" | "tag";
     "github_com_l3montree-dev_devguard_database_models.Attestation": {
-      /** @description Ensure foreign key field order matches Artifact primary key: ArtifactName, AssetVersionName, AssetID */
       artifact: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"];
+      artifactId: string;
+      /** @description not stored in this table, filled by joining artifacts and asset_versions */
       artifactName: string;
       assetId: string;
       assetVersionName: string;
@@ -17168,6 +16329,8 @@ export interface components {
        */
       assetSignature: number;
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
+      assetVersionId: string;
+      /** @description part of the content hash, the asset version relation itself is kept by AssetVersionID */
       assetVersionName: string;
       componentFixedVersion: string;
       componentPurl: string;
@@ -17229,7 +16392,7 @@ export interface components {
     };
     "github_com_l3montree-dev_devguard_database_models.InTotoLink": {
       assetId: string;
-      assetVersionName: string;
+      assetVersionId: string;
       createdAt: string;
       filename: string;
       pat: components["schemas"]["github_com_l3montree-dev_devguard_database_models.PAT"];
@@ -17268,6 +16431,8 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_models.LicenseRisk": {
       artifacts: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"][];
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
+      assetVersionId: string;
+      /** @description part of the content hash, the asset version relation itself is kept by AssetVersionID */
       assetVersionName: string;
       component: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Component"];
       /** @description only valid purls */
@@ -17373,7 +16538,7 @@ export interface components {
     "github_com_l3montree-dev_devguard_database_models.SupplyChain": {
       assetId: string;
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
-      assetVersionName: string;
+      assetVersionId: string;
       createdAt: string;
       supplyChainId: string;
       supplyChainOutputDigest: string;
@@ -17408,6 +16573,7 @@ export interface components {
       vexSource: string;
     };
     "github_com_l3montree-dev_devguard_database_models.VulnEvent": {
+      artifactId: string;
       /**
        * @description set instead of DependencyVulnID for a group event applying to every
        *     DependencyVuln sharing this AssetSignature.
@@ -17570,6 +16736,8 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
