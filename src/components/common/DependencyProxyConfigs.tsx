@@ -40,7 +40,15 @@ const rulesPlaceholder = `# Available fields: pkg.name, pkg.version, pkg.purl, p
 #     expr: pkg.name.startsWith("@evil-scope/")
 #
 # registries:
-#   npm: https://nexus.example.com/repository/npm/
+#   npm:
+#     # packages of these scopes are loaded from this registry.
+#     # Quote the scopes, YAML does not allow a plain @ at the start of a value.
+#     - url: https://npm.example.com
+#       scopes: ["@example", "@example-internal"]
+#       # optional - sent as "Authorization: Bearer <token>"
+#       token: <your-registry-token>
+#     # an entry without scopes is the fallback for all other packages
+#     - url: https://nexus.example.com/repository/npm/
 #   deb:
 #     url: https://deb.example.com
 #     # optional - the key(s) the upstream Release is signed with.
@@ -82,10 +90,10 @@ const exampleRules = [
   expr: pkg.ecosystem == "pypi"`,
   },
   {
-    label: "Block npm publisher changes",
-    rule: `- name: publisher-changed
-  action: deny
-  expr: has(pkg.publisher) && pkg.publisher.changedSinceLastVersion`,
+    label: "Add two npm upstream registries",
+    rule: `- url: https://npm.company.com
+  scopes: ["@company"]
+  token: <your-token>`,
   },
 ];
 
@@ -127,13 +135,24 @@ const getEcosystemContent = (key: string, url: string) => {
               codeString={`npmRegistryServer: "${url}"`}
             />
           </div>
-          <Callout intent="warning">
-            If your project already has a{" "}
-            <code className="font-mono text-sm">package-lock.json</code>, it may
-            still contain the original download URLs. Delete the lock file and
-            run <code className="font-mono text-sm">npm install</code> once to
-            rewrite it with the proxy URLs.
-          </Callout>
+          <div className="flex flex-col gap-2">
+            <Callout intent="warning">
+              If your project already has a{" "}
+              <code className="font-mono text-sm">package-lock.json</code>, it
+              may still contain the original download URLs. Delete the lock file
+              and run <code className="font-mono text-sm">npm install</code>{" "}
+              once to rewrite it with the proxy URLs.
+            </Callout>
+            <Callout intent="info">
+              To load scoped packages from a private registry, list several
+              registries under{" "}
+              <code className="font-mono text-sm">registries.npm</code> in the
+              proxy configuration. Each entry can set{" "}
+              <code className="font-mono text-sm">scopes</code> and a{" "}
+              <code className="font-mono text-sm">token</code>. All other
+              packages use the entry without scopes, or the public npm registry.
+            </Callout>
+          </div>
         </div>
       );
 
