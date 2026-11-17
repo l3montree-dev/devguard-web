@@ -25,6 +25,7 @@ export type CompliancePostureWithControlDTO =
   Schemas["dtos.CompliancePostureWithControl"];
 export type ComplianceComponentDetailsDTO =
   Schemas["dtos.ComplianceComponentDetails"];
+export type ScopeFrameworkDTO = Schemas["dtos.ScopeFramework"];
 export type ComplianceComponentImplementsControlStatementDTO =
   Schemas["dtos.ComplianceComponentImplementsControlStatement"];
 export type OrgOverview = Schemas["dtos.OrgOverview"];
