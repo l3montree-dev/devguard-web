@@ -545,7 +545,12 @@ const CVE_FIELDS: Completion[] = [
     type: "property",
     detail: "string (date) | null",
   },
-  { label: "weaknesses", type: "property", detail: "list<map>" },
+  {
+    label: "cwes",
+    type: "property",
+    detail: "list<string>",
+    info: 'CWE ids, e.g. "CWE-79" in vuln.cve.cwes',
+  },
   { label: "exploits", type: "property", detail: "list<map>" },
   { label: "affectedComponents", type: "property", detail: "list" },
   { label: "relationships", type: "property", detail: "list" },
