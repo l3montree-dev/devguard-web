@@ -19,7 +19,7 @@ import {
 const DevguardTokenCard = ({
   title = "Create a new variable / secret",
   variant,
-  description = "Your pipeline uses this token to upload the scan results to DevGuard. Click 'Generate token', copy the token and store it as a masked variable/ secret. It is only shown once.",
+  description = "Your pipeline uses this token to upload the scan results to DevGuard. Click 'Generate token', copy the token and store it as a masked variable/secret. It is only shown once.",
 }: {
   title?: string;
   description?: string;

@@ -38,6 +38,9 @@ interface Props {
   }) => Promise<void>;
 }
 
+const hasOpenQuickfix = (v: VulnWithCVE) =>
+  v.state !== "fixed" && isDirectDependencyUpdateAvailable(v);
+
 const SelectionCheckbox = ({
   checked,
   onToggle,
@@ -100,7 +103,7 @@ const FixableBadge = ({ message }: { message: string }) => (
 );
 
 const QuickfixWrench = ({ vuln }: { vuln: VulnWithCVE }) => {
-  if (!isDirectDependencyUpdateAvailable(vuln)) {
+  if (!hasOpenQuickfix(vuln)) {
     return null;
   }
   return (
@@ -238,8 +241,8 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
     () => groupBy(row.original.vulns, "cveID"),
     [row.original.vulns],
   );
-  const packageHasQuickfix = useMemo(
-    () => row.original.vulns.some(isDirectDependencyUpdateAvailable),
+  const packageHasOpenQuickfix = useMemo(
+    () => row.original.vulns.some(hasOpenQuickfix),
     [row.original.vulns],
   );
 
@@ -344,7 +347,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
             <Badge variant="outline" className="w-fit">
               {row.original.vulnCount}
             </Badge>
-            {packageHasQuickfix && (
+            {packageHasOpenQuickfix && (
               <FixableBadge message="A quick fix is available for at least one vulnerability in this package. Expand it to see the affected dependency and the exact upgrade command." />
             )}
           </div>
@@ -373,7 +376,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
           const pathExplosionOrOnlySinglePath =
             isPathExplosion || !hasMultiplePaths;
 
-          const cveHasQuickfix = vulns.some(isDirectDependencyUpdateAvailable);
+          const cveHasOpenQuickfix = vulns.some(hasOpenQuickfix);
 
           const vulnDetailHref =
             pathname + "/../dependency-risks/" + sortedVulns[0]?.id;
@@ -497,7 +500,7 @@ const RiskHandlingRow: FunctionComponent<Props> = ({
                 </td>
                 <td className="py-2 px-4">
                   <div className="flex items-center gap-2">
-                    {cveHasQuickfix && (
+                    {cveHasOpenQuickfix && (
                       <FixableBadge
                         message={
                           pathExplosionOrOnlySinglePath

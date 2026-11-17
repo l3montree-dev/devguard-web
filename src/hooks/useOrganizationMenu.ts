@@ -80,7 +80,7 @@ export const useOrganizationMenu = () => {
           testId: "nav-org-dependency-proxy",
         },
         {
-          title: "Settings",
+          title: "Organization Settings",
           href: "/" + decodedOrgSlug + "/settings",
           Icon: CogIcon,
           isActive:
