@@ -35,6 +35,10 @@ const EXAMPLES: Array<{ label: string; expression: string }> = [
     label: "By severity",
     expression: "vuln.cve.cvss < 4.0",
   },
+  {
+    label: "By weakness",
+    expression: '"CWE-79" in vuln.cve.cwes',
+  },
 ];
 
 interface CelPlaygroundProps {

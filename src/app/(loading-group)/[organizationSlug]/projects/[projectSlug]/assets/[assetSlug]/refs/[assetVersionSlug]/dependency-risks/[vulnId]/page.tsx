@@ -69,6 +69,7 @@ import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../compone
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
+import Weaknesses from "../../../../../../../../../../../components/Weaknesses";
 
 // Renders nothing unless a ticket can actually be created — that needs a linked
 // issue tracker and a vulnerability that doesn't have a ticket yet.
@@ -507,7 +508,7 @@ const Index: FunctionComponent = () => {
                 </div>
               )}
               <div className={lockedOverlay}>
-                {vuln && (
+                {vuln && vuln.state !== "fixed" && (
                   <div className="mt-6">
                     <Quickfix vuln={vuln} />
                   </div>
@@ -655,6 +656,7 @@ const Index: FunctionComponent = () => {
                   )}
                   <DetailedRiskAssessment vuln={vuln} asset={asset} />
                 </div>
+                <Weaknesses vuln={vuln} />
                 <div data-tour="affected-component">
                   <AffectedComponentDetails vuln={vuln} />
                 </div>
