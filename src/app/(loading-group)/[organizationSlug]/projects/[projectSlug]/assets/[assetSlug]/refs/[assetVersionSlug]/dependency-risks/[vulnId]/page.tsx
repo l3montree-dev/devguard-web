@@ -507,7 +507,7 @@ const Index: FunctionComponent = () => {
                 </div>
               )}
               <div className={lockedOverlay}>
-                {vuln && (
+                {vuln && vuln.state !== "fixed" && (
                   <div className="mt-6">
                     <Quickfix vuln={vuln} />
                   </div>
