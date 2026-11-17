@@ -7,6 +7,11 @@ on:
 
 permissions: read-all
 
+# Overlapping runs push in arbitrary order, so an older run could overwrite refs a newer run already pushed.
+concurrency:
+  group: mirror-to-gitlab
+  cancel-in-progress: false
+
 jobs:
   mirror:
     runs-on: ubuntu-latest
@@ -20,11 +25,16 @@ jobs:
           persist-credentials: false
 
       - name: Mirror to GitLab
-        continue-on-error: true
         run: |
+          # On tag-triggered runs actions/checkout rewrites the triggering annotated tag as a lightweight one.
+          # Restore the real tags so GitLab never receives a lightweight tag that later conflicts with the annotated one.
+          # Also refreshes the branches, so a run that waited in the queue pushes the current state.
+          git fetch --force --prune --tags origin
           git remote add gitlab "https://oauth2:${GITLAB_TOKEN}@${GITLAB_HOST}/${GITLAB_REPO}.git"
-          git push --prune gitlab 'refs/heads/*:refs/heads/*'
-          git push --prune gitlab 'refs/tags/*:refs/tags/*'
+          # Avoid --mirror, which also pushes refs/remotes/* that GitLab rejects as hidden refs.
+          # Push from refs/remotes/origin/* so all branches are present and --prune never deletes the default branch.
+          git push --prune gitlab 'refs/remotes/origin/*:refs/heads/*'
+          git push --force gitlab 'refs/tags/*:refs/tags/*'
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_MIRROR_TOKEN }}
           GITLAB_HOST: ${{ vars.GITLAB_HOST }}
