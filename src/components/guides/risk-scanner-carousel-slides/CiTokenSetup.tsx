@@ -19,13 +19,13 @@ export const ciTokenInstructions: Record<
     title:
       'Navigate to Settings > Secrets and Variables > Actions. Press the button "New repository secret"',
     description:
-      "For example, for the DevGuard project its following url: https://github.com/l3montree-dev/devguard/settings/secrets/actions",
+      "For example, for the DevGuard project it's the following URL: https://github.com/l3montree-dev/devguard/settings/secrets/actions",
   },
   gitlab: {
     title:
       'Navigate to CI/CD Settings > Variables > Expand. Press the button "Add variable"',
     description:
-      "For example, for the DevGuard project its following URL: https://gitlab.com/l3montree/example-project/-/settings/ci_cd",
+      "For example, for the DevGuard project it's the following URL: https://gitlab.com/l3montree/example-project/-/settings/ci_cd",
   },
 };
 
@@ -42,6 +42,13 @@ const images: Record<CiProvider, { light: string; dark: string; alt: string }> =
       alt: "Open the CI/CD settings in GitLab",
     },
   };
+
+const tokenCardDescription: Record<CiProvider, string> = {
+  github:
+    "Your workflow uses this token to upload the scan results to DevGuard. Click 'Generate token', copy the token and store it as a repository secret. It is only shown once.",
+  gitlab:
+    "Your pipeline uses this token to upload the scan results to DevGuard. Click 'Generate token', copy the token and store it as a masked/hidden variable. Don't mark it as 'protected', otherwise only protected branches can be scanned. It is only shown once.",
+};
 
 // screenshot of where to put the secret + the token card to create it
 const CiTokenSetup: FunctionComponent<{
@@ -72,7 +79,10 @@ const CiTokenSetup: FunctionComponent<{
         />
       </div>
       <div className="mt-10">
-        <DevguardTokenCard variant={variant} />
+        <DevguardTokenCard
+          variant={variant}
+          description={tokenCardDescription[provider]}
+        />
       </div>
     </>
   );
