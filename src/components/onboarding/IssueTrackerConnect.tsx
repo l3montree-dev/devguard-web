@@ -52,7 +52,7 @@ const IssueTrackerConnect: FunctionComponent<{
           setProvider(value as ExternalTicketProvider);
         }}
       >
-        <SelectTrigger variant={variant} className="w-[220px]">
+        <SelectTrigger variant={variant} className="w-[320px]">
           <SelectValue placeholder="Select Provider" />
         </SelectTrigger>
         <SelectContent>
