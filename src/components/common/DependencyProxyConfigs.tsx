@@ -10,6 +10,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { ProxyScope } from "@/hooks/useDependencyProxy";
 import { useDependencyProxy } from "@/hooks/useDependencyProxy";
+import { useSecrets } from "@/hooks/useSecrets";
+import Link from "next/link";
 import { toast } from "@/lib/toast";
 import { InputWithButton } from "../ui/input-with-button";
 import type { Diagnostic } from "@codemirror/lint";
@@ -45,8 +47,10 @@ const rulesPlaceholder = `# Available fields: pkg.name, pkg.version, pkg.purl, p
 #     # Quote the scopes, YAML does not allow a plain @ at the start of a value.
 #     - url: https://npm.example.com
 #       scopes: ["@example", "@example-internal"]
-#       # optional - sent as "Authorization: Bearer <token>"
-#       token: <your-registry-token>
+#       # optional - $npm_token references a secret of this organization, project or repository
+#       auth:
+#         type: token
+#         token: $npm_token
 #     # an entry without scopes is the fallback for all other packages
 #     - url: https://nexus.example.com/repository/npm/
 #   deb:
@@ -90,10 +94,30 @@ const exampleRules = [
   expr: pkg.ecosystem == "pypi"`,
   },
   {
-    label: "Add two npm upstream registries",
-    rule: `- url: https://npm.company.com
-  scopes: ["@company"]
-  token: <your-token>`,
+    label: "Pin an npm scope to its registry",
+    rule: `- name: company-scope-registry
+  action: deny
+  expr: pkg.name.startsWith("@company/") && pkg.registry != "https://npm.company.com"`,
+  },
+  {
+    label: "npm registry with token auth",
+    rule: `registries:
+  npm:
+    - url: https://npm.company.com
+      scopes: ["@company"]
+      auth:
+        type: token
+        token: $npm_token`,
+  },
+  {
+    label: "npm registry with login auth",
+    rule: `registries:
+  npm:
+    - url: https://nexus.company.com/repository/npm/
+      auth:
+        type: login
+        username: ci-user
+        password: $nexus_password`,
   },
 ];
 
@@ -464,6 +488,17 @@ ${url}/v3.20/community`}
   }
 };
 
+const secretsSettingsPath = (scope: ProxyScope) => {
+  switch (scope.level) {
+    case "organization":
+      return `/${scope.organization}/settings/secrets`;
+    case "project":
+      return `/${scope.organization}/projects/${scope.projectSlug}/settings/secrets`;
+    case "asset":
+      return `/${scope.organization}/projects/${scope.projectSlug}/assets/${scope.assetSlug}/settings/secrets`;
+  }
+};
+
 interface Props {
   scope: ProxyScope | null;
   forceVertical?: boolean;
@@ -471,6 +506,8 @@ interface Props {
 
 const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
   const { config: data, proxyUrls, saveConfig } = useDependencyProxy(scope);
+  const { data: secrets = [] } = useSecrets(scope);
+  const availableSecrets = secrets.filter((secret) => !secret.overridden);
 
   const [rulesText, setRulesText] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -633,6 +670,30 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
             </div>
           </div>
           {codeError && <p className="text-sm text-destructive">{codeError}</p>}
+          {scope && (
+            <p className="text-sm text-muted-foreground">
+              {availableSecrets.length > 0 ? (
+                <>
+                  Available secrets:{" "}
+                  {availableSecrets.map((secret, i) => (
+                    <span key={secret.id}>
+                      {i > 0 && ", "}
+                      <code className="font-mono">${secret.name}</code>
+                    </span>
+                  ))}
+                  .{" "}
+                </>
+              ) : (
+                "No secrets available yet. "
+              )}
+              <Link
+                href={secretsSettingsPath(scope)}
+                className="underline hover:text-foreground"
+              >
+                Manage secrets
+              </Link>
+            </p>
+          )}
         </Section>
         <div className="flex justify-end pt-2">
           <Button

@@ -12,6 +12,7 @@ import {
   Cable,
   FileCog,
   KeyRound,
+  LockKeyhole,
   BrickWallFireIcon,
   ScrollText,
   Settings,
@@ -27,6 +28,7 @@ const groups: SettingsNavGroup[] = [
     items: [
       { title: "Members", segment: "members", Icon: Users },
       { title: "Access tokens", segment: "access-tokens", Icon: KeyRound },
+      { title: "Secrets and Variables", segment: "secrets", Icon: LockKeyhole },
     ],
   },
   {
