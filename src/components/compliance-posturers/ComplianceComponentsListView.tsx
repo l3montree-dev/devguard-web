@@ -5,6 +5,7 @@
 
 import type { ComplianceComponentImplementsControlDTO } from "@/types/dto";
 import { useComplianceComponents } from "@/hooks/useCompliancePostures";
+import type { ComplianceScope } from "@/services/compliancePostureService";
 import Page from "@/components/Page";
 import EmptyParty from "@/components/common/EmptyParty";
 import ListItem from "@/components/common/ListItem";
@@ -62,13 +63,15 @@ const ComponentControlBadges: FunctionComponent<{
 };
 
 interface Props {
+  scope: ComplianceScope;
   contextName: string;
 }
 
 const ComplianceComponentsListView: FunctionComponent<Props> = ({
+  scope,
   contextName,
 }) => {
-  const { data: components, isLoading } = useComplianceComponents();
+  const { data: components, isLoading } = useComplianceComponents(scope);
 
   return (
     <Page
@@ -105,13 +108,13 @@ const ComplianceComponentsListView: FunctionComponent<Props> = ({
         ) : !components?.length ? (
           <EmptyParty
             title="No compliance components tracked yet."
-            description="Components are seeded from OSCAL component-definitions."
+            description="Upload an OSCAL component definition to track components."
           />
         ) : (
           <div className="flex flex-col gap-2">
             {components.map((component) => (
               <ListItem
-                key={component.uuid}
+                key={component.id}
                 Title={
                   <span className="flex flex-row items-center gap-2">
                     <ComplianceComponentIcon title={component.title} />
