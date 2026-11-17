@@ -34,7 +34,7 @@ export class ComplianceFlow {
   async openCompliancePostureWithPlusInControlID() {
     const row = this.page
       .locator(
-        '[data-testid="compliance-posture-row"][data-framework-control-id*="+"]',
+        '[data-testid="compliance-posture-row"][data-framework-control-ids*="+"]',
       )
       .first();
     await row.waitFor({ state: "visible", timeout: 10_000 });
