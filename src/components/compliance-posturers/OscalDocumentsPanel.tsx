@@ -160,6 +160,7 @@ const OscalDocumentsPanel: FunctionComponent<Props> = ({
       <AuthGuard require="admin">
         <AsyncButton
           variant="secondary"
+          data-testid={`activate-${defaultDocument.name}`}
           onClick={() => handleActivate(defaultDocument)}
         >
           Activate
