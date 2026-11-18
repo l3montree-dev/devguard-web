@@ -11,11 +11,11 @@ export type SecretCreateRequest =
 export const secretsUrl = (scope: ConfigScope) => {
   switch (scope.level) {
     case "organization":
-      return `/organizations/${scope.organization}/secrets/`;
+      return `/organizations/${scope.organization}/devguard-secrets/`;
     case "project":
-      return `/organizations/${scope.organization}/projects/${scope.projectSlug}/secrets/`;
+      return `/organizations/${scope.organization}/projects/${scope.projectSlug}/devguard-secrets/`;
     case "asset":
-      return `/organizations/${scope.organization}/projects/${scope.projectSlug}/assets/${scope.assetSlug}/secrets/`;
+      return `/organizations/${scope.organization}/projects/${scope.projectSlug}/assets/${scope.assetSlug}/devguard-secrets/`;
   }
 };
 
@@ -26,15 +26,18 @@ export const createSecret = async (
   switch (scope.level) {
     case "organization":
       return unwrap(
-        await browserClient.POST("/organizations/{organization}/secrets", {
-          params: { path: { organization: scope.organization } },
-          body,
-        }),
+        await browserClient.POST(
+          "/organizations/{organization}/devguard-secrets",
+          {
+            params: { path: { organization: scope.organization } },
+            body,
+          },
+        ),
       );
     case "project":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/secrets",
+          "/organizations/{organization}/projects/{projectSlug}/devguard-secrets",
           {
             params: {
               path: {
@@ -49,7 +52,7 @@ export const createSecret = async (
     case "asset":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/secrets",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/devguard-secrets",
           {
             params: {
               path: {
@@ -70,14 +73,14 @@ export const deleteSecret = async (scope: ConfigScope, id: string) => {
     case "organization":
       return unwrap(
         await browserClient.DELETE(
-          "/organizations/{organization}/secrets/{id}",
+          "/organizations/{organization}/devguard-secrets/{id}",
           { params: { path: { organization: scope.organization, id } } },
         ),
       );
     case "project":
       return unwrap(
         await browserClient.DELETE(
-          "/organizations/{organization}/projects/{projectSlug}/secrets/{id}",
+          "/organizations/{organization}/projects/{projectSlug}/devguard-secrets/{id}",
           {
             params: {
               path: {
@@ -92,7 +95,7 @@ export const deleteSecret = async (scope: ConfigScope, id: string) => {
     case "asset":
       return unwrap(
         await browserClient.DELETE(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/secrets/{id}",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/devguard-secrets/{id}",
           {
             params: {
               path: {
