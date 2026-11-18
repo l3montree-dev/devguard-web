@@ -172,9 +172,13 @@ const getEcosystemContent = (key: string, url: string) => {
               registries under{" "}
               <code className="font-mono text-sm">registries.npm</code> in the
               proxy configuration. Each entry can set{" "}
-              <code className="font-mono text-sm">scopes</code> and a{" "}
-              <code className="font-mono text-sm">token</code>. All other
-              packages use the entry without scopes, or the public npm registry.
+              <code className="font-mono text-sm">scopes</code> and an{" "}
+              <code className="font-mono text-sm">auth</code> block (
+              <code className="font-mono text-sm">token</code> or{" "}
+              <code className="font-mono text-sm">login</code>) that references
+              secrets as <code className="font-mono text-sm">$name</code>. All
+              other packages use the entry without scopes, or the public npm
+              registry.
             </Callout>
           </div>
         </div>

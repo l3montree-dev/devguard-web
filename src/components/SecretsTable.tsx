@@ -132,7 +132,7 @@ const SecretsTable: FunctionComponent<Props> = ({ scope }) => {
         <NewSecretDialog
           scope={scope}
           onCreated={() => mutate()}
-          Trigger={<Button>New secret</Button>}
+          Trigger={<Button>Add secret</Button>}
         />
       </div>
     </Section>

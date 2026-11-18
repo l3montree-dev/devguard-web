@@ -27,7 +27,7 @@ const groups: SettingsNavGroup[] = [
     items: [
       { title: "Members", segment: "members", Icon: Users },
       { title: "Access tokens", segment: "access-tokens", Icon: KeyRound },
-      { title: "Secrets and Variables", segment: "secrets", Icon: LockKeyhole },
+      { title: "Secrets", segment: "secrets", Icon: LockKeyhole },
     ],
   },
   {
