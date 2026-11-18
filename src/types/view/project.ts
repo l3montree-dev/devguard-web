@@ -7,6 +7,7 @@ export type SubGroupProject = Omit<ProjectDTO, "subGroupsAndAsset"> & {
   resourceType: "project";
   state?: string;
   subGroupsAndAsset?: SubGroupsAndAsset[];
+  subGroupsAndAssetTotal?: number;
 };
 
 export type SubGroupsAndAsset =
