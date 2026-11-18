@@ -24,12 +24,9 @@ export const providerIdToBaseURL = (
 export const externalProviderIdToIntegrationName = (
   provider?: string,
 ): "github" | "gitlab" | undefined => {
-  if (provider === "gitlab") {
-    return "gitlab";
-  } else if (provider === "opencode") {
-    return "gitlab";
-  } else if (provider === "github") {
-    return "github";
+  if (!provider) {
+    return undefined;
   }
-  return undefined;
+  // every non-github provider (gitlab, opencode, custom kratos provider IDs) is a gitlab instance
+  return provider === "github" ? "github" : "gitlab";
 };

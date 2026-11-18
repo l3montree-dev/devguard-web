@@ -12,6 +12,7 @@ import type {
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useConfig } from "@/context/ConfigContext";
 
 const providerDisplayNames: Record<string, string> = {
   github: "GitHub",
@@ -20,6 +21,14 @@ const providerDisplayNames: Record<string, string> = {
 };
 
 function SsoProviderIcon({ provider }: { provider: string }) {
+  const { gitlabOAuth2Config } = useConfig();
+  // custom provider IDs configured as gitlab instances get the gitlab icon
+  const iconProvider =
+    provider in providerDisplayNames ||
+    !gitlabOAuth2Config?.some((conf) => conf.providerID === provider)
+      ? provider
+      : "gitlab";
+
   const icons: Record<string, { light: string; dark: string }> = {
     opencode: {
       light: "/assets/provider-icons/opencode.svg",
@@ -35,7 +44,7 @@ function SsoProviderIcon({ provider }: { provider: string }) {
     },
   };
 
-  const entry = icons[provider];
+  const entry = icons[iconProvider];
   if (!entry) return null;
 
   return (
@@ -66,7 +75,7 @@ export function OrySsoButton({
   buttonProps,
   className,
 }: OryNodeSsoButtonProps & { className?: string }) {
-  const provider = String(attributes.value).split("-")[0];
+  const provider = String(attributes.value);
   const displayName = providerDisplayNames[provider];
   return (
     <Button
@@ -129,7 +138,7 @@ export function OrySsoSettings({
           value?: string;
           disabled?: boolean;
         };
-        const provider = String(attrs.value ?? "").split("-")[0];
+        const provider = String(attrs.value ?? "");
         const displayName = providerDisplayNames[provider] ?? provider;
         return (
           <Button
@@ -157,7 +166,7 @@ export function OrySsoSettings({
           value?: string;
           disabled?: boolean;
         };
-        const provider = String(attrs.value ?? "").split("-")[0];
+        const provider = String(attrs.value ?? "");
         const displayName = providerDisplayNames[provider] ?? provider;
         return (
           <Button

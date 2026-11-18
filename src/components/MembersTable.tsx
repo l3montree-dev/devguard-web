@@ -68,8 +68,8 @@ const MembersTable: FunctionComponent<Props> = ({
           <tbody>
             {members
               .filter(
-                (m) =>
-                  !(m.id.startsWith("gitlab") || m.id.startsWith("github")),
+                // external users from ticket integrations (gitlab:, github:, jira:) are not org members
+                (m) => !/^(gitlab|github|jira):/.test(m.id),
               )
               .map((m, i, arr) => {
                 return (
