@@ -95,7 +95,7 @@ const NewSecretDialog: FunctionComponent<Props> = ({
                   </FormControl>
                   <FormDescription>
                     Lowercase letters, digits and underscores. Reference it as
-                    $name in the dependency proxy configuration.
+                    $name in your configuration.
                   </FormDescription>
                 </FormItem>
               )}
