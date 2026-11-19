@@ -801,7 +801,9 @@ function propertyPathBefore(text: string, pos: number): string[] {
   return parts;
 }
 
-const LIST_MACROS = "all|exists|exists_one|filter|map";
+// A list macro call up to its variable, e.g. ".all(other," - the variable is captured.
+const LIST_MACRO_CALL =
+  /\.(?:all|exists|exists_one|filter|map)\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,/g;
 
 function findField(fields: CelField[], label: string) {
   return fields.find((f) => f.label === label);
@@ -818,12 +820,9 @@ function resolveFields(
   let field = findField(completions, path[0]);
   let fields = field?.fields;
   if (!field) {
-    const macros = [
-      ...textBefore.matchAll(
-        new RegExp(`\\.(?:${LIST_MACROS})\\(\\s*${path[0]}\\s*,`, "g"),
-      ),
-    ];
-    const macro = macros.at(-1);
+    const macro = [...textBefore.matchAll(LIST_MACRO_CALL)]
+      .filter((match) => match[1] === path[0])
+      .at(-1);
     if (!macro) return undefined;
     // filter() keeps the list's element type, so it is skipped
     const listPath = propertyPathBefore(textBefore, macro.index + 1).filter(
