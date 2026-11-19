@@ -1,7 +1,7 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import { browserClient, unwrap } from "@/services/apiClient";
+import { ApiError, browserClient, unwrap } from "@/services/apiClient";
 import type { components } from "@/types/api/generated";
 
 export interface AssetScope {
@@ -67,3 +67,22 @@ export const inviteAssetMembers = async (scope: AssetScope, ids: string[]) =>
       { params: { path: scope }, body: { ids } as never },
     ),
   );
+
+// Unlike unwrap, keeps the server's message - it carries the CEL compile error.
+export const testAssetVersionRetentionPolicy = async (
+  scope: AssetScope,
+  assetVersionRetentionPolicy: string,
+) => {
+  const { data, error, response } = await browserClient.POST(
+    "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/retention-policy/test/",
+    { params: { path: scope }, body: { assetVersionRetentionPolicy } },
+  );
+  if (!response.ok) {
+    throw new ApiError(
+      (error as { message?: string } | undefined)?.message ??
+        `${response.status} ${response.url}`,
+      response.status,
+    );
+  }
+  return data!;
+};

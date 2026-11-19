@@ -8653,6 +8653,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/vex-rules/recommendations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get crowdsourced VEX recommendations for all vulns of an asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              [
+                key: string
+              ]: components["schemas"]["dtos.VexRuleRecommendation"];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/vex.json/": {
     parameters: {
       query?: never;
@@ -8692,6 +8739,54 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/retention-policy/test/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Test an asset version retention policy against the current asset versions without deleting anything */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Retention policy to test */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.TestAssetVersionRetentionPolicyRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.TestAssetVersionRetentionPolicyResponse"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -14536,6 +14631,7 @@ export interface components {
       projectSlug: string;
     };
     "dtos.Asset": {
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -14600,6 +14696,7 @@ export interface components {
       riskAutomaticTicketThreshold: number;
     };
     "dtos.AssetDetails": {
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -14636,6 +14733,7 @@ export interface components {
       state: string;
     };
     "dtos.AssetDetailsWithSecrets": {
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -14681,6 +14779,8 @@ export interface components {
       ids: string[];
     };
     "dtos.AssetPatchRequest": {
+      /** @description an empty string resets to the default policy */
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       centralDependencyVulnManagement: boolean;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
@@ -14717,7 +14817,7 @@ export interface components {
       assetId: string;
       createdAt: string;
       defaultBranch: boolean;
-      lastAccessedAt: string;
+      lastUploadAt: string;
       metadata: {
         [key: string]: unknown;
       };
@@ -15955,6 +16055,13 @@ export interface components {
       subProjectExternalEntityId: string;
       subProjectName: string;
     };
+    "dtos.TestAssetVersionRetentionPolicyRequest": {
+      assetVersionRetentionPolicy: string;
+    };
+    "dtos.TestAssetVersionRetentionPolicyResponse": {
+      kept: components["schemas"]["dtos.AssetVersion"][];
+      toDelete: components["schemas"]["dtos.AssetVersion"][];
+    };
     "dtos.TestVEXRulesRequest": {
       celExpression: string[];
       /** @enum {unknown} */
@@ -16180,6 +16287,8 @@ export interface components {
       vulnAssetId: string;
     };
     "github_com_l3montree-dev_devguard_database_models.Asset": {
+      /** @description the default lives in the database, see celrules.DefaultAssetVersionRetentionPolicy */
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
@@ -16234,7 +16343,11 @@ export interface components {
       defaultBranch: boolean;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
       id: string;
-      lastAccessedAt: string;
+      /**
+       * @description only set by scans uploaded by a client - background rescans of upstream SBOMs do not count
+       *     includes both sbom and sarif imports
+       */
+      lastUploadAt: string;
       metadata: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       name: string;
       signingPubKey: string;
@@ -16283,7 +16396,6 @@ export interface components {
       relationships: components["schemas"]["github_com_l3montree-dev_devguard_database_models.CVERelationship"][];
       risk: components["schemas"]["dtos.RiskMetrics"];
       vector: string;
-      weaknesses: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Weakness"][];
       withdrawn: string;
     };
     "github_com_l3montree-dev_devguard_database_models.CVERelationship": {
@@ -16596,12 +16708,6 @@ export interface components {
       vexRule: components["schemas"]["github_com_l3montree-dev_devguard_database_models.VEXRule"];
       vexRuleId: string;
     };
-    "github_com_l3montree-dev_devguard_database_models.Weakness": {
-      cve: string;
-      cwe: string;
-      source: string;
-      type: string;
-    };
     "github_com_l3montree-dev_devguard_database_models.WebhookIntegration": {
       createdAt: string;
       description: string;
@@ -16736,8 +16842,6 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000
