@@ -8,9 +8,8 @@ import ManagePatsDialog from "@/components/ManagePatsDialog";
 import NewTokenDialog from "@/components/NewTokenDialog";
 import { DatePicker } from "@/components/DatePicker";
 import FormSection from "@/components/common/FormSection";
-import OutlineSelectCard from "@/components/common/OutlineSelectCard";
+import SelectCard from "@/components/common/SelectCard";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import useAccessToken from "@/hooks/useAccessToken";
@@ -166,105 +165,101 @@ const AccessTokenManagement: FunctionComponent<AccessTokenManagementProps> = ({
         forceVertical={section.forceVertical}
         primaryHeadline={section.primaryHeadline}
       >
-        <Card className="pt-6">
-          <form onSubmit={handleSubmit(handleCreatePat)}>
-            <CardContent>
-              <FormSection step={1} title="Token name">
-                <Input
-                  variant="onCard"
-                  placeholder="e.g. GitLab CI pipeline"
-                  {...register("description")}
+        <form onSubmit={handleSubmit(handleCreatePat)}>
+          <FormSection step={1} title="Token name">
+            <Input
+              placeholder="e.g. GitLab CI pipeline"
+              {...register("description")}
+            />
+          </FormSection>
+
+          <FormSection step={2} title="Token type">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {TOKEN_TYPES.map((type) => (
+                <SelectCard
+                  key={String(type.value)}
+                  selected={symmetric === type.value}
+                  onClick={() => setValue("symmetric", type.value)}
+                  icon={type.icon}
+                  label={type.label}
+                  tag={type.tag}
+                  description={type.description}
                 />
-              </FormSection>
+              ))}
+            </div>
+          </FormSection>
 
-              <FormSection step={2} title="Token type">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {TOKEN_TYPES.map((type) => (
-                    <OutlineSelectCard
-                      key={String(type.value)}
-                      selected={symmetric === type.value}
-                      onClick={() => setValue("symmetric", type.value)}
-                      icon={type.icon}
-                      label={type.label}
-                      tag={type.tag}
-                      description={type.description}
-                    />
-                  ))}
+          <FormSection step={3} title="Scopes">
+            <div className="rounded-lg bg-card border divide-y border-input dark:border-foreground/10 divide-input dark:divide-foreground/10">
+              <label className="flex cursor-pointer items-center justify-between gap-4 p-3 hover:bg-muted/40 transition-colors">
+                <div>
+                  <p className="text-sm font-medium">Scan</p>
+                  <p className="text-xs text-muted-foreground">
+                    Submit scan results and CVE findings.
+                  </p>
                 </div>
-              </FormSection>
+                <Checkbox
+                  checked={Boolean(scan)}
+                  onCheckedChange={(e) => setValue("scan", Boolean(e))}
+                />
+              </label>
+              <label className="flex cursor-pointer items-center justify-between gap-4 p-3 hover:bg-muted/40 transition-colors">
+                <div>
+                  <p className="text-sm font-medium">Manage</p>
+                  <p className="text-xs text-muted-foreground">
+                    Create and configure assets, projects, and settings.
+                  </p>
+                </div>
+                <Checkbox
+                  checked={Boolean(manage)}
+                  onCheckedChange={(e) => setValue("manage", Boolean(e))}
+                />
+              </label>
+            </div>
+          </FormSection>
 
-              <FormSection step={3} title="Scopes">
-                <div className="rounded-lg border divide-y border-input dark:border-foreground/10 divide-input dark:divide-foreground/10">
-                  <label className="flex cursor-pointer items-center justify-between gap-4 p-3 hover:bg-muted/40 transition-colors">
-                    <div>
-                      <p className="text-sm font-medium">Scan</p>
-                      <p className="text-xs text-muted-foreground">
-                        Submit scan results and CVE findings.
-                      </p>
-                    </div>
-                    <Checkbox
-                      checked={Boolean(scan)}
-                      onCheckedChange={(e) => setValue("scan", Boolean(e))}
-                    />
-                  </label>
-                  <label className="flex cursor-pointer items-center justify-between gap-4 p-3 hover:bg-muted/40 transition-colors">
-                    <div>
-                      <p className="text-sm font-medium">Manage</p>
-                      <p className="text-xs text-muted-foreground">
-                        Create and configure assets, projects, and settings.
-                      </p>
-                    </div>
-                    <Checkbox
-                      checked={Boolean(manage)}
-                      onCheckedChange={(e) => setValue("manage", Boolean(e))}
-                    />
-                  </label>
-                </div>
-              </FormSection>
+          <FormSection step={4} title="Expiry date" last>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-3">
+                <DatePicker
+                  date={expiryDate}
+                  onDateChange={handleExpiryDateChange}
+                  variant="onCard"
+                />
+                {expiryDate && !expiryError && (
+                  <span className="text-xs text-muted-foreground">
+                    Token valid until{" "}
+                    {expiryDate.toLocaleDateString(undefined, {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                )}
+              </div>
+              {expiryError && (
+                <p className="text-xs text-destructive">{expiryError}</p>
+              )}
+            </div>
+          </FormSection>
 
-              <FormSection step={4} title="Expiry date" last>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-3">
-                    <DatePicker
-                      date={expiryDate}
-                      onDateChange={handleExpiryDateChange}
-                      variant="onCard"
-                    />
-                    {expiryDate && !expiryError && (
-                      <span className="text-xs text-muted-foreground">
-                        Token valid until{" "}
-                        {expiryDate.toLocaleDateString(undefined, {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </span>
-                    )}
-                  </div>
-                  {expiryError && (
-                    <p className="text-xs text-destructive">{expiryError}</p>
-                  )}
-                </div>
-              </FormSection>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <ManagePatsDialog
-                accessTokens={accessTokens}
-                onDeletePat={onDeletePat}
+          <div className="flex justify-end gap-4">
+            <ManagePatsDialog
+              accessTokens={accessTokens}
+              onDeletePat={onDeletePat}
+            >
+              <Button
+                type="button"
+                variant="outline"
+                disabled={accessTokens.length === 0}
+                className="disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={accessTokens.length === 0}
-                  className="disabled:pointer-events-auto disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  Manage Existing Tokens ({accessTokens.length})
-                </Button>
-              </ManagePatsDialog>
-              <Button type="submit">Create Token</Button>
-            </CardFooter>
-          </form>
-        </Card>
+                Manage Existing Tokens ({accessTokens.length})
+              </Button>
+            </ManagePatsDialog>
+            <Button type="submit">Create Token</Button>
+          </div>
+        </form>
       </Section>
 
       <NewTokenDialog
