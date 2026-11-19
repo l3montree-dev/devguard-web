@@ -526,8 +526,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 form.formState.dirtyFields?.sharesInformation ||
                 form.formState.dirtyFields?.enableTicketRange ||
                 form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
-                form.formState.dirtyFields?.riskAutomaticTicketThreshold ||
-                form.formState.dirtyFields?.keepOriginalSbomRootComponent
+                form.formState.dirtyFields?.riskAutomaticTicketThreshold
               )
             }
             onClick={createUpdateHandler(
@@ -538,7 +537,6 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 "enableTicketRange",
                 "cvssAutomaticTicketThreshold",
                 "riskAutomaticTicketThreshold",
-                "keepOriginalSbomRootComponent",
               ],
               handleUpdate,
             )}

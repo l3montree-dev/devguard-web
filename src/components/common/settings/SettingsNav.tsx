@@ -7,7 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import useDecodedPathname from "../../../hooks/useDecodedPathname";
 
 export interface SettingsNavItem {
   title: string;
@@ -30,7 +30,7 @@ interface Props {
 }
 
 const SettingsNav = ({ base, groups, hidden, tour }: Props) => {
-  const pathname = usePathname();
+  const pathname = useDecodedPathname();
 
   return (
     <nav data-tour={tour} className="flex flex-col gap-4">
