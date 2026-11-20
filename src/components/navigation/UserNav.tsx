@@ -17,7 +17,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useLoginHref } from "@/hooks/useLoginHref";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Button, buttonVariants } from "../ui/button";
@@ -35,15 +35,11 @@ import StarRepo from "./StarRepo";
 
 export default function UserNav() {
   const { setTheme } = useTheme();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const loginHref = useLoginHref();
 
   const user = useCurrentUser();
 
   const config = useConfig();
-  const queryString = searchParams.toString();
-  const currentUrl = `${pathname}${queryString ? `?${queryString}` : ""}`;
-  const loginHref = `/login?return_to=${encodeURIComponent(currentUrl)}`;
 
   const handleLogout = async () => {
     const logoutUrl = await getLogoutUrl();

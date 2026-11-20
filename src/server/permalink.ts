@@ -6,6 +6,7 @@
 // stable links (mails, issues, webhooks) without knowing the slugs upfront.
 
 import { config as appConfig } from "@/config";
+import { getLoginHref } from "@/utils/auth";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 // the query parameter /api/v1/resolve/ expects for each entity level
@@ -43,10 +44,7 @@ export const createPermalinkHandler =
 
     // send the user through login and back to this permalink afterwards
     if (resp.status === 401) {
-      return res.redirect(
-        302,
-        `/login?return_to=${encodeURIComponent(req.url!)}`,
-      );
+      return res.redirect(302, getLoginHref(req.url!));
     }
 
     if (!resp.ok) {
