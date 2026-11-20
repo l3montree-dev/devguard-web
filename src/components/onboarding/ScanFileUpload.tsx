@@ -8,7 +8,10 @@ import ManualUploadOptionsFields from "@/components/guides/risk-scanner-carousel
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "@/lib/toast";
@@ -19,9 +22,10 @@ import {
   uploadVex,
 } from "@/services/scanUploadService";
 import type { ManualUploadKind } from "@/types/view/integration";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 import type { Surface } from "@/lib/surface";
 import { ensureValidBranchOrTagSlug } from "@/utils/common";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { FunctionComponent } from "react";
 import { useDropzone } from "react-dropzone";
 
@@ -66,6 +70,12 @@ export const detectUploadKind = (
 };
 
 interface Props {
+  id?: string;
+  initialRef?: Pick<AssetVersionDTO, "name" | "slug" | "type">;
+  artifacts?: ArtifactDTO[];
+  initialArtifact?: string;
+  onLayoutChange?: () => void;
+  onUploadingChange?: (uploading: boolean) => void;
   // called with the page to show the uploaded results
   onUploaded: (destination: string) => void;
   // branch/ tag, artifact and origin fields - hidden during the onboarding,
@@ -77,27 +87,45 @@ interface Props {
 
 const ScanFileUpload: FunctionComponent<Props> = ({
   onUploaded,
+  id = "onboarding-upload",
   showOptions = true,
   variant,
+  initialRef,
+  artifacts,
+  initialArtifact,
+  onLayoutChange,
+  onUploadingChange,
 }) => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;
   const asset = useActiveAsset()!;
+  const activeRef = useActiveAssetVersion();
+  const defaultRef = initialRef ?? activeRef;
   const { branches, tags } = useAssetBranchesAndTags();
 
   const [file, setFile] = useState<{
     file: File;
     content: string;
     kind: ManualUploadKind;
+    isCycloneDx: boolean;
   }>();
-  const [branchOrTagName, setBranchOrTagName] = useState("main");
-  const [branchOrTagSlug, setBranchOrTagSlug] = useState("main");
-  const [isTag, setIsTag] = useState(false);
+  const [branchOrTagName, setBranchOrTagName] = useState(
+    defaultRef?.name || "main",
+  );
+  const [branchOrTagSlug, setBranchOrTagSlug] = useState(
+    defaultRef?.slug || "main",
+  );
+  const [isTag, setIsTag] = useState(defaultRef?.type === "tag");
   const [artifactName, setArtifactName] = useState(
-    `pkg:devguard/${activeOrg.slug}/${activeProject.slug}/${asset.slug}`,
+    initialArtifact ||
+      `pkg:devguard/${activeOrg.slug}/${activeProject.slug}/${asset.slug}`,
   );
   const [origin, setOrigin] = useState("SBOM_DEFAULT");
   const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    onLayoutChange?.();
+  }, [file, onLayoutChange]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const dropped = acceptedFiles[0];
@@ -106,8 +134,10 @@ const ScanFileUpload: FunctionComponent<Props> = ({
     reader.onload = () => {
       const content = reader.result as string;
       let kind: ManualUploadKind | undefined;
+      let parsed: Record<string, unknown>;
       try {
-        kind = detectUploadKind(JSON.parse(content));
+        parsed = JSON.parse(content);
+        kind = detectUploadKind(parsed);
       } catch {
         toast.error(
           "JSON format is not recognized, make sure it is the proper format",
@@ -120,7 +150,12 @@ const ScanFileUpload: FunctionComponent<Props> = ({
         );
         return;
       }
-      setFile({ file: dropped, content, kind });
+      setFile({
+        file: dropped,
+        content,
+        kind,
+        isCycloneDx: parsed.bomFormat === "CycloneDX",
+      });
       setOrigin(kind.toUpperCase() + "_DEFAULT");
     };
     reader.readAsText(dropped);
@@ -129,6 +164,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
   const dropzone = useDropzone({
     onDrop,
     multiple: false,
+    disabled: isUploading,
     accept: {
       "application/json": [".json"],
       "application/sarif+json": [".sarif"],
@@ -151,6 +187,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
     const refUrl = `${assetUrl}/refs/${ensureValidBranchOrTagSlug(branchOrTagSlug)}`;
 
     setIsUploading(true);
+    onUploadingChange?.(true);
     try {
       if (file.kind === "sbom") {
         const resp = await uploadSbomFile(
@@ -184,13 +221,14 @@ const ScanFileUpload: FunctionComponent<Props> = ({
       toast.error(`${kindLabels[file.kind]} has not been sent successfully`);
     } finally {
       setIsUploading(false);
+      onUploadingChange?.(false);
     }
   };
 
   return (
     <div className="flex flex-1 flex-col gap-4">
       <FileUpload
-        id="onboarding-upload"
+        id={id}
         variant={variant}
         files={file ? [file.file.name] : []}
         dropzone={dropzone}
@@ -199,6 +237,30 @@ const ScanFileUpload: FunctionComponent<Props> = ({
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           Detected file type:
           <Badge variant="secondary">{kindLabels[file.kind]}</Badge>
+        </div>
+      )}
+      {file?.isCycloneDx && (
+        <div className="flex flex-col gap-2 text-sm">
+          <label htmlFor={`${id}-kind`}>Upload CycloneDX document as</label>
+          <select
+            id={`${id}-kind`}
+            className="rounded border bg-background p-2"
+            value={file.kind}
+            disabled={isUploading}
+            onChange={(event) => {
+              const kind = event.target.value as "sbom" | "vex";
+              setFile({ ...file, kind });
+              setOrigin(kind.toUpperCase() + "_DEFAULT");
+            }}
+          >
+            <option value="sbom">SBOM</option>
+            <option value="vex">VEX</option>
+          </select>
+          <span className="text-muted-foreground">
+            CycloneDX documents can contain both an inventory and VEX
+            information. Choose VEX to import vulnerability exploitability
+            statements.
+          </span>
         </div>
       )}
       {showOptions && (
@@ -217,9 +279,13 @@ const ScanFileUpload: FunctionComponent<Props> = ({
             artifactName,
             onArtifactNameChange: setArtifactName,
             onSelectedArtifactChange: (name) => setArtifactName(name ?? ""),
+            artifacts,
+            selectedArtifact: artifactName,
             origin,
             onOriginChange: setOrigin,
-            onReInit: () => {},
+            onReInit: () => {
+              setTimeout(() => onLayoutChange?.(), 0);
+            },
           }}
           originLabel="Origin"
           originHint="Origin of the report (e.g., SBOM_DEFAULT)"
@@ -229,7 +295,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
       <Button
         // stays at the bottom when the parent stretches the upload
         className="mt-auto self-end"
-        data-testid="onboarding-upload-submit"
+        data-testid={`${id}-submit`}
         disabled={!file || isUploading}
         isSubmitting={isUploading}
         onClick={handleUpload}
