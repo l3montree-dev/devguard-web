@@ -149,7 +149,10 @@ const RiskFeedGroupHeader = ({
                   );
                   return msg.charAt(0).toUpperCase() + msg.slice(1);
                 })()}
-                <Badge variant="secondary" className="text-xs font-normal">
+                <Badge
+                  variant="secondary"
+                  className="shrink-0 whitespace-nowrap text-xs font-normal"
+                >
                   {groupedEvents.length}x
                 </Badge>
               </span>
@@ -420,9 +423,11 @@ export default function RiskAssessmentFeed({
   return (
     <div>
       <ul className="relative flex flex-col pb-10 text-foreground" role="list">
+        {groupedEvents.length > 2 && !isOpen && (
+          <div className="pointer-events-none absolute left-3.5 top-5 bottom-10 border-l-2 border-dotted" />
+        )}
         {groupedEvents.length > 2 && (
           <div className="relative mb-10">
-            <div className="border-dotted border-l-2 h-20 absolute left-3.5 -bottom-10" />
             <Collapsible open={isOpen} onOpenChange={setIsOpen}>
               <div className="ml-7 flex items-center flex-row justify-center">
                 <Button
