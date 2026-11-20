@@ -23,13 +23,15 @@ import {
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import { useApiQueryWithTransformer } from "../../hooks/useApiQuery";
+import { useIsSelfHosted } from "@/hooks/useIsSelfHosted";
 
 const SHOWN_PAIR_KEY = "devguard-update-dialog-shown";
 
 export default function UpdateAvailableDialog() {
   const currentUser = useCurrentUser();
+  const isSelfHosted = useIsSelfHosted();
   const { data: check } = useApiQueryWithTransformer(
-    currentUser ? "/info" : null,
+    currentUser && isSelfHosted ? "/info" : null,
     async (info) => {
       const instanceVersion = info.build.version;
       const result = await checkForUpdate(instanceVersion, "minor");
@@ -47,7 +49,7 @@ export default function UpdateAvailableDialog() {
 
   const [shownPair, storeShownPair] = useLocalStorage(SHOWN_PAIR_KEY);
 
-  if (!check) return null;
+  if (!isSelfHosted || !check) return null;
 
   const open = check.result.updateAvailable && shownPair !== check.currentPair;
 
