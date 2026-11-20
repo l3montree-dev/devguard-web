@@ -18,6 +18,7 @@ import { getUserFullName } from "@/utils/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import CopyCode from "@/components/common/CopyCode";
 import { classNames } from "../../utils/common";
+import { useLoginHref } from "@/hooks/useLoginHref";
 
 interface ErrPageProps {
   error: Error & { digest?: string };
@@ -31,6 +32,7 @@ export default function ErrPage(props: ErrPageProps) {
   const { error } = props;
   const config = useConfig();
   const user = useCurrentUser();
+  const loginHref = useLoginHref();
 
   const [sentryEventId, setSentryEventId] = useState<string | null>(null);
   const [autoReloadSecondsLeft, setAutoReloadSecondsLeft] = useState<
@@ -229,7 +231,7 @@ export default function ErrPage(props: ErrPageProps) {
             </div>
           ) : (
             <Link
-              href="/login"
+              href={loginHref}
               rel="noreferrer noopener"
               className={classNames(
                 buttonVariants({ variant: "default" }),
