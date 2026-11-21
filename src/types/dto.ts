@@ -47,6 +47,7 @@ export type ExternalReference = Schemas["dtos.ExternalReference"];
 export type Relationship = Schemas["dtos.Relationship"];
 export type RemediationTypeUsage = Schemas["dtos.RemediationTypeDistribution"];
 export type WebhookDTO = Schemas["dtos.WebhookIntegration"];
+export type SecretDTO = Schemas["dtos.SecretDTO"];
 export type InstanceInfo = Omit<Schemas["dtos.InfoResponse"], "database"> & {
   database: Omit<Schemas["dtos.DatabaseInfo"], "vulndbVersion"> & {
     vulndbVersion?: string;
