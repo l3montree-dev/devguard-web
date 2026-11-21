@@ -31,10 +31,24 @@ export class ComplianceFlow {
     );
   }
 
+  // catalogs are not seeded, a new org has no postures until one is activated
+  async activateDefaultCatalog(name: string) {
+    await this.page
+      .getByTestId("manage-catalogs-and-components")
+      .click({ timeout: 10_000 });
+    const dialog = this.page.getByRole("dialog");
+    await dialog.getByTestId(`activate-${name}`).click({ timeout: 10_000 });
+    await expect(dialog.getByRole("button", { name: "Remove" })).toBeVisible({
+      timeout: 60_000,
+    });
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toBeHidden({ timeout: 10_000 });
+  }
+
   async openCompliancePostureWithPlusInControlID() {
     const row = this.page
       .locator(
-        '[data-testid="compliance-posture-row"][data-framework-control-id*="+"]',
+        '[data-testid="compliance-posture-row"][data-framework-control-ids*="+"]',
       )
       .first();
     await row.waitFor({ state: "visible", timeout: 10_000 });

@@ -15,6 +15,39 @@ export type PostureScope =
       assetVersionSlug: string;
     };
 
+export type ComplianceScope =
+  | { level: "organization"; organization: string }
+  | { level: "project"; organization: string; projectSlug: string }
+  | {
+      level: "asset";
+      organization: string;
+      projectSlug: string;
+      assetSlug: string;
+    };
+
+export const toComplianceScope = (scope: PostureScope): ComplianceScope => {
+  if (scope.level !== "assetVersion") {
+    return scope;
+  }
+  return {
+    level: "asset",
+    organization: scope.organization,
+    projectSlug: scope.projectSlug,
+    assetSlug: scope.assetSlug,
+  };
+};
+
+export const complianceScopeBaseUrl = (scope: ComplianceScope) => {
+  switch (scope.level) {
+    case "organization":
+      return `/organizations/${scope.organization}/`;
+    case "project":
+      return `/organizations/${scope.organization}/projects/${scope.projectSlug}/`;
+    case "asset":
+      return `/organizations/${scope.organization}/projects/${scope.projectSlug}/assets/${scope.assetSlug}/`;
+  }
+};
+
 // The handler binds only these two fields.
 export type StatementPayload =
   components["schemas"]["controllers.statementPayload"];
@@ -37,20 +70,17 @@ export const postureBaseUrl = (scope: PostureScope) => {
   }
 };
 
-export const readPosture = async (
-  scope: PostureScope,
-  frameworkControlID: string,
-) => {
+export const readPosture = async (scope: PostureScope, controlHash: string) => {
   switch (scope.level) {
     case "organization":
       return unwrap(
         await browserClient.GET(
-          "/organizations/{organization}/compliance-postures/{frameworkControlID}",
+          "/organizations/{organization}/compliance-postures/{controlHash}",
           {
             params: {
               path: {
                 organization: scope.organization,
-                frameworkControlID,
+                controlHash,
               },
             },
           },
@@ -59,13 +89,13 @@ export const readPosture = async (
     case "project":
       return unwrap(
         await browserClient.GET(
-          "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{frameworkControlID}",
+          "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{controlHash}",
           {
             params: {
               path: {
                 organization: scope.organization,
                 projectSlug: scope.projectSlug,
-                frameworkControlID,
+                controlHash,
               },
             },
           },
@@ -74,7 +104,7 @@ export const readPosture = async (
     case "assetVersion":
       return unwrap(
         await browserClient.GET(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{frameworkControlID}",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{controlHash}",
           {
             params: {
               path: {
@@ -82,7 +112,7 @@ export const readPosture = async (
                 projectSlug: scope.projectSlug,
                 assetSlug: scope.assetSlug,
                 assetVersionSlug: scope.assetVersionSlug,
-                frameworkControlID,
+                controlHash,
               },
             },
           },
@@ -93,17 +123,17 @@ export const readPosture = async (
 
 export const createPostureEvent = async (
   scope: PostureScope,
-  frameworkControlID: string,
+  controlHash: string,
   event: PostureEvent,
 ) => {
   switch (scope.level) {
     case "organization":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/compliance-postures/{frameworkControlID}",
+          "/organizations/{organization}/compliance-postures/{controlHash}",
           {
             params: {
-              path: { organization: scope.organization, frameworkControlID },
+              path: { organization: scope.organization, controlHash },
             },
             body: event,
           },
@@ -112,13 +142,13 @@ export const createPostureEvent = async (
     case "project":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{frameworkControlID}",
+          "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{controlHash}",
           {
             params: {
               path: {
                 organization: scope.organization,
                 projectSlug: scope.projectSlug,
-                frameworkControlID,
+                controlHash,
               },
             },
             body: event,
@@ -128,7 +158,7 @@ export const createPostureEvent = async (
     case "assetVersion":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{frameworkControlID}",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{controlHash}",
           {
             params: {
               path: {
@@ -136,7 +166,7 @@ export const createPostureEvent = async (
                 projectSlug: scope.projectSlug,
                 assetSlug: scope.assetSlug,
                 assetVersionSlug: scope.assetVersionSlug,
-                frameworkControlID,
+                controlHash,
               },
             },
             body: event,
@@ -199,7 +229,7 @@ export const deleteStatement = async (
 
 export const createStatement = async (
   scope: PostureScope,
-  frameworkControlID: string,
+  controlHash: string,
   complianceComponentID: string,
   body: StatementPayload,
 ) => {
@@ -207,12 +237,12 @@ export const createStatement = async (
     case "organization":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/compliance-postures/{frameworkControlID}/components/{complianceComponentID}/",
+          "/organizations/{organization}/compliance-postures/{controlHash}/components/{complianceComponentID}/",
           {
             params: {
               path: {
                 organization: scope.organization,
-                frameworkControlID,
+                controlHash,
                 complianceComponentID,
               },
             },
@@ -223,13 +253,13 @@ export const createStatement = async (
     case "project":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{frameworkControlID}/components/{complianceComponentID}",
+          "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{controlHash}/components/{complianceComponentID}",
           {
             params: {
               path: {
                 organization: scope.organization,
                 projectSlug: scope.projectSlug,
-                frameworkControlID,
+                controlHash,
                 complianceComponentID,
               },
             },
@@ -240,7 +270,7 @@ export const createStatement = async (
     case "assetVersion":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{frameworkControlID}/components/{complianceComponentID}",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{controlHash}/components/{complianceComponentID}",
           {
             params: {
               path: {
@@ -248,7 +278,7 @@ export const createStatement = async (
                 projectSlug: scope.projectSlug,
                 assetSlug: scope.assetSlug,
                 assetVersionSlug: scope.assetVersionSlug,
-                frameworkControlID,
+                controlHash,
                 complianceComponentID,
               },
             },

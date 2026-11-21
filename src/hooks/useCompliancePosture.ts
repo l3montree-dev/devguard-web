@@ -1,22 +1,27 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
+import { useMemo } from "react";
 import useSWR from "swr";
 
 import { fetcher } from "@/data-fetcher/fetcher";
-import type { PostureScope } from "@/services/compliancePostureService";
-import { readPosture } from "@/services/compliancePostureService";
+import type {
+  ComplianceScope,
+  PostureScope,
+} from "@/services/compliancePostureService";
+import {
+  complianceScopeBaseUrl,
+  readPosture,
+} from "@/services/compliancePostureService";
 import type { ComplianceComponentDetailsDTO } from "@/types/dto";
 import type { DetailedComplianceRiskDTO } from "@/types/view/vulnEvents";
 
 export const useCompliancePosture = (
   scope: PostureScope,
-  frameworkControlID: string | undefined,
+  controlHash: string | undefined,
 ) =>
   useSWR(
-    frameworkControlID
-      ? (["posture", scope, frameworkControlID] as const)
-      : null,
+    controlHash ? (["posture", scope, controlHash] as const) : null,
     async ([, postureScope, control]) =>
       (await readPosture(
         postureScope,
@@ -24,14 +29,25 @@ export const useCompliancePosture = (
       )) as unknown as DetailedComplianceRiskDTO,
   );
 
-// Not on the generated client: the route takes dynamic filterQuery[field][op]
-// keys, which OpenAPI cannot express.
+// The compliance components of the scope which implement the control in one of its frameworks.
 export const useComplianceComponentsForControl = (
-  frameworkControlID: string | undefined,
-) =>
-  useSWR<ComplianceComponentDetailsDTO[]>(
-    frameworkControlID
-      ? `/compliance-components/?filterQuery[frameworkControlId][is]=${encodeURIComponent(frameworkControlID)}`
+  scope: ComplianceScope,
+  frameworkControlIds: string[] | undefined,
+) => {
+  const { data } = useSWR<ComplianceComponentDetailsDTO[]>(
+    frameworkControlIds
+      ? `${complianceScopeBaseUrl(scope)}compliance-components/`
       : null,
     fetcher,
   );
+  const components = useMemo(
+    () =>
+      data?.filter((c) =>
+        (c.implementedControls ?? []).some((ic) =>
+          frameworkControlIds?.includes(ic.frameworkControlId),
+        ),
+      ),
+    [data, frameworkControlIds],
+  );
+  return { data: components };
+};

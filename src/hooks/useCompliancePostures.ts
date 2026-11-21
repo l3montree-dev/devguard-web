@@ -4,14 +4,26 @@
 import useSWR from "swr";
 
 import { fetcher } from "@/data-fetcher/fetcher";
-import { useApiQuery } from "@/hooks/useApiQuery";
-import type { PostureScope } from "@/services/compliancePostureService";
-import { postureBaseUrl } from "@/services/compliancePostureService";
-import type { CompliancePostureWithControlDTO } from "@/types/dto";
+import type {
+  ComplianceScope,
+  PostureScope,
+} from "@/services/compliancePostureService";
+import {
+  complianceScopeBaseUrl,
+  postureBaseUrl,
+} from "@/services/compliancePostureService";
+import type {
+  ComplianceComponentDetailsDTO,
+  CompliancePostureWithControlDTO,
+} from "@/types/dto";
 import type { Paged } from "@/types/view/pagination";
 
-export const useComplianceComponents = () =>
-  useApiQuery("/compliance-components/", {});
+// The compliance components which apply to the scope, including the inherited ones.
+export const useComplianceComponents = (scope: ComplianceScope) =>
+  useSWR<ComplianceComponentDetailsDTO[]>(
+    `${complianceScopeBaseUrl(scope)}compliance-components/`,
+    fetcher,
+  );
 
 // Not on the generated client: the list and stats routes take dynamic
 // filterQuery[field][op] keys, which OpenAPI cannot express.

@@ -4,13 +4,23 @@
 "use client";
 
 import ComplianceComponentsListView from "@/components/compliance-posturers/ComplianceComponentsListView";
+import useDecodedParams from "@/hooks/useDecodedParams";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 
 const Index = () => {
+  const { organizationSlug } = useDecodedParams() as {
+    organizationSlug: string;
+  };
+
   const activeOrg = useActiveOrg();
   const orgName = activeOrg.name;
 
-  return <ComplianceComponentsListView contextName={orgName} />;
+  const scope = {
+    level: "organization",
+    organization: organizationSlug,
+  } as const;
+
+  return <ComplianceComponentsListView scope={scope} contextName={orgName} />;
 };
 
 export default Index;
