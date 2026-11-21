@@ -10,6 +10,8 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import type { ProxyScope } from "@/hooks/useDependencyProxy";
 import { useDependencyProxy } from "@/hooks/useDependencyProxy";
+import { useSecrets } from "@/hooks/useSecrets";
+import Link from "next/link";
 import { toast } from "@/lib/toast";
 import { InputWithButton } from "../ui/input-with-button";
 import type { Diagnostic } from "@codemirror/lint";
@@ -40,7 +42,17 @@ const rulesPlaceholder = `# Available fields: pkg.name, pkg.version, pkg.purl, p
 #     expr: pkg.name.startsWith("@evil-scope/")
 #
 # registries:
-#   npm: https://nexus.example.com/repository/npm/
+#   npm:
+#     # packages of these scopes are loaded from this registry.
+#     # Quote the scopes, YAML does not allow a plain @ at the start of a value.
+#     - url: https://npm.example.com
+#       scopes: ["@example", "@example-internal"]
+#       # optional - $npm_token references a secret of this organization, project or repository
+#       auth:
+#         type: token
+#         token: $npm_token
+#     # an entry without scopes is the fallback for all other packages
+#     - url: https://nexus.example.com/repository/npm/
 #   deb:
 #     url: https://deb.example.com
 #     # optional - the key(s) the upstream Release is signed with.
@@ -82,10 +94,30 @@ const exampleRules = [
   expr: pkg.ecosystem == "pypi"`,
   },
   {
-    label: "Block npm publisher changes",
-    rule: `- name: publisher-changed
+    label: "Pin an npm scope to its registry",
+    rule: `- name: company-scope-registry
   action: deny
-  expr: has(pkg.publisher) && pkg.publisher.changedSinceLastVersion`,
+  expr: pkg.name.startsWith("@company/") && pkg.registry != "https://npm.company.com"`,
+  },
+  {
+    label: "npm registry with token auth",
+    rule: `registries:
+  npm:
+    - url: https://npm.company.com
+      scopes: ["@company"]
+      auth:
+        type: token
+        token: $npm_token`,
+  },
+  {
+    label: "Maven registry with login auth",
+    rule: `registries:
+  maven:
+    url: https://company.maven.com
+    auth:
+      type: login
+      username: ci-user
+      password: $nexus_password`,
   },
 ];
 
@@ -127,13 +159,28 @@ const getEcosystemContent = (key: string, url: string) => {
               codeString={`npmRegistryServer: "${url}"`}
             />
           </div>
-          <Callout intent="warning">
-            If your project already has a{" "}
-            <code className="font-mono text-sm">package-lock.json</code>, it may
-            still contain the original download URLs. Delete the lock file and
-            run <code className="font-mono text-sm">npm install</code> once to
-            rewrite it with the proxy URLs.
-          </Callout>
+          <div className="flex flex-col gap-2">
+            <Callout intent="warning">
+              If your project already has a{" "}
+              <code className="font-mono text-sm">package-lock.json</code>, it
+              may still contain the original download URLs. Delete the lock file
+              and run <code className="font-mono text-sm">npm install</code>{" "}
+              once to rewrite it with the proxy URLs.
+            </Callout>
+            <Callout intent="info">
+              To load scoped packages from a private registry, list several
+              registries under{" "}
+              <code className="font-mono text-sm">registries.npm</code> in the
+              proxy configuration. Each entry can set{" "}
+              <code className="font-mono text-sm">scopes</code> and an{" "}
+              <code className="font-mono text-sm">auth</code> block (
+              <code className="font-mono text-sm">token</code> or{" "}
+              <code className="font-mono text-sm">login</code>) that references
+              secrets as <code className="font-mono text-sm">$name</code>. All
+              other packages use the entry without scopes, or the public npm
+              registry.
+            </Callout>
+          </div>
         </div>
       );
 
@@ -231,7 +278,14 @@ default = true`}
             upstream registry under{" "}
             <code className="font-mono text-sm">registries</code> in the proxy
             configuration that serves all of them, for example a Nexus or
-            Artifactory group repository.
+            Artifactory group repository. If it requires credentials, add an{" "}
+            <code className="font-mono text-sm">auth</code> block (
+            <code className="font-mono text-sm">token</code> or{" "}
+            <code className="font-mono text-sm">login</code>) that references
+            secrets as <code className="font-mono text-sm">$name</code>. Maven
+            supports a single upstream registry, so{" "}
+            <code className="font-mono text-sm">registries.maven</code> is one
+            entry, not a list.
           </Callout>
         </div>
       );
@@ -445,6 +499,17 @@ ${url}/v3.20/community`}
   }
 };
 
+const secretsSettingsPath = (scope: ProxyScope) => {
+  switch (scope.level) {
+    case "organization":
+      return `/${scope.organization}/settings/secrets`;
+    case "project":
+      return `/${scope.organization}/projects/${scope.projectSlug}/settings/secrets`;
+    case "asset":
+      return `/${scope.organization}/projects/${scope.projectSlug}/assets/${scope.assetSlug}/settings/secrets`;
+  }
+};
+
 interface Props {
   scope: ProxyScope | null;
   forceVertical?: boolean;
@@ -452,6 +517,8 @@ interface Props {
 
 const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
   const { config: data, proxyUrls, saveConfig } = useDependencyProxy(scope);
+  const { data: secrets = [] } = useSecrets(scope);
+  const availableSecrets = secrets.filter((secret) => !secret.overridden);
 
   const [rulesText, setRulesText] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);
@@ -614,6 +681,30 @@ const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
             </div>
           </div>
           {codeError && <p className="text-sm text-destructive">{codeError}</p>}
+          {scope && (
+            <p className="text-sm text-muted-foreground">
+              {availableSecrets.length > 0 ? (
+                <>
+                  Available secrets:{" "}
+                  {availableSecrets.map((secret, i) => (
+                    <span key={secret.id}>
+                      {i > 0 && ", "}
+                      <code className="font-mono">${secret.name}</code>
+                    </span>
+                  ))}
+                  .{" "}
+                </>
+              ) : (
+                "No secrets available yet. "
+              )}
+              <Link
+                href={secretsSettingsPath(scope)}
+                className="underline hover:text-foreground"
+              >
+                Manage secrets
+              </Link>
+            </p>
+          )}
         </Section>
         <div className="flex justify-end pt-2">
           <Button
