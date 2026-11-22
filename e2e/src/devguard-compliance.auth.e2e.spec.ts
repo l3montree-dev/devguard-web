@@ -43,6 +43,7 @@ test.describe("DevGuard compliance posture flows", () => {
   test("open a compliance posture whose control id contains a plus", async () => {
     await devguardPOM.org().createOrganization(`Test Org ${Date.now()}`);
     await devguardPOM.compliance().openOrgCompliancePostures();
+    await devguardPOM.compliance().activateDefaultCatalog("Grundschutz++");
     await devguardPOM.compliance().openCompliancePostureWithPlusInControlID();
   });
 });

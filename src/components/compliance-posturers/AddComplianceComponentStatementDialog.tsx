@@ -22,7 +22,10 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/lib/toast";
 import type { PostureScope } from "@/services/compliancePostureService";
-import { createStatement } from "@/services/compliancePostureService";
+import {
+  createStatement,
+  toComplianceScope,
+} from "@/services/compliancePostureService";
 import type { ImplementationStatus } from "@/types/view/compliance";
 import type { ComplianceComponentImplementsControlStatementDTO } from "@/types/dto";
 import type { Dispatch, FunctionComponent, SetStateAction } from "react";
@@ -50,7 +53,8 @@ interface Props {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   scope: PostureScope;
-  frameworkControlId: string;
+  controlHash: string;
+  frameworkControlIds: string[];
   attachedComponentIds: string[];
   onCreated: (
     statement: ComplianceComponentImplementsControlStatementDTO,
@@ -61,16 +65,18 @@ const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
   open,
   setOpen,
   scope,
-  frameworkControlId,
+  controlHash,
+  frameworkControlIds,
   attachedComponentIds,
   onCreated,
 }) => {
   const { data: allComponents } = useComplianceComponentsForControl(
-    open ? frameworkControlId : undefined,
+    toComplianceScope(scope),
+    open ? frameworkControlIds : undefined,
   );
 
   const components = useMemo(
-    () => allComponents?.filter((c) => !attachedComponentIds.includes(c.uuid)),
+    () => allComponents?.filter((c) => !attachedComponentIds.includes(c.id)),
     [allComponents, attachedComponentIds],
   );
 
@@ -81,16 +87,16 @@ const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
   const [description, setDescription] = useState("");
 
   const selectedComponent = useMemo(
-    () => components?.find((c) => c.uuid === componentId),
+    () => components?.find((c) => c.id === componentId),
     [components, componentId],
   );
 
   const implementsControlDescription = useMemo(
     () =>
-      selectedComponent?.implementedControls.find(
-        (ic) => ic.frameworkControlId === frameworkControlId,
+      selectedComponent?.implementedControls?.find((ic) =>
+        frameworkControlIds.includes(ic.frameworkControlId),
       )?.description,
-    [selectedComponent, frameworkControlId],
+    [selectedComponent, frameworkControlIds],
   );
 
   const reset = () => {
@@ -107,7 +113,7 @@ const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
 
     let json: ComplianceComponentImplementsControlStatementDTO;
     try {
-      json = (await createStatement(scope, frameworkControlId, componentId, {
+      json = (await createStatement(scope, controlHash, componentId, {
         implementationStatus: status,
         description,
       })) as ComplianceComponentImplementsControlStatementDTO;
@@ -146,7 +152,7 @@ const AddComplianceComponentStatementDialog: FunctionComponent<Props> = ({
               </SelectTrigger>
               <SelectContent>
                 {(components ?? []).map((c) => (
-                  <SelectItem key={c.uuid} value={c.uuid}>
+                  <SelectItem key={c.id} value={c.id}>
                     <span className="flex flex-row items-center gap-2">
                       <ComplianceComponentIcon title={c.title} size="sm" />
                       {c.title}

@@ -9,6 +9,7 @@ import type { CompliancePostureWithControlDTO } from "@/types/dto";
 import { flexRender } from "@tanstack/react-table";
 
 import { useRouter } from "next/navigation";
+import { uniqBy } from "lodash";
 import { useMemo } from "react";
 import type { FunctionComponent } from "react";
 import { classNames } from "@/utils/common";
@@ -23,7 +24,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import type { PostureScope } from "@/services/compliancePostureService";
-import { postureBaseUrl } from "@/services/compliancePostureService";
+import {
+  postureBaseUrl,
+  toComplianceScope,
+} from "@/services/compliancePostureService";
 import {
   useComplianceComponents,
   useCompliancePostures,
@@ -35,15 +39,15 @@ import useTable from "@/hooks/useTable";
 import { createAppColumnHelper } from "@/hooks/useTable";
 import type { TableColumnDef } from "@/hooks/useTable";
 import { buildFilterSearchParams } from "@/utils/url";
-import { Loader2, Download, Component } from "lucide-react";
-import Link from "next/link";
+import { Loader2, Download, Library } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import FrameworkSelect from "./FrameworkSelect";
 import FrameworkIcon from "./FrameworkIcon";
 import ComplianceStats from "./ComplianceStats";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useActiveOrg } from "@/hooks/useActiveOrg";
 import OscalDownloadModal from "./OscalDownloadModal";
+import ComplianceDocumentsModal from "./ComplianceDocumentsModal";
+import type { ComplianceDocumentsTab } from "./ComplianceDocumentsModal";
 import { useState } from "react";
 import { FlatBadge } from "../common/Severity";
 import { importanceVariant } from "./CompliancePostureDetailView";
@@ -68,20 +72,21 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const asset = useActiveAsset();
-  const org = useActiveOrg();
 
-  const { data: components } = useComplianceComponents();
+  const { data: components } = useComplianceComponents(
+    toComplianceScope(scope),
+  );
 
   const componentsByControl = useMemo(() => {
     const map = new Map<
       string,
-      { uuid: string; title: string; description: string }[]
+      { id: string; title: string; description: string }[]
     >();
     for (const component of components ?? []) {
       for (const ic of component.implementedControls) {
         const existing = map.get(ic.frameworkControlId) ?? [];
         existing.push({
-          uuid: component.uuid,
+          id: component.id,
           title: component.title,
           description: ic.description,
         });
@@ -90,14 +95,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
     }
     return map;
   }, [components]);
-
-  const activeFrameworkFilter = useMemo(() => {
-    if (!searchParams) return null;
-    for (const [key, value] of searchParams.entries()) {
-      if (key.startsWith("filterQuery[framework]")) return value;
-    }
-    return null;
-  }, [searchParams]);
 
   const columnsDef: TableColumnDef<CompliancePostureWithControlDTO, any>[] =
     useMemo(
@@ -123,14 +120,21 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
             </div>
           ),
         }),
-        columnHelper.accessor("framework", {
+        columnHelper.accessor("frameworks", {
           header: "Framework",
-          id: "framework",
+          id: "frameworks",
           enableSorting: true,
           cell: (info) => (
-            <div className="flex flex-row items-center gap-2">
-              <FrameworkIcon framework={info.getValue()} />
-              <span className="whitespace-nowrap">{info.getValue()}</span>
+            <div className="flex flex-col gap-1">
+              {(info.getValue() ?? []).map((framework: string) => (
+                <div
+                  key={framework}
+                  className="flex flex-row items-center gap-2"
+                >
+                  <FrameworkIcon framework={framework} />
+                  <span className="whitespace-nowrap">{framework}</span>
+                </div>
+              ))}
             </div>
           ),
         }),
@@ -174,19 +178,25 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
               </div>
             ),
         }),
-        columnHelper.accessor("frameworkControlId", {
+        columnHelper.accessor("frameworkControlIds", {
           header: "Component",
           id: "component",
           enableSorting: false,
           cell: (info) => {
-            const solvingComponents = componentsByControl.get(info.getValue());
-            if (!solvingComponents?.length) {
+            const solvingComponents = uniqBy(
+              (info.getValue() as string[]).flatMap(
+                (frameworkControlId) =>
+                  componentsByControl.get(frameworkControlId) ?? [],
+              ),
+              "id",
+            );
+            if (!solvingComponents.length) {
               return <span className="text-muted-foreground"></span>;
             }
             return (
               <div className="flex flex-row flex-wrap gap-1">
                 {solvingComponents.map((c) => (
-                  <Tooltip key={c.uuid}>
+                  <Tooltip key={c.id}>
                     <TooltipTrigger onClick={(e) => e.stopPropagation()}>
                       <Badge
                         variant="outline"
@@ -206,62 +216,9 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
             );
           },
         }),
-        columnHelper.accessor("mappedControls", {
-          header: "Mapped Controls",
-          id: "mapped_controls",
-          enableSorting: false,
-          cell: (info) => {
-            const controls = info.getValue() ?? [];
-            if (!controls.length) return null;
-            const sorted = (
-              activeFrameworkFilter
-                ? [...controls].sort((a, b) => {
-                    const aMatch =
-                      a.relatedFramework === activeFrameworkFilter ? -1 : 0;
-                    const bMatch =
-                      b.relatedFramework === activeFrameworkFilter ? -1 : 0;
-                    return aMatch - bMatch;
-                  })
-                : controls
-            ).slice(0, 5);
-            const remaining = controls.length - sorted.length;
-            return (
-              <div className="flex flex-wrap gap-1">
-                {sorted.map(
-                  (c: {
-                    relatedFramework: string;
-                    relatedControlId: string;
-                  }) => {
-                    const label = `${c.relatedFramework}:${c.relatedControlId}`;
-                    const isActive =
-                      activeFrameworkFilter &&
-                      c.relatedFramework === activeFrameworkFilter;
-                    return (
-                      <Badge
-                        key={label}
-                        variant={isActive ? "secondary" : "outline"}
-                        className="whitespace-nowrap font-mono text-xs"
-                      >
-                        {label}
-                      </Badge>
-                    );
-                  },
-                )}
-                {remaining > 0 && (
-                  <Badge
-                    variant="outline"
-                    className="whitespace-nowrap text-xs"
-                  >
-                    +{remaining} more
-                  </Badge>
-                )}
-              </div>
-            );
-          },
-        }),
       ],
 
-      [activeFrameworkFilter, componentsByControl],
+      [componentsByControl],
     );
 
   const query = useMemo(() => {
@@ -276,8 +233,8 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
   }, [searchParams]);
 
   const {
-    postures: { data: vulns, isLoading },
-    stats: { data: stats, isLoading: statsLoading },
+    postures: { data: vulns, isLoading, mutate: mutatePostures },
+    stats: { data: stats, isLoading: statsLoading, mutate: mutateStats },
   } = useCompliancePostures(scope, query);
 
   const isClosed = searchParams?.get("state") === "closed";
@@ -291,6 +248,13 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
 
   const { branches, tags } = useAssetBranchesAndTags();
   const [showOscalModal, setShowOscalModal] = useState(false);
+  const [showDocumentsModal, setShowDocumentsModal] = useState(false);
+  const [documentsTab, setDocumentsTab] =
+    useState<ComplianceDocumentsTab>("catalogs");
+  const openDocumentsModal = (tab: ComplianceDocumentsTab) => {
+    setDocumentsTab(tab);
+    setShowDocumentsModal(true);
+  };
 
   const params = useSearchParams();
   const pathname = usePathname();
@@ -333,11 +297,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         operators: [{ value: "ilike", label: "is" }],
       },
       {
-        label: "Mapped Framework",
-        value: "mapped_framework",
-        operators: [{ value: "ilike", label: "contains" }],
-      },
-      {
         label: "Solvable by Component",
         value: "has_component_coverage",
         operators: [{ value: "is" }],
@@ -367,14 +326,6 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       <div className="flex flex-row items-center justify-between">
         {asset && <BranchTagSelector branches={branches} tags={tags} />}
         <div className="ml-auto flex flex-row gap-2">
-          {org && (
-            <Link href={`/${org.slug}/compliance-postures/components`}>
-              <Button variant="secondary">
-                <Component className="mr-2 h-4 w-4" />
-                See all components
-              </Button>
-            </Link>
-          )}
           <Button
             variant="secondary"
             onClick={() => setShowOscalModal(true)}
@@ -383,6 +334,14 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
             <Download className="mr-2 h-4 w-4" />
             Download OSCAL
           </Button>
+          <Button
+            variant="default"
+            onClick={() => openDocumentsModal("catalogs")}
+            data-testid="manage-catalogs-and-components"
+          >
+            <Library className="mr-2 h-4 w-4" />
+            Manage frameworks
+          </Button>
         </div>
       </div>
       <OscalDownloadModal
@@ -390,6 +349,18 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
         setOpen={setShowOscalModal}
         oscalBaseUrl={TUNNEL_BASE_URL + postureBaseUrl(scope) + `oscal/`}
         frameworks={frameworks}
+      />
+      <ComplianceDocumentsModal
+        open={showDocumentsModal}
+        setOpen={setShowDocumentsModal}
+        tab={documentsTab}
+        setTab={setDocumentsTab}
+        scope={toComplianceScope(scope)}
+        componentsHref={`${pathname}/components`}
+        onChange={() => {
+          mutatePostures();
+          mutateStats();
+        }}
       />
       <Section
         forceVertical
@@ -444,10 +415,22 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
       </Section>
       {!vulns?.data.length ? (
         <div>
-          <EmptyParty
-            title="No matching results."
-            description="Try adjusting your search or filter to find what you're looking for."
-          />
+          {vulns && frameworks.length === 0 ? (
+            <EmptyParty
+              title="No catalogs activated."
+              description="Activate an OSCAL catalog to track its controls as compliance postures."
+              Button={
+                <Button onClick={() => openDocumentsModal("catalogs")}>
+                  Manage catalogs
+                </Button>
+              }
+            />
+          ) : (
+            <EmptyParty
+              title="No matching results."
+              description="Try adjusting your search or filter to find what you're looking for."
+            />
+          )}
           <div className="mt-4">{vulns && <CustomPagination {...vulns} />}</div>
         </div>
       ) : (
@@ -520,7 +503,7 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
                       <tr
                         onClick={() =>
                           router?.push(
-                            pathname + "/" + row.original.frameworkControlId,
+                            pathname + "/" + row.original.controlHash,
                           )
                         }
                         className={classNames(
@@ -529,11 +512,12 @@ const CompliancePosturesListView: FunctionComponent<Props> = ({
                           i % 2 != 0 && "bg-card/50",
                           "hover:bg-muted",
                         )}
-                        key={row.original.frameworkControlId}
+                        key={row.original.controlHash}
                         data-testid="compliance-posture-row"
-                        data-framework-control-id={
-                          row.original.frameworkControlId
-                        }
+                        data-control-hash={row.original.controlHash}
+                        data-framework-control-ids={row.original.frameworkControlIds?.join(
+                          " ",
+                        )}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <td className="p-4" key={cell.id}>

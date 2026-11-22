@@ -9,6 +9,7 @@ import type { PostureScope } from "@/services/compliancePostureService";
 import {
   createPostureEvent,
   deleteStatement,
+  toComplianceScope,
 } from "@/services/compliancePostureService";
 import {
   useComplianceComponentsForControl,
@@ -33,15 +34,11 @@ import { useSession } from "@/context/SessionContext";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 
-import type {
-  BadgeVariant,
-  ControlRelationship,
-} from "@/types/view/compliance";
+import type { BadgeVariant } from "@/types/view/compliance";
 
 function securityLevelVariant(value: string): BadgeVariant {
   if (value === "erhöht") return "MEDIUM";
@@ -85,11 +82,6 @@ import VulnState from "@/components/common/VulnState";
 import GitProviderIcon from "@/components/GitProviderIcon";
 import EditorSkeleton from "@/components/risk-assessment/EditorSkeleton";
 import RiskAssessmentFeedSkeleton from "@/components/risk-assessment/RiskAssessmentFeedSkeleton";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -100,7 +92,6 @@ import { useActiveAssetVersion } from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useDeleteEvent } from "@/hooks/useDeleteEvent";
 import { getIntegrationNameFromRepositoryIdOrExternalProviderId } from "@/utils/view";
-import { ChevronRightIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { toast } from "@/lib/toast";
 import {
@@ -108,12 +99,6 @@ import {
   validateJustification,
 } from "@/utils/justificationValidator";
 import FrameworkIcon from "./FrameworkIcon";
-import {
-  EquivalentToIcon,
-  IntersectsWithIcon,
-  SubsetOfIcon,
-  SupersetOfIcon,
-} from "./SetRelationshipIcons";
 
 import useDecodedParams from "@/hooks/useDecodedParams";
 import Callout from "../common/Callout";
@@ -124,89 +109,21 @@ const MarkdownEditor = dynamic(
   { ssr: false },
 );
 
-const relationshipDescription: Record<ControlRelationship, string> = {
-  "equivalent-to": "This control is equivalent to the related control.",
-  "intersects-with":
-    "This control partially overlaps with the related control.",
-  "subset-of": "This control is a subset of the related control.",
-  "superset-of": "This control is a superset of the related control.",
+// where the default catalogs come from and under which license they are published
+const frameworkSources: Record<string, { href: string; license: string }> = {
+  "Grundschutz++": {
+    href: "https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/tree/main/Anwenderkataloge/Grundschutz%2B%2B",
+    license: "CC-BY-4.0",
+  },
+  "BSI-Anforderungen-zum-Risikomanagement": {
+    href: "https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Risikomanagement/BSI-Anforderungen-zum-Risikomanagement-catalog.json",
+    license: "CC-BY-4.0",
+  },
+  Lieferkettensicherheit: {
+    href: "https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Lieferkettensicherheit/Lieferkettensicherheit-resolved_catalog.json",
+    license: "CC-BY-4.0",
+  },
 };
-
-function RelationshipIcon({
-  relationship,
-}: {
-  relationship: ControlRelationship;
-}) {
-  const className = "h-4 w-4";
-  switch (relationship) {
-    case "equivalent-to":
-      return <EquivalentToIcon className={className} />;
-    case "intersects-with":
-      return <IntersectsWithIcon className={className} />;
-    case "subset-of":
-      return <SubsetOfIcon className={className} />;
-    case "superset-of":
-      return <SupersetOfIcon className={className} />;
-    default:
-      return null;
-  }
-}
-
-function MappedControlsGroup({
-  framework,
-  controls,
-}: {
-  framework: string;
-  controls: { relatedControlId: string; relationship: ControlRelationship }[];
-}) {
-  const [open, setOpen] = useState(false);
-  const pathname = usePathname() ?? "";
-  const basePath = pathname.substring(0, pathname.lastIndexOf("/"));
-  return (
-    <Collapsible open={open} onOpenChange={setOpen} className="mb-2 w-full">
-      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
-        <ChevronRightIcon
-          className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`}
-        />
-
-        <span className="text-start">{framework}</span>
-        <span className="ml-1 text-xs text-muted-foreground whitespace-nowrap">
-          ({controls.length})
-        </span>
-      </CollapsibleTrigger>
-      <CollapsibleContent className="mt-1 flex flex-wrap">
-        {controls.map(({ relatedControlId, relationship }) => (
-          <Tooltip key={relatedControlId}>
-            <TooltipTrigger asChild>
-              {framework === "Grundschutz" ? (
-                <Badge
-                  variant="secondary"
-                  className="mr-2 mb-2 flex cursor-default items-center gap-1"
-                >
-                  <RelationshipIcon relationship={relationship} />
-                  {relatedControlId}
-                </Badge>
-              ) : (
-                <Link href={`${basePath}/${framework}:${relatedControlId}`}>
-                  <Badge
-                    variant="secondary"
-                    className="mr-2 mb-2 flex cursor-default items-center gap-1"
-                  >
-                    <RelationshipIcon relationship={relationship} />
-                    {relatedControlId}
-                  </Badge>
-                </Link>
-              )}
-            </TooltipTrigger>
-            <TooltipContent>
-              {relationshipDescription[relationship]}
-            </TooltipContent>
-          </Tooltip>
-        ))}
-      </CollapsibleContent>
-    </Collapsible>
-  );
-}
 
 interface Props {
   scope: PostureScope;
@@ -277,7 +194,8 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
   } = useCompliancePosture(scope, vulnId);
 
   const { data: availableComponents } = useComplianceComponentsForControl(
-    vuln?.frameworkControlId,
+    toComplianceScope(scope),
+    vuln?.frameworkControlIds,
   );
 
   const attachedComponentIds = useMemo(
@@ -288,7 +206,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
   const hasAttachableComponents = useMemo(
     () =>
       (availableComponents ?? []).some(
-        (c) => !attachedComponentIds.includes(c.uuid),
+        (c) => !attachedComponentIds.includes(c.id),
       ),
     [availableComponents, attachedComponentIds],
   );
@@ -434,7 +352,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
       async (current) => {
         const json = (await createPostureEvent(
           scope,
-          vuln.frameworkControlId,
+          vuln.controlHash,
           data,
         )) as unknown as DetailedComplianceRiskDTO;
 
@@ -489,6 +407,9 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
     await deleteEvent(eventId);
     mutate();
   };
+  // Currently the links in the Grundschutz++ catalog are wrong, so we don't want to link them here — we can remove this condition once the report gets updated
+  const linkNamespaces = !vuln.frameworks?.includes("Grundschutz++");
+
   return (
     <Page title={vuln.title}>
       <div className="flex flex-row gap-4">
@@ -560,9 +481,11 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                   </Link>
                 )}
                 <VulnState state={vuln.state} />
-                <Badge key={vuln.framework} variant={"secondary"}>
-                  {vuln.framework}
-                </Badge>
+                {vuln.frameworks?.map((framework) => (
+                  <Badge key={framework} variant={"secondary"}>
+                    {framework}
+                  </Badge>
+                ))}
               </div>
 
               {availableComponents && availableComponents.length > 0 && (
@@ -590,13 +513,14 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                             {
                               <div className="flex mt-2 flex-wrap gap-2">
                                 {availableComponents.map((c) => {
-                                  const claim = c.implementedControls.find(
+                                  const claim = c.implementedControls?.find(
                                     (ic) =>
-                                      ic.frameworkControlId ===
-                                      vuln.frameworkControlId,
+                                      vuln.frameworkControlIds?.includes(
+                                        ic.frameworkControlId,
+                                      ),
                                   );
                                   return (
-                                    <Tooltip key={c.uuid}>
+                                    <Tooltip key={c.id}>
                                       <TooltipTrigger asChild>
                                         <Badge
                                           variant="outline"
@@ -627,12 +551,13 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                       <div className="flex mt-2 flex-col gap-2">
                         {vuln.byComponents.map((statement) => {
                           const component = availableComponents.find(
-                            (c) => c.uuid === statement.complianceComponentId,
+                            (c) => c.id === statement.complianceComponentId,
                           );
 
-                          const control = component?.implementedControls.find(
+                          const control = component?.implementedControls?.find(
                             (ic) =>
-                              ic.frameworkControlId === vuln.frameworkControlId,
+                              ic.frameworkControlId ===
+                              statement.frameworkControlId,
                           );
                           if (!control || !component) return null;
 
@@ -686,7 +611,8 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                     open={showAddComponent}
                     setOpen={setShowAddComponent}
                     scope={scope}
-                    frameworkControlId={vuln.frameworkControlId}
+                    controlHash={vuln.controlHash}
+                    frameworkControlIds={vuln.frameworkControlIds ?? []}
                     attachedComponentIds={(vuln.byComponents ?? []).map(
                       (s) => s.complianceComponentId,
                     )}
@@ -735,7 +661,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
               {vuln.events && vuln.events.length > 0 && (
                 <div className="mt-16">
                   <RiskAssessmentFeed
-                    vulnerabilityName={vuln.frameworkControlId}
+                    vulnerabilityName={vuln.controlId}
                     events={vuln.events}
                     page="compliance-posture"
                     deleteEvent={handleDeleteEvent}
@@ -968,58 +894,30 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
               <div className="rounded-lg border bg-card p-4">
                 <div className="flex items-center gap-3">
                   <FrameworkIcon
-                    framework={vuln.framework}
+                    framework={vuln.frameworks?.[0] ?? ""}
                     className="h-10 w-10 shrink-0"
                   />
                   <div>
-                    {vuln.framework && vuln.framework === "SCF" ? (
-                      <Link
-                        className="text-xs text-muted-foreground"
-                        href="https://securecontrolsframework.com/"
-                        target="_blank"
-                      >
-                        {vuln.framework} (CC-BY-ND-4.0)
-                      </Link>
-                    ) : vuln.framework && vuln.framework === "Grundschutz++" ? (
-                      <Link
-                        className="text-xs text-muted-foreground"
-                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/tree/main/Anwenderkataloge/Grundschutz%2B%2B"
-                        target="_blank"
-                      >
-                        {vuln.framework} (CC-BY-4.0)
-                      </Link>
-                    ) : vuln.framework && vuln.framework === "ISO27001" ? (
-                      <Link
-                        className="text-xs text-muted-foreground"
-                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/ISO27001/ISO27001-AnnexA-catalog.json"
-                        target="_blank"
-                      >
-                        {vuln.framework} (CC-BY-4.0)
-                      </Link>
-                    ) : vuln.framework &&
-                      vuln.framework ===
-                        "BSI-Anforderungen-zum-Risikomanagement" ? (
-                      <Link
-                        className="text-xs text-muted-foreground"
-                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Risikomanagement/BSI-Anforderungen-zum-Risikomanagement-catalog.json"
-                        target="_blank"
-                      >
-                        {vuln.framework} (CC-BY-4.0)
-                      </Link>
-                    ) : vuln.framework &&
-                      vuln.framework === "Lieferkettensicherheit" ? (
-                      <Link
-                        className="text-xs text-muted-foreground"
-                        href="https://github.com/BSI-Bund/Stand-der-Technik-Bibliothek/blob/main/control_layer/Lieferkettensicherheit/Lieferkettensicherheit-resolved_catalog.json"
-                        target="_blank"
-                      >
-                        {vuln.framework} (CC-BY-4.0)
-                      </Link>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {vuln.framework}
-                      </p>
-                    )}
+                    {vuln.frameworks?.map((framework) => {
+                      const source = frameworkSources[framework];
+                      return source ? (
+                        <Link
+                          key={framework}
+                          className="block text-xs text-muted-foreground"
+                          href={source.href}
+                          target="_blank"
+                        >
+                          {framework} ({source.license})
+                        </Link>
+                      ) : (
+                        <p
+                          key={framework}
+                          className="text-xs text-muted-foreground"
+                        >
+                          {framework}
+                        </p>
+                      );
+                    })}
                     <p className="font-semibold">{vuln.controlId}</p>
                   </div>
                 </div>
@@ -1050,9 +948,8 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                             vuln.additional.security_level.value,
                           )}
                         >
-                          {/* Currently the links in the Grundschutz++ catalog are wrong, so we don't want to link them here — we can remove this condition once the report gets updated */}
                           {vuln.additional.security_level.ns &&
-                          vuln.framework !== "Grundschutz++" ? (
+                          linkNamespaces ? (
                             <Link
                               href={vuln.additional.security_level.ns}
                               target="_blank"
@@ -1094,8 +991,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                             vuln.additional.importance.value,
                           )}
                         >
-                          {vuln.additional.importance.ns &&
-                          vuln.framework !== "Grundschutz++" ? (
+                          {vuln.additional.importance.ns && linkNamespaces ? (
                             <Link
                               href={vuln.additional.importance.ns}
                               target="_blank"
@@ -1134,8 +1030,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                             vuln.additional.effort_level.value,
                           )}
                         >
-                          {vuln.additional.effort_level.ns &&
-                          vuln.framework !== "Grundschutz++" ? (
+                          {vuln.additional.effort_level.ns && linkNamespaces ? (
                             <Link
                               href={vuln.additional.effort_level.ns}
                               target="_blank"
@@ -1167,8 +1062,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                     <div className="flex flex-col items-start justify-between border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Tags</dt>
                       <dd className="font-medium">
-                        {vuln.additional.tags.ns &&
-                        vuln.framework !== "Grundschutz++"
+                        {vuln.additional.tags.ns && linkNamespaces
                           ? vuln.additional.tags.value
                               .split(",")
                               .map((tag: string) => (
@@ -1219,8 +1113,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                         Documentation
                       </dt>
                       <dd className="font-medium">
-                        {vuln.additional.documentation.ns &&
-                        vuln.framework !== "Grundschutz++" ? (
+                        {vuln.additional.documentation.ns && linkNamespaces ? (
                           <Link
                             href={vuln.additional.documentation.ns}
                             target="_blank"
@@ -1248,8 +1141,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                     <div className="flex flex-col items-start justify-betweens border-t py-3 gap-2">
                       <dt className="text-xs text-muted-foreground">Result</dt>
                       <dd className="font-medium">
-                        {vuln.additional.result.ns &&
-                        vuln.framework !== "Grundschutz++" ? (
+                        {vuln.additional.result.ns && linkNamespaces ? (
                           <Link
                             href={vuln.additional.result.ns}
                             target="_blank"
@@ -1276,7 +1168,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                       </dt>
                       <dd className="font-medium">
                         {vuln.additional.result_specification.ns &&
-                        vuln.framework !== "Grundschutz++" ? (
+                        linkNamespaces ? (
                           <Link
                             href={vuln.additional.result_specification.ns}
                             target="_blank"
@@ -1297,44 +1189,6 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                             }
                           />
                         )}
-                      </dd>
-                    </div>
-                  )}
-                  {vuln.mappedControls?.length > 0 && (
-                    <div className="flex flex-col items-start justify-between gap-2 border-t py-3">
-                      <dt className="text-xs text-muted-foreground">
-                        Mapped Controls
-                      </dt>
-                      <dd className="font-medium w-full">
-                        {Object.entries(
-                          (
-                            vuln.mappedControls as {
-                              relatedFramework: string;
-                              relatedControlId: string;
-                              relationship: ControlRelationship;
-                            }[]
-                          ).reduce<
-                            Record<
-                              string,
-                              {
-                                relatedControlId: string;
-                                relationship: ControlRelationship;
-                              }[]
-                            >
-                          >((acc, control) => {
-                            (acc[control.relatedFramework] ??= []).push({
-                              relatedControlId: control.relatedControlId,
-                              relationship: control.relationship,
-                            });
-                            return acc;
-                          }, {}),
-                        ).map(([framework, controls]) => (
-                          <MappedControlsGroup
-                            key={framework}
-                            framework={framework}
-                            controls={controls}
-                          />
-                        ))}
                       </dd>
                     </div>
                   )}

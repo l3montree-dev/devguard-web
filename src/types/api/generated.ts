@@ -1050,81 +1050,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/compliance-components/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List all compliance components */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path?: never;
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"][];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/compliance-components/{complianceComponentID}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get compliance component details */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Compliance component ID */
-          complianceComponentID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/dependency-proxy/{secret}/apk/{path}": {
     parameters: {
       query?: never;
@@ -1911,14 +1836,14 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/oauth2/gitlab/callback/{integrationName}": {
+  "/oauth2/gitlab/{integrationName}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** GitLab OAuth2 callback */
+    /** GitLab OAuth2 login */
     get: {
       parameters: {
         query?: never;
@@ -1948,14 +1873,14 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/oauth2/gitlab/{integrationName}": {
+  "/oauth2/gitlab/callback/{integrationName}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** GitLab OAuth2 login */
+    /** GitLab OAuth2 callback */
     get: {
       parameters: {
         query?: never;
@@ -2134,6 +2059,167 @@ export interface paths {
     };
     trace?: never;
   };
+  "/organizations/{organization}/compliance-components/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the compliance components which apply to the organization */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-components/{complianceComponentID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get compliance component details */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Compliance component ID */
+          complianceComponentID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-components/definitions/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Upload a component definition for the organization */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      /** @description OSCAL component definition */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.saveComponentDefinitionRequest"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-components/definitions/{name}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a component definition from the organization */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Component definition name */
+          name: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/compliance-postures": {
     parameters: {
       query?: never;
@@ -2168,6 +2254,232 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-postures/{controlHash}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get compliance posture for a control */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Control hash */
+          controlHash: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create a compliance posture event */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Control hash */
+          controlHash: string;
+        };
+        cookie?: never;
+      };
+      /** @description Event data */
+      requestBody: {
+        content: {
+          "application/json": {
+            justification?: string;
+            status?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-postures/{controlHash}/components/{complianceComponentID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a compliance statement for a component */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Control hash */
+          controlHash: string;
+          /** @description Compliance component ID */
+          complianceComponentID: string;
+        };
+        cookie?: never;
+      };
+      /** @description Request body */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.statementPayload"];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-postures/catalogs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the catalogs which apply to the organization */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ScopeFramework"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Activate or upload a catalog for the organization */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      /** @description OSCAL catalog */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.saveCatalogRequest"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/compliance-postures/catalogs/{name}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a catalog from the organization */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Catalog name */
+          name: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -2316,128 +2628,6 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/compliance-postures/{frameworkControlID}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get compliance posture for a framework control */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Framework Control ID */
-          frameworkControlID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
-          };
-        };
-      };
-    };
-    put?: never;
-    /** Create a compliance posture event */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Framework Control ID */
-          frameworkControlID: string;
-        };
-        cookie?: never;
-      };
-      /** @description Event data */
-      requestBody: {
-        content: {
-          "application/json": {
-            justification?: string;
-            status?: string;
-          };
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/compliance-postures/{frameworkControlID}/components/{complianceComponentID}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a compliance statement for a component */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Framework control ID */
-          frameworkControlID: string;
-          /** @description Compliance component ID */
-          complianceComponentID: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["controllers.statementPayload"];
-        };
-      };
-      responses: {
-        /** @description Created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
-          };
-        };
-      };
-    };
     delete?: never;
     options?: never;
     head?: never;
@@ -2925,6 +3115,45 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/integrations/gitlab/{gitlab_integration_id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete a GitLab integration access token */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description GitLab integration ID */
+          gitlab_integration_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/integrations/gitlab/test-and-save/": {
     parameters: {
       query?: never;
@@ -2973,7 +3202,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/integrations/gitlab/{gitlab_integration_id}/": {
+  "/organizations/{organization}/integrations/jira/{jira_integration_id}/": {
     parameters: {
       query?: never;
       header?: never;
@@ -2983,7 +3212,7 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Delete a GitLab integration access token */
+    /** Delete a Jira integration access token */
     delete: {
       parameters: {
         query?: never;
@@ -2991,8 +3220,8 @@ export interface paths {
         path: {
           /** @description Organization slug */
           organization: string;
-          /** @description GitLab integration ID */
-          gitlab_integration_id: string;
+          /** @description Jira integration ID */
+          jira_integration_id: string;
         };
         cookie?: never;
       };
@@ -3061,45 +3290,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/integrations/jira/{jira_integration_id}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete a Jira integration access token */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Jira integration ID */
-          jira_integration_id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/integrations/repositories": {
     parameters: {
       query?: never;
@@ -3134,6 +3324,75 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/webhook/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update webhook integration (org) */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Webhook ID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      /** @description Webhook data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.WebhookUpdateRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.WebhookIntegration"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete webhook integration (org) */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Webhook ID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -3225,75 +3484,6 @@ export interface paths {
       };
     };
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/integrations/webhook/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** Update webhook integration (org) */
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Webhook ID */
-          id: string;
-        };
-        cookie?: never;
-      };
-      /** @description Webhook data */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["dtos.WebhookUpdateRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.WebhookIntegration"];
-          };
-        };
-      };
-    };
-    post?: never;
-    /** Delete webhook integration (org) */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Webhook ID */
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
     options?: never;
     head?: never;
     patch?: never;
@@ -3904,52 +4094,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/search/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Search projects with sub-projects and assets */
-    get: {
-      parameters: {
-        query?: {
-          /** @description Search query */
-          search?: string;
-          /** @description Page number */
-          page?: number;
-          /** @description Page size */
-          pageSize?: number;
-        };
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Project"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}": {
     parameters: {
       query?: never;
@@ -4303,6 +4447,299 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance-components/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the compliance components which apply to the asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance-components/{complianceComponentID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get compliance component details */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Compliance component ID */
+          complianceComponentID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance-components/definitions/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Upload a component definition for the asset */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description OSCAL component definition */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.saveComponentDefinitionRequest"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance-components/definitions/{name}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a component definition from the asset */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Component definition name */
+          name: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance-postures/catalogs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the catalogs which apply to the asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ScopeFramework"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Activate or upload a catalog for the asset */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description OSCAL catalog */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.saveCatalogRequest"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance-postures/catalogs/{name}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a catalog from the asset */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Catalog name */
+          name: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/compliance/{policy}": {
     parameters: {
       query?: never;
@@ -4559,92 +4996,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/csaf/white/changes.csv": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get CSAF changes CSV */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": string;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/csaf/white/index.txt": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get CSAF index file */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": string;
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/csaf/white/{year}": {
     parameters: {
       query?: never;
@@ -4724,6 +5075,92 @@ export interface paths {
             [name: string]: unknown;
           };
           content?: never;
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/csaf/white/changes.csv": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get CSAF changes CSV */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": string;
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/csaf/white/index.txt": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get CSAF index file */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": string;
+          };
         };
       };
     };
@@ -4894,47 +5331,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/external-references/sync": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Sync external sources for all artifacts of an asset version */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/external-references/{url}": {
     parameters: {
       query?: never;
@@ -4973,6 +5369,47 @@ export interface paths {
         };
       };
     };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/external-references/sync": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Sync external sources for all artifacts of an asset version */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -6743,6 +7180,146 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{controlHash}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get compliance posture for a control */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+          /** @description Control hash */
+          controlHash: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create a compliance posture event */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+          /** @description Control hash */
+          controlHash: string;
+        };
+        cookie?: never;
+      };
+      /** @description Event data */
+      requestBody: {
+        content: {
+          "application/json": {
+            justification?: string;
+            status?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{controlHash}/components/{complianceComponentID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a compliance statement for a component */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+          /** @description Control hash */
+          controlHash: string;
+          /** @description Compliance component ID */
+          complianceComponentID: string;
+        };
+        cookie?: never;
+      };
+      /** @description Request body */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.statementPayload"];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/components/{statementID}": {
     parameters: {
       query?: never;
@@ -6910,146 +7487,6 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{frameworkControlID}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get compliance posture for a framework control */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-          /** @description Framework Control ID */
-          frameworkControlID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
-          };
-        };
-      };
-    };
-    put?: never;
-    /** Create a compliance posture event */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-          /** @description Framework Control ID */
-          frameworkControlID: string;
-        };
-        cookie?: never;
-      };
-      /** @description Event data */
-      requestBody: {
-        content: {
-          "application/json": {
-            justification?: string;
-            status?: string;
-          };
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/compliance-postures/{frameworkControlID}/components/{complianceComponentID}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a compliance statement for a component */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-          /** @description Framework control ID */
-          frameworkControlID: string;
-          /** @description Compliance component ID */
-          complianceComponentID: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["controllers.statementPayload"];
-        };
-      };
-      responses: {
-        /** @description Created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
-          };
-        };
-      };
-    };
     delete?: never;
     options?: never;
     head?: never;
@@ -7296,56 +7733,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-vulns/batch": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Batch create vulnerability events */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["dtos.BatchDependencyVulnStatusRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.DetailedDependencyVuln"][];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-vulns/{dependencyVulnID}": {
     parameters: {
       query?: never;
@@ -7577,6 +7964,56 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/dependency-vulns/batch": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Batch create vulnerability events */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Request body */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.BatchDependencyVulnStatusRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.DetailedDependencyVuln"][];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/events": {
     parameters: {
       query?: never;
@@ -7714,56 +8151,6 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/first-party-vulns/batch": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Batch update first-party vulnerability states */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Asset version slug */
-          assetVersionSlug: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["dtos.BatchFirstPartyVulnStatusRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"][];
-          };
-        };
-      };
-    };
     delete?: never;
     options?: never;
     head?: never;
@@ -7944,6 +8331,56 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/first-party-vulns/batch": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Batch update first-party vulnerability states */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Request body */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.BatchFirstPartyVulnStatusRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.DetailedFirstPartyVuln"][];
           };
         };
       };
@@ -9078,6 +9515,78 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/vex-rules/{ruleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a VEX rule */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Rule ID */
+          ruleId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.VEXRule"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    /** Delete a VEX rule */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Rule ID */
+          ruleId: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/vex-rules/recommendations": {
     parameters: {
       query?: never;
@@ -9234,78 +9743,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/vex-rules/{ruleId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get a VEX rule */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Rule ID */
-          ruleId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.VEXRule"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    /** Delete a VEX rule */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Asset slug */
-          assetSlug: string;
-          /** @description Rule ID */
-          ruleId: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description No Content */
-        204: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/compliance": {
     parameters: {
       query?: never;
@@ -9347,6 +9784,175 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-components/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the compliance components which apply to the project */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-components/{complianceComponentID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get compliance component details */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Compliance component ID */
+          complianceComponentID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentDetails"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-components/definitions/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Upload a component definition for the project */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description OSCAL component definition */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.saveComponentDefinitionRequest"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-components/definitions/{name}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a component definition from the project */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Component definition name */
+          name: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/compliance-postures": {
     parameters: {
       query?: never;
@@ -9383,6 +9989,244 @@ export interface paths {
     put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{controlHash}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get compliance posture for a control */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Control hash */
+          controlHash: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create a compliance posture event */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Control hash */
+          controlHash: string;
+        };
+        cookie?: never;
+      };
+      /** @description Event data */
+      requestBody: {
+        content: {
+          "application/json": {
+            justification?: string;
+            status?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{controlHash}/components/{complianceComponentID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a compliance statement for a component */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Control hash */
+          controlHash: string;
+          /** @description Compliance component ID */
+          complianceComponentID: string;
+        };
+        cookie?: never;
+      };
+      /** @description Request body */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.statementPayload"];
+        };
+      };
+      responses: {
+        /** @description Created */
+        201: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-postures/catalogs/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List the catalogs which apply to the project */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.ScopeFramework"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Activate or upload a catalog for the project */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description OSCAL catalog */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["controllers.saveCatalogRequest"];
+        };
+      };
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/compliance-postures/catalogs/{name}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a catalog from the project */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Catalog name */
+          name: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description No Content */
+        204: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
     options?: never;
     head?: never;
     patch?: never;
@@ -9539,134 +10383,6 @@ export interface paths {
     };
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{frameworkControlID}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get compliance posture for a framework control */
-    get: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Framework Control ID */
-          frameworkControlID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
-          };
-        };
-      };
-    };
-    put?: never;
-    /** Create a compliance posture event */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Framework Control ID */
-          frameworkControlID: string;
-        };
-        cookie?: never;
-      };
-      /** @description Event data */
-      requestBody: {
-        content: {
-          "application/json": {
-            justification?: string;
-            status?: string;
-          };
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CompliancePostureWithDetails"];
-          };
-        };
-      };
-    };
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/compliance-postures/{frameworkControlID}/components/{complianceComponentID}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Create a compliance statement for a component */
-    post: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Framework control ID */
-          frameworkControlID: string;
-          /** @description Compliance component ID */
-          complianceComponentID: string;
-        };
-        cookie?: never;
-      };
-      /** @description Request body */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["controllers.statementPayload"];
-        };
-      };
-      responses: {
-        /** @description Created */
-        201: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"];
-          };
-        };
-      };
-    };
     delete?: never;
     options?: never;
     head?: never;
@@ -9994,6 +10710,79 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/integrations/webhook/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update webhook integration (project) */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Webhook ID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      /** @description Webhook data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.WebhookUpdateRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.WebhookIntegration"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete webhook integration (project) */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Webhook ID */
+          id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/integrations/webhook/test": {
     parameters: {
       query?: never;
@@ -10084,79 +10873,6 @@ export interface paths {
       };
     };
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}/projects/{projectSlug}/integrations/webhook/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    /** Update webhook integration (project) */
-    put: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Webhook ID */
-          id: string;
-        };
-        cookie?: never;
-      };
-      /** @description Webhook data */
-      requestBody: {
-        content: {
-          "application/json": components["schemas"]["dtos.WebhookUpdateRequest"];
-        };
-      };
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.WebhookIntegration"];
-          };
-        };
-      };
-    };
-    post?: never;
-    /** Delete webhook integration (project) */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-          /** @description Webhook ID */
-          id: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
     options?: never;
     head?: never;
     patch?: never;
@@ -10647,50 +11363,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/organizations/{organization}/projects/{projectSlug}/releases/candidates": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List release candidates */
-    get: {
-      parameters: {
-        query?: {
-          /** @description Release ID */
-          releaseID?: string;
-        };
-        header?: never;
-        path: {
-          /** @description Organization slug */
-          organization: string;
-          /** @description Project slug */
-          projectSlug: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["dtos.CandidatesResponse"];
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}": {
     parameters: {
       query?: never;
@@ -11078,6 +11750,97 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}/stats/average-fixing-time/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get average remediation times for a release */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Release ID */
+          releaseID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RemediationTimeAverages"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}/stats/risk-history/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get risk history for a release */
+    get: {
+      parameters: {
+        query: {
+          /** @description Start date (YYYY-MM-DD) */
+          start: string;
+          /** @description End date (YYYY-MM-DD) */
+          end: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Release ID */
+          releaseID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RiskHistory"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/releases/{releaseID}/vex.json": {
     parameters: {
       query?: never;
@@ -11164,6 +11927,50 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/releases/candidates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List release candidates */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Release ID */
+          releaseID?: string;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.CandidatesResponse"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/resources": {
     parameters: {
       query?: never;
@@ -11198,6 +12005,52 @@ export interface paths {
           };
           content: {
             "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_ProjectAsset"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/search/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Search projects with sub-projects and assets */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Search query */
+          search?: string;
+          /** @description Page number */
+          page?: number;
+          /** @description Page size */
+          pageSize?: number;
+        };
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_shared.Paged-dtos_Project"];
           };
         };
       };
@@ -11417,6 +12270,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/pats/{tokenID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete personal access token */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Token ID */
+          tokenID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/pats/revoke-by-private-key": {
     parameters: {
       query?: never;
@@ -11451,43 +12341,6 @@ export interface paths {
       };
     };
     delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/pats/{tokenID}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    post?: never;
-    /** Delete personal access token */
-    delete: {
-      parameters: {
-        query?: never;
-        header?: never;
-        path: {
-          /** @description Token ID */
-          tokenID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description OK */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content?: never;
-        };
-      };
-    };
     options?: never;
     head?: never;
     patch?: never;
@@ -12887,6 +13740,66 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/vulndb/{cveID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a specific CVE by ID
+     * @description Retrieve details of a specific CVE by its ID, including risk and vector calculations
+     */
+    get: {
+      parameters: {
+        query?: {
+          /** @description Confidentiality Requirements (low, medium, high), default is medium */
+          confidentialityRequirements?: string;
+          /** @description Integrity Requirements (low, medium, high), default is medium */
+          integrityRequirements?: string;
+          /** @description Availability Requirements (low, medium, high), default is medium */
+          availabilityRequirements?: string;
+        };
+        header?: never;
+        path: {
+          /** @description CVE ID */
+          cveID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description Details of the specified CVE" and optional advisories */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.CVE"];
+          };
+        };
+        /** @description Internal server error */
+        500: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              message?: string;
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/vulndb/cve-ecosystem-distribution": {
     parameters: {
       query?: never;
@@ -13037,66 +13950,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/vulndb/{cveID}/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a specific CVE by ID
-     * @description Retrieve details of a specific CVE by its ID, including risk and vector calculations
-     */
-    get: {
-      parameters: {
-        query?: {
-          /** @description Confidentiality Requirements (low, medium, high), default is medium */
-          confidentialityRequirements?: string;
-          /** @description Integrity Requirements (low, medium, high), default is medium */
-          integrityRequirements?: string;
-          /** @description Availability Requirements (low, medium, high), default is medium */
-          availabilityRequirements?: string;
-        };
-        header?: never;
-        path: {
-          /** @description CVE ID */
-          cveID: string;
-        };
-        cookie?: never;
-      };
-      requestBody?: never;
-      responses: {
-        /** @description Details of the specified CVE" and optional advisories */
-        200: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.CVE"];
-          };
-        };
-        /** @description Internal server error */
-        500: {
-          headers: {
-            [name: string]: unknown;
-          };
-          content: {
-            "application/json": {
-              message?: string;
-            };
-          };
-        };
-      };
-    };
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/webhook": {
     parameters: {
       query?: never;
@@ -13224,6 +14077,16 @@ export interface components {
     "controllers.licenseResponse": {
       count: number;
       license: components["schemas"]["licenses.License"];
+    };
+    "controllers.saveCatalogRequest": {
+      catalog: Record<string, never>;
+      /** @description optional, defaults to the title of the catalog */
+      name: string;
+    };
+    "controllers.saveComponentDefinitionRequest": {
+      componentDefinition: Record<string, never>;
+      /** @description optional, defaults to the title of the component definition */
+      name: string;
     };
     "controllers.statementPayload": {
       description: string;
@@ -14926,8 +15789,12 @@ export interface components {
       releases: components["schemas"]["dtos.Release"][];
     };
     "dtos.ComplianceComponentDetails": {
+      assetId: string;
+      componentDefinition: string;
       description: string;
+      id: string;
       implementedControls: components["schemas"]["dtos.ComplianceComponentImplementsControl"][];
+      projectId: string;
       title: string;
       uuid: string;
     };
@@ -14958,14 +15825,14 @@ export interface components {
       assetVersionName: string;
       class: string;
       compliancePostureId: string;
+      controlHash: string;
       controlId: string;
       description: string;
-      framework: string;
-      frameworkControlId: string;
+      frameworkControlIds: string[];
+      frameworks: string[];
       importance: string;
-      mappedControls: components["schemas"]["dtos.MappedControl"][];
       orgId: string;
-      parentFrameworkControlId: string;
+      parentControlId: string;
       projectId: string;
       securityLevel: string;
       state: components["schemas"]["dtos.VulnState"];
@@ -14980,15 +15847,15 @@ export interface components {
       byComponents: components["schemas"]["dtos.ComplianceComponentImplementsControlStatement"][];
       class: string;
       compliancePostureId: string;
+      controlHash: string;
       controlId: string;
       description: string;
       events: components["schemas"]["dtos.VulnEvent"][];
-      framework: string;
-      frameworkControlId: string;
+      frameworkControlIds: string[];
+      frameworks: string[];
       importance: string;
-      mappedControls: components["schemas"]["dtos.MappedControl"][];
       orgId: string;
-      parentFrameworkControlId: string;
+      parentControlId: string;
       projectId: string;
       securityLevel: string;
       state: components["schemas"]["dtos.VulnState"];
@@ -15452,12 +16319,6 @@ export interface components {
       component: string;
       maliciousPackageID: string;
       projectName: string;
-    };
-    "dtos.MappedControl": {
-      frameworkControlId: string;
-      relatedControlId: string;
-      relatedFramework: string;
-      relationship: string;
     };
     /** @enum {string} */
     "dtos.MechanicalJustificationType":
@@ -16037,6 +16898,11 @@ export interface components {
       amountOpened: number;
       dependencyVulns: components["schemas"]["dtos.DependencyVuln"][];
     };
+    "dtos.ScopeFramework": {
+      assetId: string;
+      framework: string;
+      projectId: string;
+    };
     "dtos.SemverEvent": {
       fixed: string;
       introduced: string;
@@ -16126,7 +16992,6 @@ export interface components {
     /** @enum {string} */
     "dtos.VexRuleRecommendationType": "session" | "crowdsourced" | "upstream";
     "dtos.VulnEvent": {
-      artifactId: string;
       createdAt: string;
       createdByVexRule: boolean;
       id: string;
@@ -16162,8 +17027,6 @@ export interface components {
       | "attachedComplianceComponent"
       | "removedComplianceComponent"
       | "detected"
-      | "detectedInArtifact"
-      | "fixedInArtifact"
       | "rawRiskAssessmentUpdated";
     "dtos.VulnInPackage": {
       cveId: string;
@@ -16283,8 +17146,61 @@ export interface components {
       createdAt: string;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
       id: string;
+      lastHistoryUpdate: string;
       licenseRisks: components["schemas"]["github_com_l3montree-dev_devguard_database_models.LicenseRisk"][];
+      riskHistories: components["schemas"]["github_com_l3montree-dev_devguard_database_models.ArtifactRiskHistory"][];
       vulnAssetId: string;
+    };
+    "github_com_l3montree-dev_devguard_database_models.ArtifactRiskHistory": {
+      artifactId: string;
+      /** @description not stored in this table, filled by joining artifacts and asset_versions */
+      artifactName: string;
+      assetId: string;
+      assetVersionName: string;
+      averageClosedRisk: number;
+      averageOpenRisk: number;
+      critical: number;
+      criticalCvss: number;
+      cvePurlCritical: number;
+      cvePurlCriticalCvss: number;
+      cvePurlFixableCritical: number;
+      cvePurlFixableCriticalCvss: number;
+      cvePurlFixableHigh: number;
+      cvePurlFixableHighCvss: number;
+      cvePurlFixableLow: number;
+      cvePurlFixableLowCvss: number;
+      cvePurlFixableMedium: number;
+      cvePurlFixableMediumCvss: number;
+      cvePurlHigh: number;
+      cvePurlHighCvss: number;
+      cvePurlLow: number;
+      cvePurlLowCvss: number;
+      cvePurlMedium: number;
+      cvePurlMediumCvss: number;
+      /** @description on the day 2024-08-12 the asset had a sumRisk of 25. */
+      day: string;
+      fixableCritical: number;
+      fixableCriticalCvss: number;
+      fixableHigh: number;
+      fixableHighCvss: number;
+      fixableLow: number;
+      fixableLowCvss: number;
+      fixableMedium: number;
+      fixableMediumCvss: number;
+      fixedDependencyVulns: number;
+      high: number;
+      highCvss: number;
+      low: number;
+      lowCvss: number;
+      maxClosedRisk: number;
+      maxOpenRisk: number;
+      medium: number;
+      mediumCvss: number;
+      minClosedRisk: number;
+      minOpenRisk: number;
+      openDependencyVulns: number;
+      sumClosedRisk: number;
+      sumOpenRisk: number;
     };
     "github_com_l3montree-dev_devguard_database_models.Asset": {
       /** @description the default lives in the database, see celrules.DefaultAssetVersionRetentionPolicy */
@@ -16685,7 +17601,6 @@ export interface components {
       vexSource: string;
     };
     "github_com_l3montree-dev_devguard_database_models.VulnEvent": {
-      artifactId: string;
       /**
        * @description set instead of DependencyVulnID for a group event applying to every
        *     DependencyVuln sharing this AssetSignature.
@@ -16842,6 +17757,30 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | -9223372036854776000
+      | 9223372036854776000
       | 1
       | 1000
       | 1000000
