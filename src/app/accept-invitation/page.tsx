@@ -22,6 +22,7 @@ import { writeLocalStorage } from "@/hooks/useLocalStorage";
 import FourSideGridPattern from "@/components/misc/FourSideGridPattern";
 import LoggedInAs from "@/components/misc/LoggedInAs";
 import { extractInvitationCode } from "@/utils/url";
+import { useLoginHref } from "@/hooks/useLoginHref";
 
 import type { InvitationFormValues } from "@/types/view/invitation";
 
@@ -32,6 +33,7 @@ const AcceptInvitation = () => {
 
   const searchParams = useSearchParams();
   const router = useRouter();
+  const loginHref = useLoginHref();
 
   const form = useForm<InvitationFormValues>();
   const [failed, setFailed] = useState(false);
@@ -130,7 +132,7 @@ const AcceptInvitation = () => {
                       invitation.
                     </p>
                     <div className="mt-8 flex flex-row">
-                      <Link href="/login">
+                      <Link href={loginHref}>
                         <Button>Login</Button>
                       </Link>
                     </div>

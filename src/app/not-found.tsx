@@ -10,10 +10,12 @@ import { useConfig } from "@/context/ConfigContext";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import LoggedInAs from "@/components/misc/LoggedInAs";
 import { classNames } from "../utils/common";
+import { useLoginHref } from "@/hooks/useLoginHref";
 
 export default function NotFoundPage() {
   const config = useConfig();
   const user = useCurrentUser();
+  const loginHref = useLoginHref();
 
   return (
     <main className="grid min-h-full place-items-center bg-background px-6 py-24 sm:py-32 lg:px-8">
@@ -54,7 +56,7 @@ export default function NotFoundPage() {
                 You are not logged in.
               </p>
               <Link
-                href="/login"
+                href={loginHref}
                 rel="noreferrer noopener"
                 className={classNames(
                   buttonVariants({ variant: "default" }),
