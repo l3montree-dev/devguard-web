@@ -43,6 +43,16 @@ export default function ManualIntegrationSlide({
           initialArtifact={
             searchParams?.get("artifact") || artifacts?.[0]?.artifactName
           }
+          secondaryButton={
+            <Button
+              variant="secondary"
+              id="manual-integration-back"
+              disabled={isUploading}
+              onClick={() => api?.scrollTo(prevIndex)}
+            >
+              Back
+            </Button>
+          }
           onLayoutChange={api?.reInit}
           onUploadingChange={setIsUploading}
           onUploaded={(destination) => {
@@ -51,15 +61,6 @@ export default function ManualIntegrationSlide({
             window.location.assign(destination);
           }}
         />
-        <Button
-          className="mt-6"
-          variant="secondary"
-          id="manual-integration-back"
-          disabled={isUploading}
-          onClick={() => api?.scrollTo(prevIndex)}
-        >
-          Back
-        </Button>
       </div>
     </CarouselItem>
   );

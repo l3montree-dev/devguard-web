@@ -26,7 +26,7 @@ import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 import type { Surface } from "@/lib/surface";
 import { ensureValidBranchOrTagSlug } from "@/utils/common";
 import { useCallback, useEffect, useState } from "react";
-import type { FunctionComponent } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 import { useDropzone } from "react-dropzone";
 
 const kindLabels: Record<ManualUploadKind, string> = {
@@ -54,14 +54,8 @@ export const detectUploadKind = (
     return "vex";
   }
   if (parsed.bomFormat === "CycloneDX") {
-    // a CycloneDX document without components, but with vulnerabilities is a VEX
-    const components = parsed.components as unknown[] | undefined;
     const vulnerabilities = parsed.vulnerabilities as unknown[] | undefined;
-    if (
-      (!components || components.length === 0) &&
-      vulnerabilities &&
-      vulnerabilities.length > 0
-    ) {
+    if (vulnerabilities && vulnerabilities.length > 0) {
       return "vex";
     }
     return "sbom";
@@ -83,6 +77,8 @@ interface Props {
   showOptions?: boolean;
   // the surface the upload is rendered on
   variant?: Surface;
+  // rendered left of upload button, like a back button
+  secondaryButton?: ReactNode;
 }
 
 const ScanFileUpload: FunctionComponent<Props> = ({
@@ -93,6 +89,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
   initialRef,
   artifacts,
   initialArtifact,
+  secondaryButton,
   onLayoutChange,
   onUploadingChange,
 }) => {
@@ -107,7 +104,6 @@ const ScanFileUpload: FunctionComponent<Props> = ({
     file: File;
     content: string;
     kind: ManualUploadKind;
-    isCycloneDx: boolean;
   }>();
   const [branchOrTagName, setBranchOrTagName] = useState(
     defaultRef?.name || "main",
@@ -134,10 +130,8 @@ const ScanFileUpload: FunctionComponent<Props> = ({
     reader.onload = () => {
       const content = reader.result as string;
       let kind: ManualUploadKind | undefined;
-      let parsed: Record<string, unknown>;
       try {
-        parsed = JSON.parse(content);
-        kind = detectUploadKind(parsed);
+        kind = detectUploadKind(JSON.parse(content));
       } catch {
         toast.error(
           "JSON format is not recognized, make sure it is the proper format",
@@ -150,12 +144,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
         );
         return;
       }
-      setFile({
-        file: dropped,
-        content,
-        kind,
-        isCycloneDx: parsed.bomFormat === "CycloneDX",
-      });
+      setFile({ file: dropped, content, kind });
       setOrigin(kind.toUpperCase() + "_DEFAULT");
     };
     reader.readAsText(dropped);
@@ -239,30 +228,6 @@ const ScanFileUpload: FunctionComponent<Props> = ({
           <Badge variant="secondary">{kindLabels[file.kind]}</Badge>
         </div>
       )}
-      {file?.isCycloneDx && (
-        <div className="flex flex-col gap-2 text-sm">
-          <label htmlFor={`${id}-kind`}>Upload CycloneDX document as</label>
-          <select
-            id={`${id}-kind`}
-            className="rounded border bg-background p-2"
-            value={file.kind}
-            disabled={isUploading}
-            onChange={(event) => {
-              const kind = event.target.value as "sbom" | "vex";
-              setFile({ ...file, kind });
-              setOrigin(kind.toUpperCase() + "_DEFAULT");
-            }}
-          >
-            <option value="sbom">SBOM</option>
-            <option value="vex">VEX</option>
-          </select>
-          <span className="text-muted-foreground">
-            CycloneDX documents can contain both an inventory and VEX
-            information. Choose VEX to import vulnerability exploitability
-            statements.
-          </span>
-        </div>
-      )}
       {showOptions && (
         <ManualUploadOptionsFields
           options={{
@@ -292,16 +257,17 @@ const ScanFileUpload: FunctionComponent<Props> = ({
           showArtifact={file?.kind !== "sarif"}
         />
       )}
-      <Button
-        // stays at the bottom when the parent stretches the upload
-        className="mt-auto self-end"
-        data-testid={`${id}-submit`}
-        disabled={!file || isUploading}
-        isSubmitting={isUploading}
-        onClick={handleUpload}
-      >
-        {file ? `Upload ${kindLabels[file.kind]}` : "Upload"}
-      </Button>
+      <div className="mt-auto flex flex-row gap-2 justify-end">
+        {secondaryButton}
+        <Button
+          data-testid={`${id}-submit`}
+          disabled={!file || isUploading}
+          isSubmitting={isUploading}
+          onClick={handleUpload}
+        >
+          {file ? `Upload ${kindLabels[file.kind]}` : "Upload"}
+        </Button>
+      </div>
     </div>
   );
 };
