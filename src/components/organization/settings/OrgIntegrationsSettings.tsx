@@ -4,9 +4,13 @@
 "use client";
 
 import GithubAppInstallationAlert from "@/components/common/GithubAppInstallationAlert";
-import { GitLabIntegrationDialog } from "@/components/common/GitLabIntegrationDialog";
-import { JiraIntegrationDialog } from "@/components/common/JiraIntegrationDialog";
+import GitLabIntegrationForm from "@/components/common/GitLabIntegrationForm";
+import JiraIntegrationForm from "@/components/common/JiraIntegrationForm";
 import ListItem from "@/components/common/ListItem";
+import RedmineIntegrationForm from "@/components/common/RedmineIntegrationForm";
+import { RedmineIntegrationSettingsDialog } from "@/components/common/RedmineIntegrationSettingsDialog";
+import { IntegrationDialog } from "@/components/integration/IntegrationDialog";
+import { Badge } from "@/components/ui/badge";
 import { AsyncButton, Button, buttonVariants } from "@/components/ui/button";
 import { useConfig } from "@/context/ConfigContext";
 import { usePatchOrgContext } from "@/hooks/usePatchOrgContext";
@@ -15,8 +19,13 @@ import { encodeObjectBase64 } from "@/services/encodeService";
 import {
   deleteGitlabIntegration,
   deleteJiraIntegration,
+  deleteRedmineIntegration,
 } from "@/services/organizationService";
-import type { GitLabIntegrationDTO, JiraIntegrationDTO } from "@/types/dto";
+import type {
+  GitLabIntegrationDTO,
+  JiraIntegrationDTO,
+  RedmineIntegrationDTO,
+} from "@/types/dto";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -69,6 +78,30 @@ const OrgIntegrationsSettings = () => {
 
   const handleNewJira = (integration: JiraIntegrationDTO) =>
     patchOrg({ jiraIntegrations: org.jiraIntegrations.concat(integration) });
+
+  const handleNewRedmineIntegration = (integration: RedmineIntegrationDTO) => {
+    patchOrg({
+      redmineIntegrations: org.redmineIntegrations.concat(integration),
+    });
+  };
+
+  const handleRedmineSettingsSaved = (integration: RedmineIntegrationDTO) => {
+    patchOrg({
+      redmineIntegrations: org.redmineIntegrations.map((i) => {
+        if (i.id === integration.id) {
+          return integration;
+        }
+        return i;
+      }),
+    });
+  };
+
+  const handleDeleteRedmineIntegration = async (id: string) => {
+    await deleteRedmineIntegration(org.slug, id);
+    patchOrg({
+      redmineIntegrations: org.redmineIntegrations.filter((i) => i.id !== id),
+    });
+  };
 
   return (
     <>
@@ -138,6 +171,35 @@ const OrgIntegrationsSettings = () => {
           }
         />
       ))}
+      {org.redmineIntegrations.map((integration) => (
+        <ListItem
+          key={integration.id}
+          Title={
+            <ProviderTitle src="/assets/provider-icons/redmine.svg">
+              {integration.name}
+            </ProviderTitle>
+          }
+          Description={
+            "DevGuard uses an Access-Token to access your repositories and create issues."
+          }
+          Button={
+            <>
+              <RedmineIntegrationSettingsDialog
+                integration={integration}
+                onSave={handleRedmineSettingsSaved}
+                Button={<Button variant={"secondary"}>Settings</Button>}
+              ></RedmineIntegrationSettingsDialog>
+              <AsyncButton
+                variant={"destructiveOutline"}
+                onClick={() => handleDeleteRedmineIntegration(integration.id)}
+              >
+                Delete
+              </AsyncButton>
+            </>
+          }
+        />
+      ))}
+
       <ListItem
         Title={
           <ProviderTitle src="/assets/github.svg" invert>
@@ -178,8 +240,15 @@ const OrgIntegrationsSettings = () => {
         }
         Description="DevGuard uses a personal, organization, group or repository access token to access your repositories and interact with your code. Due to the excessive permissions granted to the app, it can only be done by the organization owner."
         Button={
-          <GitLabIntegrationDialog
-            onNewIntegration={handleNewGitLab}
+          <IntegrationDialog
+            description="To integrate with GitLab a personal access token, a group access token or a repository access token is necessary."
+            integration="gitlab"
+            Form={(setOpen) => (
+              <GitLabIntegrationForm
+                onNewIntegration={handleNewGitLab}
+                setOpen={setOpen}
+              />
+            )}
             Button={<Button variant="secondary">Integrate with GitLab</Button>}
           />
         }
@@ -192,9 +261,52 @@ const OrgIntegrationsSettings = () => {
         }
         Description="DevGuard uses a Jira API Token to access your Jira projects and interact with your issues. This allows DevGuard to create and manage issues in your Jira projects."
         Button={
-          <JiraIntegrationDialog
-            onNewIntegration={handleNewJira}
+          <IntegrationDialog
+            description="To integrate with Jira, you need to provide your Personal Access Token"
+            integration="jira"
+            Form={(setOpen) => (
+              <JiraIntegrationForm
+                onNewIntegration={handleNewJira}
+                setOpen={setOpen}
+              />
+            )}
             Button={<Button variant="secondary">Integrate with Jira</Button>}
+          />
+        }
+      />
+      <ListItem
+        Title={
+          <ProviderTitle src="/assets/provider-icons/redmine.svg">
+            Integrate with Redmine&nbsp;
+            <Badge className="text-xs" variant="secondary">
+              Community driven
+            </Badge>
+          </ProviderTitle>
+        }
+        Description="DevGuard uses a Redmine API Token to access your Redmine projects and interact with your issues. This allows DevGuard to create and manage issues in your Redmine projects."
+        Button={
+          <IntegrationDialog
+            description={
+              <>
+                To integrate with Redmine, you need to provide your API access
+                key.
+                <br />
+                You can find your API access key under &ldquo;My account&rdquo;
+                → &ldquo;API access key&rdquo;. Make sure the REST API is
+                enabled under &ldquo;Administration&rdquo; →
+                &ldquo;Settings&rdquo; → &ldquo;API&rdquo;.
+              </>
+            }
+            integration="redmine"
+            Form={(setOpen) => (
+              <RedmineIntegrationForm
+                onNewIntegration={handleNewRedmineIntegration}
+                setOpen={setOpen}
+              />
+            )}
+            Button={
+              <Button variant={"secondary"}>Integrate with Redmine</Button>
+            }
           />
         }
       />

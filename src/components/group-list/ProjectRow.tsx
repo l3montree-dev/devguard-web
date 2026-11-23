@@ -199,6 +199,17 @@ const ProjectRow: FunctionComponent<Props> = ({
                 parentProjectSlug={project.slug}
                 compact
               />
+              {!isLoading &&
+                project.subGroupsAndAssetTotal != null &&
+                (subgroupsWithAssets?.length ?? 0) <
+                  project.subGroupsAndAssetTotal && (
+                  <Link
+                    href={`/${activeOrg.slug}/projects/${project.slug}`}
+                    className="self-start px-2 py-1 text-sm !text-muted-foreground hover:underline"
+                  >
+                    See all ({project.subGroupsAndAssetTotal})
+                  </Link>
+                )}
             </div>
           </div>
         )}

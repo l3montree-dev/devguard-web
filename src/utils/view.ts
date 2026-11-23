@@ -212,7 +212,7 @@ export const getParentRepositoryIdAndName = (
 export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
   asset?: AssetDTO,
   project?: ProjectDTO,
-): "gitlab" | "github" | "jira" | undefined => {
+): "gitlab" | "github" | "jira" | "redmine" | undefined => {
   if (asset && asset.repositoryId) {
     const repoID = asset.repositoryId;
 
@@ -222,6 +222,8 @@ export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
       return "github";
     } else if (repoID?.startsWith("jira:")) {
       return "jira";
+    } else if (repoID?.startsWith("redmine:")) {
+      return "redmine";
     }
   }
   if (asset?.externalEntityProviderId) {
@@ -236,7 +238,10 @@ export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
     return "github";
   } else if (parentRepoID?.startsWith("jira:")) {
     return "jira";
+  } else if (parentRepoID?.startsWith("redmine:")) {
+    return "redmine";
   }
+
   return undefined;
 };
 

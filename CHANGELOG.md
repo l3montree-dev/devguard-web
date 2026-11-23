@@ -4,6 +4,28 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.19.1] — 2026-11-20
+
+### Added
+
+- **Asset version retention policy (Preview)** — new settings page to configure the retention policy of asset versions (will be further announced in the upcoming release)
+- **"See all" link on project rows** — project rows now link to the full list
+- **Withdrawn CVE notice** — the dependency risk page shows a warning with the withdrawal date when a CVE has been withdrawn
+
+### Changed
+
+- **Access token section** — improved the access token management UI, backed by a new reusable select card component
+- **Update dialog** — the update-available dialog now takes the self-hosted check into account
+- **SBOM root component option removed** — removed `keepOriginalSBOMRootComponent` from the asset vulnerability management form and the CEL linter
+- **Dependency updates** — applied `npm audit fix` and refreshed the Nix npm-packages hash
+
+### Fixed
+
+- **Settings navigation** — fixed the highlighting of the active nav item in the settings layout
+- **Risk history date** — corrected the date shown in the risk history
+
+---
+
 ## [v1.19.0] — 2026-11-17
 
 ### Added

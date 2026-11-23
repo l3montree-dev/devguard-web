@@ -3,6 +3,7 @@
 
 "use client";
 
+import AssetVersionRetentionSettings from "@/components/asset/settings/AssetVersionRetentionSettings";
 import BackgroundJobsDebug from "@/components/asset/settings/BackgroundJobsDebug";
 import GeneralSettings from "@/components/asset/settings/GeneralSettings";
 import Section from "@/components/common/Section";
@@ -21,6 +22,13 @@ export default function GeneralSettingsPage() {
         description="The name, description and repository provider of this repository."
       >
         <GeneralSettings />
+      </Section>
+      <Section
+        forceVertical
+        title="Branch and tag retention"
+        description="Decide which branches and tags DevGuard keeps. Branches and tags the policy does not keep are deleted by the background pipeline."
+      >
+        <AssetVersionRetentionSettings />
       </Section>
       <BackgroundJobsDebug />
     </>

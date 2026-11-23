@@ -7,6 +7,10 @@ type Schemas = components["schemas"];
 
 export type AssetDTO = Schemas["dtos.Asset"];
 export type JiraIntegrationDTO = Schemas["dtos.JiraIntegration"];
+export type RedmineIntegrationDTO = Schemas["dtos.RedmineIntegration"];
+export type RedmineTrackerDTO = Schemas["dtos.RedmineTracker"];
+export type RedmineStatusDTO = Schemas["dtos.RedmineStatus"];
+export type RedminePriorityDTO = Schemas["dtos.RedminePriority"];
 export type AverageVulnEventsPerWeek = Schemas["dtos.AverageVulnEventsPerWeek"];
 export type InviteRequest = Schemas["dtos.InviteRequest"];
 export type InstanceSettings = Schemas["dtos.InstanceSettings"];
