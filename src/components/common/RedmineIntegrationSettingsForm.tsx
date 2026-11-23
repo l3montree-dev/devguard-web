@@ -50,7 +50,7 @@ type RedmineIntegrationSettingsFormValues = {
   criticalPriorityId: string;
 };
 
-export default function RedmineIntegrationForm({
+export default function RedmineIntegrationSettingsForm({
   integration,
   onSave,
   additionalOnClick,

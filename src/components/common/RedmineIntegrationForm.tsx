@@ -73,9 +73,9 @@ export default function RedmineIntegrationForm({
     <Form {...form}>
       <form
         className="flex flex-col gap-4"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
-          waitFor(form.handleSubmit(handleSubmit))();
+          await waitFor(form.handleSubmit(handleSubmit))();
           if (additionalOnClick) {
             additionalOnClick();
           }
@@ -91,7 +91,6 @@ export default function RedmineIntegrationForm({
                 <Input
                   variant={variant}
                   placeholder="My Redmine Personal Access Token"
-                  autoComplete="url"
                   {...field}
                 />
               </FormControl>

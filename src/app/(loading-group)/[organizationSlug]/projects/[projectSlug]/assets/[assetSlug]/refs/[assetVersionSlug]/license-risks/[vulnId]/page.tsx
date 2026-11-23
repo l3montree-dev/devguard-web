@@ -18,7 +18,7 @@ import { useSession } from "@/context/SessionContext";
 import AuthGuard from "@/components/AuthGuard";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { FunctionComponent } from "react";
 
 import { Combobox } from "@/components/common/Combobox";
@@ -57,6 +57,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CreateTicketButton } from "../../../../../../../../../../../components/integration/CreateTicketButton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -111,6 +112,12 @@ const Index: FunctionComponent = () => {
     setPrevVulnLicense(vulnLicense);
     if (vulnLicense) setUpdatedLicense(vulnLicense);
   }
+
+  const integrationName = useMemo(
+    () =>
+      getIntegrationNameFromRepositoryIdOrExternalProviderId(asset, project),
+    [asset, project],
+  );
 
   const handleSubmit = async (data: {
     status?: VulnEventDTO["type"];
@@ -451,35 +458,24 @@ const Index: FunctionComponent = () => {
                               </AsyncButton>
                             )}
 
-                          {!vuln.ticketId &&
-                            getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                          <CreateTicketButton
+                            integrationName={integrationName}
+                            externalEntityProviderId={getIntegrationNameFromRepositoryIdOrExternalProviderId(
                               asset,
                               project,
-                            ) === "jira" && (
-                              <AsyncButton
-                                variant={"secondary"}
-                                onClick={() =>
-                                  handleSubmit({
-                                    status: "mitigate",
-                                    justification,
-                                    license: updatedLicense,
-                                  })
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <div className="flex">
-                                    <Image
-                                      alt="Jira Logo"
-                                      width={15}
-                                      height={15}
-                                      className="mr-2"
-                                      src={"/assets/jira-svgrepo-com.svg"}
-                                    />
-                                    Create Jira Ticket
-                                  </div>
-                                </div>
-                              </AsyncButton>
                             )}
+                            hasTicket={Boolean(vuln.ticketId)}
+                            orgSlug={organizationSlug}
+                            projectSlug={projectSlug}
+                            assetSlug={assetSlug}
+                            onClick={() =>
+                              handleSubmit({
+                                status: "mitigate",
+                                justification,
+                                license: updatedLicense,
+                              })
+                            }
+                          />
 
                           <AsyncButton
                             onClick={() =>
