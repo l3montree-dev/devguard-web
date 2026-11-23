@@ -16,11 +16,13 @@ import useDecodedParams from "./useDecodedParams";
 export default function useVexRuleRecommendations(
   recommendationsQuery?: URLSearchParams | null,
 ) {
-  const { organizationSlug, projectSlug, assetSlug } = useDecodedParams() as {
-    organizationSlug: string;
-    projectSlug: string;
-    assetSlug: string;
-  };
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } =
+    useDecodedParams() as {
+      organizationSlug: string;
+      projectSlug: string;
+      assetSlug: string;
+      assetVersionSlug: string;
+    };
   const [rulePrefill, setRulePrefill] = useState<VexRulePrefill>();
   const [addRuleDialogOpen, setAddRuleDialogOpen] = useState(false);
   const currentUserRole = useCurrentUserRole();
@@ -29,6 +31,7 @@ export default function useVexRuleRecommendations(
     organizationSlug,
     projectSlug,
     assetSlug,
+    assetVersionSlug,
   });
   const {
     data: recommendationsResponse,
@@ -71,8 +74,12 @@ export function vexRuleRecommendationsURL(params: {
   organizationSlug: string;
   projectSlug: string;
   assetSlug: string;
+  assetVersionSlug?: string;
 }): string {
-  const { organizationSlug, projectSlug, assetSlug } = params;
+  const { organizationSlug, projectSlug, assetSlug, assetVersionSlug } = params;
+  if (assetVersionSlug) {
+    return `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/refs/${assetVersionSlug}/vex-rules/recommendations`;
+  }
   return `/organizations/${organizationSlug}/projects/${projectSlug}/assets/${assetSlug}/vex-rules/recommendations`;
 }
 

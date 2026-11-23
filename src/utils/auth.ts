@@ -3,6 +3,9 @@
 
 import type { User } from "@/types/auth";
 
+export const getLoginHref = (returnTo: string) =>
+  `/login?${new URLSearchParams({ return_to: returnTo }).toString()}`;
+
 export const getUserFullName = (user: User) => {
   if (typeof user.traits.name === "string") {
     return user.traits.name;

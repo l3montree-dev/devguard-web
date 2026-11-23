@@ -185,7 +185,11 @@ const RefsPage = () => {
                       </td>
                       <td className="px-4 py-2" />
                       <td className="px-4 py-2">
-                        <DateString date={parseDateOnly(tag.lastAccessedAt)} />
+                        {tag.lastUploadAt ? (
+                          <DateString date={parseDateOnly(tag.lastUploadAt)} />
+                        ) : (
+                          "Never"
+                        )}
                       </td>
                       <td className="px-4 py-2">
                         {distributionByRef[tag.name] && (
@@ -276,9 +280,13 @@ const RefsPage = () => {
                         )}
                       </td>
                       <td className="px-4 py-2">
-                        <DateString
-                          date={parseDateOnly(branch.lastAccessedAt)}
-                        />
+                        {branch.lastUploadAt ? (
+                          <DateString
+                            date={parseDateOnly(branch.lastUploadAt)}
+                          />
+                        ) : (
+                          "Never"
+                        )}
                       </td>
                       <td className="px-4 py-2">
                         {distributionByRef[branch.name] && (

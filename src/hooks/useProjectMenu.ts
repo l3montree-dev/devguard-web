@@ -67,7 +67,7 @@ export const useProjectMenu = () => {
           testId: "nav-group-dependency-proxy",
         },
         {
-          title: "Settings",
+          title: "Project Settings",
           href: "/" + orgSlug + "/projects/" + projectSlug + "/settings",
           Icon: CogIcon,
           isActive:
