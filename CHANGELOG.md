@@ -4,6 +4,58 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.19.1] — 2026-11-20
+
+### Added
+
+- **Asset version retention policy (Preview)** — new settings page to configure the retention policy of asset versions (will be further announced in the upcoming release)
+- **"See all" link on project rows** — project rows now link to the full list
+- **Withdrawn CVE notice** — the dependency risk page shows a warning with the withdrawal date when a CVE has been withdrawn
+
+### Changed
+
+- **Access token section** — improved the access token management UI, backed by a new reusable select card component
+- **Update dialog** — the update-available dialog now takes the self-hosted check into account
+- **SBOM root component option removed** — removed `keepOriginalSBOMRootComponent` from the asset vulnerability management form and the CEL linter
+- **Dependency updates** — applied `npm audit fix` and refreshed the Nix npm-packages hash
+
+### Fixed
+
+- **Settings navigation** — fixed the highlighting of the active nav item in the settings layout
+- **Risk history date** — corrected the date shown in the risk history
+
+---
+
+## [v1.19.0] — 2026-11-17
+
+### Added
+
+- **VEX rule recommendations per branch** — recommended VEX rules are now suggested per branch, and the page refreshes after a rule is created from a recommendation
+- **Weaknesses in CEL rules** — weaknesses (CWEs) are exposed to CEL rules and shown on the dependency risk page, with linter and playground support
+- **Artifact events in the event stream** — `detectedInArtifact` and `fixedInArtifact` events are shown in the event stream, and license risk events are now transformed correctly
+- **Dependency proxy in the project menu** — the dependency proxy is now reachable from the project menu
+- **Hover navigation** — the navigation bar dropdowns open on hover
+
+### Changed
+
+- **CEL rules UI/UX redesigned** — new design for creating and editing CEL rules
+- **Affected branches tags** — the listing shows the latest minor version tags and has clearer wording
+- **Settings renamed** — settings pages and titles were renamed on all levels, along with small menu renamings
+- **Wording** — adjusted the wording of the onboarding and both CI/CD workflows
+- **Date picker** — weeks start on Monday and the picker keeps a fixed height
+- **Risk assessment dropdown** — it now looks more clearly like a button, and comments in the risk handling rows were reworked
+- **Release pages removed** — the release pages, release dialog and related hooks and services were removed
+- **Dependency updates** — updated Next.js to 16.4.6; refreshed the Nix package hashes
+- **Cleanup** — removed unused code and regenerated the API client
+
+### Fixed
+
+- **Quickfix badge** — the quickfix badge is now invisible for fixed vulnerabilities
+- **Risk assessment name** — the display name is now set to the id
+- **SBOM upload errors** — a readable reason is shown when an SBOM upload fails (thanks @magndotcc)
+
+---
+
 ## [v1.18.0] — 2026-11-05
 
 ### Added

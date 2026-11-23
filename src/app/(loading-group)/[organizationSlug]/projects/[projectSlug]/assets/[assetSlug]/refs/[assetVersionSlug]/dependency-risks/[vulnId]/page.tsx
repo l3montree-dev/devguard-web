@@ -69,6 +69,8 @@ import { Skeleton } from "../../../../../../../../../../../components/ui/skeleto
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
 import { CreateTicketButton } from "@/components/integration/CreateTicketButton";
+import Weaknesses from "../../../../../../../../../../../components/Weaknesses";
+import DateString from "../../../../../../../../../../../components/common/DateString";
 
 const Index: FunctionComponent = () => {
   const role = useCurrentUserRole();
@@ -383,6 +385,14 @@ const Index: FunctionComponent = () => {
               <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <>
+                    {vuln.cve.withdrawn && (
+                      <div className="my-3">
+                        <Callout intent="danger">
+                          Vulnerability was withdrawn on{" "}
+                          <DateString date={new Date(vuln.cve.withdrawn)} />
+                        </Callout>
+                      </div>
+                    )}
                     <Markdown>
                       {descriptionExpanded ||
                       (vuln.cve?.description?.length ?? 0) <= 500
@@ -466,7 +476,7 @@ const Index: FunctionComponent = () => {
                 </div>
               )}
               <div className={lockedOverlay}>
-                {vuln && (
+                {vuln && vuln.state !== "fixed" && (
                   <div className="mt-6">
                     <Quickfix vuln={vuln} />
                   </div>
@@ -617,6 +627,7 @@ const Index: FunctionComponent = () => {
                   )}
                   <DetailedRiskAssessment vuln={vuln} asset={asset} />
                 </div>
+                <Weaknesses vuln={vuln} />
                 <div data-tour="affected-component">
                   <AffectedComponentDetails vuln={vuln} />
                 </div>

@@ -13,7 +13,7 @@ export default function AssetSettingsLayout({ children }: PropsWithChildren) {
   const asset = useActiveAsset()!;
 
   return (
-    <Page title={"Settings (" + asset.name + ")"}>
+    <Page title={"Repository Settings (" + asset.name + ")"}>
       <SettingsShell nav={<AssetSettingsNav />}>{children}</SettingsShell>
     </Page>
   );

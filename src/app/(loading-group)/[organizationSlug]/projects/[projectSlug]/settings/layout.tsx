@@ -26,7 +26,7 @@ export default function ProjectSettingsLayout({ children }: PropsWithChildren) {
   }, [allowed, router, slug]);
 
   return (
-    <Page title={"Settings (" + project.name + ")"}>
+    <Page title={"Project Settings (" + project.name + ")"}>
       <SettingsShell nav={<ProjectSettingsNav />}>{children}</SettingsShell>
     </Page>
   );

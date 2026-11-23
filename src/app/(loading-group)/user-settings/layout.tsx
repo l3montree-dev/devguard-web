@@ -12,6 +12,7 @@ import { ClientContextWrapper } from "@/context/ClientContextWrapper";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { OrganizationProvider } from "../../../context/OrganizationContext";
+import { getLoginHref } from "@/utils/auth";
 
 export default async function UserSettingsLayout({
   children,
@@ -19,7 +20,7 @@ export default async function UserSettingsLayout({
   children: ReactNode;
 }) {
   if (!(await fetchSession())) {
-    redirect("/login?return_to=/user-settings");
+    redirect(getLoginHref("/user-settings"));
   }
 
   return (

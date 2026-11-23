@@ -13,7 +13,7 @@ export default function OrgSettingsLayout({ children }: PropsWithChildren) {
   const org = useActiveOrg();
 
   return (
-    <Page title={"Settings (" + org.name + ")"}>
+    <Page title={"Organization Settings (" + org.name + ")"}>
       <SettingsShell nav={<OrgSettingsNav />}>{children}</SettingsShell>
     </Page>
   );

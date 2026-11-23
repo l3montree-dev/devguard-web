@@ -10,13 +10,14 @@ import Page from "@/components/Page";
 import { useSession } from "../../../context/SessionContext";
 import { redirect } from "next/navigation";
 import { useConfig } from "../../../context/ConfigContext";
+import { getLoginHref } from "@/utils/auth";
 
 export default function SetupOrg() {
   const session = useSession();
   const instanceSettings = useConfig();
 
   if (session.session === null) {
-    redirect("/login");
+    redirect(getLoginHref("/setup"));
   }
 
   if (instanceSettings?.singleOrganizationMode) {
