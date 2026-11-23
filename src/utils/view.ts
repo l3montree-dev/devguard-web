@@ -238,7 +238,10 @@ export const getIntegrationNameFromRepositoryIdOrExternalProviderId = (
     return "github";
   } else if (parentRepoID?.startsWith("jira:")) {
     return "jira";
+  } else if (parentRepoID?.startsWith("redmine:")) {
+    return "redmine";
   }
+
   return undefined;
 };
 
