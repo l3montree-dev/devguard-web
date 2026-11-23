@@ -108,9 +108,10 @@ export default function ProviderSetup({
   };
 
   const providerIntegrationPresent =
-    activeOrg.githubAppInstallations?.length > 0 ||
-    activeOrg.gitLabIntegrations?.length > 0 ||
-    activeOrg.jiraIntegrations?.length > 0;
+    activeOrg.githubAppInstallations.length > 0 ||
+    activeOrg.gitLabIntegrations.length > 0 ||
+    activeOrg.jiraIntegrations.length > 0 ||
+    activeOrg.redmineIntegrations.length > 0;
 
   return (
     <div>

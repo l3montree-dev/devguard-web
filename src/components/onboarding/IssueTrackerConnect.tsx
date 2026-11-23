@@ -40,9 +40,10 @@ const IssueTrackerConnect: FunctionComponent<{
   }
 
   const hasIntegration =
-    activeOrg.githubAppInstallations?.length > 0 ||
-    activeOrg.gitLabIntegrations?.length > 0 ||
-    activeOrg.jiraIntegrations?.length > 0;
+    activeOrg.githubAppInstallations.length > 0 ||
+    activeOrg.gitLabIntegrations.length > 0 ||
+    activeOrg.jiraIntegrations.length > 0 ||
+    activeOrg.redmineIntegrations.length > 0;
 
   return (
     <div className="flex flex-col gap-6">
