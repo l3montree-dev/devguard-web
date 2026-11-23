@@ -3,6 +3,7 @@
 
 import type { ExternalTicketProvider } from "@/types/common";
 import Image from "next/image";
+import { Badge } from "../ui/badge";
 
 export default function ProviderTitleIcon({
   provider,
@@ -60,6 +61,22 @@ export default function ProviderTitleIcon({
             height={16}
           />{" "}
           openCode
+        </span>
+      );
+    case "redmine":
+      return (
+        <span className="inline-flex items-center gap-2">
+          <Image
+            src="/assets/provider-icons/redmine.svg"
+            alt="Redmine Icon"
+            className="h-4 w-auto"
+            width={16}
+            height={16}
+          />{" "}
+          Redmine
+          <Badge className="text-xs" variant="secondary">
+            Community driven
+          </Badge>
         </span>
       );
     default:

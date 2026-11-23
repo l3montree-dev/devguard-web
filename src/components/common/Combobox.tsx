@@ -104,32 +104,7 @@ export function Combobox(props: Props) {
                     }
                   }}
                 >
-                  {"Render" in item ? (
-                    item.Render
-                  ) : (
-                    <>
-                      {item.value.startsWith("gitlab") ? (
-                        <img
-                          className="mr-2 inline-block h-4 w-4"
-                          src="/assets/gitlab.svg"
-                          alt="GitLab"
-                        />
-                      ) : item.value.startsWith("github") ? (
-                        <img
-                          className="mr-2 inline-block h-4 w-4 dark:invert"
-                          src="/assets/github.svg"
-                          alt="GitHub"
-                        />
-                      ) : item.value.startsWith("jira") ? (
-                        <img
-                          className="mr-2 inline-block h-4 w-4"
-                          src="/assets/jira-svgrepo-com.svg"
-                          alt="Jira"
-                        />
-                      ) : null}
-                      {item.label}
-                    </>
-                  )}
+                  {"Render" in item ? item.Render : item.label}
                 </CommandItem>
               ))}
             </CommandGroup>

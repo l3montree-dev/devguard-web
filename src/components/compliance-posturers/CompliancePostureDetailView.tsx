@@ -118,6 +118,7 @@ import {
 import useDecodedParams from "@/hooks/useDecodedParams";
 import Callout from "../common/Callout";
 import { FlatBadge } from "../common/Severity";
+import { CreateTicketButton } from "../integration/CreateTicketButton";
 
 const MarkdownEditor = dynamic(
   () => import("@/components/common/MarkdownEditor"),
@@ -299,7 +300,7 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
   const assetVersion = useActiveAssetVersion();
   const { session } = useSession();
   const params = useDecodedParams();
-  const { assetSlug, projectSlug } = params;
+  const { assetSlug, projectSlug, organizationSlug } = params;
 
   const inherited = isInherited(vuln, assetVersion, asset, project);
 
@@ -798,80 +799,23 @@ const CompliancePostureDetailView = ({ scope, vulnId }: Props) => {
                                     </TooltipContent>
                                   </Tooltip>
                                 )}
-                              {vuln.ticketId === null &&
-                                integrationName === "gitlab" && (
-                                  <AsyncButton
-                                    variant={"secondary"}
-                                    onClick={() =>
-                                      handleSubmit({
-                                        status: "mitigate",
-                                        justification,
-                                      })
-                                    }
-                                  >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        <GitProviderIcon
-                                          externalEntityProviderIdOrRepositoryId={
-                                            asset.externalEntityProviderId ??
-                                            "gitlab"
-                                          }
-                                        />
-                                        Create Ticket
-                                      </div>
-                                    </div>
-                                  </AsyncButton>
+                              <CreateTicketButton
+                                integrationName={integrationName}
+                                externalEntityProviderId={getIntegrationNameFromRepositoryIdOrExternalProviderId(
+                                  asset,
+                                  project,
                                 )}
-                              {vuln.ticketId === null &&
-                                integrationName === "github" && (
-                                  <AsyncButton
-                                    variant={"secondary"}
-                                    onClick={() =>
-                                      handleSubmit({
-                                        status: "mitigate",
-                                        justification,
-                                      })
-                                    }
-                                  >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        <Image
-                                          alt="GitHub Logo"
-                                          width={15}
-                                          height={15}
-                                          className="mr-2 dark:invert"
-                                          src={"/assets/github.svg"}
-                                        />
-                                        Create GitHub Ticket
-                                      </div>
-                                    </div>
-                                  </AsyncButton>
-                                )}
-                              {vuln.ticketId === null &&
-                                integrationName === "jira" && (
-                                  <AsyncButton
-                                    variant={"secondary"}
-                                    onClick={() =>
-                                      handleSubmit({
-                                        status: "mitigate",
-                                        justification,
-                                      })
-                                    }
-                                  >
-                                    <div className="flex flex-col">
-                                      <div className="flex">
-                                        <Image
-                                          alt="Jira Logo"
-                                          width={15}
-                                          height={15}
-                                          className="mr-2"
-                                          src={"/assets/jira-svgrepo-com.svg"}
-                                        />
-                                        Create Jira Ticket
-                                      </div>
-                                    </div>
-                                  </AsyncButton>
-                                )}
+                                hasTicket={Boolean(vuln.ticketId)}
+                                orgSlug={organizationSlug}
+                                projectSlug={projectSlug}
+                                assetSlug={assetSlug}
+                                onClick={() =>
+                                  handleSubmit({
+                                    status: "mitigate",
+                                    justification,
+                                  })
+                                }
+                              />
                             </>
                           )}
                           <AsyncButton

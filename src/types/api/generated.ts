@@ -3100,6 +3100,190 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/integrations/redmine/test-and-save/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Test and save Redmine integration credentials */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      /** @description Redmine credentials */
+      requestBody: {
+        content: {
+          "application/json": {
+            name?: string;
+            token?: string;
+            tracker?: string;
+            url?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RedmineIntegration"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete a Redmine integration access token */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Redmine integration ID */
+          redmine_integration_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/properties/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve Redmine integration properties (trackers, statuses, priorities) */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Redmine integration ID */
+          redmine_integration_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RedmineIntegrationProperties"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/settings/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update Redmine integration settings */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Redmine integration ID */
+          redmine_integration_id: string;
+        };
+        cookie?: never;
+      };
+      /** @description Redmine integration settings */
+      requestBody: {
+        content: {
+          "application/json": {
+            closeStatus?: number;
+            criticalPriority?: number;
+            defaultStatus?: number;
+            highPriority?: number;
+            lowPriority?: number;
+            mediumPriority?: number;
+            mermaidIntegration?: string;
+            tracker?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RedmineIntegration"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/integrations/repositories": {
     parameters: {
       query?: never;
@@ -15526,6 +15710,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["dtos.Project"][];
+      redmineIntegrations: components["schemas"]["dtos.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -15572,6 +15757,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["dtos.Project"][];
+      redmineIntegrations: components["schemas"]["dtos.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -15674,6 +15860,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["dtos.Project"][];
+      redmineIntegrations: components["schemas"]["dtos.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -15867,6 +16054,37 @@ export interface components {
     };
     "dtos.Recommendation": {
       recommendedVersion: string;
+    };
+    "dtos.RedmineIntegration": {
+      closeStatusId: number;
+      criticalPriorityId: number;
+      defaultStatusId: number;
+      highPriorityId: number;
+      id: string;
+      lowPriorityId: number;
+      mediumPriorityId: number;
+      mermaidIntegration: string;
+      name: string;
+      obfuscatedToken: string;
+      trackerId: number;
+      url: string;
+    };
+    "dtos.RedmineIntegrationProperties": {
+      priorities: components["schemas"]["dtos.RedminePriority"][];
+      statuses: components["schemas"]["dtos.RedmineStatus"][];
+      trackers: components["schemas"]["dtos.RedmineTracker"][];
+    };
+    "dtos.RedminePriority": {
+      id: number;
+      name: string;
+    };
+    "dtos.RedmineStatus": {
+      id: number;
+      name: string;
+    };
+    "dtos.RedmineTracker": {
+      id: number;
+      name: string;
     };
     "dtos.Relationship": {
       relationshipType: string;
@@ -16562,6 +16780,9 @@ export interface components {
       updatedAt: string;
       vulnAssetId: string;
     };
+    /** @enum {string} */
+    "github_com_l3montree-dev_devguard_database_models.MermaidIntegrationType":
+      "none" | "macro" | "commonmark";
     "github_com_l3montree-dev_devguard_database_models.Org": {
       configFiles: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       contactPhoneNumber: string;
@@ -16583,6 +16804,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"][];
+      redmineIntegrations: components["schemas"]["github_com_l3montree-dev_devguard_database_models.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -16647,6 +16869,23 @@ export interface components {
     /** @enum {string} */
     "github_com_l3montree-dev_devguard_database_models.ProjectType":
       "default" | "dynamic";
+    "github_com_l3montree-dev_devguard_database_models.RedmineIntegration": {
+      closeStatusId: number;
+      createdAt: string;
+      criticalPriorityId: number;
+      defaultStatusId: number;
+      highPriorityId: number;
+      id: string;
+      lowPriorityId: number;
+      mediumPriorityId: number;
+      mermaidIntegration: components["schemas"]["github_com_l3montree-dev_devguard_database_models.MermaidIntegrationType"];
+      name: string;
+      org: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Org"];
+      orgId: string;
+      trackerId: number;
+      updatedAt: string;
+      url: string;
+    };
     "github_com_l3montree-dev_devguard_database_models.SupplyChain": {
       assetId: string;
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
