@@ -8,7 +8,10 @@ import ManualUploadOptionsFields from "@/components/guides/risk-scanner-carousel
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
-import { useAssetBranchesAndTags } from "@/hooks/useActiveAssetVersion";
+import {
+  useActiveAssetVersion,
+  useAssetBranchesAndTags,
+} from "@/hooks/useActiveAssetVersion";
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useActiveProject } from "@/hooks/useActiveProject";
 import { toast } from "@/lib/toast";
@@ -19,10 +22,11 @@ import {
   uploadVex,
 } from "@/services/scanUploadService";
 import type { ManualUploadKind } from "@/types/view/integration";
+import type { ArtifactDTO, AssetVersionDTO } from "@/types/dto";
 import type { Surface } from "@/lib/surface";
 import { ensureValidBranchOrTagSlug } from "@/utils/common";
-import { useCallback, useState } from "react";
-import type { FunctionComponent } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { FunctionComponent, ReactNode } from "react";
 import { useDropzone } from "react-dropzone";
 
 const kindLabels: Record<ManualUploadKind, string> = {
@@ -50,14 +54,8 @@ export const detectUploadKind = (
     return "vex";
   }
   if (parsed.bomFormat === "CycloneDX") {
-    // a CycloneDX document without components, but with vulnerabilities is a VEX
-    const components = parsed.components as unknown[] | undefined;
     const vulnerabilities = parsed.vulnerabilities as unknown[] | undefined;
-    if (
-      (!components || components.length === 0) &&
-      vulnerabilities &&
-      vulnerabilities.length > 0
-    ) {
+    if (vulnerabilities && vulnerabilities.length > 0) {
       return "vex";
     }
     return "sbom";
@@ -66,6 +64,12 @@ export const detectUploadKind = (
 };
 
 interface Props {
+  id?: string;
+  initialRef?: Pick<AssetVersionDTO, "name" | "slug" | "type">;
+  artifacts?: ArtifactDTO[];
+  initialArtifact?: string;
+  onLayoutChange?: () => void;
+  onUploadingChange?: (uploading: boolean) => void;
   // called with the page to show the uploaded results
   onUploaded: (destination: string) => void;
   // branch/ tag, artifact and origin fields - hidden during the onboarding,
@@ -73,16 +77,27 @@ interface Props {
   showOptions?: boolean;
   // the surface the upload is rendered on
   variant?: Surface;
+  // rendered left of upload button, like a back button
+  secondaryButton?: ReactNode;
 }
 
 const ScanFileUpload: FunctionComponent<Props> = ({
   onUploaded,
+  id = "onboarding-upload",
   showOptions = true,
   variant,
+  initialRef,
+  artifacts,
+  initialArtifact,
+  secondaryButton,
+  onLayoutChange,
+  onUploadingChange,
 }) => {
   const activeOrg = useActiveOrg();
   const activeProject = useActiveProject()!;
   const asset = useActiveAsset()!;
+  const activeRef = useActiveAssetVersion();
+  const defaultRef = initialRef ?? activeRef;
   const { branches, tags } = useAssetBranchesAndTags();
 
   const [file, setFile] = useState<{
@@ -90,14 +105,23 @@ const ScanFileUpload: FunctionComponent<Props> = ({
     content: string;
     kind: ManualUploadKind;
   }>();
-  const [branchOrTagName, setBranchOrTagName] = useState("main");
-  const [branchOrTagSlug, setBranchOrTagSlug] = useState("main");
-  const [isTag, setIsTag] = useState(false);
+  const [branchOrTagName, setBranchOrTagName] = useState(
+    defaultRef?.name || "main",
+  );
+  const [branchOrTagSlug, setBranchOrTagSlug] = useState(
+    defaultRef?.slug || "main",
+  );
+  const [isTag, setIsTag] = useState(defaultRef?.type === "tag");
   const [artifactName, setArtifactName] = useState(
-    `pkg:devguard/${activeOrg.slug}/${activeProject.slug}/${asset.slug}`,
+    initialArtifact ||
+      `pkg:devguard/${activeOrg.slug}/${activeProject.slug}/${asset.slug}`,
   );
   const [origin, setOrigin] = useState("SBOM_DEFAULT");
   const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    onLayoutChange?.();
+  }, [file, onLayoutChange]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const dropped = acceptedFiles[0];
@@ -129,6 +153,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
   const dropzone = useDropzone({
     onDrop,
     multiple: false,
+    disabled: isUploading,
     accept: {
       "application/json": [".json"],
       "application/sarif+json": [".sarif"],
@@ -151,6 +176,7 @@ const ScanFileUpload: FunctionComponent<Props> = ({
     const refUrl = `${assetUrl}/refs/${ensureValidBranchOrTagSlug(branchOrTagSlug)}`;
 
     setIsUploading(true);
+    onUploadingChange?.(true);
     try {
       if (file.kind === "sbom") {
         const resp = await uploadSbomFile(
@@ -184,13 +210,14 @@ const ScanFileUpload: FunctionComponent<Props> = ({
       toast.error(`${kindLabels[file.kind]} has not been sent successfully`);
     } finally {
       setIsUploading(false);
+      onUploadingChange?.(false);
     }
   };
 
   return (
     <div className="flex flex-1 flex-col gap-4">
       <FileUpload
-        id="onboarding-upload"
+        id={id}
         variant={variant}
         files={file ? [file.file.name] : []}
         dropzone={dropzone}
@@ -217,25 +244,30 @@ const ScanFileUpload: FunctionComponent<Props> = ({
             artifactName,
             onArtifactNameChange: setArtifactName,
             onSelectedArtifactChange: (name) => setArtifactName(name ?? ""),
+            artifacts,
+            selectedArtifact: artifactName,
             origin,
             onOriginChange: setOrigin,
-            onReInit: () => {},
+            onReInit: () => {
+              setTimeout(() => onLayoutChange?.(), 0);
+            },
           }}
           originLabel="Origin"
           originHint="Origin of the report (e.g., SBOM_DEFAULT)"
           showArtifact={file?.kind !== "sarif"}
         />
       )}
-      <Button
-        // stays at the bottom when the parent stretches the upload
-        className="mt-auto self-end"
-        data-testid="onboarding-upload-submit"
-        disabled={!file || isUploading}
-        isSubmitting={isUploading}
-        onClick={handleUpload}
-      >
-        {file ? `Upload ${kindLabels[file.kind]}` : "Upload"}
-      </Button>
+      <div className="mt-auto flex flex-row gap-2 justify-end">
+        {secondaryButton}
+        <Button
+          data-testid={`${id}-submit`}
+          disabled={!file || isUploading}
+          isSubmitting={isUploading}
+          onClick={handleUpload}
+        >
+          {file ? `Upload ${kindLabels[file.kind]}` : "Upload"}
+        </Button>
+      </div>
     </div>
   );
 };
