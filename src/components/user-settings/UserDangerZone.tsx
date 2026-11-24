@@ -4,6 +4,7 @@
 "use client";
 
 import DangerZone from "@/components/common/DangerZone";
+import ImportSection from "@/components/common/data-transfer/ImportSection";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { useConfig } from "@/context/ConfigContext";
@@ -23,6 +24,13 @@ const UserDangerZone = () => {
   return (
     <DangerZone>
       <div className="flex flex-col gap-4">
+        {!config.singleOrganizationMode && (
+          <ImportSection
+            title="Import Organization"
+            description="Imports an organization archive as a new organization. You become its owner."
+            importPath="/organizations/import/"
+          />
+        )}
         <ListItem
           Title="Logout"
           Description="End your current session on this device."
