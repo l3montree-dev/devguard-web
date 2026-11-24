@@ -510,8 +510,7 @@ interface Props {
 
 const DependencyProxyConfigs = ({ scope, forceVertical }: Props) => {
   const { config: data, proxyUrls, saveConfig } = useDependencyProxy(scope);
-  const { data: secrets = [] } = useSecrets(scope);
-  const availableSecrets = secrets.filter((secret) => !secret.overridden);
+  const { data: availableSecrets = [] } = useSecrets(scope);
 
   const [rulesText, setRulesText] = useState("");
   const [codeError, setCodeError] = useState<string | null>(null);

@@ -16599,7 +16599,6 @@ export interface components {
       id: string;
       inheritedFrom: string;
       name: string;
-      overridden: boolean;
       scope: components["schemas"]["dtos.SecretScope"];
     };
     /** @enum {string} */

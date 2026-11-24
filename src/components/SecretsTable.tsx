@@ -88,13 +88,7 @@ const SecretsTable: FunctionComponent<Props> = ({ scope }) => {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <LockIcon className="h-4 w-4 text-muted-foreground" />
-                        <span
-                          className={classNames(
-                            "font-mono",
-                            secret.overridden &&
-                              "text-muted-foreground line-through",
-                          )}
-                        >
+                        <span className={classNames("font-mono")}>
                           {secret.name}
                         </span>
                         {Boolean(secret.inheritedFrom) && (
