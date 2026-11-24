@@ -4,7 +4,11 @@
 "use client";
 
 import CelCodeBlock from "@/components/common/CelCodeBlock";
-import { checkCelSyntax, REF_FIELDS } from "@/components/common/celLinter";
+import {
+  ASSET_VERSION_COMPLETIONS,
+  checkCelSyntax,
+  REF_FIELDS,
+} from "@/components/common/celLinter";
 import { AsyncButton, Button } from "@/components/ui/button";
 import {
   Collapsible,
@@ -137,7 +141,9 @@ const AssetVersionRetentionSettings = () => {
   const [policy, setPolicy] = useState(saved);
 
   const isEmpty = policy.trim() === "";
-  const syntaxError = isEmpty ? null : checkCelSyntax(policy);
+  const syntaxError = isEmpty
+    ? null
+    : checkCelSyntax(policy, ASSET_VERSION_COMPLETIONS);
   // an empty policy resets to the default, so that is what gets previewed
   const test = useRetentionPolicyTest(isEmpty ? DEFAULT_POLICY : policy);
   // the server compiles with cel-go and catches what the editor's linter cannot

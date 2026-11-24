@@ -3,7 +3,10 @@
 
 "use client";
 
-import { checkCelSyntax } from "@/components/common/celLinter";
+import {
+  ASSET_VERSION_COMPLETIONS,
+  checkCelSyntax,
+} from "@/components/common/celLinter";
 import { testAssetVersionRetentionPolicy } from "@/services/assetService";
 import type { components } from "@/types/api/generated";
 import { useEffect, useState } from "react";
@@ -27,7 +30,8 @@ export function useRetentionPolicyTest(policy: string) {
 
   const expression = policy.trim();
   const hasSyntaxError =
-    expression !== "" && checkCelSyntax(expression) !== null;
+    expression !== "" &&
+    checkCelSyntax(expression, ASSET_VERSION_COMPLETIONS) !== null;
   const { organization, projectSlug, assetSlug } = scope;
 
   useEffect(() => {

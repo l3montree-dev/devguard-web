@@ -173,7 +173,11 @@ class CelParser {
   private tokens: Token[];
   private pos = 0;
 
-  constructor(tokens: Token[]) {
+  constructor(
+    tokens: Token[],
+    private expression: string,
+    private completions: CelField[],
+  ) {
     this.tokens = tokens;
   }
 
@@ -328,6 +332,24 @@ class CelParser {
           );
         }
         this.next();
+        const path = propertyPathBefore(this.expression, t.start);
+        const fields = resolveFields(
+          this.completions,
+          path,
+          this.expression.slice(0, t.start),
+        );
+        if (fields && !fields.some((f) => f.label === t.value)) {
+          const match = fields.find(
+            (f) => f.label.toLowerCase() === t.value.toLowerCase(),
+          );
+          throw new CelSyntaxError(
+            match
+              ? `Did you mean "${match.label}"?`
+              : `"${t.value}" is not a valid property of ${path.join(".")}`,
+            t.start,
+            t.end - t.start,
+          );
+        }
         if (this.isPunct("(")) {
           this.next();
           this.parseArgs();
@@ -450,11 +472,16 @@ class CelParser {
  */
 export function checkCelSyntax(
   expression: string,
+  completions = VEX_RULE_COMPLETIONS,
 ): { message: string; pos: number; length: number } | null {
   try {
     const tokens = tokenize(expression);
     if (tokens.length === 1) return null; // only EOF -> empty/comment-only line
-    const isBool = new CelParser(tokens).parseProgram();
+    const isBool = new CelParser(
+      tokens,
+      expression,
+      completions,
+    ).parseProgram();
     if (!isBool) {
       return {
         message:
@@ -476,12 +503,12 @@ export function checkCelSyntax(
   }
 }
 
-export function celParseLinter() {
+export function celParseLinter(completions: CelField[]) {
   return (view: EditorView): Diagnostic[] => {
     const text = view.state.doc.toString();
     if (text.trim() === "") return [];
 
-    const error = checkCelSyntax(text);
+    const error = checkCelSyntax(text, completions);
     if (!error) return [];
 
     return [
@@ -502,6 +529,34 @@ export type CelField = Completion & {
   fields?: CelField[];
   elementFields?: CelField[];
 };
+
+const STRING_METHODS: CelField[] = [
+  {
+    label: "contains",
+    type: "method",
+    detail: "(string) -> bool",
+    apply: 'contains("")',
+  },
+  {
+    label: "startsWith",
+    type: "method",
+    detail: "(string) -> bool",
+    apply: 'startsWith("")',
+  },
+  {
+    label: "endsWith",
+    type: "method",
+    detail: "(string) -> bool",
+    apply: 'endsWith("")',
+  },
+  {
+    label: "matches",
+    type: "method",
+    detail: "(regex) -> bool",
+    apply: 'matches("")',
+  },
+  { label: "size", type: "method", detail: "() -> int", apply: "size()" },
+];
 
 // Mirrors dtos.RiskMetrics as seen through the CEL "vuln.cve.risk" map.
 const RISK_FIELDS: CelField[] = [
@@ -837,7 +892,9 @@ function resolveFields(
   }
   for (const part of path.slice(1)) {
     field = fields && findField(fields, part);
-    fields = field?.fields;
+    fields =
+      field?.fields ??
+      (field?.detail?.startsWith("string") ? STRING_METHODS : undefined);
   }
   return fields;
 }
