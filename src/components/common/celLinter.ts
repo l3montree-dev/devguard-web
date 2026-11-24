@@ -503,7 +503,7 @@ export function checkCelSyntax(
   }
 }
 
-export function celParseLinter(completions = VEX_RULE_COMPLETIONS) {
+export function celParseLinter(completions: CelField[]) {
   return (view: EditorView): Diagnostic[] => {
     const text = view.state.doc.toString();
     if (text.trim() === "") return [];

@@ -113,7 +113,7 @@ const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
-  cel: celParseLinter(),
+  cel: celParseLinter(ASSET_VERSION_COMPLETIONS),
   "cel-asset-version": celParseLinter(ASSET_VERSION_COMPLETIONS),
 };
 
