@@ -6,7 +6,7 @@
 import { useFormContext } from "react-hook-form";
 import type { OryNodeInputProps } from "@ory/elements-react";
 import { Input } from "@/components/ui/input";
-import { PasswordField } from "../PasswordField";
+import { PasswordField } from "@/components/common/PasswordField";
 
 export function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
   const { register } = useFormContext();
@@ -21,6 +21,7 @@ export function OryInput({ node, attributes, onClick }: OryNodeInputProps) {
   if (rest.type === "password") {
     return (
       <PasswordField
+        variant="onCard"
         field={field}
         label="password"
         data-testid={name}
