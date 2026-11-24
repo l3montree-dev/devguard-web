@@ -8,9 +8,11 @@ import type { FocusEventHandler, MouseEventHandler } from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
+// mirrors the Input component; the ring uses focus-within because the wrapper itself never receives focus
 const PASSWORD_FIELD_CLASS =
-  "bg-background/70 flex h-10 w-full rounded-md border border-input text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 items-center";
+  "flex h-10 w-full items-center rounded-md border border-input text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50 dark:border-foreground/10";
 
 export const CONFIRM_PASSWORD_LABEL = "Confirm Password";
 
@@ -26,6 +28,7 @@ export function PasswordField({
   disabled,
   pattern,
   className,
+  variant = "default",
   onClick,
   onBlur,
 }: {
@@ -40,6 +43,7 @@ export function PasswordField({
   disabled?: boolean;
   pattern?: string;
   className?: string;
+  variant?: "default" | "onCard";
   onClick?: MouseEventHandler<HTMLInputElement>;
   onBlur?: FocusEventHandler<HTMLInputElement>;
 }) {
@@ -47,7 +51,13 @@ export function PasswordField({
   const { ref, onBlur: fieldOnBlur, ...fieldRest } = field;
 
   return (
-    <div className={`${PASSWORD_FIELD_CLASS} ${className ?? ""}`}>
+    <div
+      className={cn(
+        PASSWORD_FIELD_CLASS,
+        variant === "onCard" ? "bg-background/70" : "bg-card",
+        className,
+      )}
+    >
       <input
         id={id}
         ref={ref}
@@ -65,10 +75,10 @@ export function PasswordField({
         }}
         data-testid={dataTestId}
         {...fieldRest}
-        className="w-full py-2 pl-3"
+        className="w-full bg-transparent py-2 pl-3 placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed"
       />
       <Button
-        className="bg-transparent hover:bg-transparent text-foreground"
+        className="bg-transparent hover:bg-transparent text-muted-foreground"
         type="button"
         onClick={() => setReveal((prev) => !prev)}
         aria-label={reveal ? `Hide ${label}` : `Show ${label}`}

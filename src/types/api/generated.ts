@@ -16597,7 +16597,6 @@ export interface components {
     };
     "dtos.SecretDTO": {
       id: string;
-      inherited: boolean;
       inheritedFrom: string;
       name: string;
       overridden: boolean;

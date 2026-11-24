@@ -8,7 +8,10 @@ import { useFormContext } from "react-hook-form";
 import type { OryNodeInputProps } from "@ory/elements-react";
 import { Label } from "@/components/ui/label";
 import { usePasswordMismatch } from "@/hooks/usePasswordMismatch";
-import { CONFIRM_PASSWORD_LABEL, PasswordField } from "../PasswordField";
+import {
+  CONFIRM_PASSWORD_LABEL,
+  PasswordField,
+} from "@/components/common/PasswordField";
 import { OryInput } from "./OryInput";
 
 export function OryRegistrationInput(props: OryNodeInputProps) {
@@ -49,6 +52,7 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
   return (
     <div className="flex flex-col gap-1">
       <PasswordField
+        variant="onCard"
         field={register(name, { value })}
         label="password"
         data-testid={name}
@@ -65,6 +69,7 @@ export function OryRegistrationInput(props: OryNodeInputProps) {
         {CONFIRM_PASSWORD_LABEL}
       </Label>
       <PasswordField
+        variant="onCard"
         id="confirm-password"
         field={register("confirmPassword")}
         label="confirm password"

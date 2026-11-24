@@ -110,12 +110,12 @@ const exampleRules = [
         token: $npm_token`,
   },
   {
-    label: "npm registry with login auth",
+    label: "npm registry with basic auth",
     rule: `registries:
   npm:
     - url: https://nexus.company.com/repository/npm/
       auth:
-        type: login
+        type: basic-auth
         username: ci-user
         password: $nexus_password`,
   },
@@ -175,10 +175,10 @@ const getEcosystemContent = (key: string, url: string) => {
               <code className="font-mono text-sm">scopes</code> and an{" "}
               <code className="font-mono text-sm">auth</code> block (
               <code className="font-mono text-sm">token</code> or{" "}
-              <code className="font-mono text-sm">login</code>) that references
-              secrets as <code className="font-mono text-sm">$name</code>. All
-              other packages use the entry without scopes, or the public npm
-              registry.
+              <code className="font-mono text-sm">basic-auth</code>) that
+              references secrets as{" "}
+              <code className="font-mono text-sm">$name</code>. All other
+              packages use the entry without scopes, or the public npm registry.
             </Callout>
           </div>
         </div>

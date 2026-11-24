@@ -97,7 +97,7 @@ const SecretsTable: FunctionComponent<Props> = ({ scope }) => {
                         >
                           {secret.name}
                         </span>
-                        {secret.inherited && (
+                        {Boolean(secret.inheritedFrom) && (
                           <Badge variant="secondary">
                             Inherited from {secret.inheritedFrom}
                           </Badge>
@@ -105,7 +105,7 @@ const SecretsTable: FunctionComponent<Props> = ({ scope }) => {
                       </div>
                     </td>
                     <td className="p-4 text-right">
-                      {!secret.inherited && (
+                      {!Boolean(secret.inheritedFrom) && (
                         <Alert
                           onConfirm={() => handleDelete(secret.id)}
                           title="Delete secret"

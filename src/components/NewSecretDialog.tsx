@@ -28,6 +28,8 @@ import {
   FormLabel,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { PasswordField } from "./common/PasswordField";
 
 interface Props {
   scope: ConfigScope;
@@ -89,34 +91,27 @@ const NewSecretDialog: FunctionComponent<Props> = ({
                     <Input
                       placeholder="npm_token"
                       required
-                      pattern="[a-z0-9_]+"
+                      pattern="[a-zA-Z0-9_]+"
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    Lowercase letters, digits and underscores. Reference it as
-                    $name in the dependency proxy configuration.
+                    Letters, digits and underscores. Reference it as $name in
+                    the dependency proxy configuration.
                   </FormDescription>
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="value"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Value</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      autoComplete="off"
-                      required
-                      {...field}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="secret-value">Value</Label>
+              <PasswordField
+                id="secret-value"
+                field={form.register("value", { required: true })}
+                label="Value"
+                autoComplete="off"
+                required
+              />
+            </div>
             <div className="flex justify-end">
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 Add secret
