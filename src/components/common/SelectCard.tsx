@@ -14,7 +14,7 @@ interface OutlineSelectCardProps {
   children?: ReactNode;
 }
 
-const OutlineSelectCard = ({
+const SelectCard = ({
   selected,
   onClick,
   icon: Icon,
@@ -27,7 +27,7 @@ const OutlineSelectCard = ({
     type="button"
     onClick={onClick}
     className={cn(
-      "relative flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",
+      "relative flex flex-col items-start gap-2 rounded-lg bg-card border p-4 text-left transition-colors",
       selected
         ? "border-primary bg-primary/5 ring-1 ring-primary"
         : "border-input dark:border-foreground/10 hover:border-muted-foreground/70 dark:hover:border-foreground/40",
@@ -51,4 +51,4 @@ const OutlineSelectCard = ({
   </button>
 );
 
-export default OutlineSelectCard;
+export default SelectCard;

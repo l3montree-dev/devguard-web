@@ -323,7 +323,8 @@ const Index: FunctionComponent = () => {
             id: "issue-tracker",
             icon: Ticket,
             title: "Connect your issue tracker",
-            summary: "Let DevGuard create tickets in GitHub, GitLab or Jira.",
+            summary:
+              "Let DevGuard create tickets in GitHub, GitLab, Redmine or Jira.",
             description: isSyncedFromGitLab
               ? "Whenever DevGuard detects a new risk, it creates a ticket in your project. Invite the DevGuard Bot, so it is allowed to do so."
               : "Whenever DevGuard detects a new risk, it creates a ticket in your issue tracker. There you can work on the risk and even use slash commands to apply mitigation strategies.",

@@ -88,16 +88,10 @@ const SecretsTable: FunctionComponent<Props> = ({ scope }) => {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <LockIcon className="h-4 w-4 text-muted-foreground" />
-                        <span
-                          className={classNames(
-                            "font-mono",
-                            secret.overridden &&
-                              "text-muted-foreground line-through",
-                          )}
-                        >
+                        <span className={classNames("font-mono")}>
                           {secret.name}
                         </span>
-                        {secret.inherited && (
+                        {Boolean(secret.inheritedFrom) && (
                           <Badge variant="secondary">
                             Inherited from {secret.inheritedFrom}
                           </Badge>
@@ -105,7 +99,7 @@ const SecretsTable: FunctionComponent<Props> = ({ scope }) => {
                       </div>
                     </td>
                     <td className="p-4 text-right">
-                      {!secret.inherited && (
+                      {!Boolean(secret.inheritedFrom) && (
                         <Alert
                           onConfirm={() => handleDelete(secret.id)}
                           title="Delete secret"

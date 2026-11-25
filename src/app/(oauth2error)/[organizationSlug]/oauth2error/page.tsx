@@ -10,15 +10,11 @@ import useDocumentTitle from "@/hooks/useDocumentTitle";
 import { TUNNEL_BASE_URL } from "@/services/apiClient";
 import Image from "next/image";
 import Link from "next/link";
-import { use } from "react";
+import useDecodedParams from "../../../../hooks/useDecodedParams";
 
-export default function OAuth2ErrorPage({
-  params,
-}: {
-  params: Promise<{ organizationSlug: string }>;
-}) {
+export default function OAuth2ErrorPage() {
   useDocumentTitle("Reauthorization required");
-  const { organizationSlug } = use(params);
+  const { organizationSlug } = useDecodedParams();
 
   const providerId = decodeURIComponent(organizationSlug).replace("@", "");
   const reauthorizeUrl =

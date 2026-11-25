@@ -40,9 +40,10 @@ const IssueTrackerConnect: FunctionComponent<{
   }
 
   const hasIntegration =
-    activeOrg.githubAppInstallations?.length > 0 ||
-    activeOrg.gitLabIntegrations?.length > 0 ||
-    activeOrg.jiraIntegrations?.length > 0;
+    activeOrg.githubAppInstallations.length > 0 ||
+    activeOrg.gitLabIntegrations.length > 0 ||
+    activeOrg.jiraIntegrations.length > 0 ||
+    activeOrg.redmineIntegrations.length > 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,7 +53,7 @@ const IssueTrackerConnect: FunctionComponent<{
           setProvider(value as ExternalTicketProvider);
         }}
       >
-        <SelectTrigger variant={variant} className="w-[220px]">
+        <SelectTrigger variant={variant} className="w-[320px]">
           <SelectValue placeholder="Select Provider" />
         </SelectTrigger>
         <SelectContent>

@@ -8,6 +8,7 @@ import { innerCardClassName, type Surface } from "@/lib/surface";
 import {
   deleteGitlabIntegration,
   deleteJiraIntegration,
+  deleteRedmineIntegration,
 } from "@/services/organizationService";
 import type { OrganizationDetailsDTO } from "@/types/dto";
 import type { ExternalTicketProvider } from "@/types/common";
@@ -107,10 +108,37 @@ export default function ProviderSetup({
     }
   };
 
+  const handleDeleteRedmine = async (id: string) => {
+    let deleted = true;
+    try {
+      await deleteRedmineIntegration(activeOrg.slug, id);
+    } catch {
+      deleted = false;
+    }
+
+    if (deleted) {
+      updateOrganization((prev) => {
+        if (!prev.organization) {
+          return prev;
+        }
+        return {
+          ...prev,
+          organization: {
+            ...prev.organization,
+            redmineIntegrations: prev.organization.redmineIntegrations.filter(
+              (i) => i.id !== id,
+            ),
+          },
+        };
+      });
+    }
+  };
+
   const providerIntegrationPresent =
-    activeOrg.githubAppInstallations?.length > 0 ||
-    activeOrg.gitLabIntegrations?.length > 0 ||
-    activeOrg.jiraIntegrations?.length > 0;
+    activeOrg.githubAppInstallations.length > 0 ||
+    activeOrg.gitLabIntegrations.length > 0 ||
+    activeOrg.jiraIntegrations.length > 0 ||
+    activeOrg.redmineIntegrations.length > 0;
 
   return (
     <div>
@@ -211,6 +239,35 @@ export default function ProviderSetup({
           }
         />
       ))}
+      {activeOrg.redmineIntegrations.map((integration) => (
+        <ListItem
+          className={cn("mb-4", innerCardClassName(variant))}
+          key={integration.id}
+          Title={
+            <div className="flex flex-row items-center">
+              <Image
+                src="/assets/provider-icons/redmine.svg"
+                alt="Redmine"
+                width={20}
+                height={20}
+                className="mr-2 inline-block"
+              />
+              {integration.name}
+            </div>
+          }
+          Description={
+            "DevGuard uses an API access key to access your Redmine projects and interact with your issues."
+          }
+          Button={
+            <AsyncButton
+              variant={"destructiveOutline"}
+              onClick={() => handleDeleteRedmine(integration.id)}
+            >
+              Delete
+            </AsyncButton>
+          }
+        />
+      ))}
       {providerIntegrationPresent && (
         <div className="mb-4 flex flex-col items-end">
           <Button
@@ -226,7 +283,9 @@ export default function ProviderSetup({
               ? "GitHub App"
               : selectedProvider === "jira"
                 ? "Jira Integration"
-                : "GitLab Integration"}
+                : selectedProvider === "redmine"
+                  ? "Redmine Integration"
+                  : "GitLab Integration"}
           </Button>
         </div>
       )}

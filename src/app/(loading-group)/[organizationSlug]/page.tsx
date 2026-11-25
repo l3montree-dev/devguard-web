@@ -132,6 +132,7 @@ const OrganizationHomePage: FunctionComponent = () => {
               return {
                 ...subgroup,
                 subGroupsAndAsset: subGroupsAndAsset.data,
+                subGroupsAndAssetTotal: subGroupsAndAsset.total,
               };
             }
 

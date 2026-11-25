@@ -488,4 +488,4 @@ export default Index;
 const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
 const today = new Date();
 const last3Month = new Date(today);
-last3Month.setMonth(last3Month.getMonth() - 10);
+last3Month.setMonth(last3Month.getMonth() - 3);

@@ -14,7 +14,6 @@ import VulnAssessmentComposer from "@/components/risk-assessment/VulnAssessmentC
 import PathToComponent from "@/components/risk-handling/PathToComponent";
 import RelationCard from "@/components/risk-handling/RelationCard";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -69,48 +68,9 @@ import RiskAssessmentFeedSkeleton from "../../../../../../../../../../../compone
 import { Skeleton } from "../../../../../../../../../../../components/ui/skeleton";
 import { useActiveAssetVersion } from "../../../../../../../../../../../hooks/useActiveAssetVersion";
 import useDecodedParams from "../../../../../../../../../../../hooks/useDecodedParams";
+import { CreateTicketButton } from "@/components/integration/CreateTicketButton";
 import Weaknesses from "../../../../../../../../../../../components/Weaknesses";
-
-// Renders nothing unless a ticket can actually be created — that needs a linked
-// issue tracker and a vulnerability that doesn't have a ticket yet.
-const CreateTicketButton: FunctionComponent<{
-  integrationName: "gitlab" | "github" | "jira" | undefined;
-  hasTicket: boolean;
-  externalEntityProviderId?: string;
-  onClick: () => void;
-}> = ({ integrationName, hasTicket, externalEntityProviderId, onClick }) => {
-  if (integrationName === undefined || hasTicket) return null;
-
-  return (
-    <Button variant="secondary" onClick={onClick}>
-      {integrationName === "gitlab" && (
-        <GitProviderIcon
-          externalEntityProviderIdOrRepositoryId={
-            externalEntityProviderId ?? "gitlab"
-          }
-        />
-      )}
-      {integrationName === "github" && (
-        <Image
-          alt="GitHub Logo"
-          width={15}
-          height={15}
-          className="dark:invert"
-          src={"/assets/github.svg"}
-        />
-      )}
-      {integrationName === "jira" && (
-        <Image
-          alt="Jira Logo"
-          width={15}
-          height={15}
-          src={"/assets/jira-svgrepo-com.svg"}
-        />
-      )}
-      <span className="ml-1">Create Ticket</span>
-    </Button>
-  );
-};
+import DateString from "../../../../../../../../../../../components/common/DateString";
 
 const Index: FunctionComponent = () => {
   const role = useCurrentUserRole();
@@ -425,6 +385,14 @@ const Index: FunctionComponent = () => {
               <div className="mt-2 cve-description overflow-x-auto text-muted-foreground">
                 {vuln ? (
                   <>
+                    {vuln.cve.withdrawn && (
+                      <div className="my-3">
+                        <Callout intent="danger">
+                          Vulnerability was withdrawn on{" "}
+                          <DateString date={new Date(vuln.cve.withdrawn)} />
+                        </Callout>
+                      </div>
+                    )}
                     <Markdown>
                       {descriptionExpanded ||
                       (vuln.cve?.description?.length ?? 0) <= 500
@@ -584,7 +552,10 @@ const Index: FunctionComponent = () => {
                               externalEntityProviderId={
                                 asset.externalEntityProviderId
                               }
-                              onClick={() => setMitigateDialogOpen(true)}
+                              orgSlug={organizationSlug}
+                              projectSlug={projectSlug}
+                              assetSlug={assetSlug}
+                              onClick={async () => setMitigateDialogOpen(true)}
                             />
                           }
                         />

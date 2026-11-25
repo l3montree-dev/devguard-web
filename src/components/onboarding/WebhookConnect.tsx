@@ -20,7 +20,7 @@ import { ExternalTicketProviderNames } from "@/const/providers";
 import { useActiveAsset } from "@/hooks/useActiveAsset";
 import type { Surface } from "@/lib/surface";
 import type { ExternalTicketProvider } from "@/types/common";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Info } from "lucide-react";
 import { useState } from "react";
 import type { FunctionComponent } from "react";
 
@@ -43,7 +43,7 @@ const WebhookConnect: FunctionComponent<{
           setProvider(value as ExternalTicketProvider);
         }}
       >
-        <SelectTrigger variant={variant} className="w-[220px]">
+        <SelectTrigger variant={variant} className="w-[320px]">
           <SelectValue placeholder="Select Provider" />
         </SelectTrigger>
         <SelectContent>
@@ -62,6 +62,16 @@ const WebhookConnect: FunctionComponent<{
             The DevGuard GitHub App already receives issue and comment events
             from GitHub. Once the app is installed on your repository, ticket
             updates are synced automatically.
+          </AlertDescription>
+        </Alert>
+      ) : provider === "redmine" ? (
+        <Alert>
+          <Info />
+          <AlertTitle>Webhooks are not supported for Redmine yet</AlertTitle>
+          <AlertDescription>
+            DevGuard creates and updates tickets in Redmine, but changes made in
+            Redmine (e.g. closing an issue or adding a comment) are not synced
+            back to DevGuard yet. No webhook setup is required.
           </AlertDescription>
         </Alert>
       ) : (

@@ -44,6 +44,7 @@ export default function useRepositoryConnection() {
     activeOrg.gitLabIntegrations,
     activeOrg.githubAppInstallations,
     activeOrg.jiraIntegrations,
+    activeOrg.redmineIntegrations,
     activeOrg.slug,
   ]);
 

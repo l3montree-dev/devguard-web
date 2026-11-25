@@ -1,7 +1,6 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
-import type { JiraIntegrationDTO } from "@/types/dto";
 import React, { type FunctionComponent, type ReactNode } from "react";
 import {
   Dialog,
@@ -11,15 +10,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import JiraIntegrationForm from "./JiraIntegrationForm";
+import type { ExternalTicketProvider } from "@/types/common";
+import { ExternalTicketProviderNames } from "@/const/providers";
 
 interface Props {
   Button: ReactNode;
-  onNewIntegration: (integration: JiraIntegrationDTO) => void;
+  Form: (setOpen: (open: boolean) => void) => ReactNode;
+  integration: ExternalTicketProvider;
+  description: ReactNode | string;
 }
-export const JiraIntegrationDialog: FunctionComponent<Props> = ({
-  onNewIntegration,
+export const IntegrationDialog: FunctionComponent<Props> = ({
   Button: Trigger,
+  Form: IntegrationForm,
+  integration,
+  description,
 }) => {
   const [open, setOpen] = React.useState(false);
 
@@ -28,13 +32,12 @@ export const JiraIntegrationDialog: FunctionComponent<Props> = ({
       <DialogTrigger asChild>{Trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Integrate with Jira</DialogTitle>
-          <DialogDescription>
-            To integrate with Jira, you need to provide your Personal Access
-            Token
-          </DialogDescription>
+          <DialogTitle>
+            Integrate with {ExternalTicketProviderNames[integration]}
+          </DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <JiraIntegrationForm onNewIntegration={onNewIntegration} />
+        {IntegrationForm(setOpen)}
       </DialogContent>
     </Dialog>
   );

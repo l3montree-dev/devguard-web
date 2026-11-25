@@ -16,7 +16,7 @@ const FormSection = ({
 }) => (
   <div className="flex gap-4">
     <div className="flex flex-col items-center">
-      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-muted text-xs font-medium text-muted-foreground">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-medium">
         {step}
       </div>
       {!last && <div className="mt-1 w-px flex-1 bg-border" />}

@@ -21,7 +21,12 @@ import { load, YAMLException } from "js-yaml";
 import { keymap, placeholder as placeholderExtension } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { cn } from "@/lib/utils";
-import { celParseLinter, celCompletionSource } from "./celLinter";
+import {
+  ASSET_VERSION_COMPLETIONS,
+  assetVersionCelCompletionSource,
+  celCompletionSource,
+  celParseLinter,
+} from "./celLinter";
 
 const vscodeDark = vscodeDarkInit({
   settings: {
@@ -97,13 +102,19 @@ const languageExtensions = {
     StreamLanguage.define(javascript),
     autocompletion({ override: [celCompletionSource] }),
   ],
+  // CEL evaluated against a branch or tag (ref, otherRefs) - the asset version retention policy.
+  "cel-asset-version": [
+    StreamLanguage.define(javascript),
+    autocompletion({ override: [assetVersionCelCompletionSource] }),
+  ],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
-  cel: celParseLinter(),
+  cel: celParseLinter(ASSET_VERSION_COMPLETIONS),
+  "cel-asset-version": celParseLinter(ASSET_VERSION_COMPLETIONS),
 };
 
 const CodeEditor = ({

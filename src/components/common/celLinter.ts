@@ -21,8 +21,20 @@ class CelSyntaxError extends Error {
   }
 }
 
-// The helper functions the VEX rule CEL environment exposes; both return a bool.
-const BOOL_FUNCTIONS = ["matchesPattern", "matchesPurl"];
+// The helper functions the CEL environments expose which return a bool.
+const BOOL_FUNCTIONS = ["matchesPattern", "matchesPurl", "isSemver", "has"];
+
+// Macros and string methods of the CEL standard library which return a bool,
+// e.g. otherRefs.all(other, ...) or ref.name.startsWith("release/").
+const BOOL_METHODS = [
+  "all",
+  "exists",
+  "exists_one",
+  "startsWith",
+  "endsWith",
+  "contains",
+  "matches",
+];
 
 const PUNCTUATORS = [
   "==",
@@ -161,7 +173,11 @@ class CelParser {
   private tokens: Token[];
   private pos = 0;
 
-  constructor(tokens: Token[]) {
+  constructor(
+    tokens: Token[],
+    private expression: string,
+    private completions: CelField[],
+  ) {
     this.tokens = tokens;
   }
 
@@ -229,12 +245,14 @@ class CelParser {
     return cond;
   }
 
+  // && and || only accept bool operands in CEL, so their result is always a
+  // bool - even when an operand is a field we can't type, e.g. ref.defaultBranch.
   private parseOr(): boolean {
     let result = this.parseAnd();
     while (this.isPunct("||")) {
       this.next();
-      const right = this.parseAnd();
-      result = result && right;
+      this.parseAnd();
+      result = true;
     }
     return result;
   }
@@ -243,8 +261,8 @@ class CelParser {
     let result = this.parseRelational();
     while (this.isPunct("&&")) {
       this.next();
-      const right = this.parseRelational();
-      result = result && right;
+      this.parseRelational();
+      result = true;
     }
     return result;
   }
@@ -314,12 +332,32 @@ class CelParser {
           );
         }
         this.next();
+        const path = propertyPathBefore(this.expression, t.start);
+        const fields = resolveFields(
+          this.completions,
+          path,
+          this.expression.slice(0, t.start),
+        );
+        if (fields && !fields.some((f) => f.label === t.value)) {
+          const match = fields.find(
+            (f) => f.label.toLowerCase() === t.value.toLowerCase(),
+          );
+          throw new CelSyntaxError(
+            match
+              ? `Did you mean "${match.label}"?`
+              : `"${t.value}" is not a valid property of ${path.join(".")}`,
+            t.start,
+            t.end - t.start,
+          );
+        }
         if (this.isPunct("(")) {
           this.next();
           this.parseArgs();
           this.expectPunct(")");
+          isBool = BOOL_METHODS.includes(t.value);
+          continue;
         }
-        // a field/method access changes the type to something we don't
+        // a field access changes the type to something we don't
         // statically know - treat it as non-bool until compared
         isBool = false;
         continue;
@@ -434,15 +472,20 @@ class CelParser {
  */
 export function checkCelSyntax(
   expression: string,
+  completions = VEX_RULE_COMPLETIONS,
 ): { message: string; pos: number; length: number } | null {
   try {
     const tokens = tokenize(expression);
     if (tokens.length === 1) return null; // only EOF -> empty/comment-only line
-    const isBool = new CelParser(tokens).parseProgram();
+    const isBool = new CelParser(
+      tokens,
+      expression,
+      completions,
+    ).parseProgram();
     if (!isBool) {
       return {
         message:
-          "Expression must evaluate to a bool, e.g. via ==, !=, matchesPattern(...) or matchesPurl(...)",
+          "Expression must evaluate to a bool, e.g. via ==, !=, &&, || or a function returning a bool",
         pos: 0,
         length: expression.length,
       };
@@ -460,12 +503,12 @@ export function checkCelSyntax(
   }
 }
 
-export function celParseLinter() {
+export function celParseLinter(completions: CelField[]) {
   return (view: EditorView): Diagnostic[] => {
     const text = view.state.doc.toString();
     if (text.trim() === "") return [];
 
-    const error = checkCelSyntax(text);
+    const error = checkCelSyntax(text, completions);
     if (!error) return [];
 
     return [
@@ -479,8 +522,44 @@ export function celParseLinter() {
   };
 }
 
+// A completion which can be followed by "." - fields are the completions after
+// the dot, elementFields those of a list's elements, bound by macros like
+// otherRefs.all(other, other.<here>).
+export type CelField = Completion & {
+  fields?: CelField[];
+  elementFields?: CelField[];
+};
+
+const STRING_METHODS: CelField[] = [
+  {
+    label: "contains",
+    type: "method",
+    detail: "(string) -> bool",
+    apply: 'contains("")',
+  },
+  {
+    label: "startsWith",
+    type: "method",
+    detail: "(string) -> bool",
+    apply: 'startsWith("")',
+  },
+  {
+    label: "endsWith",
+    type: "method",
+    detail: "(string) -> bool",
+    apply: 'endsWith("")',
+  },
+  {
+    label: "matches",
+    type: "method",
+    detail: "(regex) -> bool",
+    apply: 'matches("")',
+  },
+  { label: "size", type: "method", detail: "() -> int", apply: "size()" },
+];
+
 // Mirrors dtos.RiskMetrics as seen through the CEL "vuln.cve.risk" map.
-const RISK_FIELDS: Completion[] = [
+const RISK_FIELDS: CelField[] = [
   { label: "baseScore", type: "property", detail: "number" },
   { label: "withEnvironment", type: "property", detail: "number" },
   { label: "withThreatIntelligence", type: "property", detail: "number" },
@@ -493,7 +572,7 @@ const RISK_FIELDS: Completion[] = [
 
 // Mirrors models.CVE.ToCELMap() (devguard/database/models/cve_model.go) -
 // only the fields that map actually exposes.
-const CVE_FIELDS: Completion[] = [
+const CVE_FIELDS: CelField[] = [
   { label: "id", type: "property", detail: "number" },
   { label: "contentHash", type: "property", detail: "number" },
   {
@@ -517,6 +596,7 @@ const CVE_FIELDS: Completion[] = [
     type: "property",
     detail: "map",
     info: "Nested risk metrics - type . again for its fields",
+    fields: RISK_FIELDS,
   },
   {
     label: "cisaRequiredAction",
@@ -559,7 +639,7 @@ const CVE_FIELDS: Completion[] = [
 // Mirrors models.DependencyVuln.ToCELMap() plus the "artifactPurls" field
 // vexrules.vulnToCELMap adds on top of it - only the fields actually exposed
 // to the CEL environment used for VEX rule matching.
-const VULN_FIELDS: Completion[] = [
+const VULN_FIELDS: CelField[] = [
   { label: "id", type: "property", detail: "string" },
   { label: "assetVersionName", type: "property", detail: "string" },
   { label: "vulnAssetId", type: "property", detail: "string" },
@@ -574,6 +654,7 @@ const VULN_FIELDS: Completion[] = [
     type: "property",
     detail: "map | null",
     info: "Nested CVE object - type . again for its fields",
+    fields: CVE_FIELDS,
   },
   { label: "componentPurl", type: "property", detail: "string" },
   {
@@ -617,12 +698,37 @@ const VULN_FIELDS: Completion[] = [
   },
 ];
 
-const TOP_LEVEL_COMPLETIONS: Completion[] = [
+const NOW_COMPLETION: CelField = {
+  label: "now",
+  type: "function",
+  detail: "() -> timestamp",
+  info: "Returns the current time in RFC3339 format, e.g. 2023-01-02T15:04:05Z",
+  apply: "now()",
+};
+
+const TIMESTAMP_COMPLETION: CelField = {
+  label: "timestamp",
+  type: "function",
+  detail: "(string) -> timestamp",
+  info: 'Parses a timestamp string in RFC3339 format, e.g. timestamp("2023-01-02T15:04:05Z")',
+  apply: 'timestamp("")',
+};
+
+const DURATION_COMPLETION: CelField = {
+  label: "duration",
+  type: "function",
+  detail: "(string) -> duration",
+  info: 'Parses a duration string, e.g. duration("72h")',
+  apply: 'duration("")',
+};
+
+export const VEX_RULE_COMPLETIONS: CelField[] = [
   {
     label: "vuln",
     type: "variable",
     detail: "map",
     info: "The vulnerability being evaluated",
+    fields: VULN_FIELDS,
   },
   {
     label: "matchesPattern",
@@ -631,33 +737,96 @@ const TOP_LEVEL_COMPLETIONS: Completion[] = [
     info: "Matches vuln's dependency path (and artifact purls) against a path pattern",
     apply: "matchesPattern(vuln, )",
   },
-  {
-    label: "now",
-    type: "function",
-    detail: "() -> timestamp",
-    info: "Returns the current time in RFC3339 format, e.g. 2023-01-02T15:04:05Z",
-    apply: "now()",
-  },
-  {
-    label: "timestamp",
-    type: "function",
-    detail: "(string) -> timestamp",
-    info: 'Parses a timestamp string in RFC3339 format, e.g. timestamp("2023-01-02T15:04:05Z")',
-    apply: 'timestamp("")',
-  },
-  {
-    label: "duration",
-    type: "function",
-    detail: "(string) -> duration",
-    info: 'Parses a duration string, e.g. duration("72h")',
-    apply: 'duration("")',
-  },
+  NOW_COMPLETION,
+  TIMESTAMP_COMPLETION,
+  DURATION_COMPLETION,
   {
     label: "matchesPurl",
     type: "function",
     detail: "(purl, patternPurl) -> bool",
     info: 'Matches a purl against a purl whose version is a semver constraint, e.g. matchesPurl(vuln.componentPurl, "pkg:npm/undici@6.26.*")',
     apply: 'matchesPurl(vuln.componentPurl, "")',
+  },
+];
+
+// Mirrors models.AssetVersion.ToCELMap() (devguard/database/models/asset_version_model.go).
+export const REF_FIELDS: CelField[] = [
+  {
+    label: "name",
+    type: "property",
+    detail: "string",
+    info: 'The branch or tag name, e.g. "main" or "v1.2.3"',
+  },
+  { label: "slug", type: "property", detail: "string" },
+  {
+    label: "type",
+    type: "property",
+    detail: '"branch" | "tag"',
+    info: 'Either "branch" or "tag"',
+  },
+  {
+    label: "defaultBranch",
+    type: "property",
+    detail: "bool",
+    info: "Whether this is the default branch - it is always kept",
+  },
+  { label: "createdAt", type: "property", detail: "string (RFC3339)" },
+  { label: "updatedAt", type: "property", detail: "string (RFC3339)" },
+  {
+    label: "lastUploadAt",
+    type: "property",
+    detail: "string (RFC3339), may be absent",
+    info: 'When a client last uploaded a scan (SBOM or SARIF) - absent if it never did, so guard it: has(ref.lastUploadAt) && timestamp(ref.lastUploadAt) > now() - duration("168h")',
+  },
+];
+
+const SEMVER_FIELDS: CelField[] = [
+  { label: "major", type: "property", detail: "int" },
+  { label: "minor", type: "property", detail: "int" },
+  { label: "patch", type: "property", detail: "int" },
+  { label: "prerelease", type: "property", detail: "string" },
+];
+
+// Mirrors celrules.assetVersionCelEnv (devguard/celrules/asset_version_rules.go).
+export const ASSET_VERSION_COMPLETIONS: CelField[] = [
+  {
+    label: "ref",
+    type: "variable",
+    detail: "map",
+    info: "The branch or tag being evaluated - return true to keep it",
+    fields: REF_FIELDS,
+  },
+  {
+    label: "otherRefs",
+    type: "variable",
+    detail: "list<map>",
+    info: "All other branches and tags of this repository, e.g. otherRefs.all(other, ...)",
+    elementFields: REF_FIELDS,
+  },
+  NOW_COMPLETION,
+  TIMESTAMP_COMPLETION,
+  DURATION_COMPLETION,
+  {
+    label: "semver",
+    type: "function",
+    detail: "(string) -> semver",
+    info: 'Parses a semantic version, e.g. semver(ref.name) >= semver("v1.0.0") - fails for non-semver names, use isSemver() first',
+    apply: "semver(ref.name)",
+    fields: SEMVER_FIELDS,
+  },
+  {
+    label: "isSemver",
+    type: "function",
+    detail: "(string) -> bool",
+    info: 'Whether the string is a semantic version, e.g. isSemver("v1.2.3")',
+    apply: "isSemver(ref.name)",
+  },
+  {
+    label: "has",
+    type: "function",
+    detail: "(field) -> bool",
+    info: "Whether a field is present, e.g. has(ref.lastUploadAt)",
+    apply: "has(ref.lastUploadAt)",
   },
 ];
 
@@ -668,6 +837,16 @@ function propertyPathBefore(text: string, pos: number): string[] {
     // skip the "." that separates the previous identifier
     if (text[i - 1] !== ".") break;
     i--;
+    // skip a call's arguments, so semver(ref.name).<here> completes the
+    // fields of the call's result
+    if (text[i - 1] === ")") {
+      let depth = 0;
+      while (i > 0) {
+        i--;
+        if (text[i] === ")") depth++;
+        else if (text[i] === "(" && --depth === 0) break;
+      }
+    }
     const end = i;
     while (i > 0 && /[a-zA-Z0-9_]/.test(text[i - 1])) i--;
     const ident = text.slice(i, end);
@@ -677,37 +856,78 @@ function propertyPathBefore(text: string, pos: number): string[] {
   return parts;
 }
 
-export function celCompletionSource(
-  context: CompletionContext,
-): CompletionResult | null {
-  const wordMatch = context.matchBefore(/[a-zA-Z0-9_]*/);
-  const from = wordMatch ? wordMatch.from : context.pos;
+// A list macro call up to its variable, e.g. ".all(other," - the variable is captured.
+const LIST_MACRO_CALL =
+  /\.(?:all|exists|exists_one|filter|map)\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,/g;
 
-  const textBeforeWord = context.state.sliceDoc(0, from);
-  const path = propertyPathBefore(textBeforeWord, from);
+function findField(fields: CelField[], label: string) {
+  return fields.find((f) => f.label === label);
+}
 
-  if (path.length > 0) {
-    if (path[0] !== "vuln") return null;
-
-    if (path.length === 1) {
-      return { from, options: VULN_FIELDS, validFor: /^[a-zA-Z0-9_]*$/ };
+// Resolves the fields available after a property path. A root which isn't a
+// top-level completion may be a macro variable, e.g. "other" in
+// otherRefs.filter(o, o.type == "tag").all(other, other.<here>).
+function resolveFields(
+  completions: CelField[],
+  path: string[],
+  textBefore: string,
+): CelField[] | undefined {
+  let field = findField(completions, path[0]);
+  let fields = field?.fields;
+  if (!field) {
+    const macro = [...textBefore.matchAll(LIST_MACRO_CALL)]
+      .filter((match) => match[1] === path[0])
+      .at(-1);
+    if (!macro) return undefined;
+    // filter() keeps the list's element type, so it is skipped
+    const listPath = propertyPathBefore(textBefore, macro.index + 1).filter(
+      (part) => part !== "filter",
+    );
+    let list =
+      listPath.length > 0 ? findField(completions, listPath[0]) : undefined;
+    for (const part of listPath.slice(1)) {
+      list = list?.fields && findField(list.fields, part);
     }
-    if (path.length === 2 && path[1] === "cve") {
-      return { from, options: CVE_FIELDS, validFor: /^[a-zA-Z0-9_]*$/ };
-    }
-    if (path.length === 3 && path[1] === "cve" && path[2] === "risk") {
-      return { from, options: RISK_FIELDS, validFor: /^[a-zA-Z0-9_]*$/ };
-    }
-    return null;
+    fields = list?.elementFields;
   }
-
-  if (!wordMatch || (wordMatch.from === wordMatch.to && !context.explicit)) {
-    return null;
+  for (const part of path.slice(1)) {
+    field = fields && findField(fields, part);
+    fields =
+      field?.fields ??
+      (field?.detail?.startsWith("string") ? STRING_METHODS : undefined);
   }
+  return fields;
+}
 
-  return {
-    from,
-    options: TOP_LEVEL_COMPLETIONS,
-    validFor: /^[a-zA-Z0-9_]*$/,
+export function createCelCompletionSource(completions: CelField[]) {
+  return (context: CompletionContext): CompletionResult | null => {
+    const wordMatch = context.matchBefore(/[a-zA-Z0-9_]*/);
+    const from = wordMatch ? wordMatch.from : context.pos;
+
+    const textBeforeWord = context.state.sliceDoc(0, from);
+    const path = propertyPathBefore(textBeforeWord, from);
+
+    if (path.length > 0) {
+      const options = resolveFields(completions, path, textBeforeWord);
+      if (!options) return null;
+      return { from, options, validFor: /^[a-zA-Z0-9_]*$/ };
+    }
+
+    if (!wordMatch || (wordMatch.from === wordMatch.to && !context.explicit)) {
+      return null;
+    }
+
+    return {
+      from,
+      options: completions,
+      validFor: /^[a-zA-Z0-9_]*$/,
+    };
   };
 }
+
+export const celCompletionSource =
+  createCelCompletionSource(VEX_RULE_COMPLETIONS);
+
+export const assetVersionCelCompletionSource = createCelCompletionSource(
+  ASSET_VERSION_COMPLETIONS,
+);

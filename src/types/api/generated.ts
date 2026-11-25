@@ -3206,6 +3206,190 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/integrations/redmine/test-and-save/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Test and save Redmine integration credentials */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      /** @description Redmine credentials */
+      requestBody: {
+        content: {
+          "application/json": {
+            name?: string;
+            token?: string;
+            tracker?: string;
+            url?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RedmineIntegration"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete a Redmine integration access token */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Redmine integration ID */
+          redmine_integration_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/properties/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Retrieve Redmine integration properties (trackers, statuses, priorities) */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Redmine integration ID */
+          redmine_integration_id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RedmineIntegrationProperties"];
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/integrations/redmine/{redmine_integration_id}/settings/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update Redmine integration settings */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Redmine integration ID */
+          redmine_integration_id: string;
+        };
+        cookie?: never;
+      };
+      /** @description Redmine integration settings */
+      requestBody: {
+        content: {
+          "application/json": {
+            closeStatus?: number;
+            criticalPriority?: number;
+            defaultStatus?: number;
+            highPriority?: number;
+            lowPriority?: number;
+            mediumPriority?: number;
+            mermaidIntegration?: string;
+            tracker?: number;
+          };
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.RedmineIntegration"];
+          };
+        };
+      };
+    };
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/integrations/repositories": {
     parameters: {
       query?: never;
@@ -8877,6 +9061,53 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/vex-rules/recommendations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get crowdsourced VEX recommendations for all vulns of an asset */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": {
+              [
+                key: string
+              ]: components["schemas"]["dtos.VexRuleRecommendation"];
+            };
+          };
+        };
+      };
+    };
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/vex.json/": {
     parameters: {
       query?: never;
@@ -8916,6 +9147,54 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/retention-policy/test/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Test an asset version retention policy against the current asset versions without deleting anything */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Retention policy to test */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.TestAssetVersionRetentionPolicyRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["dtos.TestAssetVersionRetentionPolicyResponse"];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -14872,6 +15151,7 @@ export interface components {
       projectSlug: string;
     };
     "dtos.Asset": {
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -14936,6 +15216,7 @@ export interface components {
       riskAutomaticTicketThreshold: number;
     };
     "dtos.AssetDetails": {
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -14972,6 +15253,7 @@ export interface components {
       state: string;
     };
     "dtos.AssetDetailsWithSecrets": {
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       centralDependencyVulnManagement: boolean;
@@ -15017,6 +15299,8 @@ export interface components {
       ids: string[];
     };
     "dtos.AssetPatchRequest": {
+      /** @description an empty string resets to the default policy */
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       centralDependencyVulnManagement: boolean;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
@@ -15053,7 +15337,7 @@ export interface components {
       assetId: string;
       createdAt: string;
       defaultBranch: boolean;
-      lastAccessedAt: string;
+      lastUploadAt: string;
       metadata: {
         [key: string]: unknown;
       };
@@ -15762,6 +16046,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["dtos.Project"][];
+      redmineIntegrations: components["schemas"]["dtos.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -15808,6 +16093,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["dtos.Project"][];
+      redmineIntegrations: components["schemas"]["dtos.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -15910,6 +16196,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["dtos.Project"][];
+      redmineIntegrations: components["schemas"]["dtos.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -16104,6 +16391,37 @@ export interface components {
     "dtos.Recommendation": {
       recommendedVersion: string;
     };
+    "dtos.RedmineIntegration": {
+      closeStatusId: number;
+      criticalPriorityId: number;
+      defaultStatusId: number;
+      highPriorityId: number;
+      id: string;
+      lowPriorityId: number;
+      mediumPriorityId: number;
+      mermaidIntegration: string;
+      name: string;
+      obfuscatedToken: string;
+      trackerId: number;
+      url: string;
+    };
+    "dtos.RedmineIntegrationProperties": {
+      priorities: components["schemas"]["dtos.RedminePriority"][];
+      statuses: components["schemas"]["dtos.RedmineStatus"][];
+      trackers: components["schemas"]["dtos.RedmineTracker"][];
+    };
+    "dtos.RedminePriority": {
+      id: number;
+      name: string;
+    };
+    "dtos.RedmineStatus": {
+      id: number;
+      name: string;
+    };
+    "dtos.RedmineTracker": {
+      id: number;
+      name: string;
+    };
     "dtos.Relationship": {
       relationshipType: string;
       targetCve: string;
@@ -16279,10 +16597,8 @@ export interface components {
     };
     "dtos.SecretDTO": {
       id: string;
-      inherited: boolean;
       inheritedFrom: string;
       name: string;
-      overridden: boolean;
       scope: components["schemas"]["dtos.SecretScope"];
     };
     /** @enum {string} */
@@ -16304,6 +16620,13 @@ export interface components {
       subProjectDescription: string;
       subProjectExternalEntityId: string;
       subProjectName: string;
+    };
+    "dtos.TestAssetVersionRetentionPolicyRequest": {
+      assetVersionRetentionPolicy: string;
+    };
+    "dtos.TestAssetVersionRetentionPolicyResponse": {
+      kept: components["schemas"]["dtos.AssetVersion"][];
+      toDelete: components["schemas"]["dtos.AssetVersion"][];
     };
     "dtos.TestVEXRulesRequest": {
       celExpression: string[];
@@ -16530,6 +16853,8 @@ export interface components {
       vulnAssetId: string;
     };
     "github_com_l3montree-dev_devguard_database_models.Asset": {
+      /** @description the default lives in the database, see celrules.DefaultAssetVersionRetentionPolicy */
+      assetVersionRetentionPolicy: string;
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       avatar: string;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
@@ -16584,7 +16909,11 @@ export interface components {
       defaultBranch: boolean;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
       id: string;
-      lastAccessedAt: string;
+      /**
+       * @description only set by scans uploaded by a client - background rescans of upstream SBOMs do not count
+       *     includes both sbom and sarif imports
+       */
+      lastUploadAt: string;
       metadata: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       name: string;
       signingPubKey: string;
@@ -16633,7 +16962,6 @@ export interface components {
       relationships: components["schemas"]["github_com_l3montree-dev_devguard_database_models.CVERelationship"][];
       risk: components["schemas"]["dtos.RiskMetrics"];
       vector: string;
-      weaknesses: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Weakness"][];
       withdrawn: string;
     };
     "github_com_l3montree-dev_devguard_database_models.CVERelationship": {
@@ -16800,6 +17128,9 @@ export interface components {
       updatedAt: string;
       vulnAssetId: string;
     };
+    /** @enum {string} */
+    "github_com_l3montree-dev_devguard_database_models.MermaidIntegrationType":
+      "none" | "macro" | "commonmark";
     "github_com_l3montree-dev_devguard_database_models.Org": {
       configFiles: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       contactPhoneNumber: string;
@@ -16821,6 +17152,7 @@ export interface components {
       nist: boolean;
       numberOfEmployees: number;
       projects: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"][];
+      redmineIntegrations: components["schemas"]["github_com_l3montree-dev_devguard_database_models.RedmineIntegration"][];
       sharesVulnInformation: boolean;
       slug: string;
       updatedAt: string;
@@ -16885,6 +17217,23 @@ export interface components {
     /** @enum {string} */
     "github_com_l3montree-dev_devguard_database_models.ProjectType":
       "default" | "dynamic";
+    "github_com_l3montree-dev_devguard_database_models.RedmineIntegration": {
+      closeStatusId: number;
+      createdAt: string;
+      criticalPriorityId: number;
+      defaultStatusId: number;
+      highPriorityId: number;
+      id: string;
+      lowPriorityId: number;
+      mediumPriorityId: number;
+      mermaidIntegration: components["schemas"]["github_com_l3montree-dev_devguard_database_models.MermaidIntegrationType"];
+      name: string;
+      org: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Org"];
+      orgId: string;
+      trackerId: number;
+      updatedAt: string;
+      url: string;
+    };
     "github_com_l3montree-dev_devguard_database_models.SupplyChain": {
       assetId: string;
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
@@ -16945,12 +17294,6 @@ export interface components {
       userId: string;
       vexRule: components["schemas"]["github_com_l3montree-dev_devguard_database_models.VEXRule"];
       vexRuleId: string;
-    };
-    "github_com_l3montree-dev_devguard_database_models.Weakness": {
-      cve: string;
-      cwe: string;
-      source: string;
-      type: string;
     };
     "github_com_l3montree-dev_devguard_database_models.WebhookIntegration": {
       createdAt: string;
@@ -17086,8 +17429,6 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000

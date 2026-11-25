@@ -12,7 +12,6 @@ export type AssetFormValues = Modify<
     riskAutomaticTicketThreshold: number[];
     enableTicketRange: boolean;
     enableExposureMetrics: boolean;
-    keepOriginalSbomRootComponent: boolean;
   }
 >;
 
