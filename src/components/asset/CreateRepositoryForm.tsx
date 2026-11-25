@@ -45,8 +45,7 @@ export const CreateRepositoryForm: FunctionComponent<Props> = ({
       confidentialityRequirement: "medium",
       integrityRequirement: "medium",
       availabilityRequirement: "medium",
-      cvssAutomaticTicketThreshold: [],
-      riskAutomaticTicketThreshold: [],
+      ticketRangeCelExpression: "",
     },
   });
 

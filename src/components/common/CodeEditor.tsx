@@ -26,6 +26,7 @@ import {
   assetVersionCelCompletionSource,
   celCompletionSource,
   celParseLinter,
+  VEX_RULE_COMPLETIONS,
 } from "./celLinter";
 
 const vscodeDark = vscodeDarkInit({
@@ -113,7 +114,7 @@ const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
-  cel: celParseLinter(ASSET_VERSION_COMPLETIONS),
+  cel: celParseLinter(VEX_RULE_COMPLETIONS),
   "cel-asset-version": celParseLinter(ASSET_VERSION_COMPLETIONS),
 };
 

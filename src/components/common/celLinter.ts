@@ -636,6 +636,37 @@ const CVE_FIELDS: CelField[] = [
   { label: "relationships", type: "property", detail: "list" },
 ];
 
+// Mirrors models.AssetVersion.ToCELMap() (devguard/database/models/asset_version_model.go).
+export const REF_FIELDS: CelField[] = [
+  {
+    label: "name",
+    type: "property",
+    detail: "string",
+    info: 'The branch or tag name, e.g. "main" or "v1.2.3"',
+  },
+  { label: "slug", type: "property", detail: "string" },
+  {
+    label: "type",
+    type: "property",
+    detail: '"branch" | "tag"',
+    info: 'Either "branch" or "tag"',
+  },
+  {
+    label: "defaultBranch",
+    type: "property",
+    detail: "bool",
+    info: "Whether this is the default branch - it is always kept",
+  },
+  { label: "createdAt", type: "property", detail: "string (RFC3339)" },
+  { label: "updatedAt", type: "property", detail: "string (RFC3339)" },
+  {
+    label: "lastUploadAt",
+    type: "property",
+    detail: "string (RFC3339), may be absent",
+    info: 'When a client last uploaded a scan (SBOM or SARIF) - absent if it never did, so guard it: has(ref.lastUploadAt) && timestamp(ref.lastUploadAt) > now() - duration("168h")',
+  },
+];
+
 // Mirrors models.DependencyVuln.ToCELMap() plus the "artifactPurls" field
 // vexrules.vulnToCELMap adds on top of it - only the fields actually exposed
 // to the CEL environment used for VEX rule matching.
@@ -696,6 +727,13 @@ const VULN_FIELDS: CelField[] = [
     detail: "list<string>",
     info: "The purls identifying this vuln's artifacts, used internally by matchesPattern()",
   },
+  {
+    label: "ref",
+    type: "property",
+    detail: "map",
+    info: "The branch or tag the vuln was found on - type . again for its fields",
+    fields: REF_FIELDS,
+  },
 ];
 
 const NOW_COMPLETION: CelField = {
@@ -746,37 +784,6 @@ export const VEX_RULE_COMPLETIONS: CelField[] = [
     detail: "(purl, patternPurl) -> bool",
     info: 'Matches a purl against a purl whose version is a semver constraint, e.g. matchesPurl(vuln.componentPurl, "pkg:npm/undici@6.26.*")',
     apply: 'matchesPurl(vuln.componentPurl, "")',
-  },
-];
-
-// Mirrors models.AssetVersion.ToCELMap() (devguard/database/models/asset_version_model.go).
-export const REF_FIELDS: CelField[] = [
-  {
-    label: "name",
-    type: "property",
-    detail: "string",
-    info: 'The branch or tag name, e.g. "main" or "v1.2.3"',
-  },
-  { label: "slug", type: "property", detail: "string" },
-  {
-    label: "type",
-    type: "property",
-    detail: '"branch" | "tag"',
-    info: 'Either "branch" or "tag"',
-  },
-  {
-    label: "defaultBranch",
-    type: "property",
-    detail: "bool",
-    info: "Whether this is the default branch - it is always kept",
-  },
-  { label: "createdAt", type: "property", detail: "string (RFC3339)" },
-  { label: "updatedAt", type: "property", detail: "string (RFC3339)" },
-  {
-    label: "lastUploadAt",
-    type: "property",
-    detail: "string (RFC3339), may be absent",
-    info: 'When a client last uploaded a scan (SBOM or SARIF) - absent if it never did, so guard it: has(ref.lastUploadAt) && timestamp(ref.lastUploadAt) > now() - duration("168h")',
   },
 ];
 

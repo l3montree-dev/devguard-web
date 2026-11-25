@@ -1,6 +1,6 @@
 // Copyright 2026 L3montree GmbH and the DevGuard Contributors.
 // SPDX-License-Identifier: AGPL-3.0-or-later
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { DevGuardPOM } from "./pom/devguard";
 import { docShot } from "./doc-shot";
 import { openSettingsSection } from "./pom/flows/settings-nav";
@@ -21,7 +21,7 @@ test.describe("DevGuard customize risk scores", () => {
     await docShot(page, testInfo, "security-requirements-settings");
     await page.getByRole("button", { name: "Close" }).click();
     await openSettingsSection(page, "vulnerability-management");
-    await page.getByTestId("reporting-range").click();
+    await expect(page.getByTestId("reporting-range")).toBeDisabled();
     await page.mouse.wheel(0, 200);
     await docShot(page, testInfo, "reporting-range-settings");
     await page.mouse.wheel(0, 300);
