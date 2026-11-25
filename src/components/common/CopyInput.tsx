@@ -25,7 +25,11 @@ const CopyInput: FunctionComponent<Props> = (props) => {
         <Copy className="h-4 w-4" />
       </button>
       <div className="relative">
-        <Input className="bg-muted" value={props.value} readOnly />
+        <Input
+          className="bg-muted pr-10 text-ellipsis"
+          value={props.value}
+          readOnly
+        />
       </div>
     </div>
   );
