@@ -291,9 +291,10 @@ default = true`}
             Artifactory group repository. If it requires credentials, add an{" "}
             <code className="font-mono text-sm">auth</code> block (
             <code className="font-mono text-sm">token</code> or{" "}
-            <code className="font-mono text-sm">login</code>) that references
-            secrets as <code className="font-mono text-sm">$name</code>. Maven
-            supports a single upstream registry, so{" "}
+            <code className="font-mono text-sm">basic-auth</code>) that
+            references secrets as{" "}
+            <code className="font-mono text-sm">$name</code>. Maven supports a
+            single upstream registry, so{" "}
             <code className="font-mono text-sm">registries.maven</code> is one
             entry, not a list.
           </Callout>
