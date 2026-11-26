@@ -146,13 +146,6 @@ export default function RepositoriesPage() {
       ...data,
       // "None" is stored as "", but the API only accepts github/gitlab or no value
       repositoryProvider: data.repositoryProvider || undefined,
-      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold
-        ? data.cvssAutomaticTicketThreshold[0]
-        : 2,
-
-      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold
-        ? data.riskAutomaticTicketThreshold[0]
-        : 2,
     };
     try {
       const res = (await createAsset(

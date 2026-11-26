@@ -8,9 +8,8 @@ import type { Modify } from "@/types/common";
 export type AssetFormValues = Modify<
   AssetDTO,
   {
-    cvssAutomaticTicketThreshold: number[];
-    riskAutomaticTicketThreshold: number[];
     enableTicketRange: boolean;
+    ticketRangeCelExpression: string;
     enableExposureMetrics: boolean;
   }
 >;

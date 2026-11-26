@@ -3,24 +3,17 @@
 
 import { useForm } from "react-hook-form";
 import type { AssetFormValues } from "@/types/view/asset";
-import { isNumber } from "@/utils/common";
 import { useActiveAsset } from "./useActiveAsset";
 
 export const useAssetSettingsForm = () => {
   const asset = useActiveAsset()!;
+  const ticketRangeCelExpression = asset.ticketRangeCelExpression ?? "";
 
   return useForm<AssetFormValues>({
     defaultValues: {
       ...asset,
-      cvssAutomaticTicketThreshold: isNumber(asset.cvssAutomaticTicketThreshold)
-        ? [asset.cvssAutomaticTicketThreshold]
-        : [],
-      riskAutomaticTicketThreshold: isNumber(asset.riskAutomaticTicketThreshold)
-        ? [asset.riskAutomaticTicketThreshold]
-        : [],
-      enableTicketRange:
-        isNumber(asset.riskAutomaticTicketThreshold) ||
-        isNumber(asset.cvssAutomaticTicketThreshold),
+      ticketRangeCelExpression,
+      enableTicketRange: ticketRangeCelExpression !== "",
       enableExposureMetrics: [
         asset.modifiedAttackVector,
         asset.modifiedAttackComplexity,

@@ -12,14 +12,11 @@ import {
 } from "@/components/ui/collapsible";
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { InputWithButton } from "@/components/ui/input-with-button";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useConfig } from "@/context/ConfigContext";
 import { TUNNEL_BASE_URL } from "@/services/apiClient";
@@ -39,8 +36,9 @@ import { ClipboardDocumentIcon } from "@heroicons/react/20/solid";
 import { toast } from "@/lib/toast";
 import { BranchTagSelector } from "@/components/BranchTagSelector";
 import { SimpleArtifactSelector } from "@/components/ArtifactSelector";
-import { Badge } from "@/components/ui/badge";
 import WebhookSetupTicketIntegrationDialog from "@/components/guides/WebhookSetupTicketIntegrationDialog";
+import CelCodeBlock from "@/components/common/CelCodeBlock";
+import type { Diagnostic } from "@codemirror/lint";
 
 interface Props {
   form: UseFormReturn<AssetFormValues, any, AssetFormValues>;
@@ -48,11 +46,51 @@ interface Props {
   onUpdate?: (values: Partial<AssetFormValues>) => Promise<void>;
 }
 
+const exampleRules = [
+  {
+    label: `Report CVSS of 7+ on the latest release`,
+    rule: `ref.isLatest && vuln.cve != null && vuln.cve.cvss >= 7`,
+  },
+  {
+    label: `Report CVSS of 8+ on the default branch`,
+    rule: `ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8`,
+  },
+  {
+    label: `Report risk of 7+ on default branch and latest release`,
+    rule: `(ref.defaultBranch || ref.isLatest) && vuln.riskAssessment != null && vuln.riskAssessment >= 7`,
+  },
+  {
+    label: `Report env risk of 8+ on release branches`,
+    rule: `ref.name.startsWith("release/") && vuln.cve != null && vuln.cve.risk.withEnvironment >= 8`,
+  },
+  {
+    label: `Report CVSS of 9+ on all tags of the current major version`,
+    rule: `has(ref.latestRef) && isSemver(ref.name) && semver(ref.name).major == semver(ref.latestRef.name).major && vuln.cve != null && vuln.cve.cvss >= 9`,
+  },
+  {
+    label: `Report fixable vulns with EPSS of 10%+ on default branch and latest release`,
+    rule: `(ref.defaultBranch || ref.isLatest) && vuln.componentFixedVersion != null && vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss >= 0.1`,
+  },
+];
+
 const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
   const enableTicketRange = form.watch("enableTicketRange");
-  const cvssValue = form.watch("cvssAutomaticTicketThreshold");
-  const riskValue = form.watch("riskAutomaticTicketThreshold");
+  const asset = useActiveAsset();
+  const isIssueTrackerConnected = Boolean(
+    asset?.repositoryId || asset?.externalEntityProviderId,
+  );
   const [ticketSyncDialogOpen, setTicketSyncDialogOpen] = useState(false);
+  const [rulesHelpOpen, setRulesHelpOpen] = useState(false);
+
+  const handleCelValidation = (isValid: boolean, diagnostics: Diagnostic[]) => {
+    if (isValid) {
+      form.clearErrors("ticketRangeCelExpression");
+    } else {
+      form.setError("ticketRangeCelExpression", {
+        message: diagnostics[0]?.message || "Invalid CEL expression",
+      });
+    }
+  };
 
   return (
     <FormField
@@ -61,27 +99,25 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
       render={({ field }) => (
         <FormItem>
           <ListItem
-            Description="Enables automatic ticket creation for vulnerabilities. Be aware that this will create tickets for all vulnerabilities that exceed the defined thresholds, which may result in a large number of tickets being created."
+            Description="Enables automatic ticket creation for vulnerabilities. Be aware that this will create tickets for all vulnerabilities matching the CEL rule, which may result in a large number of tickets being created."
             Title="Reporting range"
             Button={
               <FormControl>
                 <Switch
                   data-testid="reporting-range"
                   checked={field.value}
+                  disabled={!isIssueTrackerConnected && !field.value}
                   onCheckedChange={(v) => {
                     form.setValue("enableTicketRange", v, {
                       shouldDirty: true,
                     });
-                    if (v) {
-                      form.setValue("cvssAutomaticTicketThreshold", [8], {
+                    if (!v) {
+                      form.setValue("ticketRangeCelExpression", "", {
                         shouldDirty: true,
                       });
-                      form.setValue("riskAutomaticTicketThreshold", [8], {
-                        shouldDirty: true,
-                      });
+                      form.clearErrors("ticketRangeCelExpression");
                     } else {
-                      form.resetField("cvssAutomaticTicketThreshold");
-                      form.resetField("riskAutomaticTicketThreshold");
+                      form.resetField("ticketRangeCelExpression");
                     }
                   }}
                 />
@@ -92,15 +128,25 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
               <div className="space-y-6">
                 {assetId && (
                   <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setTicketSyncDialogOpen(true)}
-                    >
-                      <Ticket className="mr-2 h-4 w-4" />
-                      Set up ticket sync
-                    </Button>
+                    {(!isIssueTrackerConnected || enableTicketRange) && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setTicketSyncDialogOpen(true)}
+                      >
+                        <Ticket className="mr-2 h-4 w-4" />
+                        {isIssueTrackerConnected
+                          ? "Update issue tracker"
+                          : "Connect issue tracker"}
+                      </Button>
+                    )}
+                    {!isIssueTrackerConnected && (
+                      <p className="text-xs text-primary">
+                        You first have to connect an issue tracker to use this
+                        feature.
+                      </p>
+                    )}
                     <WebhookSetupTicketIntegrationDialog
                       open={ticketSyncDialogOpen}
                       onOpenChange={setTicketSyncDialogOpen}
@@ -109,50 +155,49 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
                 )}
                 {enableTicketRange && (
                   <div className="space-y-6">
+                    <div className="flex justify-end gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setRulesHelpOpen((v) => !v)}
+                        className="text-xs text-muted-foreground underline hover:text-foreground"
+                      >
+                        {rulesHelpOpen
+                          ? "Hide example rules"
+                          : "Show example rules"}
+                      </button>
+                      <a
+                        href="https://docs.devguard.org/reference/vex-cel-reference/"
+                        target="_blank"
+                        className="text-xs text-muted-foreground underline hover:text-foreground"
+                      >
+                        Learn more about CEL rules
+                      </a>
+                    </div>
+                    {rulesHelpOpen && (
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {exampleRules.map(({ label, rule }) => (
+                          <CelCodeBlock
+                            key={label}
+                            value={rule}
+                            label={label}
+                            language="cel-ticket-range"
+                            readOnly
+                          />
+                        ))}
+                      </div>
+                    )}
                     <FormField
-                      name="cvssAutomaticTicketThreshold"
+                      name="ticketRangeCelExpression"
                       control={form.control}
-                      render={({ field: sliderField }) => (
+                      render={({ field: celField }) => (
                         <FormItem>
-                          <FormLabel>CVSS Score</FormLabel>
-                          <FormControl>
-                            <Slider
-                              min={0}
-                              max={10}
-                              step={0.5}
-                              value={cvssValue}
-                              onValueChange={sliderField.onChange}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            CVSS-BTE Score: Extends standard CVSS Base metrics
-                            with Temporal signals such as exploit availability
-                            and Environmental factors tailored to your
-                            organization’s risk profile.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Badge variant="secondary">OR</Badge>
-                    <FormField
-                      name="riskAutomaticTicketThreshold"
-                      control={form.control}
-                      render={({ field: sliderField }) => (
-                        <FormItem>
-                          <FormLabel>Risk Value</FormLabel>
-                          <FormControl>
-                            <Slider
-                              min={0}
-                              max={10}
-                              step={0.5}
-                              value={riskValue}
-                              onValueChange={sliderField.onChange}
-                            />
-                          </FormControl>
-                          <FormDescription>
-                            Calculates Risk including multiple factors.
-                          </FormDescription>
+                          <CelCodeBlock
+                            value={celField.value ?? ""}
+                            onChange={celField.onChange}
+                            onValidation={handleCelValidation}
+                            language="cel-ticket-range"
+                            placeholder={`// Create a ticket when the expression is true, e.g.:\n// ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8\n// ref.isLatest && vuln.riskAssessment != null && vuln.riskAssessment >= 7\n// vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss > 0.1`}
+                          />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -521,12 +566,14 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
             data-testid="save-vulnerability-management-settings-button"
             type="button"
             disabled={
+              !!form.formState.errors.ticketRangeCelExpression ||
+              (form.watch("enableTicketRange") &&
+                !form.watch("ticketRangeCelExpression")?.trim()) ||
               !(
                 form.formState.dirtyFields?.paranoidMode ||
                 form.formState.dirtyFields?.sharesInformation ||
                 form.formState.dirtyFields?.enableTicketRange ||
-                form.formState.dirtyFields?.cvssAutomaticTicketThreshold ||
-                form.formState.dirtyFields?.riskAutomaticTicketThreshold
+                form.formState.dirtyFields?.ticketRangeCelExpression
               )
             }
             onClick={createUpdateHandler(
@@ -535,8 +582,7 @@ export const AssetFormVulnsManagement: FunctionComponent<Props> = ({
                 "paranoidMode",
                 "sharesInformation",
                 "enableTicketRange",
-                "cvssAutomaticTicketThreshold",
-                "riskAutomaticTicketThreshold",
+                "ticketRangeCelExpression",
               ],
               handleUpdate,
             )}

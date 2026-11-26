@@ -26,6 +26,9 @@ import {
   assetVersionCelCompletionSource,
   celCompletionSource,
   celParseLinter,
+  TICKET_RANGE_COMPLETIONS,
+  ticketRangeCelCompletionSource,
+  VEX_RULE_COMPLETIONS,
 } from "./celLinter";
 
 const vscodeDark = vscodeDarkInit({
@@ -107,14 +110,20 @@ const languageExtensions = {
     StreamLanguage.define(javascript),
     autocompletion({ override: [assetVersionCelCompletionSource] }),
   ],
+  // CEL evaluated against a vuln and the branch or tag it was found on (vuln, ref, otherRefs) - the ticket range.
+  "cel-ticket-range": [
+    StreamLanguage.define(javascript),
+    autocompletion({ override: [ticketRangeCelCompletionSource] }),
+  ],
 };
 
 const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
-  cel: celParseLinter(ASSET_VERSION_COMPLETIONS),
+  cel: celParseLinter(VEX_RULE_COMPLETIONS),
   "cel-asset-version": celParseLinter(ASSET_VERSION_COMPLETIONS),
+  "cel-ticket-range": celParseLinter(TICKET_RANGE_COMPLETIONS),
 };
 
 const CodeEditor = ({

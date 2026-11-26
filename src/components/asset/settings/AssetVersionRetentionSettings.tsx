@@ -73,9 +73,14 @@ ref.type == "tag" || ${GRACE_PERIOD}
     label: "Only the latest semver tag",
     expression: `${DEFAULT_BRANCH_RULE}
 // tags: keep only the highest semantic version
-  : isSemver(ref.name) && otherRefs
-    .filter(other, other.type == "tag" && isSemver(other.name))
-    .all(other, semver(ref.name) >= semver(other.name))`,
+  : ref.isLatest`,
+  },
+  {
+    label: "Tags of the current major version",
+    expression: `${DEFAULT_BRANCH_RULE}
+// tags: keep every tag sharing the major version of the latest tag
+  : has(ref.latestRef) && isSemver(ref.name)
+    && semver(ref.name).major == semver(ref.latestRef.name).major`,
   },
   {
     label: "Latest patch of each minor version",

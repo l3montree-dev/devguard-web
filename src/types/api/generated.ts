@@ -15156,9 +15156,7 @@ export interface components {
       avatar: string;
       centralDependencyVulnManagement: boolean;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      cvssAutomaticTicketThreshold: number;
       description: string;
-      enableTicketRange: boolean;
       externalBotUserLink: string;
       externalEntityId: string;
       externalEntityProviderId: string;
@@ -15180,11 +15178,11 @@ export interface components {
       repositoryId: string;
       repositoryName: string;
       repositoryProvider: string;
-      riskAutomaticTicketThreshold: number;
       sharesInformation: boolean;
       signingPubKey: string;
       slug: string;
       state: string;
+      ticketRangeCelExpression: string;
     };
     "dtos.AssetChangeRoleRequest": {
       /** @enum {string} */
@@ -15194,9 +15192,7 @@ export interface components {
       availabilityRequirement: components["schemas"]["dtos.RequirementLevel"];
       centralDependencyVulnManagement: boolean;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      cvssAutomaticTicketThreshold: number;
       description: string;
-      enableTicketRange: boolean;
       importance: number;
       integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
       modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
@@ -15213,7 +15209,7 @@ export interface components {
        * @enum {string}
        */
       repositoryProvider: "github" | "gitlab";
-      riskAutomaticTicketThreshold: number;
+      ticketRangeCelExpression: string;
     };
     "dtos.AssetDetails": {
       assetVersionRetentionPolicy: string;
@@ -15221,9 +15217,7 @@ export interface components {
       avatar: string;
       centralDependencyVulnManagement: boolean;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      cvssAutomaticTicketThreshold: number;
       description: string;
-      enableTicketRange: boolean;
       externalBotUserLink: string;
       externalEntityId: string;
       externalEntityProviderId: string;
@@ -15246,11 +15240,11 @@ export interface components {
       repositoryId: string;
       repositoryName: string;
       repositoryProvider: string;
-      riskAutomaticTicketThreshold: number;
       sharesInformation: boolean;
       signingPubKey: string;
       slug: string;
       state: string;
+      ticketRangeCelExpression: string;
     };
     "dtos.AssetDetailsWithSecrets": {
       assetVersionRetentionPolicy: string;
@@ -15258,9 +15252,7 @@ export interface components {
       avatar: string;
       centralDependencyVulnManagement: boolean;
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
-      cvssAutomaticTicketThreshold: number;
       description: string;
-      enableTicketRange: boolean;
       externalBotUserLink: string;
       externalEntityId: string;
       externalEntityProviderId: string;
@@ -15283,11 +15275,11 @@ export interface components {
       repositoryId: string;
       repositoryName: string;
       repositoryProvider: string;
-      riskAutomaticTicketThreshold: number;
       sharesInformation: boolean;
       signingPubKey: string;
       slug: string;
       state: string;
+      ticketRangeCelExpression: string;
       webhookSecret: string;
     };
     "dtos.AssetEntry": {
@@ -15307,9 +15299,7 @@ export interface components {
       configFiles: {
         [key: string]: unknown;
       };
-      cvssAutomaticTicketThreshold: number;
       description: string;
-      enableTicketRange: boolean;
       integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
       isPublic: boolean;
       modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
@@ -15329,8 +15319,8 @@ export interface components {
        * @enum {string}
        */
       repositoryProvider: "github" | "gitlab";
-      riskAutomaticTicketThreshold: number;
       sharesInformation: boolean;
+      ticketRangeCelExpression: string;
       webhookSecret: string;
     };
     "dtos.AssetVersion": {
@@ -16860,7 +16850,6 @@ export interface components {
       confidentialityRequirement: components["schemas"]["dtos.RequirementLevel"];
       configFiles: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       createdAt: string;
-      cvssAutomaticTicketThreshold: number;
       description: string;
       externalEntityId: string;
       externalEntityProviderId: string;
@@ -16886,11 +16875,11 @@ export interface components {
       repositoryId: string;
       repositoryName: string;
       repositoryProvider: string;
-      riskAutomaticTicketThreshold: number;
       shareInformation: boolean;
       signingPubKey: string;
       slug: string;
       state: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetState"];
+      ticketRangeCelExpression: string;
       type: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetType"];
       updatedAt: string;
       webhookSecret: string;
@@ -17413,16 +17402,12 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000

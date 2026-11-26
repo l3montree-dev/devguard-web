@@ -17,11 +17,10 @@ export const useAssetUpdate = () => {
   const router = useRouter();
 
   return async (data: Partial<AssetFormValues>) => {
-    const newAsset = await patchAsset(scope, {
-      ...data,
-      cvssAutomaticTicketThreshold: data.cvssAutomaticTicketThreshold?.[0],
-      riskAutomaticTicketThreshold: data.riskAutomaticTicketThreshold?.[0],
-    } as Partial<components["schemas"]["dtos.AssetPatchRequest"]>);
+    const newAsset = await patchAsset(
+      scope,
+      data as Partial<components["schemas"]["dtos.AssetPatchRequest"]>,
+    );
     updateAsset(newAsset);
     if (newAsset.slug !== asset.slug) {
       router.push(
