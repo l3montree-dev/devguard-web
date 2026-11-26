@@ -15,7 +15,7 @@ import { toast } from "@/lib/toast";
 import type { ConfigScope } from "@/services/configFileService";
 import { deleteLabel, inheritedFrom } from "@/services/labelService";
 import { classNames } from "@/utils/common";
-import { Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import type { FunctionComponent } from "react";
 import NewLabelDialog from "./NewLabelDialog";
 
@@ -74,6 +74,7 @@ const LabelsTable: FunctionComponent<Props> = ({ scope }) => {
                   Description
                 </th>
                 <th className="w-px p-4" />
+                <th className="w-px p-4" />
               </tr>
             </thead>
             <tbody className="text-foreground">
@@ -123,10 +124,28 @@ const LabelsTable: FunctionComponent<Props> = ({ scope }) => {
                           )}
                         </div>
                       </td>
-                      <td className="p-4 text-muted-foreground">
+                      <td className="p-4 px-2 text-muted-foreground">
                         {label.description}
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="py-4 text-right">
+                        {!inherited && (
+                          <NewLabelDialog
+                            scope={scope}
+                            label={label}
+                            onSuccess={() => mutate()}
+                            Trigger={
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                aria-label={`Edit ${label.label}`}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            }
+                          />
+                        )}
+                      </td>
+                      <td className="py-4 px-2 text-right">
                         {!inherited && (
                           <Alert
                             onConfirm={() => handleDelete(label.id)}
@@ -154,7 +173,7 @@ const LabelsTable: FunctionComponent<Props> = ({ scope }) => {
       <div className="flex justify-end">
         <NewLabelDialog
           scope={scope}
-          onCreated={() => mutate()}
+          onSuccess={() => mutate()}
           Trigger={<Button>Add label</Button>}
         />
       </div>

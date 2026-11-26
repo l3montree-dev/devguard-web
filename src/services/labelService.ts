@@ -83,6 +83,66 @@ export const createLabel = async (
   }
 };
 
+export const updateLabel = async (
+  scope: ConfigScope,
+  body: LabelCreateRequest,
+  labelID: string,
+) => {
+  switch (scope.level) {
+    case "organization":
+      return unwrap(
+        await browserClient.PUT(
+          "/organizations/{organization}/labels/{labelID}/",
+          {
+            params: {
+              path: {
+                organization: scope.organization,
+                projectSlug: "",
+                assetSlug: "",
+                labelID,
+              },
+            },
+            body,
+          },
+        ),
+      );
+    case "project":
+      return unwrap(
+        await browserClient.PUT(
+          "/organizations/{organization}/projects/{projectSlug}/labels/{labelID}/",
+          {
+            params: {
+              path: {
+                organization: scope.organization,
+                projectSlug: scope.projectSlug,
+                assetSlug: "",
+                labelID,
+              },
+            },
+            body,
+          },
+        ),
+      );
+    case "asset":
+      return unwrap(
+        await browserClient.PUT(
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/{labelID}/",
+          {
+            params: {
+              path: {
+                organization: scope.organization,
+                projectSlug: scope.projectSlug,
+                assetSlug: scope.assetSlug,
+                labelID,
+              },
+            },
+            body,
+          },
+        ),
+      );
+  }
+};
+
 export const deleteLabel = async (scope: ConfigScope, labelID: string) => {
   switch (scope.level) {
     case "organization":

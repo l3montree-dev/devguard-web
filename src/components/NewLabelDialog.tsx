@@ -6,8 +6,8 @@
 import { toast } from "@/lib/toast";
 import { ApiError } from "@/services/apiClient";
 import type { ConfigScope } from "@/services/configFileService";
-import type { LabelCreateRequest } from "@/services/labelService";
-import { createLabel } from "@/services/labelService";
+import type { Label, LabelCreateRequest } from "@/services/labelService";
+import { createLabel, updateLabel } from "@/services/labelService";
 import { useState, type FunctionComponent, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
@@ -27,45 +27,68 @@ import { classNames } from "@/utils/common";
 interface Props {
   scope: ConfigScope;
   Trigger: ReactNode;
-  onCreated: () => void;
+  onSuccess: () => void;
+  label?: Label;
 }
 
 const NewLabelDialog: FunctionComponent<Props> = ({
   scope,
   Trigger,
-  onCreated,
+  onSuccess,
+  label,
 }) => {
   const labelMaxLength = 256;
   const descriptionMaxLength = 2000;
+
+  const defaultObject = {
+    label: label?.label ?? "",
+    backgroundColor: label?.backgroundColor ?? "#2824f9",
+    description: label?.description ?? "",
+  };
   const [open, setOpen] = useState(false);
   const form = useForm<LabelCreateRequest>({
-    defaultValues: { label: "", backgroundColor: "#2824f9", description: "" },
+    defaultValues: defaultObject,
   });
 
+  const handleOpenChange = (next: boolean) => {
+    if (next) form.reset(defaultObject);
+    setOpen(next);
+  };
+
   const handleSubmit = async (data: LabelCreateRequest) => {
-    try {
-      await createLabel(scope, data);
-    } catch (e) {
-      toast.error(
-        e instanceof ApiError && e.status === 409
-          ? `A label named ${data.label} with this color already exists`
-          : "Failed to create label",
-      );
-      return;
+    if (!label) {
+      try {
+        await createLabel(scope, data);
+      } catch (e) {
+        toast.error(
+          e instanceof ApiError && e.status === 409
+            ? `A label named ${data.label} with this color already exists`
+            : "Failed to create label",
+        );
+        return;
+      }
+      toast.success("Label created");
+    } else {
+      try {
+        await updateLabel(scope, data, label.id);
+      } catch (e) {
+        toast.error("Failed to update label");
+        return;
+      }
+      toast.success("Label updated");
     }
 
-    toast.success("Label created");
-    form.reset();
     setOpen(false);
-    onCreated();
+    onSuccess();
+    return;
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{Trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New label</DialogTitle>
+          <DialogTitle>{label ? "Edit label" : "New label"}</DialogTitle>
           <DialogDescription>
             Labels are inherited, so a label created here is also available in
             everything below this level.
@@ -134,7 +157,7 @@ const NewLabelDialog: FunctionComponent<Props> = ({
             />
             <div className="flex justify-end">
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                Add label
+                {label ? "Save" : "Add"} label
               </Button>
             </div>
           </form>
