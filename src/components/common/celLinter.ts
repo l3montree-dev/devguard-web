@@ -358,8 +358,9 @@ class CelParser {
           continue;
         }
         // a field access changes the type to something we don't
-        // statically know - treat it as non-bool until compared
-        isBool = false;
+        // statically know - treat it as non-bool until compared,
+        // unless the field is declared as a bool, e.g. ref.isLatest
+        isBool = fields?.find((f) => f.label === t.value)?.detail === "bool";
         continue;
       }
       if (this.isPunct("[")) {
@@ -636,8 +637,9 @@ const CVE_FIELDS: CelField[] = [
   { label: "relationships", type: "property", detail: "list" },
 ];
 
-// Mirrors models.AssetVersion.ToCELMap() (devguard/database/models/asset_version_model.go).
-export const REF_FIELDS: CelField[] = [
+// Mirrors models.AssetVersion.ToCELMap() (devguard/database/models/asset_version_model.go)
+// plus the fields celrules.NewRefs adds on top of it.
+const BASE_REF_FIELDS: CelField[] = [
   {
     label: "name",
     type: "property",
@@ -664,6 +666,23 @@ export const REF_FIELDS: CelField[] = [
     type: "property",
     detail: "string (RFC3339), may be absent",
     info: 'When a client last uploaded a scan (SBOM or SARIF) - absent if it never did, so guard it: has(ref.lastUploadAt) && timestamp(ref.lastUploadAt) > now() - duration("168h")',
+  },
+  {
+    label: "isLatest",
+    type: "property",
+    detail: "bool",
+    info: 'Whether this is the tag with the highest semantic version, e.g. "v1.12.1" - prereleases and non-semver names are never the latest',
+  },
+];
+
+export const REF_FIELDS: CelField[] = [
+  ...BASE_REF_FIELDS,
+  {
+    label: "latestRef",
+    type: "property",
+    detail: "map, may be absent",
+    info: 'The tag with the highest semantic version - absent if there is no semver tag, so guard it: has(ref.latestRef) && ref.latestRef.name == "v1.12.1"',
+    fields: BASE_REF_FIELDS,
   },
 ];
 
@@ -727,13 +746,6 @@ const VULN_FIELDS: CelField[] = [
     detail: "list<string>",
     info: "The purls identifying this vuln's artifacts, used internally by matchesPattern()",
   },
-  {
-    label: "ref",
-    type: "property",
-    detail: "map",
-    info: "The branch or tag the vuln was found on - type . again for its fields",
-    fields: REF_FIELDS,
-  },
 ];
 
 const NOW_COMPLETION: CelField = {
@@ -794,25 +806,15 @@ const SEMVER_FIELDS: CelField[] = [
   { label: "prerelease", type: "property", detail: "string" },
 ];
 
-// Mirrors celrules.assetVersionCelEnv (devguard/celrules/asset_version_rules.go).
-export const ASSET_VERSION_COMPLETIONS: CelField[] = [
-  {
-    label: "ref",
-    type: "variable",
-    detail: "map",
-    info: "The branch or tag being evaluated - return true to keep it",
-    fields: REF_FIELDS,
-  },
-  {
-    label: "otherRefs",
-    type: "variable",
-    detail: "list<map>",
-    info: "All other branches and tags of this repository, e.g. otherRefs.all(other, ...)",
-    elementFields: REF_FIELDS,
-  },
-  NOW_COMPLETION,
-  TIMESTAMP_COMPLETION,
-  DURATION_COMPLETION,
+const OTHER_REFS_COMPLETION: CelField = {
+  label: "otherRefs",
+  type: "variable",
+  detail: "list<map>",
+  info: "All other branches and tags of this repository, e.g. otherRefs.all(other, ...)",
+  elementFields: REF_FIELDS,
+};
+
+const SEMVER_COMPLETIONS: CelField[] = [
   {
     label: "semver",
     type: "function",
@@ -835,6 +837,36 @@ export const ASSET_VERSION_COMPLETIONS: CelField[] = [
     info: "Whether a field is present, e.g. has(ref.lastUploadAt)",
     apply: "has(ref.lastUploadAt)",
   },
+];
+
+// Mirrors celrules.assetVersionCelEnv (devguard/celrules/asset_version_rules.go).
+export const ASSET_VERSION_COMPLETIONS: CelField[] = [
+  {
+    label: "ref",
+    type: "variable",
+    detail: "map",
+    info: "The branch or tag being evaluated - return true to keep it",
+    fields: REF_FIELDS,
+  },
+  OTHER_REFS_COMPLETION,
+  NOW_COMPLETION,
+  TIMESTAMP_COMPLETION,
+  DURATION_COMPLETION,
+  ...SEMVER_COMPLETIONS,
+];
+
+// Mirrors celrules.ticketRangeCelEnv (devguard/celrules/ticket_range_rules.go).
+export const TICKET_RANGE_COMPLETIONS: CelField[] = [
+  ...VEX_RULE_COMPLETIONS,
+  {
+    label: "ref",
+    type: "variable",
+    detail: "map",
+    info: "The branch or tag the vuln was found on - type . again for its fields",
+    fields: REF_FIELDS,
+  },
+  OTHER_REFS_COMPLETION,
+  ...SEMVER_COMPLETIONS,
 ];
 
 function propertyPathBefore(text: string, pos: number): string[] {
@@ -937,4 +969,8 @@ export const celCompletionSource =
 
 export const assetVersionCelCompletionSource = createCelCompletionSource(
   ASSET_VERSION_COMPLETIONS,
+);
+
+export const ticketRangeCelCompletionSource = createCelCompletionSource(
+  TICKET_RANGE_COMPLETIONS,
 );

@@ -48,20 +48,28 @@ interface Props {
 
 const exampleRules = [
   {
-    label: `Report CVSS of 8+ on default branch`,
-    rule: `vuln.ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8`,
+    label: `Report CVSS of 7+ on the latest release`,
+    rule: `ref.isLatest && vuln.cve != null && vuln.cve.cvss >= 7`,
   },
   {
-    label: `Report CVSS of 8+ on all git tags`,
-    rule: `vuln.ref.type == "tag" && vuln.cve != null && vuln.cve.cvss >= 8`,
+    label: `Report CVSS of 8+ on the default branch`,
+    rule: `ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8`,
   },
   {
-    label: `Report risk of 8+ on default branch`,
-    rule: `vuln.ref.defaultBranch && vuln.riskAssessment != null && vuln.riskAssessment >= 8`,
+    label: `Report risk of 7+ on default branch and latest release`,
+    rule: `(ref.defaultBranch || ref.isLatest) && vuln.riskAssessment != null && vuln.riskAssessment >= 7`,
   },
   {
-    label: `Report env risk of 8+ on all git tags`,
-    rule: `vuln.ref.type == "tag" && vuln.cve != null && vuln.cve.risk.withEnvironment >= 8`,
+    label: `Report env risk of 8+ on release branches`,
+    rule: `ref.name.startsWith("release/") && vuln.cve != null && vuln.cve.risk.withEnvironment >= 8`,
+  },
+  {
+    label: `Report CVSS of 9+ on all tags of the current major version`,
+    rule: `has(ref.latestRef) && isSemver(ref.name) && semver(ref.name).major == semver(ref.latestRef.name).major && vuln.cve != null && vuln.cve.cvss >= 9`,
+  },
+  {
+    label: `Report fixable vulns with EPSS of 10%+ on default branch and latest release`,
+    rule: `(ref.defaultBranch || ref.isLatest) && vuln.componentFixedVersion != null && vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss >= 0.1`,
   },
 ];
 
@@ -172,6 +180,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
                             key={label}
                             value={rule}
                             label={label}
+                            language="cel-ticket-range"
                             readOnly
                           />
                         ))}
@@ -186,7 +195,8 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
                             value={celField.value ?? ""}
                             onChange={celField.onChange}
                             onValidation={handleCelValidation}
-                            placeholder={`// Create a ticket when the expression is true, e.g.:\n// vuln.ref.defaultBranch == true && vuln.cve != null && vuln.cve.cvss >= 8\n// vuln.ref.type == "tag" && vuln.riskAssessment != null && vuln.riskAssessment >= 7\n// vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss > 0.1`}
+                            language="cel-ticket-range"
+                            placeholder={`// Create a ticket when the expression is true, e.g.:\n// ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8\n// ref.isLatest && vuln.riskAssessment != null && vuln.riskAssessment >= 7\n// vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss > 0.1`}
                           />
                           <FormMessage />
                         </FormItem>
