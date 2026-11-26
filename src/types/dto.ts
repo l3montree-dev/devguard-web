@@ -52,8 +52,6 @@ export type Relationship = Schemas["dtos.Relationship"];
 export type RemediationTypeUsage = Schemas["dtos.RemediationTypeDistribution"];
 export type WebhookDTO = Schemas["dtos.WebhookIntegration"];
 export type SecretDTO = Schemas["dtos.SecretDTO"];
-// TODO: exists after regenerating the api types against the backend label branch
-export type LabelDTO = Schemas["dtos.Label"];
 export type InstanceInfo = Omit<Schemas["dtos.InfoResponse"], "database"> & {
   database: Omit<Schemas["dtos.DatabaseInfo"], "vulndbVersion"> & {
     vulndbVersion?: string;

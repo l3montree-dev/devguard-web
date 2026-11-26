@@ -4,9 +4,10 @@
 import { browserClient, unwrap } from "@/services/apiClient";
 import type { ConfigScope } from "@/services/configFileService";
 import type { components } from "@/types/api/generated";
-import type { LabelDTO } from "@/types/dto";
 
 export type LabelCreateRequest = components["schemas"]["dtos.LabelRequest"];
+export type Label =
+  components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
 
 export const labelsUrl = (scope: ConfigScope) => {
   switch (scope.level) {
@@ -20,11 +21,11 @@ export const labelsUrl = (scope: ConfigScope) => {
 };
 
 // the level a label was created on, taken from the most specific id it has
-const labelLevel = (label: LabelDTO): ConfigScope["level"] =>
+const labelLevel = (label: Label): ConfigScope["level"] =>
   label.assetID ? "asset" : label.projectID ? "project" : "organization";
 
 // the level a label is inherited from, undefined if it was created in this scope
-export const inheritedFrom = (label: LabelDTO, scope: ConfigScope) => {
+export const inheritedFrom = (label: Label, scope: ConfigScope) => {
   const level = labelLevel(label);
   return level === scope.level ? undefined : level;
 };
@@ -36,20 +37,27 @@ export const createLabel = async (
   switch (scope.level) {
     case "organization":
       return unwrap(
-        await browserClient.POST("/organizations/{organization}/labels", {
-          params: { path: { organization: scope.organization } },
+        await browserClient.POST("/organizations/{organization}/labels/", {
+          params: {
+            path: {
+              organization: scope.organization,
+              projectSlug: "",
+              assetSlug: "",
+            },
+          },
           body,
         }),
       );
     case "project":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/labels",
+          "/organizations/{organization}/projects/{projectSlug}/labels/",
           {
             params: {
               path: {
                 organization: scope.organization,
                 projectSlug: scope.projectSlug,
+                assetSlug: "",
               },
             },
             body,
@@ -59,7 +67,7 @@ export const createLabel = async (
     case "asset":
       return unwrap(
         await browserClient.POST(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/",
           {
             params: {
               path: {
@@ -80,19 +88,29 @@ export const deleteLabel = async (scope: ConfigScope, labelID: string) => {
     case "organization":
       return unwrap(
         await browserClient.DELETE(
-          "/organizations/{organization}/labels/{labelID}",
-          { params: { path: { organization: scope.organization, labelID } } },
+          "/organizations/{organization}/labels/{labelID}/",
+          {
+            params: {
+              path: {
+                organization: scope.organization,
+                projectSlug: "",
+                assetSlug: "",
+                labelID,
+              },
+            },
+          },
         ),
       );
     case "project":
       return unwrap(
         await browserClient.DELETE(
-          "/organizations/{organization}/projects/{projectSlug}/labels/{labelID}",
+          "/organizations/{organization}/projects/{projectSlug}/labels/{labelID}/",
           {
             params: {
               path: {
                 organization: scope.organization,
                 projectSlug: scope.projectSlug,
+                assetSlug: "",
                 labelID,
               },
             },
@@ -102,7 +120,7 @@ export const deleteLabel = async (scope: ConfigScope, labelID: string) => {
     case "asset":
       return unwrap(
         await browserClient.DELETE(
-          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/{labelID}",
+          "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/{labelID}/",
           {
             params: {
               path: {

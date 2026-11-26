@@ -22,6 +22,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
+import { classNames } from "@/utils/common";
 
 interface Props {
   scope: ConfigScope;
@@ -34,6 +35,8 @@ const NewLabelDialog: FunctionComponent<Props> = ({
   Trigger,
   onCreated,
 }) => {
+  const labelMaxLength = 256;
+  const descriptionMaxLength = 2000;
   const [open, setOpen] = useState(false);
   const form = useForm<LabelCreateRequest>({
     defaultValues: { label: "", backgroundColor: "#2824f9", description: "" },
@@ -82,6 +85,16 @@ const NewLabelDialog: FunctionComponent<Props> = ({
                   <FormControl>
                     <Input required {...field} />
                   </FormControl>
+                  <p
+                    className={classNames(
+                      "m-1 text-right text-xs",
+                      field.value.length > labelMaxLength
+                        ? "text-destructive"
+                        : "text-muted-foreground",
+                    )}
+                  >
+                    {field.value.length} / {labelMaxLength}
+                  </p>
                 </FormItem>
               )}
             />
@@ -94,6 +107,16 @@ const NewLabelDialog: FunctionComponent<Props> = ({
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
+                  <p
+                    className={classNames(
+                      "m-1 text-right text-xs",
+                      field.value.length > descriptionMaxLength
+                        ? "text-destructive"
+                        : "text-muted-foreground",
+                    )}
+                  >
+                    {field.value.length} / {descriptionMaxLength}
+                  </p>
                 </FormItem>
               )}
             />
