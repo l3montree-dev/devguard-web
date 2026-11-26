@@ -6,7 +6,7 @@ import useSWR from "swr";
 import { fetcher } from "@/data-fetcher/fetcher";
 import type { ConfigScope } from "@/services/configFileService";
 import { labelsUrl } from "@/services/labelService";
-import type { LabelDTO } from "@/types/dto";
+import type { Label } from "@/services/labelService";
 
 export const useLabels = (scope: ConfigScope | null) =>
-  useSWR<LabelDTO[]>(scope && labelsUrl(scope), fetcher);
+  useSWR<Label[]>(scope && labelsUrl(scope), fetcher);
