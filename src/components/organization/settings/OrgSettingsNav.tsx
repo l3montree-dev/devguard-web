@@ -18,6 +18,7 @@ import {
   TriangleAlert,
   Users,
   Webhook,
+  Tag,
 } from "lucide-react";
 
 const groups: SettingsNavGroup[] = [
@@ -28,6 +29,7 @@ const groups: SettingsNavGroup[] = [
       { title: "Members", segment: "members", Icon: Users },
       { title: "Access tokens", segment: "access-tokens", Icon: KeyRound },
       { title: "Secrets", segment: "secrets", Icon: LockKeyhole },
+      { title: "Labels", segment: "labels", Icon: Tag },
     ],
   },
   {

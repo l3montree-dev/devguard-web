@@ -3628,6 +3628,154 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/labels/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List labels on organization level */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create label */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.LabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/labels/{labelID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update label */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+          /** @description Label ID */
+          labelID: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.LabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete label */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+          /** @description Label ID */
+          labelID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/logs/": {
     parameters: {
       query?: never;
@@ -5518,6 +5666,210 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List labels on asset level */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create label */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.LabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/attach/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Attach label to artifact */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+          /** @description Artifact name */
+          artifactName: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.AttachLabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/labels/{labelID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update label */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+          /** @description Label ID */
+          labelID: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.LabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete label */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+          /** @description Label ID */
+          labelID: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/logs/": {
     parameters: {
       query?: never;
@@ -6636,6 +6988,58 @@ export interface paths {
     };
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/assets/{assetSlug}/refs/{assetVersionSlug}/artifacts/{artifactName}/labels/attach/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Attach label to artifact */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+          /** @description Artifact name */
+          artifactName: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.AttachLabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
+          };
+        };
+      };
+    };
     delete?: never;
     options?: never;
     head?: never;
@@ -10663,6 +11067,208 @@ export interface paths {
           projectSlug: string;
           /** @description Webhook ID */
           id: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content?: never;
+        };
+      };
+    };
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/labels/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List labels on project level */
+    get: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+        };
+        cookie?: never;
+      };
+      requestBody?: never;
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
+          };
+        };
+      };
+    };
+    put?: never;
+    /** Create label */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.LabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/labels/attach/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Attach label to artifact */
+    post: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug */
+          projectSlug: string;
+          /** @description Asset slug */
+          assetSlug: string;
+          /** @description Asset version slug */
+          assetVersionSlug: string;
+          /** @description Artifact name */
+          artifactName: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.AttachLabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
+          };
+        };
+      };
+    };
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}/projects/{projectSlug}/labels/{labelID}/": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Update label */
+    put: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+          /** @description Label ID */
+          labelID: string;
+        };
+        cookie?: never;
+      };
+      /** @description Label data */
+      requestBody: {
+        content: {
+          "application/json": components["schemas"]["dtos.LabelRequest"];
+        };
+      };
+      responses: {
+        /** @description OK */
+        200: {
+          headers: {
+            [name: string]: unknown;
+          };
+          content: {
+            "application/json": components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"];
+          };
+        };
+      };
+    };
+    post?: never;
+    /** Delete label */
+    delete: {
+      parameters: {
+        query?: never;
+        header?: never;
+        path: {
+          /** @description Organization slug */
+          organization: string;
+          /** @description Project slug (project and asset level) */
+          projectSlug: string;
+          /** @description Asset slug (asset level) */
+          assetSlug: string;
+          /** @description Label ID */
+          labelID: string;
         };
         cookie?: never;
       };
@@ -15364,6 +15970,9 @@ export interface components {
       projectSlug: string;
       slug: string;
     };
+    "dtos.AttachLabelRequest": {
+      label: string[];
+    };
     "dtos.AverageRemediationTimes": {
       criticalCVSSOpen: number;
       criticalCVSSRemediated: number;
@@ -15929,6 +16538,11 @@ export interface components {
       url: string;
       userEmail: string;
     };
+    "dtos.LabelRequest": {
+      backgroundColor: string;
+      description: string;
+      label: string;
+    };
     "dtos.LicenseRiskArtifact": {
       artifactName: string;
       assetId: string;
@@ -16224,6 +16838,7 @@ export interface components {
       fingerprint: string;
       id: string;
       lastUsedAt: string;
+      pubKey: string;
       scopes: string;
     };
     "dtos.PATCreateResponse": {
@@ -16234,6 +16849,7 @@ export interface components {
       fingerprint: string;
       id: string;
       lastUsedAt: string;
+      pubKey: string;
       scopes: string;
     };
     "dtos.Package": {
@@ -16849,6 +17465,7 @@ export interface components {
       createdAt: string;
       dependencyVulns: components["schemas"]["github_com_l3montree-dev_devguard_database_models.DependencyVuln"][];
       id: string;
+      labels: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
       licenseRisks: components["schemas"]["github_com_l3montree-dev_devguard_database_models.LicenseRisk"][];
       vulnAssetId: string;
     };
@@ -16868,6 +17485,7 @@ export interface components {
       importance: number;
       integrityRequirement: components["schemas"]["dtos.RequirementLevel"];
       isPublic: boolean;
+      labels: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
       metadata: components["schemas"]["github_com_l3montree-dev_devguard_database_types.JSONB"];
       modifiedAttackComplexity: components["schemas"]["dtos.ModifiedAttackComplexity"];
       modifiedAttackVector: components["schemas"]["dtos.ModifiedAttackVector"];
@@ -17106,6 +17724,19 @@ export interface components {
       url: string;
       userEmail: string;
     };
+    "github_com_l3montree-dev_devguard_database_models.Label": {
+      artifacts: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"][];
+      assetID: string;
+      assets: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Asset"][];
+      backgroundColor: string;
+      createdAt: string;
+      description: string;
+      id: string;
+      label: string;
+      organizationID: string;
+      projectID: string;
+      projects: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Project"][];
+    };
     "github_com_l3montree-dev_devguard_database_models.LicenseRisk": {
       artifacts: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Artifact"][];
       assetVersion: components["schemas"]["github_com_l3montree-dev_devguard_database_models.AssetVersion"];
@@ -17197,6 +17828,7 @@ export interface components {
       externalEntityProviderParentId: string;
       id: string;
       isPublic: boolean;
+      labels: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Label"][];
       name: string;
       organization: components["schemas"]["github_com_l3montree-dev_devguard_database_models.Org"];
       organizationId: string;
@@ -17413,16 +18045,24 @@ export interface components {
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
       | 1
       | 1000
       | 1000000
       | 1000000000
       | 60000000000
       | 3600000000000
-      | -9223372036854776000
-      | 9223372036854776000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
+      | 1
+      | 1000
+      | 1000000
+      | 1000000000
+      | 60000000000
+      | 3600000000000
       | 1
       | 1000
       | 1000000
