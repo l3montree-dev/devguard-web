@@ -4,6 +4,35 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.20.0] — 2026-11-25
+
+### Added
+
+- **Secrets** — organizations, projects and repositories have a new secrets settings page. Values are stored encrypted and cannot be viewed after saving; secrets of the parent organization and project are inherited. Reference a secret as `$name` in the dependency proxy configuration, which lists the secrets available to it
+- **Multiple npm registries in the dependency proxy** — `registries.npm` accepts a list of registries, each with optional `scopes`, so scoped packages can be loaded from private registries. The entry without scopes is the fallback for all other packages
+- **Upstream registry authentication** — npm and Maven registries in the dependency proxy accept an `auth` block (`token` or `basic-auth`) that references secrets
+- **Redmine integration** — connect Redmine as an issue tracker, including setup in the provider guide, detection of the parent project and a configurable issue priority. Redmine shows a notice that webhooks are not supported (thanks @Xenira)
+- **Public key of access tokens** — asymmetric access tokens show their public key with a copy button
+- **Show/hide toggle for secret values** — the secret value field has an eye button to reveal the input
+
+### Changed
+
+- **Integration dialogs unified** — GitLab, Jira and Redmine share one integration dialog, and the code and dependency risk pages share one "create ticket" button
+- **Report upload form unified** — the onboarding and the "identify risks" dialog use the same report upload form (thanks @nicksan222)
+- **Integration combobox** — provider icons were removed from the combobox
+- **Password fields** — password fields look like regular inputs and now show a focus ring
+
+### Fixed
+
+- **Quickfix count** — the number of fixable vulnerabilities now matches the overview
+- **Return to the current page after login** — login links in the navigation, error pages, the not-found page and the invitation page bring you back to where you were (thanks @Zayed2006)
+- **CEL linter** — VEX rules and the retention policy editor flag unknown properties (with a "Did you mean …?" hint for wrong casing) and suggest string methods such as `contains` and `startsWith`
+- **OAuth2 error page** — fixed the double encoding of the organization slug
+- **Redmine ticket button** — the create ticket button works for Redmine
+- **Community driven badge** — fixed the styling of the badge
+
+---
+
 ## [v1.19.1] — 2026-11-20
 
 ### Added

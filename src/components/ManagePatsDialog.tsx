@@ -17,6 +17,7 @@ import { Button } from "./ui/button";
 import DateString, { parseDateOnly } from "./common/DateString";
 import ConfirmTokenDeletion from "./common/ConfirmTokenDeletion";
 import ListItem from "./common/ListItem";
+import CopyInput from "./common/CopyInput";
 import { AlertTriangleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +60,7 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
             <div className="flex flex-col gap-3">
               {accessTokens.map((pat) => {
                 const isAsymmetric = "fingerprint" in pat && !!pat.fingerprint;
+                const pubKey = isAsymmetric ? pat.pubKey : undefined;
                 const expiryState = getExpiryState(pat.expiryDateUnix);
 
                 return (
@@ -113,7 +115,16 @@ const ManagePatsDialog: FunctionComponent<PropsWithChildren<Props>> = ({
                         </Button>
                       </ConfirmTokenDeletion>
                     }
-                  />
+                  >
+                    {isAsymmetric && pubKey && (
+                      <div>
+                        <span className="text-xs text-muted-foreground">
+                          Public Key
+                        </span>
+                        <CopyInput value={pubKey} />
+                      </div>
+                    )}
+                  </ListItem>
                 );
               })}
             </div>

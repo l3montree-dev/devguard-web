@@ -10,12 +10,9 @@ import React, {
   type FunctionComponent,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
-import { useDropzone } from "react-dropzone";
 import { toast } from "@/lib/toast";
-import { readErrorMessage } from "@/services/apiClient";
 import { useUpdateOrganization } from "../context/OrganizationContext";
 import { useActiveAsset } from "../hooks/useActiveAsset";
 import { useActiveOrg } from "../hooks/useActiveOrg";
@@ -24,11 +21,6 @@ import useAccessToken from "../hooks/useAccessToken";
 import useRepositoryConnection from "../hooks/useRepositoryConnection";
 import { createArtifact } from "@/services/artifactService";
 import { createAssetVersion } from "@/services/assetVersionService";
-import {
-  uploadSarif,
-  uploadSbomFile,
-  uploadVex,
-} from "@/services/scanUploadService";
 import AutomatedIntegrationSlide from "./guides/risk-scanner-carousel-slides/AutomatedIntegrationSlide";
 import AutoSetupProgressSlide from "./guides/risk-scanner-carousel-slides/AutoSetupProgressSlide";
 import ExternalEntityAutosetup from "./guides/risk-scanner-carousel-slides/ExternalEntityAutosetup";
@@ -49,7 +41,6 @@ import { Carousel, CarouselContent } from "./ui/carousel";
 import type { CarouselApi } from "./ui/carousel";
 import { Dialog, DialogContent } from "./ui/dialog";
 import { DevGuardCliSlide } from "./guides/risk-scanner-carousel-slides/DevGuardCliSlide";
-import { ensureValidBranchOrTagSlug } from "@/utils/common";
 
 interface RiskScannerDialogProps {
   open: boolean;
@@ -110,212 +101,7 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
 
   // Manual integration state
   const [_variant, setVariant] = React.useState<"manual" | "auto">("auto");
-  const [tab, setTab] = React.useState<"sbom" | "sarif" | "vex">("sbom");
   const updateOrg = useUpdateOrganization();
-
-  const [sbomFileName, setSbomFileName] = useState<string | undefined>();
-  const sbomFileRef = useRef<File | undefined>(undefined);
-  const [sarifFileName, setSarifFileName] = useState<string | undefined>();
-  const sarifContentRef = useRef<string | undefined>(undefined);
-  const [vexFileName, setVexFileName] = useState<string | undefined>();
-  const vexContentRef = useRef<string | undefined>(undefined);
-
-  const onDropVex = useCallback((acceptedFiles: File[]) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const txt = reader.result as string;
-          const parsed = JSON.parse(txt);
-
-          if (
-            parsed?.bomFormat === "CycloneDX" ||
-            parsed?.document?.category === "csaf_vex" ||
-            parsed?.["@context"] === "https://openvex.dev/ns/v0.2.0"
-          ) {
-            vexContentRef.current = txt;
-            setVexFileName(file.name);
-          } else {
-            toast.error(
-              "VEX file does not follow CycloneDX format or CSAF/VEX format or OpenVEX format",
-            );
-          }
-        } catch (_e) {
-          toast.error(
-            "JSON format is not recognized, make sure it is the proper format",
-          );
-          return;
-        }
-      };
-      reader.readAsText(file);
-    });
-  }, []);
-
-  const onDropSbom = useCallback((acceptedFiles: File[]) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const txt = reader.result as string;
-          const parsed = JSON.parse(txt);
-          if (parsed?.bomFormat === "CycloneDX") {
-            sbomFileRef.current = file;
-            setSbomFileName(file.name);
-          } else {
-            toast.error(
-              "SBOM does not follow CycloneDX format or Version is < 1.6",
-            );
-          }
-        } catch (_e) {
-          toast.error(
-            "JSON format is not recognized, make sure it is the proper format",
-          );
-          return;
-        }
-      };
-      reader.readAsText(file);
-    });
-  }, []);
-
-  const sbomDropzone = useDropzone({
-    onDrop: onDropSbom,
-    accept: { "application/json": [".json"] },
-  });
-
-  const onDropSarif = useCallback((acceptedFiles: File[]) => {
-    acceptedFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        sarifContentRef.current = reader.result as string;
-        const parsed = JSON.parse(sarifContentRef.current || "{}");
-        if (!parsed.$schema?.includes("sarif")) {
-          toast.error("SARIF file does not follow SARIF format");
-          return;
-        }
-
-        setSarifFileName(file.name);
-      };
-      reader.readAsText(file);
-    });
-  }, []);
-
-  const sarifDropzone = useDropzone({
-    onDrop: onDropSarif,
-    accept: {
-      "application/json": [".json"],
-      "application/sarif+json": [".sarif"],
-      "text/plain": [".sarif"],
-    },
-  });
-
-  const vexDropzone = useDropzone({
-    onDrop: onDropVex,
-    accept: {
-      "application/json": [".json"],
-      "application/sarif+json": [".sarif"],
-      "text/plain": [".sarif"],
-    },
-  });
-
-  const scanTarget = (params: {
-    branchOrTagName: string;
-    isTag: boolean;
-    isDefault: boolean;
-    artifactName: string;
-    origin: string;
-  }) => ({
-    ...params,
-    assetName: `${activeOrg.slug}/${activeProject.slug}/${asset!.slug}`,
-  });
-
-  const uploadSBOM = async (params: {
-    branchOrTagName: string;
-    branchOrTagSlug: string;
-    isTag: boolean;
-    artifactName: string;
-    isDefault: boolean;
-    origin: string;
-  }) => {
-    if (!sbomFileRef.current) return;
-
-    const resp = await uploadSbomFile(
-      {
-        organization: decodeURIComponent(activeOrg.slug),
-        projectSlug: activeProject.slug,
-        assetSlug: asset!.slug,
-      },
-      scanTarget(params),
-      sbomFileRef.current,
-    );
-
-    if (resp.ok) {
-      // This was a total upfuck...
-      // When you are reading this farytail of a shit show your will be enlightet...
-      // When you have a fresh repository (asset) next catches a 404 and seems to store that in their beautiful cache, a very beautiful cache.
-      // https://nextjs.org/docs/app/getting-started/fetching-data
-      // You can see we added a better error tracking in the AssetLayout to make that visible.
-      // As router.push() (and not in combination with refresh) did not helped us out here we used the hard navigation here...
-      // The End. And if they are not debugging version 1.0.0 release canidate a thousand they will be dead.
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination, react-hooks/immutability -- see above
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/dependency-risks?artifact=${encodeURIComponent(params.artifactName)}`;
-      onOpenChange(false);
-      toast.success("SBOM has successfully been sent!");
-    } else {
-      // check if there is an error message
-      const msg = await readErrorMessage(resp);
-      toast.error("SBOM has not been sent successfully. Reason: " + msg);
-    }
-  };
-
-  const uploadSARIF = async (params: {
-    branchOrTagName: string;
-    branchOrTagSlug: string;
-    isTag: boolean;
-    artifactName: string;
-    isDefault: boolean;
-    origin: string;
-  }) => {
-    if (!sarifContentRef.current) return;
-
-    try {
-      await uploadSarif(scanTarget(params), sarifContentRef.current);
-    } catch {
-      toast.error("SARIF report has not been sent successfully");
-      return;
-    }
-
-    {
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- hard navigation, see the SBOM upload above
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${ensureValidBranchOrTagSlug(params.branchOrTagSlug)}/code-risks/`;
-      onOpenChange(false);
-      toast.success("SARIF report has successfully been sent!");
-    }
-  };
-
-  const uploadVEX = async (params: {
-    branchOrTagName: string;
-    branchOrTagSlug: string;
-    isTag: boolean;
-    artifactName: string;
-    isDefault: boolean;
-    origin: string;
-  }) => {
-    if (!vexContentRef.current) return;
-
-    try {
-      await uploadVex(scanTarget(params), vexContentRef.current);
-    } catch {
-      toast.error("VEX has not been sent successfully");
-      return;
-    }
-
-    {
-      onOpenChange(false);
-      // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- hard navigation, see the SBOM upload above
-      window.location.href = `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/vex-rules/`;
-      toast.success("VEX has successfully been sent!");
-    }
-  };
 
   const handleInformationSourceSetup = async (params: {
     branchOrTagName: string;
@@ -362,28 +148,11 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     }
 
     onOpenChange(false);
-    // hard navigation, see the SBOM upload above
+    // hard navigation, refresh cached asset data
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign(
       `/${activeOrg.slug}/projects/${activeProject.slug}/assets/${asset!.slug}/refs/${assetVersionData.slug}/dependency-risks/`,
     );
-  };
-
-  const handleUpload = async (params: {
-    branchOrTagName: string;
-    branchOrTagSlug: string;
-    isTag: boolean;
-    artifactName: string;
-    isDefault: boolean;
-    origin: string;
-  }) => {
-    if (tab === "sbom") {
-      await uploadSBOM(params);
-    } else if (tab === "sarif") {
-      await uploadSARIF(params);
-    } else {
-      await uploadVEX(params);
-    }
   };
 
   const activeOrg = useActiveOrg()!;
@@ -482,12 +251,6 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
     });
   }, []);
 
-  const isUploadDisabled =
-    tab === "sbom"
-      ? !sbomFileName
-      : tab === "sarif"
-        ? !sarifFileName
-        : !vexFileName;
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent>
@@ -627,20 +390,10 @@ const RiskScannerDialog: FunctionComponent<RiskScannerDialogProps> = ({
               api={api}
             />
             <ManualIntegrationSlide
-              tab={tab}
-              setTab={setTab}
-              sbomFileName={sbomFileName}
-              sarifFileName={sarifFileName}
-              sbomDropzone={sbomDropzone}
-              sarifDropzone={sarifDropzone}
-              isUploadDisabled={isUploadDisabled}
-              vexDropzone={vexDropzone}
-              vexFileName={vexFileName}
-              handleUpload={handleUpload}
               prevIndex={prevIndex}
               onClose={() => onOpenChange(false)}
               api={api}
-              assetVersionName={assetVersion?.name}
+              assetVersion={assetVersion}
               artifacts={artifacts || []}
             />
             <ExternalEntityAutosetup

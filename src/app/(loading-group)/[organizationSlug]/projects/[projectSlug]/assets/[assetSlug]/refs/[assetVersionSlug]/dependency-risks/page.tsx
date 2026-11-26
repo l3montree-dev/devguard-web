@@ -64,6 +64,7 @@ import useDecodedPathname from "../../../../../../../../../../hooks/useDecodedPa
 import useRouterQuery from "../../../../../../../../../../hooks/useRouterQuery";
 import useScannerImage from "../../../../../../../../../../hooks/useScannerImage";
 import useVexRuleRecommendations from "@/hooks/useVexRuleRecommendations";
+import { useRiskHistory } from "@/hooks/useAssetVersionStats";
 
 const severityRanges: Record<string, [number | null, number | null]> = {
   low: [null, 4],
@@ -199,26 +200,30 @@ const Index: FunctionComponent = () => {
     mutate: mutateVulns,
   } = useDependencyVulnList<VulnByPackage>(vulnScope, queryWithState);
 
-  // the "See all" link reuses these, so the filter and the count query are separate
   const fixableFilterParams = useMemo(() => {
     const p = new URLSearchParams(queryWithState);
     p.append("filterQuery[direct_dependency_fixed_version][is not null]", "1");
     return p;
   }, [queryWithState]);
 
-  // pageSize 0 asks for the total without the rows
-  const fixableCountQuery = useMemo(() => {
-    const p = new URLSearchParams(fixableFilterParams);
-    p.set("page", "1");
-    p.set("pageSize", "0");
-    return p;
-  }, [fixableFilterParams]);
+  const selectedArtifact = searchParams?.get("artifact") || undefined;
 
-  const { data: fixableVulns } = useDependencyVulnList<VulnByPackage>(
+  const { data: riskHistory } = useRiskHistory(
     vulnScope,
-    fixableCountQuery,
+    extractDateOnly(last3Month),
+    extractDateOnly(today),
+    selectedArtifact,
   );
-  const fixableVulnsCount = fixableVulns?.total ?? 0;
+
+  const latest = riskHistory?.length
+    ? riskHistory[riskHistory.length - 1]
+    : null;
+
+  const fixableVulnsCount =
+    (latest?.cvePurlFixableLowCvss ?? 0) +
+    (latest?.cvePurlFixableMediumCvss ?? 0) +
+    (latest?.cvePurlFixableHighCvss ?? 0) +
+    (latest?.cvePurlFixableCriticalCvss ?? 0);
 
   const handleBulkAction = useCallback(
     async (params: {
@@ -915,3 +920,8 @@ const Index: FunctionComponent = () => {
 };
 
 export default Index;
+
+const extractDateOnly = (date: Date) => date.toISOString().split("T")[0];
+const today = new Date();
+const last3Month = new Date(today);
+last3Month.setMonth(last3Month.getMonth() - 3);

@@ -22,6 +22,7 @@ import { keymap, placeholder as placeholderExtension } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { cn } from "@/lib/utils";
 import {
+  ASSET_VERSION_COMPLETIONS,
   assetVersionCelCompletionSource,
   celCompletionSource,
   celParseLinter,
@@ -112,8 +113,8 @@ const languageLinters: Record<Language, (view: EditorView) => Diagnostic[]> = {
   yaml: yamlParseLinter(),
   json: jsonParseLinter(),
   toml: tomlParseLinter(),
-  cel: celParseLinter(),
-  "cel-asset-version": celParseLinter(),
+  cel: celParseLinter(ASSET_VERSION_COMPLETIONS),
+  "cel-asset-version": celParseLinter(ASSET_VERSION_COMPLETIONS),
 };
 
 const CodeEditor = ({
