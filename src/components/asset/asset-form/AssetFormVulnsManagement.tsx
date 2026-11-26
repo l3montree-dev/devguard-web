@@ -48,36 +48,20 @@ interface Props {
 
 const exampleRules = [
   {
-    label: `Report CVSS of 8 or higher`,
-    rule: `vuln.cve != null && vuln.cve.cvss >= 8`,
+    label: `Report CVSS of 8+ on default branch`,
+    rule: `vuln.ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8`,
   },
   {
-    label: `Report a specific weakness (CWE)`,
-    rule: `vuln.cve != null && "CWE-79" in vuln.cve.cwes`,
+    label: `Report CVSS of 8+ on all git tags`,
+    rule: `vuln.ref.type == "tag" && vuln.cve != null && vuln.cve.cvss >= 8`,
   },
   {
-    label: `Report Risk Value of 8 or higher`,
-    rule: `vuln.riskAssessment != null && vuln.riskAssessment >= 8`,
+    label: `Report risk of 8+ on default branch`,
+    rule: `vuln.ref.defaultBranch && vuln.riskAssessment != null && vuln.riskAssessment >= 8`,
   },
   {
-    label: `Report environmental risk of 8 or higher`,
-    rule: `vuln.cve != null && vuln.cve.risk.withEnvironment >= 8`,
-  },
-  {
-    label: `Report EPSS of 0.1 or higher`,
-    rule: `vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss >= 0.1`,
-  },
-  {
-    label: `Report CVSS of 7+ with known exploits`,
-    rule: `vuln.cve != null && vuln.cve.cvss >= 7 && vuln.cve.exploits.size() > 0`,
-  },
-  {
-    label: `Report CVSS of 8+ on the default branch`,
-    rule: `vuln.ref.defaultBranch == true && vuln.cve != null && vuln.cve.cvss >= 8`,
-  },
-  {
-    label: `Report on default and release branches`,
-    rule: `vuln.ref.defaultBranch == true || vuln.ref.name.startsWith("release/")`,
+    label: `Report env risk of 8+ on all git tags`,
+    rule: `vuln.ref.type == "tag" && vuln.cve != null && vuln.cve.risk.withEnvironment >= 8`,
   },
 ];
 
