@@ -4,9 +4,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { Suspense } from "react";
-import { Registration } from "@ory/elements-react/theme";
 import { getRegistrationFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
+import { AltchaRegistration } from "../../components/ory/AltchaFlows";
 import { oryComponentOverrides } from "../../components/ory/overrides";
 import oryConfig from "../../ory.config";
 import TermsOfUseLink from "../../components/TermsOfUseLink";
@@ -33,7 +33,7 @@ const RegistrationForm = async ({ searchParams }: OryPageParams) => {
   }
 
   return (
-    <Registration
+    <AltchaRegistration
       flow={rewriteFlow(flow)}
       config={oryConfig}
       components={oryComponentOverrides}

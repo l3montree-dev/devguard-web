@@ -3,13 +3,12 @@
 
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Verification } from "@ory/elements-react/theme";
 import { getVerificationFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
 import Image from "next/image";
 import { Card, CardContent } from "../../components/ui/card";
 import oryConfig from "../../ory.config";
-import { oryComponentOverrides } from "../../components/ory/overrides";
+import VerificationFlow from "../../components/ory/VerificationFlow";
 import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
 import Footer from "@/components/misc/Footer";
@@ -26,13 +25,7 @@ const VerificationForm = async ({ searchParams }: OryPageParams) => {
     return null;
   }
 
-  return (
-    <Verification
-      flow={flow}
-      config={oryConfig}
-      components={oryComponentOverrides}
-    />
-  );
+  return <VerificationFlow flow={flow} config={oryConfig} />;
 };
 
 const VerificationPage = (props: OryPageParams) => {

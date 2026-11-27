@@ -5,11 +5,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { Suspense } from "react";
 
-import { Login } from "@ory/elements-react/theme";
 import { getLoginFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
 import oryConfig from "../../ory.config";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
+import { AltchaLogin } from "../../components/ory/AltchaFlows";
 import { loginComponentOverrides } from "../../components/ory/overrides";
 import { Card, CardContent } from "../../components/ui/card";
 import PrivacyPolicyLink from "../../components/PrivacyPolicyLink";
@@ -32,9 +32,9 @@ const LoginForm = async ({ searchParams }: OryPageParams) => {
   }
 
   return (
-    <Login
-      config={oryConfig}
+    <AltchaLogin
       flow={flow}
+      config={oryConfig}
       components={loginComponentOverrides}
     />
   );
