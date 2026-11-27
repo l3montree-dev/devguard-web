@@ -73,24 +73,19 @@ ref.type == "tag" || ${GRACE_PERIOD}
     label: "Only the latest semver tag",
     expression: `${DEFAULT_BRANCH_RULE}
 // tags: keep only the highest semantic version
-  : ref.isLatest`,
+  : ref.isLatestBySemverStable`,
   },
   {
-    label: "Tags of the current major version",
+    label: "Latest tag of each major version",
     expression: `${DEFAULT_BRANCH_RULE}
-// tags: keep every tag sharing the major version of the latest tag
-  : has(ref.latestRef) && isSemver(ref.name)
-    && semver(ref.name).major == semver(ref.latestRef.name).major`,
+// tags: keep the highest version of every major
+  : ref.isLatestBySemverInMajor`,
   },
   {
     label: "Latest patch of each minor version",
     expression: `${DEFAULT_BRANCH_RULE}
 // tags: keep the highest patch of every major.minor
-  : isSemver(ref.name) && otherRefs
-    .filter(other, other.type == "tag" && isSemver(other.name)
-      && semver(other.name).major == semver(ref.name).major
-      && semver(other.name).minor == semver(ref.name).minor)
-    .all(other, semver(ref.name) >= semver(other.name))`,
+  : ref.isLatestBySemverInMinor`,
   },
   {
     label: "Latest patch of the last 3 minor versions",

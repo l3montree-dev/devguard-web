@@ -359,7 +359,7 @@ class CelParser {
         }
         // a field access changes the type to something we don't
         // statically know - treat it as non-bool until compared,
-        // unless the field is declared as a bool, e.g. ref.isLatest
+        // unless the field is declared as a bool, e.g. ref.isLatestBySemverStable
         isBool = fields?.find((f) => f.label === t.value)?.detail === "bool";
         continue;
       }
@@ -639,7 +639,7 @@ const CVE_FIELDS: CelField[] = [
 
 // Mirrors models.AssetVersion.ToCELMap() (devguard/database/models/asset_version_model.go)
 // plus the fields celrules.NewRefs adds on top of it.
-const BASE_REF_FIELDS: CelField[] = [
+export const REF_FIELDS: CelField[] = [
   {
     label: "name",
     type: "property",
@@ -668,21 +668,34 @@ const BASE_REF_FIELDS: CelField[] = [
     info: 'When a client last uploaded a scan (SBOM or SARIF) - absent if it never did, so guard it: has(ref.lastUploadAt) && timestamp(ref.lastUploadAt) > now() - duration("168h")',
   },
   {
-    label: "isLatest",
+    label: "isLatestBySemverIncludingPrereleases",
     type: "property",
     detail: "bool",
-    info: 'Whether this is the tag with the highest semantic version, e.g. "v1.12.1" - prereleases and non-semver names are never the latest',
+    info: "Whether this is the tag with the highest semantic version, prereleases included (1.0.0 > 1.0.0-rc1 > 0.9.0)",
   },
-];
-
-export const REF_FIELDS: CelField[] = [
-  ...BASE_REF_FIELDS,
   {
-    label: "latestRef",
+    label: "isLatestBySemverStable",
     type: "property",
-    detail: "map, may be absent",
-    info: 'The tag with the highest semantic version - absent if there is no semver tag, so guard it: has(ref.latestRef) && ref.latestRef.name == "v1.12.1"',
-    fields: BASE_REF_FIELDS,
+    detail: "bool",
+    info: "Whether this is the tag with the highest semantic version, prereleases excluded",
+  },
+  {
+    label: "isLatestBySemverInMajor",
+    type: "property",
+    detail: "bool",
+    info: "Whether this is the tag with the highest semantic version within its major line, prereleases excluded",
+  },
+  {
+    label: "isLatestBySemverInMinor",
+    type: "property",
+    detail: "bool",
+    info: "Whether this is the tag with the highest patch within its minor line, prereleases excluded",
+  },
+  {
+    label: "isLatestByCreatedAt",
+    type: "property",
+    detail: "bool",
+    info: "Whether this is the most recently created tag",
   },
 ];
 

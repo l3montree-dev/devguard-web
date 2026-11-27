@@ -49,7 +49,7 @@ interface Props {
 const exampleRules = [
   {
     label: `Report CVSS of 7+ on the latest release`,
-    rule: `ref.isLatest && vuln.cve != null && vuln.cve.cvss >= 7`,
+    rule: `ref.isLatestBySemverStable && vuln.cve != null && vuln.cve.cvss >= 7`,
   },
   {
     label: `Report CVSS of 8+ on the default branch`,
@@ -57,19 +57,19 @@ const exampleRules = [
   },
   {
     label: `Report risk of 7+ on default branch and latest release`,
-    rule: `(ref.defaultBranch || ref.isLatest) && vuln.riskAssessment != null && vuln.riskAssessment >= 7`,
+    rule: `(ref.defaultBranch || ref.isLatestBySemverStable) && vuln.riskAssessment != null && vuln.riskAssessment >= 7`,
   },
   {
     label: `Report env risk of 8+ on release branches`,
     rule: `ref.name.startsWith("release/") && vuln.cve != null && vuln.cve.risk.withEnvironment >= 8`,
   },
   {
-    label: `Report CVSS of 9+ on all tags of the current major version`,
-    rule: `has(ref.latestRef) && isSemver(ref.name) && semver(ref.name).major == semver(ref.latestRef.name).major && vuln.cve != null && vuln.cve.cvss >= 9`,
+    label: `Report CVSS of 9+ on the latest tag of each major version`,
+    rule: `ref.isLatestBySemverInMajor && vuln.cve != null && vuln.cve.cvss >= 9`,
   },
   {
     label: `Report fixable vulns with EPSS of 10%+ on default branch and latest release`,
-    rule: `(ref.defaultBranch || ref.isLatest) && vuln.componentFixedVersion != null && vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss >= 0.1`,
+    rule: `(ref.defaultBranch || ref.isLatestBySemverStable) && vuln.componentFixedVersion != null && vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss >= 0.1`,
   },
 ];
 
@@ -196,7 +196,7 @@ const EnableTicketRange: FunctionComponent<Props> = ({ form, assetId }) => {
                             onChange={celField.onChange}
                             onValidation={handleCelValidation}
                             language="cel-ticket-range"
-                            placeholder={`// Create a ticket when the expression is true, e.g.:\n// ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8\n// ref.isLatest && vuln.riskAssessment != null && vuln.riskAssessment >= 7\n// vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss > 0.1`}
+                            placeholder={`// Create a ticket when the expression is true, e.g.:\n// ref.defaultBranch && vuln.cve != null && vuln.cve.cvss >= 8\n// ref.isLatestBySemverStable && vuln.riskAssessment != null && vuln.riskAssessment >= 7\n// vuln.cve != null && vuln.cve.epss != null && vuln.cve.epss > 0.1`}
                           />
                           <FormMessage />
                         </FormItem>
