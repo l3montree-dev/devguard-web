@@ -4,6 +4,18 @@ All notable frontend changes to DevGuard Web are documented here.
 
 For API and backend changes see the [DevGuard CHANGELOG](https://github.com/l3montree-dev/devguard/blob/main/CHANGELOG.md).
 
+## [v1.20.1] — 2026-11-27
+
+### Added
+
+- **Labels (Preview)** — organizations, projects and repositories have a new labels settings page to create labels with a name, color and optional description. Labels are inherited from the parent organization and project and can only be deleted where they were created (will be further announced in an upcoming release)
+
+### Fixed
+
+- **Collapsed events in the risk assessment feed** — grouped events are aligned left, the count badge no longer wraps and the dotted timeline line is drawn correctly (thanks @Zayed2006)
+
+---
+
 ## [v1.20.0] — 2026-11-25
 
 ### Added
