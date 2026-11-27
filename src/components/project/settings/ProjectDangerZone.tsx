@@ -5,6 +5,7 @@
 
 import Alert from "@/components/common/Alert";
 import DangerZone from "@/components/common/DangerZone";
+import ExportSection from "@/components/common/data-transfer/ExportSection";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -51,6 +52,7 @@ const ProjectDangerZone = () => {
     false,
   );
   const publicChild = isPublic ? publicChildren?.data[0] : undefined;
+  const projectPath = `/organizations/${scope.organization}/projects/${scope.projectSlug}`;
 
   const handlePublicChange = async (checked: boolean) => {
     setIsPublic(checked);
@@ -154,6 +156,22 @@ const ProjectDangerZone = () => {
             </Link>
           </div>
         )}
+        <ExportSection
+          title="Export Group"
+          description={`Downloads the ${project.name} group with all of its sub-groups and repositories as an archive that can be imported into another DevGuard instance.`}
+          resourcePath={projectPath}
+        />
+        {/* The import is only available through the devguard-cli for now, see dataTransferService.
+        <ImportSection
+          title="Import Group"
+          description={`Imports a group archive as a sub-group of the ${project.name} group.`}
+          importPath={`${projectPath}/import/`}
+        />
+        <ImportSection
+          title="Import Repository"
+          description={`Imports a repository archive into the ${project.name} group.`}
+          importPath={`${projectPath}/import/`}
+        /> */}
         {project.externalEntityProviderId ? null : (
           <ListItem
             Title="Delete Group"

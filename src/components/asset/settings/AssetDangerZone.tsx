@@ -5,6 +5,7 @@
 
 import Alert from "@/components/common/Alert";
 import DangerZone from "@/components/common/DangerZone";
+import ExportSection from "@/components/common/data-transfer/ExportSection";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -94,6 +95,11 @@ const AssetDangerZone = () => {
             </Link>
           </div>
         )}
+        <ExportSection
+          title="Export Repository"
+          description={`Downloads the ${asset.name} repository with all of its data as an archive that can be imported into another DevGuard instance.`}
+          resourcePath={`/organizations/${scope.organization}/projects/${scope.projectSlug}/assets/${scope.assetSlug}`}
+        />
         {asset.externalEntityProviderId ? null : (
           <ListItem
             Title="Delete Repository"

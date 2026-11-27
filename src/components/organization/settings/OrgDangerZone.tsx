@@ -5,6 +5,7 @@
 
 import Alert from "@/components/common/Alert";
 import DangerZone from "@/components/common/DangerZone";
+import ExportSection from "@/components/common/data-transfer/ExportSection";
 import ListItem from "@/components/common/ListItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -17,8 +18,10 @@ import {
 import { useActiveOrg } from "@/hooks/useActiveOrg";
 import { useOrgProjects } from "@/hooks/useOrgProjects";
 import { useOrgUpdate } from "@/hooks/useOrgUpdate";
+import { isAtLeast, useCurrentUserRole } from "@/hooks/useUserRole";
 import { toast } from "@/lib/toast";
 import { deleteOrganization } from "@/services/organizationService";
+import { UserRole } from "@/types/view/vuln";
 import { classNames } from "@/utils/common";
 import { InfoIcon } from "lucide-react";
 import Link from "next/link";
@@ -32,6 +35,8 @@ const publicFilter = new URLSearchParams({
 const OrgDangerZone = () => {
   const org = useActiveOrg();
   const handleUpdate = useOrgUpdate();
+  // the backend only lets owners export an organization and import groups into it
+  const isOwner = isAtLeast(useCurrentUserRole(), UserRole.Owner);
   const [isPublic, setIsPublic] = useState(org.isPublic);
   const [isSaving, setIsSaving] = useState(false);
   const { data: publicProjects } = useOrgProjects(
@@ -111,6 +116,21 @@ const OrgDangerZone = () => {
               Go to Group Settings
             </Link>
           </div>
+        )}
+        {isOwner && (
+          <>
+            <ExportSection
+              title="Export Organization"
+              description={`Downloads the ${org.name} organization with all of its groups and repositories as an archive that can be imported into another DevGuard instance.`}
+              resourcePath={`/organizations/${org.slug}`}
+            />
+            {/* The import is only available through the devguard-cli for now, see dataTransferService.
+            <ImportSection
+              title="Import Group"
+              description={`Imports a group archive as a top-level group of the ${org.name} organization.`}
+              importPath={`/organizations/${org.slug}/import/`}
+            /> */}
+          </>
         )}
         <ListItem
           Title="Delete Organization"
