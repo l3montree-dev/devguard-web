@@ -139,8 +139,8 @@ const RiskFeedGroupHeader = ({
         </div>
         <div className="w-full overflow-hidden rounded border">
           <CollapsibleTrigger asChild>
-            <button className="w-full bg-card px-2 py-2 font-medium flex flex-row items-center justify-between hover:bg-muted/50 transition-colors">
-              <span className="flex flex-row items-center gap-2">
+            <button className="w-full bg-card px-2 py-2 text-left font-medium flex flex-row items-center justify-between gap-2 hover:bg-muted/50 transition-colors">
+              <span className="flex flex-row items-center gap-2 text-left">
                 {(() => {
                   const msg = eventTypeMessages(
                     groupedEvents[0],
