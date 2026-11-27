@@ -43,6 +43,8 @@ export const config = {
     "white" | "dark" | false,
   errorTrackingDsn: process.env.ERROR_TRACKING_DSN || "",
   registrationEnabled: process.env.REGISTRATION_ENABLED !== "false",
+  emailVerificationEnabled: process.env.EMAIL_VERIFICATION_ENABLED === "true",
+  altchaEnabled: Boolean(process.env.ALTCHA_HMAC_SECRET),
   issueTrackerUrl:
     process.env.ISSUE_TRACKER_URL ||
     "https://github.com/l3montree-dev/devguard/issues/new/choose",

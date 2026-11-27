@@ -4,6 +4,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOryMiddleware } from "@ory/nextjs/middleware";
 import oryConfig from "./ory.config";
+import { config as appConfig } from "./config";
+import { ALTCHA_COOKIE_NAME } from "./const/altcha";
+import { altcha } from "./services/altcha";
+import { isAltchaProtected } from "./utils/altcha";
 import { rewriteFlow } from "./utils/auth";
 
 const proxyToOry = createOryMiddleware(oryConfig);
@@ -64,6 +68,20 @@ export async function proxy(request: NextRequest) {
     const target = new URL(`/self-service/${flowType}/browser`, request.url);
     target.search = request.nextUrl.search;
     return NextResponse.redirect(target);
+  }
+
+  if (
+    appConfig.altchaEnabled &&
+    isAltchaProtected(request.method, request.nextUrl.pathname)
+  ) {
+    const altchaResponse = await altcha.middleware(request);
+    if (altchaResponse instanceof Response && !altchaResponse.ok) {
+      altchaResponse.headers.append(
+        "Set-Cookie",
+        `${ALTCHA_COOKIE_NAME}=; Path=/; Max-Age=0`,
+      );
+      return altchaResponse;
+    }
   }
 
   const response = await proxyToOry(request);

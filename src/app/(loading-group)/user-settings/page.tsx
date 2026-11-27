@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import Section from "@/components/common/Section";
+import EmailVerificationStatus from "@/components/EmailVerificationStatus";
 import UserSettings from "@/components/UserSettings";
+import { config } from "@/config";
 import oryConfig from "@/ory.config";
 import { getSettingsFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
@@ -22,6 +24,11 @@ export default async function AccountSettingsPage(props: OryPageParams) {
       description="Manage your profile, password and two-factor authentication."
     >
       <div className="dark:text-white">
+        {config.emailVerificationEnabled ? (
+          <EmailVerificationStatus
+            addresses={flow.identity.verifiable_addresses ?? []}
+          />
+        ) : null}
         <UserSettings flow={flow as any} config={oryConfig} />
       </div>
     </Section>

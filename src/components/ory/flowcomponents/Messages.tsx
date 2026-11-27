@@ -39,10 +39,15 @@ export function OryToast({
 }
 
 const MESSAGE_OVERRIDES: Record<number, string> = {
-  4000029: "You must accept the terms of use to use DevGuard",
+  4000029:
+    "You must accept the terms of use and privacy policy to use DevGuard",
 };
 
+const HIDDEN_MESSAGE_IDS = new Set([1080002]);
+
 export function OryMessageContent({ message }: OryMessageContentProps) {
+  if (HIDDEN_MESSAGE_IDS.has(message.id)) return null;
+
   const text = MESSAGE_OVERRIDES[message.id] ?? message.text;
   const colorClass =
     message.type === "error"

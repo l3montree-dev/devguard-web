@@ -3,12 +3,12 @@
 
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Recovery } from "@ory/elements-react/theme";
 import { getRecoveryFlow } from "@ory/nextjs/app";
 import type { OryPageParams } from "@ory/nextjs/app";
 import Image from "next/image";
 import { Card, CardContent } from "../../components/ui/card";
 import oryConfig from "../../ory.config";
+import { AltchaRecovery } from "../../components/ory/AltchaFlows";
 import { oryComponentOverrides } from "../../components/ory/overrides";
 import FlowSkeleton from "../../components/ory/FlowSkeleton";
 import ContainerYardScene from "../../components/threejs/ContainerYardScene";
@@ -28,7 +28,7 @@ const RecoveryForm = async ({ searchParams }: OryPageParams) => {
   }
 
   return (
-    <Recovery
+    <AltchaRecovery
       flow={flow}
       config={oryConfig}
       components={oryComponentOverrides}

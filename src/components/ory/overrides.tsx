@@ -18,6 +18,7 @@ import {
 } from "./flowcomponents/Cards";
 import { OryMessageContent, OryToast } from "./flowcomponents/Messages";
 import {
+  OryAnchor,
   OryButton,
   OryCheckbox,
   OryCodeInput,
@@ -28,6 +29,7 @@ import { OrySsoButton, OrySsoRoot, OrySsoSettings } from "./flowcomponents/SSO";
 
 export const loginComponentOverrides: OryFlowComponentOverrides = {
   Node: {
+    Anchor: OryAnchor,
     Button: OryButton,
     SsoButton: OrySsoButton,
     Input: OryInput,
@@ -56,6 +58,7 @@ export const loginComponentOverrides: OryFlowComponentOverrides = {
 
 export const oryComponentOverrides: OryFlowComponentOverrides = {
   Node: {
+    Anchor: OryAnchor,
     Button: OryButton,
     SsoButton: OrySsoButton,
     Input: OryRegistrationInput,

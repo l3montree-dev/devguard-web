@@ -4,6 +4,8 @@
 "use client";
 
 import type { PropsWithChildren } from "react";
+import { FlowType } from "@ory/client-fetch";
+import { useOryFlow } from "@ory/elements-react";
 import type {
   OryCardSettingsSectionProps,
   OryFormSectionContentProps,
@@ -13,6 +15,7 @@ import {
   DefaultCardFooter,
   DefaultCardHeader,
 } from "@ory/elements-react/theme";
+import { VerificationSuccessHeader } from "./VerificationSuccessHeader";
 import Section from "@/components/common/Section";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -27,9 +30,13 @@ export function OryCardRootTransparent({ children }: PropsWithChildren) {
 }
 
 export function OryCardHeader() {
+  const { flowType, flow } = useOryFlow();
+  const isVerified =
+    flowType === FlowType.Verification && flow.state === "passed_challenge";
+
   return (
     <div className="text-center">
-      <DefaultCardHeader />
+      {isVerified ? <VerificationSuccessHeader /> : <DefaultCardHeader />}
     </div>
   );
 }
