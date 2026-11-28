@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: 	AGPL-3.0-or-later
 
 import useAccessToken from "../hooks/useAccessToken";
+import useScopedAccessToken from "../hooks/useScopedAccessToken";
 import {
   Card,
   CardContent,
@@ -16,6 +17,16 @@ import {
   type Surface,
 } from "@/lib/surface";
 
+// the token is created at the scope useScopedAccessToken resolves to,
+// so the confirmation has to name that scope
+const accessTokenKind = (scopedUrl: string) => {
+  if (scopedUrl.includes("/assets/")) return "asset access token";
+  if (scopedUrl.includes("/projects/")) return "project access token";
+  if (scopedUrl.startsWith("/organizations/"))
+    return "organization access token";
+  return "personal access token";
+};
+
 const DevguardTokenCard = ({
   title = "Create a new variable / secret",
   variant,
@@ -28,6 +39,7 @@ const DevguardTokenCard = ({
 }) => {
   const { accessToken: pat, onCreateAccessToken: onCreatePat } =
     useAccessToken();
+  const tokenKind = accessTokenKind(useScopedAccessToken());
   return (
     <Card className={innerCardClassName(variant)}>
       <CardHeader>
@@ -64,9 +76,8 @@ const DevguardTokenCard = ({
                   expiryDateUnix:
                     Math.floor(Date.now() / 1000) + 365 * 24 * 60 * 60,
                 }),
-              updateConfirmTitle: "Create new personal access token",
-              updateConfirmDescription:
-                "Are you sure you want to create a new personal access token? Make sure to copy it, as you won't be able to see it again.",
+              updateConfirmTitle: `Create new ${tokenKind}`,
+              updateConfirmDescription: `Are you sure you want to create a new ${tokenKind}? Make sure to copy it, as you won't be able to see it again.`,
             }}
           />
         </div>
